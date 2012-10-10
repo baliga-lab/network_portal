@@ -576,4 +576,50 @@ class Bicluster_Function(models.Model):
     p_b = models.FloatField(blank=True, null=True)
     method = models.CharField(max_length=30, blank=True, null=True)
 
+class WorkflowCategories(models.Model):
+    name = models.CharField(max_length=255)
 
+class ComponentTypes(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.CharField(max_length = 255)
+
+class ComponentIOTypes(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.CharField(max_length=1024)
+    type = models.IntegerField(blank=True, null=True)
+    
+    
+class WorkflowComponents(models.Model):
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=64)
+    category = models.ForeignKey(WorkflowCategories)
+    description = models.CharField(max_length = 1024, blank=True, null=True)
+    type = models.ForeignKey(ComponentTypes)
+    input = models.ForeignKey(ComponentIOTypes, related_name='InputType')
+    output = models.ForeignKey(ComponentIOTypes, related_name='OutputType')
+    imgurl = models.CharField(max_length = 1024, blank=True, null=True)
+    guistring = models.CharField(max_length = 2048, blank=True, null=True)
+    serviceurl = models.CharField(max_length = 1024, blank=True, null=True)
+
+class Users(models.Model):
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    password = models.CharField(max_length=255, blank=True, null=True)
+    organization = models.CharField(max_length=255, blank=True, null=True)
+
+class Workflows(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=1024, blank=True, null=True)
+    owner = models.ForeignKey(Users)
+    shared = models.BooleanField(default=True)
+
+class WorkflowEdgeTypes(models.Model):
+    name = models.CharField(max_length=64)
+
+class WorkflowEdges(models.Model):
+    workflow = models.ForeignKey(Workflows)
+    source = models.ForeignKey(WorkflowComponents, related_name='source')
+    target = models.ForeignKey(WorkflowComponents, related_name='target')
+    type = models.ForeignKey(WorkflowEdgeTypes)
+    
