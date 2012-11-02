@@ -614,12 +614,22 @@ class Workflows(models.Model):
     owner = models.ForeignKey(Users)
     shared = models.BooleanField(default=True)
 
+class WorkflowNodes(models.Model):
+    serviceuri = models.CharField(max_length=1024)
+    subaction = models.CharField(max_length=255, blank=True, null=True)
+    datauri = models.CharField(max_length=1024, blank=True, null=True)
+    workflow = models.ForeignKey(Workflows)
+    component = models.ForeignKey(WorkflowComponents)
+
+
 class WorkflowEdgeTypes(models.Model):
     name = models.CharField(max_length=64)
 
 class WorkflowEdges(models.Model):
     workflow = models.ForeignKey(Workflows)
-    source = models.ForeignKey(WorkflowComponents, related_name='source')
-    target = models.ForeignKey(WorkflowComponents, related_name='target')
-    type = models.ForeignKey(WorkflowEdgeTypes)
-    
+    sourcenode = models.ForeignKey(WorkflowNodes, related_name='sourcenode')
+    targetnode = models.ForeignKey(WorkflowNodes, related_name='targetnode')
+    #sourceid = models.CharField(max_length = 255)
+    #targetid = models.CharField(max_length = 255)
+    datatype = models.ForeignKey(WorkflowEdgeTypes, related_name='datatype')
+    paralleltype = models.ForeignKey(WorkflowEdgeTypes, related_name='paralleltype')

@@ -90,10 +90,39 @@ def workflow(request):
 
     return render_to_response('workflow.html', locals())
 
+class WorkflowEdge:
+    def __init__(self):
+        self.paralleltype = 1
+
+    def setSourceID(self, sourceid):
+        self.sourceid = sourceid
+    
+    def getSourceID(self):
+        return self.sourceid     
+                    
+    def setTargetID(self, targetid):
+        self.targetid = targetid
+
+    def getTargetID(self):
+        return self.targetid
+
+    def setDataType(self, datatype):
+        self.datatype = datatype
+
+    def getDataType(self):
+        return self.datatype
+
+    def setParallelType(self, paralleltype):
+        self.paralleltype = paralleltype
+
+    def getParallelType(self):
+        return self.paralleltype
+
+
 @csrf_exempt
 def saveworkflow(request):
     print "Save workflow"
-    #print request.raw_post_data
+    print request.raw_post_data
 
     try:
         workflow = json.loads(request.raw_post_data)
@@ -102,7 +131,6 @@ def saveworkflow(request):
         error = {'status':500, 'desc':wfdesc }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
-    # Iterate through the stuff in the list
     wfname = workflow['name']
     wfdesc = workflow['desc']
     wfownerid = workflow['userid']
@@ -112,15 +140,70 @@ def saveworkflow(request):
         workflowentry = Workflows(name = wfname, description = wfdesc, owner_id = int(wfownerid))
         workflowentry.save()
         wfid = workflowentry.id
-        #print str(wfid)
-   
-        # save the edges of the workflow
-        edgelist = workflow['edgelist']
-        for key in edgelist.keys(): #key is the source node
-            #print key
-            #print edgelist[key]['node']
-            record = WorkflowEdges(workflow_id = wfid, source_id = int(key), target_id = int(edgelist[key]['node']), type_id = int(edgelist[key]['type']))
+        print "Workflow saved with id: " + str(wfid)
+
+        # save workflow nodes
+        nodelist = workflow['workflownodes']
+        nodeobjs = {}
+        for key in nodelist.keys():
+            if (nodeobjs.has_key(nodelist[key]['id'])):
+                node = nodeobjs[nodelist[key]['id']]
+            else:
+                node = WorkflowNodes(serviceuri = nodelist[key]['serviceuri'],
+                                     subaction = nodelist[key]['subaction'],
+                                     datauri = nodelist[key]['datauri'],
+                                     component_id = nodelist[key]['componentid'],
+                                     workflow_id = wfid)
+                node.save()
+                nodeobjs[nodelist[key]['id']] = node
+                print "Node saved with id: " + str(node.id)
+
+
+        # save workflow edges
+        edgelist = workflow['workflowedges']
+        edgeobjs = {}
+        for key in edgelist.keys(): #key is the indexed property names such as sourceid_0, targetid_0, etc
+            print key
+            edgeindx = int(re.split('_', key)[1])
+            #print edgeindx
+            propname = re.split('_', key)[0]
+            print propname
+
+            edgeobj = WorkflowEdge()
+            if edgeobjs.has_key(str(edgeindx)):
+                edgeobj = edgeobjs[str(edgeindx)]
+            else:
+                print 'Starting an edge object'
+                edgeobjs[str(edgeindx)] = edgeobj
+
+            print 'Setting value'
+            if (propname == 'sourceid'):
+                edgeobj.setSourceID(edgelist[key])
+            elif (propname == 'targetid'):
+                edgeobj.setTargetID(edgelist[key])
+            elif (propname == 'datatype'):
+                edgeobj.setDataType(int(edgelist[key]))
+            elif (propname == 'isparallel'):
+                edgeobj.setParallelType(int(edgelist[key]))
+        
+        print 'Saving edges...'
+        for key in edgeobjs.keys():
+            edgeobj = edgeobjs[key]
+            sourceid = edgeobj.getSourceID()
+            sourcenode = nodeobjs[sourceid]
+            print "Source node id: " + str(sourcenode.id)
+            targetid = edgeobj.getTargetID()
+            targetnode = nodeobjs[targetid]
+            record = WorkflowEdges(workflow_id = wfid, 
+                                   sourcenode_id = sourcenode.id,
+                                   targetnode_id = targetnode.id,
+                                   #sourceid = edgeobj.getSourceID(),
+                                   #targetid = edgeobj.getTargetID(),
+                                   datatype_id = edgeobj.getDataType(),
+                                   paralleltype_id = edgeobj.getParallelType())
             record.save()
+
+
     except Exception as e:
         print str(e)
         return HttpResponse(json.dumps(e))
@@ -132,27 +215,38 @@ def getworkflow(request, workflow_id):
     print "Get workflow"
     #print request.raw_post_data
 
-    #try:
-    #    query = json.loads(request.raw_get_data)
-    #except Exception as e:
-    #    print str(e)
-    #    error = {'status':500, 'message': 'Failed to parse json data' }
-    #    return HttpResponse(json.dumps(error), mimetype='application/json')
 
     try:
         data_dict = {}
-        targetid = workflow_id
-        workflow = (Workflows.objects.filter(id = targetid))[0]
-        edges = WorkflowEdges.objects.filter(workflow_id = targetid)
+        workflowid = workflow_id
+        workflow = (Workflows.objects.filter(id = workflowid))[0]
+        nodes = WorkflowNodes.objects.filter(workflow_id = workflowid)
+        edges = WorkflowEdges.objects.filter(workflow_id = workflowid)
+
         data_dict = {'id': workflow.id, 'name': workflow.name, 'desc': workflow.description}
-        edges_obj = {};
+
+        nodes_obj = {}
+        for node in nodes:
+            node_dict = {}
+            print node.serviceuri
+            node_dict = {'id': node.id, 'serviceuri': node.serviceuri, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
+            nodes_obj[node.id] = node_dict
+
+
+        edges_obj = {}
         idx = 0
         for edge in edges:
             edge_dict = {}
-            edge_dict = {'source': edge.source_id, 'target': edge.target_id, 'type': edge.type_id}
+            datatype = WorkflowEdgeTypes.objects.filter(id = edge.datatype_id)[0]
+            paralleltype = WorkflowEdgeTypes.objects.filter(id = edge.paralleltype_id)[0]
+            print datatype.name
+            edge_dict = {'sourcenodeid': edge.sourcenode_id, 'targetnodeid': edge.targetnode_id, 'datatype': datatype.name, 'paralleltype': paralleltype.name}
             edges_obj[str(idx)] = edge_dict
             idx = idx + 1
+
         data_dict['edges'] = edges_obj
+        data_dict['nodes'] = nodes_obj
+
         print json.dumps(data_dict)
         return HttpResponse(json.dumps(data_dict), mimetype='application/json')
     except Exception as e:
