@@ -3,6 +3,7 @@
 
 
 {% block content %}<div class="main">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.15-all-min.js'></script>
@@ -33,8 +34,8 @@ Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start th
 <td></td>
 <td colspan="2">
 <input type="button" value="Run" onclick="SubmitWorkflow()" />
-<input type="button" value="Save" onclick="SaveWorkflow()" />
-<input type="button" value="Clear" onclick="ClearWorkflowCanvas()" />
+<input type="button" value="Save" onclick="ShowSaveWorkflowDlg()" />
+<input type="button" value="Clear" onclick="InitializeWorkflow()" />
 </td>
 </tr>
 <tr>
@@ -47,13 +48,14 @@ Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start th
                {% for component in wfentry.Components %}
                    <li>
                         <div class="component" id='component_{{component.id|stringformat:"i"}}'>
-                            <p>{{component.short_name}}</p>
-                            <input type="text" value="{{component.serviceurl}}" class="componentchild"
+                        <div class="componenttitle">{{component.short_name}}</div>
+                        <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
+                        <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
                                     title="Enter the url or path to the executable of the component"/>
-                            <input type="text" placeholder="Enter subaction"
-                                   title="Enter subaction (for example, a web handler for firegoose)" class="componentchild"/>
-                            <input type="text" placeholder="Enter data url"
-                                   title="Enter the url of data to be opened by the component" class="componentchild"/>
+                        <input class="componentchildinput" type="text" placeholder="Enter subaction"
+                                   title="Enter subaction (for example, a web handler for firegoose)"/>
+                        <input class="componentchildinput" type="text" placeholder="Enter data url"
+                                   title="Enter the url of data to be opened by the component"/>
                         </div>
                    </li>
                {% endfor %}
@@ -83,20 +85,13 @@ Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start th
 
 <p id="result"></p>
 
-<div id="dlgSave">
-    <div class="window">
-        <b>Save Workflow</b>
-        <span id="txt">Workflow Name: </span><input type="text" id="inputWFName" />
-        <span id="Span1">Description: </span><input type="text" id="inputWFDesc" />
-        <br />
-        <button onclick="hm('dlgSave');SaveOKSelected()">OK</button><button onclick="hm('box');SaveCancelSelected()">Cancel</button>
-    </div>
-
-    <!-- Do not remove div#mask, because you'll need it to fill the whole screen --> 
-    <div id="mask"></div>
-</div>
 <div id="dialog" title="Start Boss">
    <p>Boss is not running. Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start the boss</p>
+</div>
+
+<div id="dlgsaveworkflow" class="dlgsaveworkflow" title="Save Workflow">
+    <p>Name: <input type="text" /></p>
+    <p>Description: <input type="text" /></p>
 </div>
 </div>
 {% endblock %}

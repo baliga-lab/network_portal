@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.utils import simplejson as json
+from django.db import transaction
 
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
@@ -131,77 +132,93 @@ def saveworkflow(request):
         error = {'status':500, 'desc':wfdesc }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
-    wfname = workflow['name']
-    wfdesc = workflow['desc']
-    wfownerid = workflow['userid']
-
     try:
-        # save the workflow info
-        workflowentry = Workflows(name = wfname, description = wfdesc, owner_id = int(wfownerid))
-        workflowentry.save()
-        wfid = workflowentry.id
-        print "Workflow saved with id: " + str(wfid)
+        # put the whole thing in a transaction
+        with transaction.commit_on_success():
+            wfname = workflow['name']
+            wfdesc = workflow['desc']
+            wfownerid = workflow['userid']
+            wfid = workflow['workflowid']
 
-        # save workflow nodes
-        nodelist = workflow['workflownodes']
-        nodeobjs = {}
-        for key in nodelist.keys():
-            if (nodeobjs.has_key(nodelist[key]['id'])):
-                node = nodeobjs[nodelist[key]['id']]
+            if wfid:
+                    # this is an existing workflow
+                    # we first remove all the nodes and edges of that workflow
+                    WorkflowEdges.objects.filter(workflow_id = wfid).delete()
+                    WorkflowNodes.objects.filter(workflow_id = wfid).delete()
+                    print "All workflow nodes and edges removed"
+                    # update workflow info
             else:
-                node = WorkflowNodes(serviceuri = nodelist[key]['serviceuri'],
-                                     subaction = nodelist[key]['subaction'],
-                                     datauri = nodelist[key]['datauri'],
-                                     component_id = nodelist[key]['componentid'],
-                                     workflow_id = wfid)
-                node.save()
-                nodeobjs[nodelist[key]['id']] = node
-                print "Node saved with id: " + str(node.id)
+                # save the workflow info
+                workflowentry = Workflows(name = wfname, description = wfdesc, owner_id = int(wfownerid))
+                workflowentry.save()
+                wfid = workflowentry.id
+                print "Workflow saved with id: " + str(wfid)
+
+            # save workflow nodes
+            nodelist = workflow['workflownodes']
+            nodeobjs = {}
+            for key in nodelist.keys():
+                print 'key: ' + key
+                print 'node ID: ' + nodelist[key]['id']
+                print 'service uri: ' + nodelist[key]['serviceuri']
+                if (nodeobjs.has_key(nodelist[key]['id'])):
+                    node = nodeobjs[nodelist[key]['id']]
+                else:
+                    node = WorkflowNodes(serviceuri = nodelist[key]['serviceuri'],
+                                         subaction = nodelist[key]['subaction'],
+                                         datauri = nodelist[key]['datauri'],
+                                         component_id = nodelist[key]['componentid'],
+                                         workflow_id = wfid)
+                    node.save()
+                    nodeobjs[nodelist[key]['id']] = node
+                    print "Node saved with id: " + str(node.id)
 
 
-        # save workflow edges
-        edgelist = workflow['workflowedges']
-        edgeobjs = {}
-        for key in edgelist.keys(): #key is the indexed property names such as sourceid_0, targetid_0, etc
-            print key
-            edgeindx = int(re.split('_', key)[1])
-            #print edgeindx
-            propname = re.split('_', key)[0]
-            print propname
+            # save workflow edges
+            edgelist = workflow['workflowedges']
+            edgeobjs = {}
+            for key in edgelist.keys(): #key is the indexed property names such as sourceid_0, targetid_0, etc
+                print key
+                edgeindx = int(re.split('_', key)[1])
+                #print edgeindx
+                propname = re.split('_', key)[0]
+                print propname
 
-            edgeobj = WorkflowEdge()
-            if edgeobjs.has_key(str(edgeindx)):
-                edgeobj = edgeobjs[str(edgeindx)]
-            else:
-                print 'Starting an edge object'
-                edgeobjs[str(edgeindx)] = edgeobj
+                edgeobj = WorkflowEdge()
+                if edgeobjs.has_key(str(edgeindx)):
+                    edgeobj = edgeobjs[str(edgeindx)]
+                else:
+                    print 'Starting an edge object'
+                    edgeobjs[str(edgeindx)] = edgeobj
 
-            print 'Setting value'
-            if (propname == 'sourceid'):
-                edgeobj.setSourceID(edgelist[key])
-            elif (propname == 'targetid'):
-                edgeobj.setTargetID(edgelist[key])
-            elif (propname == 'datatype'):
-                edgeobj.setDataType(int(edgelist[key]))
-            elif (propname == 'isparallel'):
-                edgeobj.setParallelType(int(edgelist[key]))
-        
-        print 'Saving edges...'
-        for key in edgeobjs.keys():
-            edgeobj = edgeobjs[key]
-            sourceid = edgeobj.getSourceID()
-            sourcenode = nodeobjs[sourceid]
-            print "Source node id: " + str(sourcenode.id)
-            targetid = edgeobj.getTargetID()
-            targetnode = nodeobjs[targetid]
-            record = WorkflowEdges(workflow_id = wfid, 
-                                   sourcenode_id = sourcenode.id,
-                                   targetnode_id = targetnode.id,
-                                   #sourceid = edgeobj.getSourceID(),
-                                   #targetid = edgeobj.getTargetID(),
-                                   datatype_id = edgeobj.getDataType(),
-                                   paralleltype_id = edgeobj.getParallelType())
-            record.save()
+                print 'Setting value of ' + propname + ' for edge ' + str(edgeindx)
+                if (propname == 'sourceid'):
+                    edgeobj.setSourceID(edgelist[key])
+                elif (propname == 'targetid'):
+                    edgeobj.setTargetID(edgelist[key])
+                elif (propname == 'datatypeid'):
+                    edgeobj.setDataType(int(edgelist[key]))
+                elif (propname == 'isparallel'):
+                    edgeobj.setParallelType(int(edgelist[key]))
+
+            print 'Saving edges...'
+            for key in edgeobjs.keys():
+                edgeobj = edgeobjs[key]
+                sourceid = edgeobj.getSourceID()
+                sourcenode = nodeobjs[sourceid]
+                targetid = edgeobj.getTargetID()
+                targetnode = nodeobjs[targetid]
+
+                print 'Source node id: ' + sourceid + '=> ' + targetid
+
+                record = WorkflowEdges(workflow_id = wfid,
+                                       sourcenode_id = sourcenode.id,
+                                       targetnode_id = targetnode.id,
+                                       #sourceid = edgeobj.getSourceID(),
+                                       #targetid = edgeobj.getTargetID(),
+                                       datatype_id = edgeobj.getDataType(),
+                                       paralleltype_id = edgeobj.getParallelType())
+                record.save()
 
 
     except Exception as e:

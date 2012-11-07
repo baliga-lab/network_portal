@@ -1485,51 +1485,55 @@ table#motif {
     height: 40px;
 }
 
-.componentchild
+.componenttitle
+{
+    margin-bottom: 15px;
+}
+
+.componentchildinput
+{
+    display: none;
+}
+
+.componentclose
 {
     display: none;
 }
 
 .workflowcomponent
-{ 
+{
     padding: 0.5em;
     background: transparent;
     position: absolute;
     border-style:solid;
     border-width: 3px;
-    overflow: auto;
     width: 150px;
-    height: 60px;
+    height: 70px;
+    overflow: auto;
 }
 
+.workflowcomponentclose
+{
+    display: block;
+    height: 10px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    text-indent: -900em;
+    top: 4px;
+    width: 10px;
+}
 
-.workflowcomponentchild
+.workflowcomponentchildinput
 {
    display: block;
-   width: 120px;
-   height: 40px;
-   font-size: 6px;
+   width: 140px;
+   height: 20px;
+   font-size: 0.5em;
 }
-/* Z-index of #mask must lower than #boxes .window */
-#mask {
-  position:absolute;
-  z-index:9000;
-  background-color:#000;
-  display:none;
-}
-   
-#dlgSave .window {
-  position:fixed;
-  width:440px;
-  height:200px;
-  display:none;
-  z-index:9999;
-  padding:20px;
-}
- 
- 
-/* Customize your modal window here, you can add background image too */
-#dlgSave #dialog {
-  width:375px; 
-  height:203px;
+
+.dlgsaveworkflow
+{
+    display: none;
+    border-width: 2px;
 }
