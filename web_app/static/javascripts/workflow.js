@@ -1,6 +1,9 @@
 // Workflow logic
 var wfcnt = 0;
 var currWorkflowID = "";
+var currWorkflowName = "";
+var currWorkflowDesc = "";
+
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
     endpoint: "Dot",
@@ -75,7 +78,9 @@ function on_socket_get(message) {
 function InitializeWorkflow()
 {
     ClearWorkflowCanvas();
-    CurrWorkflowID = "";
+    currWorkflowID = "";
+    currWorkflowName = "";
+    currWorkflowDesc = "";
 }
 
 // Callback when a connection is established between two UI components
@@ -196,7 +201,7 @@ function ExtractWorkflow() {
 
                     var serviceurlelement = $(source).children()[2];
                     //alert(serviceurlelement);
-                    alert("Service uri: " + $(serviceurlelement).attr("value"));
+                    //alert("Service uri: " + $(serviceurlelement).attr("value"));
                     var subactionelement = $(source).children()[3];
                     var dataurielement = $(source).children()[4];
                     //alert($(dataurielement).attr("value"));
@@ -282,6 +287,15 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
 // of the workflow
 function ShowSaveWorkflowDlg()
 {
+    var p1 = ($("#dlgsaveworkflow").children())[0];
+    var nameinput = ($(p1).children())[0];
+    $(nameinput).attr("value", currWorkflowName);
+    //alert("Workflow name: " + name);
+
+    var p2 = ($("#dlgsaveworkflow").children())[1];
+    var descinput = ($(p2).children())[0];
+    $(descinput).attr("value", currWorkflowDesc);
+
     $( "#dlgsaveworkflow" ).dialog({
             resizable: false,
             height:300,
@@ -291,11 +305,13 @@ function ShowSaveWorkflowDlg()
                     var p1 = ($("#dlgsaveworkflow").children())[0];
                     var nameinput = ($(p1).children())[0];
                     var name = $(nameinput).attr("value");
-                    alert("Workflow name: " + name);
+                    currWorkflowName = name;
+                    //alert("Workflow name: " + name);
 
                     var p2 = ($("#dlgsaveworkflow").children())[1];
                     var descinput = ($(p2).children())[0];
                     var desc = $(descinput).attr("value");
+                    currWorkflowDesc = desc;
 
                     //alert("Saving workflow " + currWorkflowID);
                     SaveWorkflow(name, desc, currWorkflowID, 1);
@@ -314,7 +330,7 @@ function SubmitWorkflow() {
 
     if (ConnectToGaggle()) {
         ExtractWorkflow();
-        var jsonObj = ConstructWorkflowJSON("Workflow", "Hello world", currWorkflowID, "1");
+        var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, "1");
         var jsonString = JSON.stringify(jsonObj);
         //alert(jsonString);
         SubmitWorkflowToBoss(jsonString);
@@ -503,6 +519,8 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt) {
 function DisplayWorkflow(flowdata) {
     if (flowdata != undefined) {
         //alert(flowdata.name);
+        currWorkflowName = flowdata.name;
+        currWorkflowDesc = flowdata.desc;
         nodes_obj = flowdata.nodes;
         edges_obj = flowdata.edges;
         var processedNodes = {};
@@ -560,27 +578,15 @@ function GetComponentId(idstr) {
 
 function RemoveComponent(clicktarget)
 {
-     //alert("In RemoveComponent");
      var target = clicktarget;
      var component = $(target).parent();
      var componentid = $(component).attr("id");
      //alert($(component).attr("id"));
 
-     /*var connectionList = jsPlumb.getConnections();
-     for (i = 0; i < connectionList.length; i++) {
-          var conn = connectionList[i];
-          var source = conn.source;
-          var target = conn.target;
-          var sourceid = $(source).attr("id");
-          var targetid = $(target).attr("id");
-          alert("Connection source ID: " + $(source).attr("id") + " target ID: " + $(target).attr("id"));
-          if (sourceid == componentid || targetid == componentid)
-          {
-              //alert("Remove connection...");
-              jsPlumb.detach(conn);
-          }
-     } */
-
+     // Make sure the components are placed with position:absolute. If using
+     // relative position, removing a component will cause others to shift locations
+     // and JSPlumb will display the endpoints incorrectly.
+     // See the SearchAndCreateNode function for details.
      jsPlumb.selectEndpoints({ source: component }).each(
                                           function (ep) {
                                               jsPlumb.deleteEndpoint(ep);
