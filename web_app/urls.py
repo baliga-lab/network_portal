@@ -10,10 +10,20 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'network_portal.views.home', name='home'),
     # url(r'^network_portal/', include('network_portal.foo.urls')),
+
+    # url('', include('social_auth.urls')),
+
     url(r'^$', 'web_app.views.home', name='home'),
+    #url(r'^openid/complete/\w*$', 'web_app.views.logincomplete', name='about'),
+
+    # django_openid_auth
+    url(r'^openid/', include('django_openid_auth.urls')),
     url(r'^about$', 'web_app.views.about', name='about'),
     url(r'^contact$', 'web_app.views.contact', name='contact'),
+    url(r'^workflow/getedgedatatypes/\w*$', 'web_app.views.getedgedatatypes', name='getedgedatatypes'),
+    url(r'^workflow/saveedge/$', 'web_app.views.saveedge', name='saveedge'),
     url(r'^workflow/save', 'web_app.views.saveworkflow', name='saveworkflow'),
+    url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'web_app.views.deleteworkflow', name='saveworkflow'),
     url(r'^workflow/(?P<workflow_id>\d+)/$', 'web_app.views.getworkflow', name='getworkflow'),
     url(r'^workflow$', 'web_app.views.workflow', name='workflow'),
     url(r'^search', 'web_app.views.search', name='search'),

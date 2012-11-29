@@ -1477,6 +1477,49 @@ table#motif {
     display: inline;
 }
 
+
+.tblWorkflow
+{
+    width: 860px;
+}
+
+.tdcomponents
+{
+    width: 100px;
+    overflow: hidden;
+}
+
+.divcomponents
+{
+    width:100px;
+    height: 600px;
+    overflow: auto;
+}
+
+.tdlistworkflow {
+    overflow: hidden;
+    width: 100px;
+}
+
+.divWorkflow
+{
+    overflow: auto;
+    width: 100px;
+    height: 600px;
+}
+
+.tdworkflowcanvas
+{
+    width: 600px;
+}
+
+.workflowcanvas
+{
+    background-color: transparent;
+    width:600px;
+    height: 600px"
+}
+
 .component  
 {
     padding: 0.5em; 
@@ -1532,7 +1575,18 @@ table#motif {
    font-size: 0.5em;
 }
 
+.dataLabel
+{
+
+}
+
 .dlgsaveworkflow
+{
+    display: none;
+    border-width: 2px;
+}
+
+.dlgauthenticationalert
 {
     display: none;
     border-width: 2px;

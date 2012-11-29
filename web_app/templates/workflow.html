@@ -8,6 +8,7 @@
 <script src="http://www.java.com/js/deployJava.js"></script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.15-all-min.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/handlers/GaggleMicroformatHandler.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/gaggleData.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/gaggleDataHolder.js"></script>
@@ -20,27 +21,29 @@
 <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
 </applet>
 
-Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start the boss</p>
-
-<input type="text" id="htmlLoader" />
+<!-- <input type="text" id="htmlLoader" />
 <input type="button" value="Load" onclick="LoadHTML()" />
 <input type="button" value="Filter" onclick="FilterHTML()" />
-<div id="divHTMLResult"></div>
+<div id="divHTMLResult"></div> -->
 
 </div>
-<table id="tblWorkflow">
+<table id="tblWorkflow" class="tblWorkflow">
 <tbody>
 <tr>
 <td></td>
-<td colspan="2">
+<td style="width: 600px">
+<a href='http://localhost:8000/static/jnlp/boss.jnlp'>start the boss</a>
 <input type="button" value="Run" onclick="SubmitWorkflow()" />
-<input type="button" value="Save" onclick="ShowSaveWorkflowDlg()" />
+<input type="button" value="Save" onclick="SaveClicked()" />
+<input type="button" value="Delete" onclick="DeleteClicked()" />
 <input type="button" value="Clear" onclick="InitializeWorkflow()" />
+</td>
+<td style="width: 100px">
 </td>
 </tr>
 <tr>
 <td>
-<div id="components" style="width:150px; height: 600px">
+<div id="components" class="divcomponents">
     {% if wfentries.count > 0 %}
         {% for wfentry in wfentries %}
             <p><strong>{{wfentry.Category.name}}</strong></p>
@@ -51,11 +54,14 @@ Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start th
                         <div class="componenttitle">{{component.short_name}}</div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
                         <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
-                                    title="Enter the url or path to the executable of the component"/>
+                                   title="Enter the url or path to the executable of the component"/>
+                        <input class="componentchildinput" type="text" value="{{component.arguments}}"
+                                   title="Enter the arguments of the component"/>
                         <input class="componentchildinput" type="text" placeholder="Enter subaction"
                                    title="Enter subaction (for example, a web handler for firegoose)"/>
                         <input class="componentchildinput" type="text" placeholder="Enter data url"
                                    title="Enter the url of data to be opened by the component"/>
+                        <input type="hidden" value="{{component.name}}" />
                         </div>
                    </li>
                {% endfor %}
@@ -67,12 +73,12 @@ Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start th
 <td>
 <div id="workflowcanvas" style="background-color: transparent; width:500px; height: 600px"></div>
 </td>
-<td>
-    <div id="divWorkflow">
+<td class="tdlistworkflow">
+    <div id="divWorkflow" class="divWorkflow">
     <ul>
     {% if myworkflows.count > 0 %}
         {% for workflow in myworkflows %}
-            <li><a href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
+            <li id='liwf_{{workflow.id|stringformat:"i"}}'><a href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
         {% endfor %}
     {% endif %}
     </ul>
@@ -85,13 +91,19 @@ Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start th
 
 <p id="result"></p>
 
-<div id="dialog" title="Start Boss">
-   <p>Boss is not running. Click <a href='http://localhost:8000/static/jnlp/boss.jnlp'>here</a> to start the boss</p>
-</div>
-
 <div id="dlgsaveworkflow" class="dlgsaveworkflow" title="Save Workflow">
     <p>Name: <input type="text" /></p>
     <p>Description: <input type="text" /></p>
 </div>
+
+<div id="dlgauthenticationalert" class="dlgauthenticationalert" title="Warning">
+    <p>Do you want to login and save the workflow?</p>
+</div>
+
+<div id="dlgdeletealert" class="dlgauthenticationalert" title="Warning">
+    <p>Do you really want to delete the workflow?</p>
+</div>
+
+<input id="authenticated" type="hidden" value="{{isauthenticated}}" />
 </div>
 {% endblock %}

@@ -579,14 +579,14 @@ class Bicluster_Function(models.Model):
 class WorkflowCategories(models.Model):
     name = models.CharField(max_length=255)
 
-class ComponentTypes(models.Model):
-    name = models.CharField(max_length=64)
-    description = models.CharField(max_length = 255)
+#class ComponentTypes(models.Model):
+#    name = models.CharField(max_length=64)
+#    description = models.CharField(max_length = 255)
 
-class ComponentIOTypes(models.Model):
-    name = models.CharField(max_length=64)
-    description = models.CharField(max_length=1024)
-    type = models.IntegerField(blank=True, null=True)
+#class ComponentIOTypes(models.Model):
+#    name = models.CharField(max_length=64)
+#    description = models.CharField(max_length=1024)
+#    type = models.IntegerField(blank=True, null=True)
     
     
 class WorkflowComponents(models.Model):
@@ -594,18 +594,16 @@ class WorkflowComponents(models.Model):
     short_name = models.CharField(max_length=64)
     category = models.ForeignKey(WorkflowCategories)
     description = models.CharField(max_length = 1024, blank=True, null=True)
-    type = models.ForeignKey(ComponentTypes)
-    input = models.ForeignKey(ComponentIOTypes, related_name='InputType')
-    output = models.ForeignKey(ComponentIOTypes, related_name='OutputType')
     imgurl = models.CharField(max_length = 1024, blank=True, null=True)
     guistring = models.CharField(max_length = 2048, blank=True, null=True)
     serviceurl = models.CharField(max_length = 1024, blank=True, null=True)
+    arguments = models.CharField(max_length=1024, null=True)
 
 class Users(models.Model):
     firstname = models.CharField(max_length=255)
     lastname = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
-    password = models.CharField(max_length=255, blank=True, null=True)
+    password = models.CharField(max_length=2048, blank=True, null=True)
     organization = models.CharField(max_length=255, blank=True, null=True)
 
 class Workflows(models.Model):
@@ -616,13 +614,14 @@ class Workflows(models.Model):
 
 class WorkflowNodes(models.Model):
     serviceuri = models.CharField(max_length=1024)
+    arguments = models.CharField(max_length=1024, null=True)
     subaction = models.CharField(max_length=255, blank=True, null=True)
     datauri = models.CharField(max_length=1024, blank=True, null=True)
     workflow = models.ForeignKey(Workflows)
     component = models.ForeignKey(WorkflowComponents)
 
 
-class WorkflowEdgeTypes(models.Model):
+class WorkflowEdgeDataTypes(models.Model):
     name = models.CharField(max_length=64)
 
 class WorkflowEdges(models.Model):
@@ -631,5 +630,5 @@ class WorkflowEdges(models.Model):
     targetnode = models.ForeignKey(WorkflowNodes, related_name='targetnode')
     #sourceid = models.CharField(max_length = 255)
     #targetid = models.CharField(max_length = 255)
-    datatype = models.ForeignKey(WorkflowEdgeTypes, related_name='datatype')
-    paralleltype = models.ForeignKey(WorkflowEdgeTypes, related_name='paralleltype')
+    datatype = models.ForeignKey(WorkflowEdgeDataTypes, related_name='datatype')
+    paralleltype = models.IntegerField(default = 1)

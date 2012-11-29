@@ -9,6 +9,7 @@ from django.template.loader import get_template
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
+#from social_auth.backends.google import GoogleOAuth2
 from django.utils import simplejson as json
 from django.db import transaction
 
@@ -43,6 +44,10 @@ class GeneResultEntry:
 
 
 def home(request):
+    #print request.REQUEST
+    #print request.user.username
+    #print request.user.first_name  + ' ' + request.user.last_name + ' ' + request.user.email
+
     genes = Gene.objects.all()
     bicl_count = Bicluster.objects.count()
     sp_count = Species.objects.count()
@@ -63,9 +68,23 @@ class WorkFlowEntry:
     def __init__(self, category, components):
         self.Category = category
         self.Components = components
-        
+
+def createuser(user):
+    print 'creating user...'
+    if user.is_authenticated():
+        record = Users(firstname = user.first_name,
+                       lastname = user.last_name,
+                       email = user.email,
+                       password = '')
+        record.save()
+        return (record)
+    return
+
 def workflow(request):
+    #print request.REQUEST
     print "workflow page"
+    #print request.user.username
+    #print request.user.first_name
     wfentries = []
     wfcategories = WorkflowCategories.objects.all()
     for category_obj in wfcategories:
@@ -73,7 +92,16 @@ def workflow(request):
         wfentries.append(wfentry)
         print("Category " + str(category_obj.id) + ": " + str(wfentries.count))
 
-    myworkflows = Workflows.objects.filter(owner_id = 1)
+    isauthenticated = "false"
+    if request.user.is_authenticated():
+        isauthenticated = "true"
+        dbuser = Users.objects.filter(email = request.user.email)
+        if (len(dbuser) > 0):
+            user = dbuser[0]
+        elif (len(dbuser) == 0):
+            user = createuser(request.user)
+        myworkflows = Workflows.objects.filter(owner_id = user.id)
+
 
     # jpype executes java code
     #try:
@@ -165,6 +193,7 @@ def saveworkflow(request):
                     node = nodeobjs[nodelist[key]['id']]
                 else:
                     node = WorkflowNodes(serviceuri = nodelist[key]['serviceuri'],
+                                         arguments = nodelist[key]['arguments'],
                                          subaction = nodelist[key]['subaction'],
                                          datauri = nodelist[key]['datauri'],
                                          component_id = nodelist[key]['componentid'],
@@ -209,7 +238,7 @@ def saveworkflow(request):
                 targetid = edgeobj.getTargetID()
                 targetnode = nodeobjs[targetid]
 
-                print 'Source node id: ' + sourceid + '=> ' + targetid
+                print 'Source node id: ' + sourceid + '=> ' + targetid + " Data type id: " + str(edgeobj.getDataType())
 
                 record = WorkflowEdges(workflow_id = wfid,
                                        sourcenode_id = sourcenode.id,
@@ -217,7 +246,7 @@ def saveworkflow(request):
                                        #sourceid = edgeobj.getSourceID(),
                                        #targetid = edgeobj.getTargetID(),
                                        datatype_id = edgeobj.getDataType(),
-                                       paralleltype_id = edgeobj.getParallelType())
+                                       paralleltype = edgeobj.getParallelType())
                 record.save()
 
 
@@ -227,6 +256,22 @@ def saveworkflow(request):
 
     data = {'id':str(wfid), 'name':wfname, 'desc':wfdesc }
     return HttpResponse(json.dumps(data), mimetype='application/json')
+
+def deleteworkflow(request, workflowid):
+    print "Delete workflow " + str(workflowid)
+    try:
+        # delete all the edges
+        WorkflowEdges.objects.filter(workflow_id = workflowid).delete()
+        # delete all the nodes
+        WorkflowNodes.objects.filter(workflow_id = workflowid).delete()
+        # delete the workflow
+        Workflows.objects.filter(id = workflowid).delete()
+
+    except Exception as e:
+            print str(e)
+            error = {'status':500, 'message': 'Failed to retreive workflow info' }
+            return HttpResponse(json.dumps(error), mimetype='application/json')
+    return HttpResponse("1")
 
 def getworkflow(request, workflow_id):
     print "Get workflow"
@@ -246,7 +291,7 @@ def getworkflow(request, workflow_id):
         for node in nodes:
             node_dict = {}
             print node.serviceuri
-            node_dict = {'id': node.id, 'serviceuri': node.serviceuri, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
+            node_dict = {'id': node.id, 'serviceuri': node.serviceuri, 'arguments': node.arguments, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
             nodes_obj[node.id] = node_dict
 
 
@@ -254,10 +299,10 @@ def getworkflow(request, workflow_id):
         idx = 0
         for edge in edges:
             edge_dict = {}
-            datatype = WorkflowEdgeTypes.objects.filter(id = edge.datatype_id)[0]
-            paralleltype = WorkflowEdgeTypes.objects.filter(id = edge.paralleltype_id)[0]
+            datatype = WorkflowEdgeDataTypes.objects.filter(id = edge.datatype_id)[0]
+            #paralleltype = WorkflowEdgeDataTypes.objects.filter(id = edge.paralleltype_id)[0]
             print datatype.name
-            edge_dict = {'sourcenodeid': edge.sourcenode_id, 'targetnodeid': edge.targetnode_id, 'datatype': datatype.name, 'paralleltype': paralleltype.name}
+            edge_dict = {'sourcenodeid': edge.sourcenode_id, 'targetnodeid': edge.targetnode_id, 'datatype': datatype.name, 'paralleltype': edge.paralleltype}
             edges_obj[str(idx)] = edge_dict
             idx = idx + 1
 
@@ -271,7 +316,24 @@ def getworkflow(request, workflow_id):
         error = {'status':500, 'message': 'Failed to retreive workflow info' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
-    
+def getedgedatatypes(request):
+   print "get edge data types"
+   edgedatatype_dict = {}
+   for edatatype in WorkflowEdgeDataTypes.objects.all():
+       #print edatatype.name
+       edgedatatype_dict[edatatype.id] = edatatype.name
+   print json.dumps(edgedatatype_dict);
+   return HttpResponse(json.dumps(edgedatatype_dict), mimetype='application/json')
+
+@csrf_exempt
+def saveedge(request):
+    print "save edge"
+    #print request.POST
+    edgetypeid = request.POST['value']
+    #print edgetypeid
+    edgedatatype = WorkflowEdgeDataTypes.objects.filter(id = edgetypeid)[0]
+    #print edgedatatype.name
+    return HttpResponse(edgedatatype.name)
 
 def search(request):
     if request.GET.has_key('q'):
@@ -306,6 +368,47 @@ def search(request):
         except Exception as e:
             error_message = str(e)
     return render_to_response('search.html', locals())
+
+
+# This function is not used now.
+# It extracts the authentication info from response of the openid server
+def logincomplete(request):
+    print "login redirect"
+    print request.REQUEST
+    mode = request.REQUEST['openid.mode']
+    if mode == 'id_res':
+        firstname = request.REQUEST['openid.ext1.value.firstname']
+        lastname = request.REQUEST['openid.ext1.value.lastname']
+        email = request.REQUEST['openid.ext1.value.email']
+        identity = request.REQUEST['openid.identity']
+        print firstname + ' ' + lastname + ' ' + email + ' ' + identity
+        if request.user.is_authenticated():
+            print 'User ' + request.user.username + ' ' + request.user.password + ' authenticated'
+            #request.user.username = email
+            #request.user.first_name = firstname
+            #request.user.last_name = lastname
+            #request.user.email = email
+
+        userresult = Users.objects.filter(password = identity)
+        if (len(userresult) == 0):
+            #Create a user
+            #UserManager manager
+            record = Users(firstname = firstname,
+                           lastname = lastname,
+                           email = email,
+                           password = identity)
+            record.save()
+        else:
+            user = userresult[0]
+            user.firstname = firstname
+            user.lastname = lastname
+            user.email = email
+            user.save()
+        return HttpResponseRedirect('/')
+    else:
+        error_message = "Invalid login."
+
+
 
 def logout_page(request):
     """
