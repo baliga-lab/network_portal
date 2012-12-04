@@ -597,6 +597,7 @@ class WorkflowComponents(models.Model):
     imgurl = models.CharField(max_length = 1024, blank=True, null=True)
     guistring = models.CharField(max_length = 2048, blank=True, null=True)
     serviceurl = models.CharField(max_length = 1024, blank=True, null=True)
+    downloadurl = models.CharField(max_length = 2048, blank = True, null=True)
     arguments = models.CharField(max_length=1024, null=True)
 
 class Users(models.Model):
@@ -614,7 +615,7 @@ class Workflows(models.Model):
 
 class WorkflowNodes(models.Model):
     serviceuri = models.CharField(max_length=1024)
-    arguments = models.CharField(max_length=1024, null=True)
+    arguments = models.CharField(max_length=1024, blank=True, null=True)
     subaction = models.CharField(max_length=255, blank=True, null=True)
     datauri = models.CharField(max_length=1024, blank=True, null=True)
     workflow = models.ForeignKey(Workflows)

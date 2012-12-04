@@ -23,7 +23,7 @@ from web_app.networks.models import *
 from web_app.networks.functions import functional_systems
 from web_app.networks.helpers import get_influence_biclusters
 
-import jpype
+#import jpype
 import openid
 
 import search as s
@@ -92,6 +92,7 @@ def workflow(request):
         wfentries.append(wfentry)
         print("Category " + str(category_obj.id) + ": " + str(wfentries.count))
 
+    userid = ''
     isauthenticated = "false"
     if request.user.is_authenticated():
         isauthenticated = "true"
@@ -100,6 +101,7 @@ def workflow(request):
             user = dbuser[0]
         elif (len(dbuser) == 0):
             user = createuser(request.user)
+        userid = str(user.id)
         myworkflows = Workflows.objects.filter(owner_id = user.id)
 
 

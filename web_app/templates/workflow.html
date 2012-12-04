@@ -51,11 +51,12 @@
                {% for component in wfentry.Components %}
                    <li>
                         <div class="component" id='component_{{component.id|stringformat:"i"}}'>
-                        <div class="componenttitle">{{component.short_name}}</div>
+                        <div class="componenttitle"><a href="{{component.downloadurl}}">{{component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
                         <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
                                    title="Enter the url or path to the executable of the component"/>
                         <input class="componentchildinput" type="text" value="{{component.arguments}}"
+                                   placeholder="Enter the arguments of the component executable"
                                    title="Enter the arguments of the component"/>
                         <input class="componentchildinput" type="text" placeholder="Enter subaction"
                                    title="Enter subaction (for example, a web handler for firegoose)"/>
@@ -104,6 +105,6 @@
     <p>Do you really want to delete the workflow?</p>
 </div>
 
-<input id="authenticated" type="hidden" value="{{isauthenticated}}" />
+<input id="authenticated" type="hidden" value="{{userid}}" />
 </div>
 {% endblock %}

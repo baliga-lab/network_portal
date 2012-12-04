@@ -26,7 +26,7 @@ var sourceWFEndpointOptions = {
 var targetWFEndpointOptions = {
     anchor: "LeftMiddle",
     endpoint: "Rectangle",
-    paintStyle: { width: 8, height: 10, fillStyle: '#666' },
+    paintStyle: { width: 12, height: 12, fillStyle: '#666' },
     maxConnections: -1,
     connector: "StateMachine",
     isTarget: true
@@ -123,6 +123,9 @@ function EditCallback(value, settings) {
     }
  }
 
+// User clicked on the connection
+// We add the label overlay if not yet
+// And hook up the mouseenter event
 function ConnectionClicked(connection)
 {
     var overlays = connection.overlays;
@@ -273,6 +276,26 @@ function componentDropEvent(ev, component) {
     //jsPlumb.connect({ source: e1, target: e2, anchor: "Continuous" });
 }
 
+// Start download a url based on OS
+function startDownload(url)
+{
+    //var url='http://server/folder/file.ext';
+    if (url != null)
+    {
+        var index = -1;
+        if (navigator.appVersion.indexOf("Win") != -1 ) index = 0;
+        if (navigator.appVersion.indexOf("MacOS") != -1 ) index = 1;
+        if (navigator.appVersion.indexOf("Linux") != -1 ) index = 2;
+
+        //alert(index);
+        if (index >= 0)
+        {
+            var splitted = url.split(";");
+            //alert(splitted[index]);
+            window.open(splitted[index],'Download');
+        }
+    }
+}
 
 // Extract workflow from UI
 function ExtractWorkflow() {
@@ -289,11 +312,17 @@ function ExtractWorkflow() {
         //alert(srcEP);
         //srcEP.
         var overlays = conn.overlays;
-        //alert(overlays);
+        //alert(overlays.length);
         var label = overlays[1];
         if (label == undefined || label.getLabel == undefined)
             label = overlays[0];
-        //alert(label.getLabel());
+        //alert(label.constructor.toString());
+        var connlabel = "Data";  // default
+        if (label.getLabel != undefined)
+        {
+            //alert(label.getLabel());
+            connlabel = label.getLabel();
+        }
 
         var srcidstr = $(conn.source).attr("id");
         var targetidstr = $(conn.target).attr("id");
@@ -373,10 +402,10 @@ function ExtractWorkflow() {
                 //alert(WF_edges[fieldname]);
 
                 fieldname = "datatype_" + i.toString();
-                WF_edges[fieldname] = label.getLabel();
+                WF_edges[fieldname] = connlabel;
 
                 fieldname = "datatypeid_" + i.toString();
-                WF_edges[fieldname] = FindDataTypeID(label.getLabel());
+                WF_edges[fieldname] = FindDataTypeID(connlabel);
 
                 fieldname = "isparallel_" + i.toString();
                 WF_edges[fieldname] = "1"; // TODO handle edge parallel type (parallel, sequential, parallel by default)
@@ -388,7 +417,7 @@ function ExtractWorkflow() {
 
 function FindDataTypeID(label)
 {
-    alert("Searching label " + label);
+    //alert("Searching label " + label);
     if (WorkflowEdgeDataTypes != null)
     {
         for (key in WorkflowEdgeDataTypes)
@@ -434,7 +463,7 @@ function DeleteClicked()
                             $.get("/workflow/delete/" + currWorkflowID + "/",
                                         function (data) {
                                             //alert("Get workflow " + wfid);
-                                            alert("Remove workflow: " + data);
+                                            //alert("Remove workflow: " + data);
                                             if (data == "1")
                                             {
                                                 var liid = "#liwf_" + currWorkflowID;
@@ -458,7 +487,7 @@ function DeleteClicked()
 function SaveClicked()
 {
     //alert($("#authenticated").attr("value"));
-    if ($("#authenticated").attr("value") == "true")
+    if ($("#authenticated").attr("value") != "")
         ShowSaveWorkflowDlg();
     else
         ShowAuthenticationAlert();
@@ -516,7 +545,8 @@ function ShowSaveWorkflowDlg()
                     currWorkflowDesc = desc;
 
                     //alert("Saving workflow " + currWorkflowID);
-                    SaveWorkflow(name, desc, currWorkflowID, 1);
+                    var userid = $("#authenticated").attr("value");
+                    SaveWorkflow(name, desc, currWorkflowID, userid);
                     $( this ).dialog( "close" );
                 },
                 Cancel: function() {
@@ -533,7 +563,8 @@ function SubmitWorkflow() {
     //if (ConnectToGaggle())
     {
         ExtractWorkflow();
-        var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, "1");
+        var userid = $("#authenticated").attr("value");
+        var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
         var jsonString = JSON.stringify(jsonObj);
         //alert(jsonString);
         SubmitWorkflowToBoss(jsonString);
@@ -776,6 +807,7 @@ function DisplayWorkflow(flowdata, workflowid) {
                 target: targetnode.TargetEP,
                 //overlays: connoverlays
                 overlays: [
+                            ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
 		                    ["Label", { label: edge['datatype'], location: 0.5}]
 	                    ]
             });
