@@ -336,7 +336,7 @@ function ExtractWorkflow() {
                 // populate the workflow nodes object
                 if (WF_nodes[srcidstr] == undefined)
                 {
-                    var nameelement = ($(source).children())[0];
+                    var nameelement = ($(source).children())[7];
                     //alert(nameelement);
                     //if (nameelement != undefined)
                     //    alert($(nameelement).children()[0]);
@@ -355,7 +355,7 @@ function ExtractWorkflow() {
                     wfnode.id = srcidstr;
                     //var namevalueelement = $((nameelement).children())[0];
                     //alert(srcidstr);
-                    wfnode.name = $(nameelement).html();
+                    wfnode.name = $(nameelement).attr("value");
                     wfnode.goosename = $(goosenameelement).attr("value");
                     wfnode.serviceuri = $(serviceurlelement).attr("value");
                     wfnode.arguments = $(argumentselement).attr("value");
@@ -371,7 +371,7 @@ function ExtractWorkflow() {
                 if (WF_nodes[targetidstr] == undefined)
                 {
                     //alert("Save target node");
-                    var nameelement = $(target).children()[0];
+                    var nameelement = $(target).children()[7];
                     var serviceurlelement = $(target).children()[2];
                     var argumentselement = $(target).children()[3];
                     //alert($(argumentselement).attr("value"));
@@ -381,7 +381,7 @@ function ExtractWorkflow() {
 
                     var wfnode = {};
                     wfnode.id = targetidstr;
-                    wfnode.name = $(nameelement).html();
+                    wfnode.name = $(nameelement).attr("value");
                     wfnode.goosename = $(goosenameelement).attr("value");
                     wfnode.serviceuri = $(serviceurlelement).attr("value");
                     wfnode.arguments = $(argumentselement).attr("value");
@@ -391,7 +391,6 @@ function ExtractWorkflow() {
                     WF_nodes[targetidstr] = wfnode;
                 }
 
-                //WF_edges[key]. = $(conn.source); // remember the html element of the source node
                 //alert("Save edge");
                 var fieldname = "sourceid_" + i.toString();
                 WF_edges[fieldname] = srcidstr;
@@ -695,8 +694,8 @@ function SearchAndCreateNode(nodes, nodeid, edgedatatype, nodecnt) {
             //var tableposition = $("#tblWorkflow").offset();
             //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
             //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-            var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 250;
-            var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 100;
+            var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 300;
+            var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 150;
             var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
             //alert(stylestr);
             $(sourcelement).attr('style', stylestr);

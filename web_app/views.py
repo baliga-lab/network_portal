@@ -67,6 +67,16 @@ def contact(request):
 class WorkFlowEntry:
     def __init__(self, category, components):
         self.Category = category
+        for component in components:
+            print component.serviceurl
+            if (component.arguments is None):
+                component.arguments = ''
+            if (component.serviceurl is None):
+                component.serviceurl = ''
+            if (component.downloadurl is None):
+                component.downloadurl = ''
+            if (component.short_name is None):
+                component.short_name = ''
         self.Components = components
 
 def createuser(user):
@@ -90,7 +100,7 @@ def workflow(request):
     for category_obj in wfcategories:
         wfentry = WorkFlowEntry(category_obj, category_obj.workflowcomponents_set.all())
         wfentries.append(wfentry)
-        print("Category " + str(category_obj.id) + ": " + str(wfentries.count))
+        #print("Category " + str(category_obj.id) + ": " + str(wfentries.count()))
 
     userid = ''
     isauthenticated = "false"
@@ -177,6 +187,13 @@ def saveworkflow(request):
                     WorkflowNodes.objects.filter(workflow_id = wfid).delete()
                     print "All workflow nodes and edges removed"
                     # update workflow info
+                    dbworkflow = Workflows.objects.filter(id = int(wfid))
+                    if dbworkflow:
+                        workflowobj = dbworkflow[0]
+                        workflowobj.name = wfname
+                        workflowobj.description = wfdesc
+                        workflowobj.save()
+
             else:
                 # save the workflow info
                 workflowentry = Workflows(name = wfname, description = wfdesc, owner_id = int(wfownerid))

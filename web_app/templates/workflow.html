@@ -51,9 +51,10 @@
                {% for component in wfentry.Components %}
                    <li>
                         <div class="component" id='component_{{component.id|stringformat:"i"}}'>
-                        <div class="componenttitle"><a href="{{component.downloadurl}}">{{component.short_name}}</a></div>
+                        <div class="componenttitle"><a href="javascript:startDownload('{{component.downloadurl}}')">{{component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
                         <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
+                                   placeholder="Enter the url or path to the executable of the component"
                                    title="Enter the url or path to the executable of the component"/>
                         <input class="componentchildinput" type="text" value="{{component.arguments}}"
                                    placeholder="Enter the arguments of the component executable"
@@ -63,6 +64,7 @@
                         <input class="componentchildinput" type="text" placeholder="Enter data url"
                                    title="Enter the url of data to be opened by the component"/>
                         <input type="hidden" value="{{component.name}}" />
+                        <input type="hidden" value="{{component.short_name}}" />
                         </div>
                    </li>
                {% endfor %}
