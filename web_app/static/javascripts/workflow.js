@@ -162,8 +162,7 @@ function ConnectionClicked(connection)
 // Callback when a connection is established between two UI components
 function ConnectionEstablished(connection) {
 
-    // Timer, wait 1 second until the connection is fully established
-    $('._jsPlumb_overlay').editable(//'/workflow/saveedge',
+    /*$('._jsPlumb_overlay').editable(//'/workflow/saveedge',
                                                 "/workflow/saveedge/", //SaveWorkflowEdge,
                                                 { loadurl: "/workflow/getedgedatatypes/",
                                                     type: "select",
@@ -173,40 +172,7 @@ function ConnectionEstablished(connection) {
                                                     placeholder: ""
                                                     }
                                                     );
-
-    // Make the label editable
-    //var Label = ["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}];
-    //connection.addOverlay(Label);
-    //connection.overlays.Label.label = "Data";
-
-    //alert(connection.source);
-
-    //alert(connection.connector);
-    // show the connector type selection dialog
-
-    // select all the connections between source and destination
-    //var srcid = $(info.source).attr('id');
-    //var targetid = $(info.target).attr('id');
-    //alert(srcid);
-    //var connections = jsPlumb.getConnections({scope: [source: srcid, target: targetid]});
-    //var numconnections = connections.length;
-    //alert(connections.length + " connections between " + srcid + " and " + targetid);
-    //var overlays = connection.getOverlays();
-    //alert(overlays);
-    //alert(overlays.length);
-    //for (var i = 0; i < overlays.length; i++)
-    //{
-    //    alert($(overlays[i]).attr("class"));
-
-    //    var guid = jQuery.guid++;
-    //    alert(guid);
-    //    $(label).attr("id") = guid;
-    //    alert(label.id);
-    //    $(label).click(function(event) {
-    //       var label = event.target;
-    //       label.html("<input type='text' />");
-    //    });
-    //}
+    */
 }
 
 
@@ -297,17 +263,36 @@ function startDownload(url)
     }
 }
 
+
+function NodeProcessed(node, processednodes) {
+    //alert($(node).attr('id'));
+    //alert(processednodes.length);
+    for (i = 0; i < processednodes.length; i++) {
+        //alert($(processednodes[i]).attr('id'));
+        if ($(processednodes[i]).attr('id') == $(node).attr('id'))
+            return true;
+    }
+    return false;
+}
+
 // Extract workflow from UI
 function ExtractWorkflow() {
     WF_edges = {};
     WF_nodes = {};
+
+    //var allnodes = new Array();
+    var processednodes = new Array();
+    // first extract all the nodes
+    var nodes = $("#workflowcanvas").children();
+
     var connectionList = jsPlumb.getConnections();
     //alert(connectionList.length);
-
     for (i = 0; i < connectionList.length; i++) {
         var conn = connectionList[i];
         var source = conn.source;
         var target = conn.target;
+        processednodes.push(source);
+        processednodes.push(target);
         var srcEP = conn.endpoints[0];
         //alert(srcEP);
         //srcEP.
@@ -409,6 +394,48 @@ function ExtractWorkflow() {
                 fieldname = "isparallel_" + i.toString();
                 WF_edges[fieldname] = "1"; // TODO handle edge parallel type (parallel, sequential, parallel by default)
             }
+        }
+    }
+
+    for (j = 0; j < nodes.length; j++)
+    {
+        //alert(j);
+        if (!NodeProcessed(nodes[j], processednodes))
+        {
+            var source = nodes[j];
+            var srcidstr = $(source).attr('id');
+            var srcid = GetComponentId(srcidstr);
+            //alert(srcidstr);
+            var nameelement = ($(source).children())[7];
+            //alert(nameelement);
+            //if (nameelement != undefined)
+            //    alert($(nameelement).children()[0]);
+
+            var serviceurlelement = $(source).children()[2];
+            //alert(serviceurlelement);
+            //alert("Service uri: " + $(serviceurlelement).attr("value"));
+            var argumentselement = $(source).children()[3];
+            //alert(argumentselement);
+            var subactionelement = $(source).children()[4];
+            var dataurielement = $(source).children()[5];
+            //alert($(dataurielement).attr("value"));
+            var goosenameelement = $(source).children()[6];
+
+            var wfnode = {};
+            wfnode.id = srcidstr;
+            //var namevalueelement = $((nameelement).children())[0];
+            //alert(srcidstr);
+            wfnode.name = $(nameelement).attr("value");
+            wfnode.goosename = $(goosenameelement).attr("value");
+            wfnode.serviceuri = $(serviceurlelement).attr("value");
+            wfnode.arguments = $(argumentselement).attr("value");
+            //alert("Service uri arguments: " + wfnode.arguments);
+            wfnode.subaction = $(subactionelement).attr("value");
+            wfnode.datauri = $(dataurielement).attr("value");
+            wfnode.componentid = srcid;
+
+            //alert("add node " + srcid);
+            WF_nodes[srcidstr] = wfnode;
         }
     }
     //alert("extraction done!");
@@ -618,14 +645,15 @@ function SaveWorkflow(name, desc, workflowid, userid) {
             //Write your code here
             //alert(result['id']);
             //alert(($("#divWorkflow").children().length));
-            if (workflowid == undefined || workflowid == "")
-            {
-                var link = "<li><a href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
-                //alert(link);
-                var ul = ($("#divWorkflow").children())[0]; // TODO use jquery to get the ul
+            var link = "<li><a href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
+            //alert(link);
+            var ul = ($("#divWorkflow").children())[0];
+            var wflink = $("#liwf_" + result['id']);
+            if (wflink == undefined)
                 $(ul).append(link);
-                currWorkflowID = result['id'];
-            }
+            else
+                wflink.html(link);
+            currWorkflowID = result['id'];
         }
     });
 }
@@ -650,7 +678,7 @@ WF_processednodes = {};
 
 // Given a nodeid, search if it is already added to the workflow canvas.
 // If not, create the node and add it to the workflow canvas
-function SearchAndCreateNode(nodes, nodeid, edgedatatype, nodecnt) {
+function SearchAndCreateNode(nodes, nodeid, nodecnt) {
     var node = nodes[nodeid];
     var nodecomponentid = node.componentid; // the id of the component in DB
     var sourceid = 'wfcid' + wfcnt.toString() + "_" + 'component_' + nodecomponentid;
@@ -713,7 +741,7 @@ function SearchAndCreateNode(nodes, nodeid, edgedatatype, nodecnt) {
                             //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
                         ]
             };
-            srcEP = jsPlumb.addEndpoint(sourceid, srcWFEndpointOptions);
+            srcEP = jsPlumb.addEndpoint(sourceid, sourceWFEndpointOptions);
             targetEP = jsPlumb.addEndpoint(sourceid, targetWFEndpointOptions);
             nodeobj.Element = sourcelement;
             nodeobj.SourceEP = srcEP;
@@ -725,6 +753,7 @@ function SearchAndCreateNode(nodes, nodeid, edgedatatype, nodecnt) {
             WF_endpoints[sourceid].SourceEP = srcEP;
             WF_endpoints[sourceid].TargetEP = targetEP;
             // Save the nodeobj
+            //alert("Node id: " + nodeid);
             WF_processednodes[nodeid] = sourcelement;
 
             //  set the component to be draggable
@@ -764,7 +793,8 @@ function SearchAndCreateNode(nodes, nodeid, edgedatatype, nodecnt) {
 // Display a workflow fetched from the server
 function DisplayWorkflow(flowdata, workflowid) {
     if (flowdata != undefined) {
-        //alert(flowdata.name);
+        ClearWorkflowCanvas();
+        currWorkflowID = workflowid.toString();
         currWorkflowName = flowdata.name;
         currWorkflowDesc = flowdata.desc;
         nodes_obj = flowdata.nodes;
@@ -773,25 +803,29 @@ function DisplayWorkflow(flowdata, workflowid) {
 
         //alert(edges_obj);
         //alert(edges_obj["0"]);
-        i = 0;
+        //i = 0;
         nodecnt = 0;
         WF_processednodes = {};
-        while (edges_obj[i] != undefined) {
-            if (i == 0) {
-                ClearWorkflowCanvas();
-                currWorkflowID = workflowid.toString();
-            }
+        for (var key in nodes_obj)
+        {
+            //alert(key);
+            var node = nodes_obj[key];
+            SearchAndCreateNode(nodes_obj, node["id"], nodecnt++);
+        }
 
-            edge = edges_obj[i.toString()];
-            //alert(edge['source']);
+        j = 0;
+        while (edges_obj[j] != undefined) {
+            edge = edges_obj[j.toString()];
+            //alert(edge['sourcenodeid']);
             //alert(edge['target']);
-            var sourcenode = SearchAndCreateNode(nodes_obj, edge['sourcenodeid'], edge['datatype'], nodecnt);
-            if (sourcenode.IsNew)
-                nodecnt++;
-            var targetnode = SearchAndCreateNode(nodes_obj, edge['targetnodeid'], edge['datatype'], nodecnt);
-            if (targetnode.IsNew)
-                nodecnt++;
+            var sourcenode = SearchAndCreateNode(nodes_obj, edge['sourcenodeid'], nodecnt);
+            //if (sourcenode.IsNew)
+            //    nodecnt++;
+            var targetnode = SearchAndCreateNode(nodes_obj, edge['targetnodeid'], nodecnt);
+            //if (targetnode.IsNew)
+            //    nodecnt++;
             var srcid = $(sourcenode.Element).attr('id');
+            //alert(srcid);
             var targetid = $(targetnode.Element).attr('id');
             var lblid = "lbl_" + srcid + "_" + targetid;
 
@@ -800,7 +834,7 @@ function DisplayWorkflow(flowdata, workflowid) {
 
             // remove the default Label overlay.
             // if we do not do this, there will be two labels
-            sourcenode.SourceEP.connectorOverlays.pop();
+            //sourcenode.SourceEP.connectorOverlays.pop();
             var c = jsPlumb.connect({
                 source: sourcenode.SourceEP,
                 target: targetnode.TargetEP,
@@ -812,15 +846,16 @@ function DisplayWorkflow(flowdata, workflowid) {
             });
             //c.addOverlay(connoverlays);
             //label.setLabel(edge['datatype']);
-            i++;
+            j++;
         }
 
         $('._jsPlumb_overlay').editable(//'/workflow/saveedge',
                                             "/workflow/saveedge/", //SaveWorkflowEdge,
                                             { loadurl: "/workflow/getedgedatatypes/",
                                                 type: "select",
-                                                //submit: "OK",
-                                                onblur: "submit",
+                                                submit: "OK",
+                                                callback : EditCallback,
+                                                //onblur: "submit",
                                                 //method : "post",
                                                 placeholder: ""
                                                 }
