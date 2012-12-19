@@ -9,6 +9,7 @@ var currConnection = null;
 var WF_edges = {};
 var WF_nodes = {};
 var WF_endpoints = {};
+var WF_rid = "";
 
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
@@ -250,7 +251,7 @@ function startDownload(url)
     {
         var index = -1;
         if (navigator.appVersion.indexOf("Win") != -1 ) index = 0;
-        if (navigator.appVersion.indexOf("MacOS") != -1 ) index = 1;
+        if (navigator.appVersion.indexOf("MacOS") != -1 || navigator.appVersion.indexOf("Macintosh")) index = 1;
         if (navigator.appVersion.indexOf("Linux") != -1 ) index = 2;
 
         //alert(index);
@@ -570,9 +571,18 @@ function ShowSaveWorkflowDlg()
                     var desc = $(descinput).attr("value");
                     currWorkflowDesc = desc;
 
+                    var p3 = ($("#dlgsaveworkflow").children())[2];
+                    var newworkflowinput = ($(p3).children())[0];
+                    var newworkflow = $(newworkflowinput).attr("checked");
+                    //alert(newworkflow);
+                    var workflowid = currWorkflowID;
+                    if (newworkflow != undefined)
+                        workflowid = "";
+                    //alert(workflowid);
+
                     //alert("Saving workflow " + currWorkflowID);
                     var userid = $("#authenticated").attr("value");
-                    SaveWorkflow(name, desc, currWorkflowID, userid);
+                    SaveWorkflow(name, desc, workflowid, userid);
                     $( this ).dialog( "close" );
                 },
                 Cancel: function() {
@@ -645,17 +655,52 @@ function SaveWorkflow(name, desc, workflowid, userid) {
             //Write your code here
             //alert(result['id']);
             //alert(($("#divWorkflow").children().length));
-            var link = "<li><a href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
+            var link = "<li id=\"liwf_" + result['id'] + "\"><a title=\"" + result['desc'] + "\" href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
             //alert(link);
             var ul = ($("#divWorkflow").children())[0];
-            var wflink = $("#liwf_" + result['id']);
+            var liid = "liwf_" + result['id'];
+            //alert("li ID: " + liid);
+            var wflink = document.getElementById(liid);
+            //var wflink = $(liid);
+            //alert(wflink);
             if (wflink == undefined)
                 $(ul).append(link);
             else
-                wflink.html(link);
+                $(wflink).html(link);
             currWorkflowID = result['id'];
         }
     });
+}
+
+// Start or Stop recording workflows
+function ToggleRecording()
+{
+    var proxy = get_proxyapplet();
+    if (proxy != undefined)
+    {
+        //alert($("#btnRecord"));
+        if ($("#btnRecord").attr("value") == "Record")
+        {
+            // Now we start recording
+            var id = proxy.StartRecording();
+            if (id != null)
+            {
+               $("#btnRecord").attr("value", "Stop");
+               WF_rid = id;
+            }
+            else
+                alert("Failed to start recording. Make sure the boss is started.")
+        }
+        else
+        {
+            $("#btnRecord").attr("value", "Record");
+            //alert(WF_rid);
+            var jsonworkflow = proxy.StopRecording(WF_rid);
+            //alert(jsonworkflow);
+            var jsonobj = JSON.parse(jsonworkflow);
+            DisplayWorkflow(jsonobj, "");
+        }
+    }
 }
 
 // Contact the server to get information of a workflow
@@ -668,6 +713,9 @@ function GetWorkflow(wfid) {
             function (data) {
                 //alert("Get workflow " + wfid);
                 //alert("Set current workflow ID: " + currWorkflowID);
+                //var ul = $("#divWorkflow").children()[0];
+                //$(ul).children().css();
+                alert(data);
                 DisplayWorkflow(data, wfid);
                 $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
             }
@@ -676,123 +724,151 @@ function GetWorkflow(wfid) {
 
 WF_processednodes = {};
 
+function FindComponentId(componentname, componentarray)
+{
+    for (var i = 0; i < componentarray.length; i++)
+    {
+        //alert(componentarray[i]);
+        var componentinfo = componentarray[i].split(",");
+        if (componentname.indexOf(componentinfo[0]) >= 0)
+            return componentinfo[1];
+    }
+    return "";
+}
+
 // Given a nodeid, search if it is already added to the workflow canvas.
 // If not, create the node and add it to the workflow canvas
-function SearchAndCreateNode(nodes, nodeid, nodecnt) {
+function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray) {
     var node = nodes[nodeid];
+    //alert(node);
     var nodecomponentid = node.componentid; // the id of the component in DB
-    var sourceid = 'wfcid' + wfcnt.toString() + "_" + 'component_' + nodecomponentid;
-    wfcnt++;
+    if (nodecomponentid == undefined)
+    {
+        // This is a recorded workflow, we need to find out the componentid
+        var componentname = node.name;
+        //alert(componentname);
+        nodecomponentid = FindComponentId(componentname, componentarray);
+        //alert("found component id: " + nodecomponentid);
+    }
 
-    //alert(sourceid);
-    var nodeobj = {};
-    // Find existing node for the same component
-    //var searchstr = "[id*='_component_" + nodecomponentid + "']";
-    var nodeelement = WF_processednodes[nodeid];
-    //alert(elements.length);
-    var sourcelement = null;
-    if (nodeelement == undefined) {
-        //alert("add node");
-        var componentid = "component_" + nodecomponentid; //  nodeid;
-        //alert(componentid);
-        var source = document.getElementById(componentid); // this is the component in the component list
-        //alert($(source).attr('id'));
-        //$(source).clone().appendTo("#workflowcanvas");
-        //sourcelement = $(source).clone();
-        sourcelement = $(source).clone().removeClass('ui-draggable');
-        //alert(sourcelement);
-        if (sourcelement != undefined) {
-            $(sourcelement).attr('class', 'workflowcomponent');
-            $(sourcelement).attr('id', sourceid);
-            $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
-            var closebutton = ($(sourcelement).children())[1];
-            $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
+    if (nodecomponentid >= 0)
+    {
+        var sourceid = 'wfcid' + wfcnt.toString() + "_" + 'component_' + nodecomponentid;
 
-            // configure the parameters of the component
-            var serviceuriinput = $(sourcelement).children()[2];
-            $(serviceuriinput).attr("value", node.serviceuri);
-            var argumentsinput = $(sourcelement).children()[3];
-            $(argumentsinput).attr("value", node.arguments);
-            var subactioninput = $(sourcelement).children()[4];
-            $(subactioninput).attr("value", node.subaction);
-            var datauriinput = $(sourcelement).children()[5];
-            $(datauriinput).attr("value", node.datauri);
+        wfcnt++;
 
-            var canvasposition = $("#workflowcanvas").position();
-            //var tableposition = $("#tblWorkflow").offset();
-            //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
-            //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-            var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 300;
-            var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 150;
-            var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
-            //alert(stylestr);
-            $(sourcelement).attr('style', stylestr);
-            $(sourcelement).appendTo("#workflowcanvas");
+        //alert(sourceid);
+        var nodeobj = {};
+        // Find existing node for the same component
+        //var searchstr = "[id*='_component_" + nodecomponentid + "']";
+        var nodeelement = WF_processednodes[nodeid];
+        //alert(elements.length);
+        var sourcelement = null;
+        if (nodeelement == undefined) {
+            //alert("add node");
+            var componentid = "component_" + nodecomponentid; //  nodeid;
+            //alert(componentid);
+            var source = document.getElementById(componentid); // this is the component in the component list
+            //alert($(source).attr('id'));
+            //$(source).clone().appendTo("#workflowcanvas");
+            //sourcelement = $(source).clone();
+            sourcelement = $(source).clone().removeClass('ui-draggable');
+            //alert(sourcelement);
+            if (sourcelement != undefined) {
+                $(sourcelement).attr('class', 'workflowcomponent');
+                $(sourcelement).attr('id', sourceid);
+                $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+                var closebutton = ($(sourcelement).children())[1];
+                $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
 
-            var srcWFEndpointOptions = {
-                anchor: "RightMiddle",
-                endpoint: "Dot",
-                isSource: true,
-                maxConnections: -1,
-                connector: "StateMachine",
-                connectorStyle: { strokeStyle: "#666" },
-                connectorOverlays: [
-            			    ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}]
-                            //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
-                        ]
-            };
-            srcEP = jsPlumb.addEndpoint(sourceid, sourceWFEndpointOptions);
-            targetEP = jsPlumb.addEndpoint(sourceid, targetWFEndpointOptions);
-            nodeobj.Element = sourcelement;
-            nodeobj.SourceEP = srcEP;
-            nodeobj.TargetEP = targetEP;
-            nodeobj.IsNew = true;
+                // configure the parameters of the component
+                var serviceuriinput = $(sourcelement).children()[2];
+                $(serviceuriinput).attr("value", node.serviceuri);
+                var argumentsinput = $(sourcelement).children()[3];
+                $(argumentsinput).attr("value", node.arguments);
+                var subactioninput = $(sourcelement).children()[4];
+                $(subactioninput).attr("value", node.subaction);
+                var datauriinput = $(sourcelement).children()[5];
+                $(datauriinput).attr("value", node.datauri);
 
-            // store the endpoints for retrieve later
-            WF_endpoints[sourceid] = {};
-            WF_endpoints[sourceid].SourceEP = srcEP;
-            WF_endpoints[sourceid].TargetEP = targetEP;
-            // Save the nodeobj
-            //alert("Node id: " + nodeid);
-            WF_processednodes[nodeid] = sourcelement;
+                var canvasposition = $("#workflowcanvas").position();
+                //var tableposition = $("#tblWorkflow").offset();
+                //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
+                //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
+                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 300;
+                var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
+                var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
+                //alert(stylestr);
+                $(sourcelement).attr('style', stylestr);
+                $(sourcelement).appendTo("#workflowcanvas");
 
-            //  set the component to be draggable
-            jsPlumb.draggable(sourceid, {
-                containment: "parent",
-                helper: "original"
-            });
+                var srcWFEndpointOptions = {
+                    anchor: "RightMiddle",
+                    endpoint: "Dot",
+                    isSource: true,
+                    maxConnections: -1,
+                    connector: "StateMachine",
+                    connectorStyle: { strokeStyle: "#666" },
+                    connectorOverlays: [
+                                ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}]
+                                //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
+                            ]
+                };
+                srcEP = jsPlumb.addEndpoint(sourceid, sourceWFEndpointOptions);
+                targetEP = jsPlumb.addEndpoint(sourceid, targetWFEndpointOptions);
+                nodeobj.Element = sourcelement;
+                nodeobj.SourceEP = srcEP;
+                nodeobj.TargetEP = targetEP;
+                nodeobj.IsNew = true;
+
+                // store the endpoints for retrieve later
+                WF_endpoints[sourceid] = {};
+                WF_endpoints[sourceid].SourceEP = srcEP;
+                WF_endpoints[sourceid].TargetEP = targetEP;
+                // Save the nodeobj
+                //alert("Node id: " + nodeid);
+                WF_processednodes[nodeid] = sourcelement;
+
+                //  set the component to be draggable
+                jsPlumb.draggable(sourceid, {
+                    containment: "parent",
+                    helper: "original"
+                });
+            }
         }
+        else {
+            // The node already exists, we retrieve its jsPlumb endpoints
+            //alert("Existing node");
+            //alert($(sourcelement).attr('id'));
+            sourcelement = WF_processednodes[nodeid];
+            nodeobj.Element = sourcelement;
+            nodeobj.SourceEP = WF_endpoints[$(sourcelement).attr('id')].SourceEP;
+            nodeobj.TargetEP = WF_endpoints[$(sourcelement).attr('id')].TargetEP;
+
+            // This doesn't work so I have to save all the endpoints in a dictionary :(
+            //            jsPlumb.selectEndpoints({ source: $(sourcelement).attr('id') }).each(
+            //                function (ep) {
+            //                    alert(Object.prototype.toString.call(ep));
+            //                    nodeobj.SourceEP = ep;
+            //                });
+
+            //                jsPlumb.selectEndpoints({ target: $(sourcelement).attr('id') }).each(
+            //                function (ep) {
+            //                    nodeobj.TargetEP = targetep;
+            //                }
+            //            );
+
+            nodeobj.IsNew = false;
+        }
+        return nodeobj;
     }
-    else {
-        // The node already exists, we retrieve its jsPlumb endpoints
-        //alert("Existing node");
-        //alert($(sourcelement).attr('id'));
-        sourcelement = WF_processednodes[nodeid];
-        nodeobj.Element = sourcelement;
-        nodeobj.SourceEP = WF_endpoints[$(sourcelement).attr('id')].SourceEP;
-        nodeobj.TargetEP = WF_endpoints[$(sourcelement).attr('id')].TargetEP;
-
-        // This doesn't work so I have to save all the endpoints in a dictionary :(
-        //            jsPlumb.selectEndpoints({ source: $(sourcelement).attr('id') }).each(
-        //                function (ep) {
-        //                    alert(Object.prototype.toString.call(ep));
-        //                    nodeobj.SourceEP = ep;
-        //                });
-
-        //                jsPlumb.selectEndpoints({ target: $(sourcelement).attr('id') }).each(
-        //                function (ep) {
-        //                    nodeobj.TargetEP = targetep;
-        //                }
-        //            );
-
-        nodeobj.IsNew = false;
-    }
-    return nodeobj;
+    return null;
 }
 
 // Display a workflow fetched from the server
 function DisplayWorkflow(flowdata, workflowid) {
     if (flowdata != undefined) {
+        //alert("Display workflow...");
         ClearWorkflowCanvas();
         currWorkflowID = workflowid.toString();
         currWorkflowName = flowdata.name;
@@ -806,47 +882,53 @@ function DisplayWorkflow(flowdata, workflowid) {
         //i = 0;
         nodecnt = 0;
         WF_processednodes = {};
+        var components = $("#componentstring").attr("value");
+        //alert(components);
+        var componentarray = components.split(";");
+
         for (var key in nodes_obj)
         {
             //alert(key);
-            var node = nodes_obj[key];
-            SearchAndCreateNode(nodes_obj, node["id"], nodecnt++);
+            SearchAndCreateNode(nodes_obj, key, nodecnt++, componentarray);
         }
 
-        j = 0;
+        var j = 0;
         while (edges_obj[j] != undefined) {
             edge = edges_obj[j.toString()];
             //alert(edge['sourcenodeid']);
             //alert(edge['target']);
-            var sourcenode = SearchAndCreateNode(nodes_obj, edge['sourcenodeid'], nodecnt);
+            var sourcenode = SearchAndCreateNode(nodes_obj, edge['sourcenodeid'], nodecnt, componentarray);
             //if (sourcenode.IsNew)
             //    nodecnt++;
-            var targetnode = SearchAndCreateNode(nodes_obj, edge['targetnodeid'], nodecnt);
-            //if (targetnode.IsNew)
-            //    nodecnt++;
-            var srcid = $(sourcenode.Element).attr('id');
-            //alert(srcid);
-            var targetid = $(targetnode.Element).attr('id');
-            var lblid = "lbl_" + srcid + "_" + targetid;
+            var targetnode = SearchAndCreateNode(nodes_obj, edge['targetnodeid'], nodecnt, componentarray);
+            if (sourcenode != null && targetnode != null)
+            {
+                //if (targetnode.IsNew)
+                //    nodecnt++;
+                var srcid = $(sourcenode.Element).attr('id');
+                //alert(srcid);
+                var targetid = $(targetnode.Element).attr('id');
+                var lblid = "lbl_" + srcid + "_" + targetid;
 
-            //alert("Connecting...");
-            //alert(sourcenode.SourceEP.connectorOverlays[1]);
+                //alert("Connecting...");
+                //alert(sourcenode.SourceEP.connectorOverlays[1]);
 
-            // remove the default Label overlay.
-            // if we do not do this, there will be two labels
-            //sourcenode.SourceEP.connectorOverlays.pop();
-            var c = jsPlumb.connect({
-                source: sourcenode.SourceEP,
-                target: targetnode.TargetEP,
-                //overlays: connoverlays
-                overlays: [
-                            ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
-		                    ["Label", { label: edge['datatype'], location: 0.5}]
-	                    ]
-            });
-            //c.addOverlay(connoverlays);
-            //label.setLabel(edge['datatype']);
-            j++;
+                // remove the default Label overlay.
+                // if we do not do this, there will be two labels
+                //sourcenode.SourceEP.connectorOverlays.pop();
+                var c = jsPlumb.connect({
+                    source: sourcenode.SourceEP,
+                    target: targetnode.TargetEP,
+                    //overlays: connoverlays
+                    overlays: [
+                                ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
+                                ["Label", { label: edge['datatype'], location: 0.5}]
+                            ]
+                });
+                //c.addOverlay(connoverlays);
+                //label.setLabel(edge['datatype']);
+                j++;
+            }
         }
 
         $('._jsPlumb_overlay').editable(//'/workflow/saveedge',
@@ -865,7 +947,8 @@ function DisplayWorkflow(flowdata, workflowid) {
 
 function ClearWorkflowCanvas() {
     $("#workflowcanvas").empty();  // clean up the canvas
-    jsPlumb.deleteEveryEndpoint();
+    //jsPlumb.deleteEveryEndpoint();
+    jsPlumb.reset();
     WF_endpoints = {};
     wfcnt = 0;
     wflabelcnt = 0;
@@ -953,6 +1036,12 @@ function SubmitWorkflowToBoss(jsonworkflow) {
         proxy.SubmitWorkflow(jsonworkflow);
         //alert("workflow action done");
     }
+}
+
+// change the style of the workflow component according to the status
+function SetWorkflowStatus(componentid, status)
+{
+
 }
 
 

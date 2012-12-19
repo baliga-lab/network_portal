@@ -96,10 +96,13 @@ def workflow(request):
     #print request.user.username
     #print request.user.first_name
     wfentries = []
+    componentstring = ''
     wfcategories = WorkflowCategories.objects.all()
     for category_obj in wfcategories:
         wfentry = WorkFlowEntry(category_obj, category_obj.workflowcomponents_set.all())
         wfentries.append(wfentry)
+        for component in category_obj.workflowcomponents_set.all():
+            componentstring += (component.name + ',' + str(component.id) + ';')
         #print("Category " + str(category_obj.id) + ": " + str(wfentries.count()))
 
     userid = ''

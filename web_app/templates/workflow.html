@@ -32,11 +32,12 @@
 <tr>
 <td></td>
 <td style="width: 600px">
-<a href='http://localhost:8000/static/jnlp/boss.jnlp'>start the boss</a>
+<a href='/static/jnlp/boss.jnlp'>start the boss</a>
 <input type="button" value="Run" onclick="SubmitWorkflow()" />
 <input type="button" value="Save" onclick="SaveClicked()" />
 <input type="button" value="Delete" onclick="DeleteClicked()" />
 <input type="button" value="Clear" onclick="InitializeWorkflow()" />
+<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" />
 </td>
 <td style="width: 100px">
 </td>
@@ -74,14 +75,14 @@
 </div>
 </td>
 <td>
-<div id="workflowcanvas" style="background-color: transparent; width:500px; height: 600px"></div>
+<div id="workflowcanvas" style="background-color: transparent; width:500px; height: 1000px"></div>
 </td>
 <td class="tdlistworkflow">
     <div id="divWorkflow" class="divWorkflow">
     <ul>
     {% if myworkflows.count > 0 %}
         {% for workflow in myworkflows %}
-            <li id='liwf_{{workflow.id|stringformat:"i"}}'><a href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
+            <li id='liwf_{{workflow.id|stringformat:"i"}}'><a title="{{workflow.description}}" href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
         {% endfor %}
     {% endif %}
     </ul>
@@ -97,6 +98,7 @@
 <div id="dlgsaveworkflow" class="dlgsaveworkflow" title="Save Workflow">
     <p>Name: <input type="text" /></p>
     <p>Description: <input type="text" /></p>
+    <p><input type="checkbox"/>Save as a new workflow</p>
 </div>
 
 <div id="dlgauthenticationalert" class="dlgauthenticationalert" title="Warning">
@@ -108,5 +110,6 @@
 </div>
 
 <input id="authenticated" type="hidden" value="{{userid}}" />
+<input id="componentstring" type="hidden" value="{{componentstring}}" />
 </div>
 {% endblock %}
