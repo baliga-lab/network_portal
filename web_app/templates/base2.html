@@ -50,7 +50,7 @@
       <div id="nav">
         <ul>
           <li class="{% active request "^/$" %}"><a href="/">Home</a></li>
-          <li class="{% active request "^/workflow" %}"><a href="/workflow">Workflow</a></li>
+          {# <li class="{% active request "^/workflow" %}"><a href="/workflow">Workflow</a></li> #}
           <li class="{% active request "^/search" %}"><a href="/search">Search</a></li>
           <li class="{% active request "^/species" %}"><a href="/species">Species</a></li>
           <!--<li class="{% active request "^/function" %}"><a href="/functions/">Function</a></li>-->
@@ -69,6 +69,7 @@
          <a href="http://genomicscience.energy.gov/index.shtml#page=news"><img height="40px" src="{{ STATIC_PREFIX }}images/kbase-logo.jpg"></a><br>
 	  &copy; <a href="http://baliga.systemsbiology.net/" title="Baliga Lab">Baliga Lab</a>
           | <a href="http://systemsbiology.org" title="ISB">Institute for Systems Biology</a>
+        | <a href="/workflow">Development</a>
         | <a href="/">Home</a> 
 	</p>
 	{% endblock %}
