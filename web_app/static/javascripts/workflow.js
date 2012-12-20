@@ -10,6 +10,7 @@ var WF_edges = {};
 var WF_nodes = {};
 var WF_endpoints = {};
 var WF_rid = "";
+var WF_startNode = "";
 
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
@@ -90,6 +91,7 @@ function InitializeWorkflow()
     currWorkflowID = "";
     currWorkflowName = "";
     currWorkflowDesc = "";
+    WF_startNode = "";
 }
 
 
@@ -467,6 +469,7 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
     jsonObj.name = name;
     jsonObj.desc = description;
     jsonObj.userid = userid.toString();
+    jsonObj.startNode = WF_startNode;
     //jsonObj.edgelist = WF_edges;
 
     //alert(jsonObj["name"]);
@@ -703,6 +706,29 @@ function ToggleRecording()
     }
 }
 
+function TogglePause()
+{
+     var proxy = get_proxyapplet();
+    if (proxy != undefined)
+    {
+        //alert($("#btnRecord"));
+        if ($("#btnPause").attr("value") == "Pause")
+        {
+            // Now we pause the recording
+            var jsonworkflow = proxy.PauseRecording(WF_rid);
+            var jsonobj = JSON.parse(jsonworkflow);
+            DisplayWorkflow(jsonobj, "");
+            $("#btnPause").attr("value", "Resume");
+        }
+        else
+        {
+            $("#btnPause").attr("value", "Pause");
+            //alert(WF_rid);
+            proxy.ResumeRecording(WF_rid);
+        }
+    }
+}
+
 // Contact the server to get information of a workflow
 // Info includes name, description, owner, and edges
 function GetWorkflow(wfid) {
@@ -715,7 +741,7 @@ function GetWorkflow(wfid) {
                 //alert("Set current workflow ID: " + currWorkflowID);
                 //var ul = $("#divWorkflow").children()[0];
                 //$(ul).children().css();
-                alert(data);
+                //alert(data);
                 DisplayWorkflow(data, wfid);
                 $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
             }
@@ -733,7 +759,7 @@ function FindComponentId(componentname, componentarray)
         if (componentname.indexOf(componentinfo[0]) >= 0)
             return componentinfo[1];
     }
-    return "";
+    return null;
 }
 
 // Given a nodeid, search if it is already added to the workflow canvas.
@@ -742,19 +768,21 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray) {
     var node = nodes[nodeid];
     //alert(node);
     var nodecomponentid = node.componentid; // the id of the component in DB
+    var componentname = node.name;
     if (nodecomponentid == undefined)
     {
         // This is a recorded workflow, we need to find out the componentid
-        var componentname = node.name;
         //alert(componentname);
         nodecomponentid = FindComponentId(componentname, componentarray);
         //alert("found component id: " + nodecomponentid);
     }
 
-    if (nodecomponentid >= 0)
+    if (nodecomponentid != null && nodecomponentid != "")
     {
         var sourceid = 'wfcid' + wfcnt.toString() + "_" + 'component_' + nodecomponentid;
-
+        if (componentname == WF_startNode)
+            // Record the ID of the start node if there is one
+            WF_startNode = sourceid;
         wfcnt++;
 
         //alert(sourceid);
@@ -875,6 +903,9 @@ function DisplayWorkflow(flowdata, workflowid) {
         currWorkflowDesc = flowdata.desc;
         nodes_obj = flowdata.nodes;
         edges_obj = flowdata.edges;
+        WF_startNode = "";
+        if (flowdata.startNode != undefined)
+            WF_startNode = flowdata.startNode;
         var processedNodes = {};
 
         //alert(edges_obj);
@@ -927,8 +958,8 @@ function DisplayWorkflow(flowdata, workflowid) {
                 });
                 //c.addOverlay(connoverlays);
                 //label.setLabel(edge['datatype']);
-                j++;
             }
+            j++;
         }
 
         $('._jsPlumb_overlay').editable(//'/workflow/saveedge',
