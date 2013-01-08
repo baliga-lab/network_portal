@@ -30,6 +30,9 @@ import search as s
 import itertools
 import urllib2
 
+from django.core.files import File
+import os
+
 class GeneResultEntry:
     def __init__(self, id, name, species,
                  description, bicluster_ids, influence_biclusters,
@@ -105,17 +108,19 @@ def workflow(request):
             componentstring += (component.name + ',' + str(component.id) + ';')
         #print("Category " + str(category_obj.id) + ": " + str(wfentries.count()))
 
-    userid = ''
+    userid = '0' # by default the Guest user
+    dbuser = Users.objects.filter(id = 0)
     isauthenticated = "false"
     if request.user.is_authenticated():
         isauthenticated = "true"
         dbuser = Users.objects.filter(email = request.user.email)
-        if (len(dbuser) > 0):
-            user = dbuser[0]
-        elif (len(dbuser) == 0):
-            user = createuser(request.user)
-        userid = str(user.id)
-        myworkflows = Workflows.objects.filter(owner_id = user.id)
+
+    if (len(dbuser) > 0):
+        user = dbuser[0]
+    elif (len(dbuser) == 0):
+        user = createuser(request.user)
+    userid = str(user.id)
+    myworkflows = Workflows.objects.filter(owner_id = user.id)
 
 
     # jpype executes java code
@@ -182,6 +187,7 @@ def saveworkflow(request):
             wfdesc = workflow['desc']
             wfownerid = workflow['userid']
             wfid = workflow['workflowid']
+            startnode = workflow['startNode']
 
             if wfid:
                     # this is an existing workflow
@@ -211,6 +217,9 @@ def saveworkflow(request):
                 print 'key: ' + key
                 print 'node ID: ' + nodelist[key]['id']
                 print 'service uri: ' + nodelist[key]['serviceuri']
+                isStartnode = False
+                if (len(startnode) > 0 and startnode == nodelist[key]['id']):
+                    isStartnode = True
                 if (nodeobjs.has_key(nodelist[key]['id'])):
                     node = nodeobjs[nodelist[key]['id']]
                 else:
@@ -219,6 +228,7 @@ def saveworkflow(request):
                                          subaction = nodelist[key]['subaction'],
                                          datauri = nodelist[key]['datauri'],
                                          component_id = nodelist[key]['componentid'],
+                                         isstartnode = isStartnode,
                                          workflow_id = wfid)
                     node.save()
                     nodeobjs[nodelist[key]['id']] = node
@@ -310,10 +320,13 @@ def getworkflow(request, workflow_id):
         data_dict = {'id': workflow.id, 'name': workflow.name, 'desc': workflow.description}
 
         nodes_obj = {}
+        startnode = ''
         for node in nodes:
             node_dict = {}
             print node.serviceuri
             node_dict = {'id': node.id, 'serviceuri': node.serviceuri, 'arguments': node.arguments, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
+            if (node.isstartnode):
+                startnode = node.id
             nodes_obj[node.id] = node_dict
 
 
@@ -330,6 +343,7 @@ def getworkflow(request, workflow_id):
 
         data_dict['edges'] = edges_obj
         data_dict['nodes'] = nodes_obj
+        data_dict['startNode'] = startnode
 
         print json.dumps(data_dict)
         return HttpResponse(json.dumps(data_dict), mimetype='application/json')
@@ -337,6 +351,95 @@ def getworkflow(request, workflow_id):
         print str(e)
         error = {'status':500, 'message': 'Failed to retreive workflow info' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
+
+def getsessions(request, workflowid):
+    #print "Get sessions for workflow " + workflowid
+
+    try:
+       sessions_obj = {}
+       sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid))
+       for session in sessions:
+           session_dict = {}
+           print session.sessionid
+           session_dict = {'id': session.sessionid, 'date': session.date.isoformat()}
+           sessions_obj[session.sessionid] = session_dict
+
+       #print json.dumps(sessions_obj)
+       return HttpResponse(json.dumps(sessions_obj), mimetype='application/json')
+    except Exception as e:
+            print str(e)
+            return HttpResponse(json.dumps(e), mimetype='application/json')
+
+@csrf_exempt
+def savereportdata(request):
+    print "save workflow report data"
+    print request.META.get('CONTENT_TYPE')
+    print request.REQUEST['sessionid']
+    print request.REQUEST['componentid']
+    print request.REQUEST['componentworkflownodeid']
+    print request.REQUEST['component-name']
+    print request.REQUEST['workflowid']
+
+    # Create a directory with the session ID
+    try:
+        sessionId = request.REQUEST['sessionid']
+        wfid = request.REQUEST['workflowid']
+        wfcomponentid = request.REQUEST['componentid']
+        wfnodeid = request.REQUEST['componentworkflownodeid']
+        wfcomponentname = request.REQUEST['component-name']
+
+        #if the session is not stored in the WorkflowSessions table, add it
+        print 'Adding session info...'
+        if WorkflowSessions.objects.filter(sessionid = sessionId).count() == 0:
+            wfsessions = WorkflowSessions(workflow_id = int(wfid),
+                                          sessionid = sessionId)
+            wfsessions.save()
+
+        print 'Saving files...'
+        url = request.REQUEST['url']
+        if (len(url) == 0):
+            print 'Joining os path...'
+            sessionpath = os.path.join('/local/network_portal/web_app/reportdata', wfid)
+            print 'Session path: ' + sessionpath
+            if not os.path.exists(sessionpath):
+                os.mkdir(sessionpath)
+
+            sessionpath = os.path.join(sessionpath, sessionId)
+            print 'wfnode path: ' + sessionpath
+            if not os.path.exists(sessionpath):
+                os.mkdir(sessionpath)
+
+            sessionpath = os.path.join(sessionpath, wfnodeid)
+            print 'wfnode path: ' + sessionpath
+            if not os.path.exists(sessionpath):
+                os.mkdir(sessionpath)
+
+            for key in request.FILES.keys():
+                #each file is an UploadedFile object
+                print 'FILE key: ' + key
+                srcfile = request.FILES[key]
+                fullfilename = srcfile.name
+                print fullfilename
+                prefix, filename = os.path.split(fullfilename)
+                print 'File name: ' + filename
+                with open(os.path.join(sessionpath, filename), 'wb') as f:
+                    destination = File(f)
+                    for chunk in srcfile.chunks():
+                        destination.write(chunk)
+                    destination.close()
+            url = os.path.join(sessionpath, filename)
+            print 'File url: ' + url
+
+        # save to the db
+        reportdata = WorkflowReportData(workflow_id = wfid,
+                                    sessionid = sessionId,
+                                    workflownode_id = wfnodeid,
+                                    workflowcomponentname = wfcomponentname,
+                                    dataurl = url)
+        reportdata.save()
+    except Exception as e:
+        print str(e)
+        return HttpResponse(json.dumps(e), mimetype='application/json')
 
 def getedgedatatypes(request):
    print "get edge data types"

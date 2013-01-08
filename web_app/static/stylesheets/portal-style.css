@@ -1597,4 +1597,12 @@ table#motif {
     border-width: 2px;
 }
 
-.
+#divWorkflow ul li.unselectedworkflow {
+    list-style-image: url("/static/images/bullet.gif");
+    list-style-type: none;
+}
+
+#divWorkflow ul li.selectedworkflow
+{
+    list-style-image: url("/static/images/righthand.jpg");
+}

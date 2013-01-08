@@ -618,9 +618,9 @@ class WorkflowNodes(models.Model):
     arguments = models.CharField(max_length=1024, blank=True, null=True)
     subaction = models.CharField(max_length=255, blank=True, null=True)
     datauri = models.CharField(max_length=1024, blank=True, null=True)
+    isstartnode = models.BooleanField(default=False)
     workflow = models.ForeignKey(Workflows)
     component = models.ForeignKey(WorkflowComponents)
-
 
 class WorkflowEdgeDataTypes(models.Model):
     name = models.CharField(max_length=64)
@@ -633,3 +633,15 @@ class WorkflowEdges(models.Model):
     #targetid = models.CharField(max_length = 255)
     datatype = models.ForeignKey(WorkflowEdgeDataTypes, related_name='datatype')
     paralleltype = models.IntegerField(default = 1)
+
+class WorkflowSessions(models.Model):
+    workflow = models.ForeignKey(Workflows)
+    sessionid = models.CharField(max_length = 128)
+    date = models.DateTimeField(auto_now_add=True, blank=True)
+
+class WorkflowReportData(models.Model):
+    dataurl = models.CharField(max_length=1024)
+    sessionid = models.CharField(max_length = 128)
+    workflow = models.ForeignKey(Workflows)
+    workflowcomponentname = models.CharField(max_length=255)
+    workflownode = models.ForeignKey(WorkflowNodes)
