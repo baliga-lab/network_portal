@@ -305,11 +305,8 @@ def deleteworkflow(request, workflowid):
             return HttpResponse(json.dumps(error), mimetype='application/json')
     return HttpResponse("1")
 
-def getworkflow(request, workflow_id):
-    print "Get workflow"
-    #print request.raw_post_data
-
-
+def generateworkflowobj(workflow_id):
+    print "Generating workflow obj..."
     try:
         data_dict = {}
         workflowid = workflow_id
@@ -324,7 +321,8 @@ def getworkflow(request, workflow_id):
         for node in nodes:
             node_dict = {}
             print node.serviceuri
-            node_dict = {'id': node.id, 'serviceuri': node.serviceuri, 'arguments': node.arguments, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
+            component = WorkflowComponents.objects.filter(id = node.component_id)[0]
+            node_dict = {'id': node.id, 'name': component.short_name, 'serviceuri': node.serviceuri, 'arguments': node.arguments, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
             if (node.isstartnode):
                 startnode = node.id
             nodes_obj[node.id] = node_dict
@@ -345,19 +343,28 @@ def getworkflow(request, workflow_id):
         data_dict['nodes'] = nodes_obj
         data_dict['startNode'] = startnode
 
-        print json.dumps(data_dict)
-        return HttpResponse(json.dumps(data_dict), mimetype='application/json')
+        return data_dict
+
     except Exception as e:
-        print str(e)
-        error = {'status':500, 'message': 'Failed to retreive workflow info' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return None
+
+def getworkflow(request, workflow_id):
+    print "Get workflow for " + workflow_id
+    #print request.raw_post_data
+
+    workflowobj = generateworkflowobj(workflow_id)
+    if workflowobj is None:
+       return HttpResponse(json.dumps("Error"),  mimetype='application/json')
+
+    return HttpResponse(json.dumps(workflowobj), mimetype='application/json')
+
 
 def getsessions(request, workflowid):
     #print "Get sessions for workflow " + workflowid
 
     try:
        sessions_obj = {}
-       sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid))
+       sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')
        for session in sessions:
            session_dict = {}
            print session.sessionid
@@ -369,6 +376,38 @@ def getsessions(request, workflowid):
     except Exception as e:
             print str(e)
             return HttpResponse(json.dumps(e), mimetype='application/json')
+
+def sessionreport(request, sessionId):
+    print 'Get session report page for ' + sessionId
+    sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
+    mysessionid = sessionId
+    return render_to_response('workflowsessionreport.html', locals())
+
+def getsessiondata(request, sessionId):
+    print 'Get session data for ' + sessionId
+
+    try:
+        # we first generate workflow obj, we need this in displaying session report data
+        wfsession = WorkflowSessions.objects.filter(sessionid = sessionId)[0]
+        print "workflow id: " + str(wfsession.workflow_id)
+        workflowobj = generateworkflowobj(wfsession.workflow_id)
+        sessiondata_dict = {'wfobj': workflowobj}
+
+        print 'Generating report data...'
+        sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
+        data_obj = {}
+        for data in sessiondata:
+            data_dict = {}
+            print data.dataurl
+            data_dict = {'id': data.id, 'dataurl': data.dataurl, 'wfnodeid': data.workflownode_id, 'componentname': data.workflowcomponentname, 'type': data.datatype}
+            data_obj[data.id] = data_dict
+        sessiondata_dict['sessiondata'] = data_obj
+
+        print json.dumps(sessiondata_dict)
+        return HttpResponse(json.dumps(sessiondata_dict), mimetype='application/json')
+    except Exception as e:
+        print str(e)
+        return HttpResponse(json.dumps(e), mimetype='application/json')
 
 @csrf_exempt
 def savereportdata(request):
@@ -395,25 +434,36 @@ def savereportdata(request):
                                           sessionid = sessionId)
             wfsessions.save()
 
+        dataType = 'url'
+        url = None
+        try:
+            url = request.POST['url']
+        except Exception as e0:
+            url = None
         print 'Saving files...'
-        url = request.REQUEST['url']
-        if (len(url) == 0):
+        if (url is None or len(url) == 0):
             print 'Joining os path...'
-            sessionpath = os.path.join('/local/network_portal/web_app/reportdata', wfid)
+            dataType = 'file'
+            #sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
+            sessionpath = '/github/baligalab/network_portal/web_app/static/reportdata/' + wfid
+            savepath = '/static/reportdata/' + wfid
             print 'Session path: ' + sessionpath
             if not os.path.exists(sessionpath):
                 os.mkdir(sessionpath)
 
-            sessionpath = os.path.join(sessionpath, sessionId)
+            sessionpath = sessionpath + '/' + sessionId
+            savepath = savepath + '/' + sessionId
             print 'wfnode path: ' + sessionpath
             if not os.path.exists(sessionpath):
                 os.mkdir(sessionpath)
 
-            sessionpath = os.path.join(sessionpath, wfnodeid)
+            sessionpath = sessionpath + '/' + wfnodeid
+            savepath = savepath + '/' + wfnodeid
             print 'wfnode path: ' + sessionpath
             if not os.path.exists(sessionpath):
                 os.mkdir(sessionpath)
 
+            print 'Save path: ' + savepath
             for key in request.FILES.keys():
                 #each file is an UploadedFile object
                 print 'FILE key: ' + key
@@ -427,7 +477,7 @@ def savereportdata(request):
                     for chunk in srcfile.chunks():
                         destination.write(chunk)
                     destination.close()
-            url = os.path.join(sessionpath, filename)
+            url = savepath + '/' + filename
             print 'File url: ' + url
 
         # save to the db
@@ -435,7 +485,8 @@ def savereportdata(request):
                                     sessionid = sessionId,
                                     workflownode_id = wfnodeid,
                                     workflowcomponentname = wfcomponentname,
-                                    dataurl = url)
+                                    dataurl = url,
+                                    datatype = dataType)
         reportdata.save()
     except Exception as e:
         print str(e)

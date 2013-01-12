@@ -645,3 +645,4 @@ class WorkflowReportData(models.Model):
     workflow = models.ForeignKey(Workflows)
     workflowcomponentname = models.CharField(max_length=255)
     workflownode = models.ForeignKey(WorkflowNodes)
+    datatype=models.CharField(max_length=32)

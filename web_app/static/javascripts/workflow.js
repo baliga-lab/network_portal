@@ -11,6 +11,7 @@ var WF_nodes = {};
 var WF_endpoints = {};
 var WF_rid = "";
 var WF_startNode = "";
+var WF_timercnt = 0;
 
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
@@ -52,7 +53,7 @@ $(document).ready(function () {
     GetEdgeDataTypes();
 
     // Start the timer to check workflow sessions
-    setInterval(function() { CheckSessions() }, 2000);
+    setTimeout(function() { CheckSessions() }, 2000);
 });
 
 function LoadHTML() {
@@ -624,6 +625,8 @@ function SubmitWorkflow() {
         var jsonString = JSON.stringify(jsonObj);
         //alert(jsonString);
         SubmitWorkflowToBoss(jsonString);
+        WF_timercnt = 0;
+        setTimeout(function() { CheckSessions() }, 5000);
     }
 }
 
@@ -768,6 +771,8 @@ function GetWorkflow(wfid) {
                 //alert(data);
                 DisplayWorkflow(data, wfid);
                 $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
+                WF_timercnt = 10; // we do not incur multiple check in this case
+                setTimeout(function() { CheckSessions() }, 2000);
             }
         );
 }
@@ -1084,14 +1089,15 @@ function CheckSessions()
         $.get("/workflow/sessions/" + currWorkflowID + "/",
                     function (result) {
                         //if (result['id'] != undefined && result['id'].length > 0)
+                        var ul = ($("#divReport").children())[0];
+                        $(ul).empty();
                         for (var key in result)
                         {
                             var session = result[key];
                             if (session != undefined)
                             {
-                                var link = "<li class='unselectedworkflow' id=\"lisession_" + session['id'] + "\"><a href='" + "javascript:GetWorkflowReport(\"" + session['id'] + "\")'>" + session['date'] + "</a></li>";
+                                var link = "<li class='unselectedworkflow' id=\"lisession_" + session['id'] + "\"><a title=\" Retrieve the report of session run at " + session['date'] + "\" href='" + "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")'>" + session['date'] + "</a></li>";
                                 //alert(link);
-                                var ul = ($("#divReport").children())[0];
                                 var liid = "lisession_" + session['id'];
                                 //alert("li ID: " + liid);
                                 var wflink = document.getElementById(liid);
@@ -1109,7 +1115,19 @@ function CheckSessions()
                     }
                 );
     }
-    //setTimeout("CheckSessions()", 2000);
+    if (WF_timercnt < 10)
+    {
+        WF_timercnt++;
+        setTimeout(function() { CheckSessions() }, 2000);
+    }
+}
+
+function GetWorkflowSessionReport(sessionid)
+{
+    if (sessionid != undefined && sessionid.length > 0)
+    {
+        window.open("/workflow/session/" + sessionid + "/");
+    }
 }
 
 
