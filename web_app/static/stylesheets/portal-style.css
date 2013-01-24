@@ -1606,3 +1606,44 @@ table#motif {
 {
     list-style-image: url("/static/images/righthand.jpg");
 }
+
+
+#divReport ul li.unselectedworkflow {
+    list-style-image: url("/static/images/bullet.gif");
+    list-style-type: none;
+}
+
+#divReport ul li.selectedworkflow
+{
+    list-style-image: url("/static/images/righthand.jpg");
+}
+
+
+.workflowreportcomponent
+{
+    background: none repeat scroll 0 0 papayawhip;
+    border-color: sandybrown;
+    border-right: 2px solid sandybrown;
+    border-style: solid;
+    border-width: 8px 2px 2px;
+    font-size: smaller;
+    font-weight: bold;
+    height: auto;
+    overflow: auto;
+    padding: 0.5em;
+    position: absolute;
+    width: 300px;
+    height: 300px;
+}
+
+.workflowreportimg
+{
+    width: 300px;
+    height: 250px;
+}
+
+.workflowreportiframe
+{
+    width: 300px;
+    height: 250px;
+}

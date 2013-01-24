@@ -12,6 +12,7 @@ var WF_endpoints = {};
 var WF_rid = "";
 var WF_startNode = "";
 var WF_timercnt = 0;
+var currSessionID = "";
 
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
@@ -96,6 +97,7 @@ function InitializeWorkflow()
     currWorkflowName = "";
     currWorkflowDesc = "";
     WF_startNode = "";
+    currSessionID = "";
 }
 
 
@@ -583,13 +585,13 @@ function ShowSaveWorkflowDlg()
                 "Save": function() {
                     var p1 = ($("#dlgsaveworkflow").children())[0];
                     var nameinput = ($(p1).children())[0];
-                    var name = $(nameinput).attr("value");
+                    var name = $(nameinput).val();
                     currWorkflowName = name;
                     //alert("Workflow name: " + name);
 
                     var p2 = ($("#dlgsaveworkflow").children())[1];
                     var descinput = ($(p2).children())[0];
-                    var desc = $(descinput).attr("value");
+                    var desc = $(descinput).val();
                     currWorkflowDesc = desc;
 
                     var p3 = ($("#dlgsaveworkflow").children())[2];
@@ -627,6 +629,24 @@ function SubmitWorkflow() {
         SubmitWorkflowToBoss(jsonString);
         WF_timercnt = 0;
         setTimeout(function() { CheckSessions() }, 5000);
+    }
+}
+
+function OnSubmitWorkflow(jsongooseinfo)
+{
+    //alert("Workflow response: " + jsongooseinfo);
+    var jsonobj = JSON.parse(jsongooseinfo);
+    for (var key in jsonobj)
+    {
+        var exepath = jsonobj[key];
+        //alert("Executable for " + key + ": " + exepath);
+        if (exepath != undefined && exepath.length > 0)
+        {
+            var componentid = "#" + key;
+            var serviceuriinput = ($(componentid).children())[2];
+            //alert("Current value: " + $(serviceuriinput).html());
+            $(serviceuriinput).attr("value", exepath);
+        }
     }
 }
 
@@ -1122,11 +1142,93 @@ function CheckSessions()
     }
 }
 
+
+function ToggleCurrentWorkflowSessionLink(currsessionid, newsessionid)
+{
+    //alert("Toggle: " + currsessionid);
+    if (currsessionid != newsessionid)
+    {
+        //alert(currsessionid);
+        if (currsessionid != undefined && currsessionid != "")
+        {
+            var liid = "lisession_" + currsessionid;
+            //alert("curr li ID: " + liid);
+            var sessionlink = document.getElementById(liid);
+            //$(wflink).css("list-style-type", "");
+            $(sessionlink).removeClass("selectedworkflow");
+            $(sessionlink).addClass("unselectedworkflow");
+        }
+        if (newsessionid != undefined && newsessionid != "")
+        {
+            var liid = "lisession_" + newsessionid;
+            //alert("new li ID: " + liid);
+            var sessionlink = document.getElementById(liid);
+            //alert($(wflink).css('list-style-image'));
+            $(sessionlink).removeClass("unselectedworkflow");
+            $(sessionlink).addClass("selectedworkflow"); //.css('list-style-image', "/static/images/righthand.jpg");
+        }
+    }
+}
+
+
 function GetWorkflowSessionReport(sessionid)
 {
     if (sessionid != undefined && sessionid.length > 0)
     {
+        //alert(currSessionID);
+        ToggleCurrentWorkflowSessionLink(currSessionID, sessionid);
+        currSessionID = sessionid;
         window.open("/workflow/session/" + sessionid + "/");
+    }
+}
+
+function DeleteSessionReport()
+{
+    if (currSessionID != "")
+    {
+        alert(currSessionID);
+
+        $.get("/workflow/deletesession/" + currSessionID + "/",
+                                                        function (data) {
+                                                            //alert("Get workflow " + wfid);
+                                                            //alert("Remove workflow: " + data);
+                                                            if (data == "1")
+                                                            {
+                                                                var liid = "#lisession_" + currSessionID;
+                                                                $(liid).remove();
+                                                                //InitializeWorkflow();
+                                                            }
+                                                        }
+                                                    );
+
+
+        /*$( "#dlgdeletealert" ).dialog({
+                            resizable: false,
+                            height:200,
+                            modal: true,
+                            buttons: {
+                                "Yes": function() {
+                                    // Delete the workflow
+                                    $.get("/workflow/deletesession/" + currSessionID + "/",
+                                                function (data) {
+                                                    //alert("Get workflow " + wfid);
+                                                    //alert("Remove workflow: " + data);
+                                                    if (data == "1")
+                                                    {
+                                                        var liid = "#lisession_" + currSessionID;
+                                                        $(liid).remove();
+                                                        //InitializeWorkflow();
+                                                    }
+                                                }
+                                            );
+
+                                    $( this ).dialog( "close" );
+                                },
+                                Cancel: function() {
+                                    $( this ).dialog( "close" );
+                                }
+                            }
+                        }); */
     }
 }
 

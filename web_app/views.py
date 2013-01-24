@@ -11,6 +11,8 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 #from social_auth.backends.google import GoogleOAuth2
 from django.utils import simplejson as json
+from django.utils import formats
+from django.utils.formats import get_format
 from django.db import transaction
 
 # apparently, the location of this changed between Django versions?
@@ -363,15 +365,17 @@ def getsessions(request, workflowid):
     #print "Get sessions for workflow " + workflowid
 
     try:
-       sessions_obj = {}
+       sessions_obj = []
        sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')
        for session in sessions:
            session_dict = {}
            print session.sessionid
-           session_dict = {'id': session.sessionid, 'date': session.date.isoformat()}
-           sessions_obj[session.sessionid] = session_dict
+           #short_datetime_format = get_format("SHORT_DATETIME_FORMAT")
+           datetime = formats.date_format(session.date, "SHORT_DATETIME_FORMAT")
+           session_dict = {'id': session.sessionid, 'date':  datetime } #.isoformat()}
+           sessions_obj.append(session_dict)
 
-       #print json.dumps(sessions_obj)
+       print json.dumps(sessions_obj)
        return HttpResponse(json.dumps(sessions_obj), mimetype='application/json')
     except Exception as e:
             print str(e)
@@ -405,6 +409,17 @@ def getsessiondata(request, sessionId):
 
         print json.dumps(sessiondata_dict)
         return HttpResponse(json.dumps(sessiondata_dict), mimetype='application/json')
+    except Exception as e:
+        print str(e)
+        return HttpResponse(json.dumps(e), mimetype='application/json')
+
+def deletesessiondata(request, sessionId):
+    print 'Delete session data for ' + sessionId
+
+    try:
+        WorkflowReportData.objects.filter(sessionid = sessionId).delete()
+        WorkflowSessions.objects.filter(sessionid = sessionId).delete()
+        return HttpResponse("1")
     except Exception as e:
         print str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')
@@ -488,6 +503,7 @@ def savereportdata(request):
                                     dataurl = url,
                                     datatype = dataType)
         reportdata.save()
+        return HttpResponse("1", mimetype)
     except Exception as e:
         print str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')
