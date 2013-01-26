@@ -210,7 +210,15 @@ function componentDropEvent(ev, component) {
             $(cloned).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
             var closebutton = ($(cloned).children())[1];
             $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
-
+            var serviceuriinput = ($(cloned).children())[2];
+            if (window.localStorage != null)
+            {
+                //alert(component.draggable.attr("id"));
+                var uri = window.localStorage.getItem(component.draggable.attr("id"));
+                //alert(uri);
+                if (uri != null)
+                    $(serviceuriinput).attr("value", uri);
+            }
             // we include the id of the original component to be able to retrieve it later to generate
             // the workflow
             var cid = 'wfcid' + wfcnt + '_' + component.draggable.attr("id");
@@ -646,6 +654,17 @@ function OnSubmitWorkflow(jsongooseinfo)
             var serviceuriinput = ($(componentid).children())[2];
             //alert("Current value: " + $(serviceuriinput).html());
             $(serviceuriinput).attr("value", exepath);
+            //alert(window.localStorage);
+            if (window.localStorage) {
+              // window.localStorage is available!
+              var componentinfo = key.split("_");
+              //alert(componentinfo[1]);
+              window.localStorage.setItem((componentinfo[1] + "_" + componentinfo[2]), exepath);
+              //alert(componentinfo[2]);
+            } else {
+              // no native support for HTML5 storage :(
+              // maybe try dojox.storage or a third-party solution
+            }
         }
     }
 }
@@ -861,6 +880,13 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                 // configure the parameters of the component
                 var serviceuriinput = $(sourcelement).children()[2];
                 $(serviceuriinput).attr("value", node.serviceuri);
+                if (window.localStorage != null)
+                {
+                    var uri = window.localStorage.getItem(("component_" + nodecomponentid));
+                    //alert(uri);
+                    if (uri != null)
+                        $(serviceuriinput).attr("value", uri);
+                }
                 var argumentsinput = $(sourcelement).children()[3];
                 $(argumentsinput).attr("value", node.arguments);
                 var subactioninput = $(sourcelement).children()[4];

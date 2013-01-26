@@ -34,6 +34,7 @@ import urllib2
 
 from django.core.files import File
 import os
+import shutil
 
 class GeneResultEntry:
     def __init__(self, id, name, species,
@@ -417,6 +418,19 @@ def deletesessiondata(request, sessionId):
     print 'Delete session data for ' + sessionId
 
     try:
+        # delete all the files of a session
+        sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
+        for data in sessiondata:
+            try:
+                print "remove file " + data.dataurl
+                with open(data.dataurl, 'wb') as f:
+                    destination = File(f)
+                    destination.delete()
+
+                #shutil.rmtree(data.dataurl)
+            except Exception as e0:
+                print "Failed to delete file: " + data.dataurl
+
         WorkflowReportData.objects.filter(sessionid = sessionId).delete()
         WorkflowSessions.objects.filter(sessionid = sessionId).delete()
         return HttpResponse("1")
