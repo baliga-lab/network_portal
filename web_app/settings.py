@@ -1,8 +1,18 @@
 # Django settings for network_portal project.
 import os.path
-
+import sys
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+#from django.template.defaultfilters import slugify
+#SOCIAL_AUTH_ENABLED_BACKENDS = ('github')
+#SOCIAL_AUTH_COMPLETE_URL_NAME='socialauth_complete'
+#SOCIAL_AUTH_ASSOCIATE_URL_NAME='associate_complete'
+#SOCIAL_AUTH_DEFAULT_USERNAME=lambdau:slugify(u)
+#SOCIAL_AUTH_EXTRA_DATA=False
+#SOCIAL_AUTH_CHANGE_SIGNAL_ONLY=True
+#SOCIAL_AUTH_ASSOCIATE_BY_MAIL=True #associateuserviaemail
+
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -70,7 +80,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    "/Users/kfoley/django_apps/network_portal/web_app/static",
+    "c:/GITHUB/baligalab/network_portal/web_app/static",
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -97,11 +107,12 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware'
 )
 
 ROOT_URLCONF = 'web_app.urls'
@@ -116,6 +127,7 @@ TEMPLATE_DIRS = (
 
 # kmf: adding context processors
 TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.core.context_processors.debug',
@@ -126,6 +138,8 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django_openid_auth',
+    #'social_auth',
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -159,3 +173,14 @@ LOGGING = {
         },
     }
 }
+
+AUTHENTICATION_BACKENDS = (
+            'django_openid_auth.auth.OpenIDBackend',
+            #'social_auth.backends.contrib.github.GithubBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        )
+
+OPENID_CREATE_USERS = True
+LOGIN_URL = '/openid/login/'
+LOGIN_REDIRECT_URL = '/'
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'

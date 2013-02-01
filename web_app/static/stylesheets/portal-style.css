@@ -1476,3 +1476,174 @@ table#motif {
     margin: 0 0 0 40px;
     display: inline;
 }
+
+
+.tblWorkflow
+{
+    width: 860px;
+}
+
+.tdcomponents
+{
+    width: 100px;
+    overflow: hidden;
+}
+
+.divcomponents
+{
+    width:100px;
+    height: 1000px;
+    overflow: auto;
+}
+
+.tdlistworkflow {
+    overflow: hidden;
+    width: 100px;
+}
+
+.divWorkflow
+{
+    overflow: auto;
+    width: 100px;
+    height: 1000px;
+}
+
+.tdworkflowcanvas
+{
+    width: 600px;
+    height: 1000px;
+}
+
+.workflowcanvas
+{
+    background-color: transparent;
+    width:600px;
+    height: 600px;
+}
+
+.component  
+{
+    padding: 0.5em; 
+    background:transparent;
+    width:50px;
+    height: 40px;
+}
+
+.componenttitle
+{
+    margin-bottom: 15px;
+}
+
+.componentchildinput
+{
+    display: none;
+}
+
+.componentclose
+{
+    display: none;
+}
+
+.workflowcomponent
+{
+    background: none repeat scroll 0 0 papayawhip;
+    border-color: sandybrown;
+    border-right: 2px solid sandybrown;
+    border-style: solid;
+    border-width: 8px 2px 2px;
+    font-size: smaller;
+    font-weight: bold;
+    height: auto;
+    overflow: auto;
+    padding: 0.5em;
+    position: absolute;
+    width: 200px;
+}
+
+.workflowcomponentclose
+{
+    display: block;
+    height: 10px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    text-indent: -900em;
+    top: 4px;
+    width: 10px;
+}
+
+.workflowcomponentchildinput
+{
+   display: block;
+   width: 190px;
+   height: 20px;
+   font-size: 1.5em;
+}
+
+.dataLabel
+{
+
+}
+
+.dlgsaveworkflow
+{
+    display: none;
+    border-width: 2px;
+}
+
+.dlgauthenticationalert
+{
+    display: none;
+    border-width: 2px;
+}
+
+#divWorkflow ul li.unselectedworkflow {
+    list-style-image: url("/static/images/bullet.gif");
+    list-style-type: none;
+}
+
+#divWorkflow ul li.selectedworkflow
+{
+    list-style-image: url("/static/images/righthand.jpg");
+}
+
+
+#divReport ul li.unselectedworkflow {
+    list-style-image: url("/static/images/bullet.gif");
+    list-style-type: none;
+}
+
+#divReport ul li.selectedworkflow
+{
+    list-style-image: url("/static/images/righthand.jpg");
+}
+
+
+.workflowreportcomponent
+{
+    background: none repeat scroll 0 0 papayawhip;
+    border-color: sandybrown;
+    border-right: 2px solid sandybrown;
+    border-style: solid;
+    border-width: 8px 2px 2px;
+    font-size: smaller;
+    font-weight: bold;
+    height: auto;
+    overflow: auto;
+    padding: 0.5em;
+    position: absolute;
+    width: 300px;
+    height: 300px;
+}
+
+.workflowreportimg
+{
+    width: 300px;
+    height: 250px;
+}
+
+.workflowreportiframe
+{
+    width: 300px;
+    height: 250px;
+}

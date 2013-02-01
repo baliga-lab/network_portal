@@ -10,9 +10,27 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'network_portal.views.home', name='home'),
     # url(r'^network_portal/', include('network_portal.foo.urls')),
+
+    # url('', include('social_auth.urls')),
+
     url(r'^$', 'web_app.views.home', name='home'),
+    #url(r'^openid/complete/\w*$', 'web_app.views.logincomplete', name='about'),
+
+    # django_openid_auth
+    url(r'^openid/', include('django_openid_auth.urls')),
     url(r'^about$', 'web_app.views.about', name='about'),
     url(r'^contact$', 'web_app.views.contact', name='contact'),
+    url(r'^workflow/getedgedatatypes/\w*$', 'web_app.views.getedgedatatypes', name='getedgedatatypes'),
+    url(r'^workflow/saveedge/$', 'web_app.views.saveedge', name='saveedge'),
+    url(r'^workflow/savereport/$', 'web_app.views.savereportdata', name='savereportdata'),
+    url(r'^workflow/session/(?P<sessionId>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/$', 'web_app.views.sessionreport', name='sessionreport'),
+    url(r'^workflow/getsession/(?P<sessionId>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/$', 'web_app.views.getsessiondata', name='getsessiondata'),
+    url(r'^workflow/deletesession/(?P<sessionId>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/$', 'web_app.views.deletesessiondata', name='deletesessiondata'),
+    url(r'^workflow/sessions/(?P<workflowid>\d+)/$', 'web_app.views.getsessions', name='getsessions'),
+    url(r'^workflow/save', 'web_app.views.saveworkflow', name='saveworkflow'),
+    url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'web_app.views.deleteworkflow', name='saveworkflow'),
+    url(r'^workflow/(?P<workflow_id>\d+)/$', 'web_app.views.getworkflow', name='getworkflow'),
+    url(r'^workflow$', 'web_app.views.workflow', name='workflow'),
     url(r'^search', 'web_app.views.search', name='search'),
     url(r'^help', 'web_app.views.help', name='help'),
     url(r'^seqviewer', 'web_app.views.seqviewer', name='seqviewer'),
@@ -63,8 +81,9 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     # Login / Logout
-    url(r'^login/$', 'django.contrib.auth.views.login'),
-    #url(r'^logout/$', logout_page),
+    #url(r'^login/$', 'django.contrib.auth.views.login'),
+    url(r'^logout/$', 'views.logout_page'),
+    url(r'^login/$', 'views.login_page'),
 
     #(r'^analysis/$', 'web_app.networks.views.analysis', name='analysis'),
     #(r'^analysis/$', include('analysis.urls')),

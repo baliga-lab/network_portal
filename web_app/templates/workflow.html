@@ -1,0 +1,158 @@
+﻿{% extends "base2.html" %}
+{% block title %}Workflow Framework - Welcome{% endblock %}
+
+
+{% block content %}<div class="main">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+
+<script src="http://www.java.com/js/deployJava.js"></script>
+<!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.15-all-min.js'></script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
+
+
+<div id="container">
+<div>
+<applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
+</applet>
+
+<!-- <input type="text" id="htmlLoader" />
+<input type="button" value="Load" onclick="LoadHTML()" />
+<input type="button" value="Filter" onclick="FilterHTML()" />
+<div id="divHTMLResult"></div> -->
+
+</div>
+<table id="tblWorkflow" class="tblWorkflow">
+<tbody>
+<tr>
+<td><h3>Modules</h3></td>
+<td style="width: 600px">
+<a href='/static/jnlp/boss.jnlp'>start the boss</a>
+<input type="button" value="Run" onclick="SubmitWorkflow()" />
+<input type="button" value="Save" onclick="SaveClicked()" />
+<input type="button" value="Delete" onclick="DeleteClicked()" />
+<input type="button" value="Clear" onclick="InitializeWorkflow()" /> || 
+<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" />
+<input id="btnPause" type="button" value="Pause" onclick="TogglePause()" />
+</td>
+<td style="width: 100px"><H3>Workflows</h3>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<div id="components" class="divcomponents">
+    {% if wfentries.count > 0 %}
+        {% for wfentry in wfentries %}
+            <p><strong>{{wfentry.Category.name}}</strong></p>
+            <ul>
+               {% for component in wfentry.Components %}
+                   <li>
+                        <div class="component" id='component_{{component.id|stringformat:"i"}}'>
+                        <div class="componenttitle"><a href="javascript:startDownload('{{component.downloadurl}}')">{{component.short_name}}</a></div>
+                        <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
+                        <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
+                                   placeholder="Enter the url or path to the executable of the component"
+                                   title="Enter the url or path to the executable of the component"/>
+                        <input class="componentchildinput" type="text" value="{{component.arguments}}"
+                                   placeholder="Enter the arguments of the component executable"
+                                   title="Enter the arguments of the component"/>
+                        <input class="componentchildinput" type="text" placeholder="Enter subaction"
+                                   title="Enter subaction (for example, a web handler for firegoose)" value=""/>
+                        <input class="componentchildinput" type="text" placeholder="Enter data url"
+                                   title="Enter the url of data to be opened by the component" value=""/>
+                        <input type="hidden" value="{{component.name}}" />
+                        <input type="hidden" value="{{component.short_name}}" />
+                        <input type="hidden" value="" />
+                        </div>
+                   </li>
+               {% endfor %}
+            </ul>
+        {% endfor %}
+    {% endif %}
+</div>
+</td>
+<td><h3>Workflow Canvas</h3>
+<div id="workflowcanvas" style="background-color: transparent; width:500px; height: 1000px">
+This is your worflow canvas. Start adding worflow componens from left, open saved workflow or read our <a href="#quickhelp">quick start guide.</a>
+</div>
+<div id="quickhelp"> 
+	<h3>Quick Start Guide</h3>
+	<h4> Initial Setup</h4>
+	<ul>
+		<li>1. Install each goose by using the links on the left. (If this is your first time) 
+			This will download the updated goose. You will need to install them for your application</li>
+		<li>2. Start The Gaggle Boss by clicking on the <b>"Start the Boss"</b> link</li>
+                <li>3. Click on the Gaggle toolbar in Firefox and <b>Connect to Gaggle</b></li>
+		<li>4. Drag the goose you want in your workflow and drop into the Workflow canvas</li>
+		<li>5. For each goose "Enter the url of the executable in your computer" 
+			e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX</li>
+		<li>6. Enter any subactions or data you want to open</li>
+		<li>7. In order to connect to components in the workflow drag the circle from the input goose to square of next workflow component</li>
+ 		<li>8. Save your workflow </li>
+	</ul>
+	<h4> Running the Workflow</h4>
+	<ul>
+		<li> 1. Create a new workflow or open a saved one</li>
+		<li> 2. Click "Run" to start the workflow</li>
+		<li> 3. For firegoose this will open a new tab and will take you to the page you specified in your workflow</li>
+		<li> 4. Select the type of the data you want for the next component from the firegoose toolbar and select "Next"</li>
+		<li> 5. Your data will be broadcasted to the next component in your workflow and your next application or webpage will be open.</li>
+		<li> 6. For each workflow component you need to select specific data and click "Next"</li>
+	</ul>
+	<h4> Recording the Workflow</h4>
+	<ul>
+		<li> 1. Gaggle can follow your actions and record them into your workflow for automated tasks</li>
+		<li> 2. Before recording make sure that the Gaggle bos has started</li>
+		<li> 3. Click on "Record" button to start recording</li>
+		<li> 4. Create workflow and follow the steps to complete your analysis</li>
+		<li> 5. Go back to your workspace and "Stop" your recording Once you are done</li>
+		<li> 6. Workflow components and connections will be automaticall created and placed into your workspace.</li>
+		<li> 7. You can "Pause" workflow anytime</li>	
+	</ul>
+
+</div>
+
+</td>
+<td class="tdlistworkflow" valign="top">
+    <div id="divWorkflow" class="divWorkflow">
+    <ul>
+    {% if myworkflows.count > 0 %}
+        {% for workflow in myworkflows %}
+            <li class="unselectedworkflow" id='liwf_{{workflow.id|stringformat:"i"}}'><a title="{{workflow.description}}" href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
+        {% endfor %}
+    {% endif %}
+    </ul>
+    </div>
+    <div>
+        <input type="button" value="Delete" onclick="DeleteSessionReport()" />
+    </div>
+    <div id="divReport" class="divWorkflow">
+       <ul></ul>
+    </div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p id="result"></p>
+
+<div id="dlgsaveworkflow" class="dlgsaveworkflow" title="Save Workflow">
+    <p>Name: <input type="text" /></p>
+    <p>Description: <input type="text" /></p>
+    <p><input type="checkbox"/>Save as a new workflow</p>
+</div>
+
+<div id="dlgauthenticationalert" class="dlgauthenticationalert" title="Warning">
+    <p>Do you want to login and save the workflow?</p>
+</div>
+
+<div id="dlgdeletealert" class="dlgauthenticationalert" title="Warning">
+    <p>Do you really want to delete the workflow?</p>
+</div>
+
+<input id="authenticated" type="hidden" value="{{userid}}" />
+<input id="componentstring" type="hidden" value="{{componentstring}}" />
+</div>
+{% endblock %}

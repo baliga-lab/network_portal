@@ -1,4 +1,6 @@
 ## Compute functional enrichment for biclusters
+## This is a variant that computes GO enrichment using hypergeometric. It doesn't
+## take the hierarchy into account like TopGO, so that approach might be better.
 ## 
 ## Copyright (C) 2011 Institute for Systems Biology, Seattle, Washington, USA.
 ## Christopher Bare
@@ -16,95 +18,76 @@ config$db.host = "localhost"
 
 
 # usage:
-# compute.and.display.enrichment(4, 'kegg', 'kegg subcategory')
-#
-# or:
-# let.it.rip(insert=F)
-#
-# or, to write functional enrichment back to the database:
-# let.it.rip(insert=T)
+# let.it.rip.GO()
+# 
+# or, to write the results to the dabase:
+# let.it.rip.GO(T) 
 #
 
-# Test w/ bicl 366, kegg enrichment
+# There was an error in the data which caused genes to be counted
+# multiple times. The data is fixed, but I also added distinct(gf.gene_id)
+# to prevent that type of error in the future.
 
-# there's possibly an error in this function. I seem to get some cases where more
-# genes are annotated with a function than are in a particular bicluster???
-
-# for each bicluster count genes grouped by function
+# for each bicluster, count genes grouped by function
 # return a data.frame w/ columns bicluster_id, function_id, count
-get.bicluster.function.counts <- function(con, network.id, type, ancestor.map=NULL) {
-  
+get.bicluster.function.counts <- function(con, network.id, type, namespace) {
+
   # don't limit this to a specific namespace, 'cause functions are annotated at
   # the most specific level possible. We map them up to higher levels through
   # the ancestor.map
-  
+
+  #count number of genes for each function in each bicluster for a species
   sql <- sprintf(paste(
-    "select b.id as bicluster_id, f.id as function_id, bg.gene_id",
+    "select b.id as bicluster_id, f.id as function_id, count(bg.gene_id) as count",
     "from networks_bicluster b",
     "join networks_bicluster_genes bg on b.id=bg.bicluster_id",
     "join networks_gene_function gf on gf.gene_id=bg.gene_id",
     "join networks_function f on gf.function_id=f.id",
     "where b.network_id = %d",
-    "and f.type='%s'",
+    "and f.type='%s' and f.namespace='%s'",
+    "group by b.id, f.id",
     "order by b.id, f.id;"),
-    network.id, type)
+    network.id, type, namespace)
   df <- dbGetQuery(con, sql)
   
-  # map lower level functions to their ancestors
-  if (is.null(ancestor.map))
-    ancestor.map <- get.ancestor.map(con, df$function_id)
-  
-  mm <- merge(df, ancestor.map, by='function_id')
-  mm2 <- ddply(mm, .(bicluster_id, ancestor_id), function(r) count=length(unique(r$gene_id)))
-  colnames(mm2)[2] <- 'function_id'
-  colnames(mm2)[3] <- 'count'
-  return(mm2)
+  return(df)
 }
 
 # for each function, count all genes in genome with that function
 # return a data.frame w/ columns function_id, count
-get.function.gene.counts <- function(con, gene.ids, type=NULL, ancestor.map=NULL) {
-  
-  # don't limit this to a specific namespace, 'cause functions are annotated at
-  # the most specific level possible. We map them up to higher levels through
-  # the ancestor.map
+get.function.gene.counts <- function(con, gene.ids, type=NULL, namespace=NULL) {
   
   # count total number of genes in the genome for each function
   # (independent of a particular network, except that the set of
   #  genes considered here should be the same as those considered
   #  in the biclustering and network inference.)
   sql <- sprintf(paste(
-    "select gf.function_id, gf.gene_id",
+    "select gf.function_id, count(distinct(gf.gene_id)) as count",
     "from networks_gene_function gf",
     "join networks_gene g on g.id = gf.gene_id",
     "join networks_function f on gf.function_id=f.id",
     "where g.id in (%s)",
     if (is.null(type)) { "" } else { sprintf("and f.type='%s'", type) },
+    if (is.null(namespace)) { "" } else { sprintf("and f.namespace='%s'", namespace) },
+    "group by gf.function_id",
     "order by gf.function_id;"),
     paste(gene.ids,collapse=","))
   df <- dbGetQuery(con, sql)
   
-  if (is.null(ancestor.map))
-    ancestor.map <- get.ancestor.map(con, df$function_id)
-  
-  mm <- merge(df, ancestor.map, by='function_id')
-  mm2 <- ddply(mm, .(ancestor_id), function(r) count=length(unique(r$gene_id)))
-  colnames(mm2)[1] <- 'function_id'
-  colnames(mm2)[2] <- 'count'
-  return(mm2)
+  return(df)
 }
 
 
 # compute functional enrichment for all biclusters in the given network
-# with the given system. If gene.ids are not given, use the
+# with the given system and namespace. If gene.ids are not given, use the
 # set of genes that appear in at least one bicluster. This will likely not
 # include all genes in the organism. If genes were considered, but not
 # included in any bicluster, we should include those in the background.
 #
 # examples:
-# enrichment(network.id=1, type='kegg')
-# enrichment(network.id=1, type='tigr')
-enrichment <- function(network.id, type=NULL, gene.ids=NULL) {
+# enrichment(network.id=1, type='kegg', namespace='kegg pathway')
+# enrichment(network.id=1, type='tigr', namespace='tigrfam')
+enrichment <- function(network.id, type=NULL, namespace=NULL, gene.ids=NULL) {
   tryCatch(
   expr={
     postgreSQL.driver <- dbDriver("PostgreSQL")
@@ -134,12 +117,13 @@ enrichment <- function(network.id, type=NULL, gene.ids=NULL) {
         network.id)
       gene.ids <- dbGetQuery(con, sql)[[1]]
     }
-    total.genes <- length(gene.ids)
+    total.genes <- length(unique(gene.ids))
+    
     cat(sprintf("number of genes that are in some bicluster: %d\n", total.genes))
     
     #count number of genes in each bicluster in the network
     sql <- sprintf(paste(
-      "select b.id as bicluster_id, count(bg.gene_id) as gene_count",
+      "select b.id as bicluster_id, count(distinct(bg.gene_id)) as gene_count",
       "from networks_bicluster b ",
       "join networks_bicluster_genes bg on b.id=bg.bicluster_id",
       "where b.network_id = %d",
@@ -147,19 +131,19 @@ enrichment <- function(network.id, type=NULL, gene.ids=NULL) {
       "order by b.id;"),
       network.id)
     bicluster.gene.counts <- dbGetQuery(con, sql)
-    cat(sprintf("counted genes in %d biclusters.\n", nrow(bicluster.gene.counts)))
     
-    ancestor.map <- get.ancestor.map(con,type=type)
-    cat(sprintf("constructed ancestor map for %s.\n", type))
+    cat(sprintf("counted genes in %d biclusters.\n", nrow(bicluster.gene.counts)))
     
     # for each bicluster count genes grouped by function
     # return a data.frame w/ columns bicluster_id, function_id, count
-    bicluster.function.counts <- get.bicluster.function.counts(con, network.id, type, ancestor.map)
+    bicluster.function.counts <- get.bicluster.function.counts(con, network.id, type, namespace)
+    
     cat(sprintf("constructed bicluster.function.counts %s\n", paste(dim(bicluster.function.counts), collapse='x')))
     
     # for each function, count all genes in genome with that function
     # return a data.frame w/ columns function_id, count
-    function.gene.counts <- get.function.gene.counts(con, gene.ids, type, ancestor.map)
+    function.gene.counts <- get.function.gene.counts(con, gene.ids, type, namespace)
+    
     cat(sprintf("constructed function.gene.counts %s\n", paste(dim(function.gene.counts), collapse='x')))
     
     # phyper(q, m, n, k)
@@ -269,7 +253,6 @@ get.ancestors <- function(con, function_ids) {
 
 # return a data.frame with two columns, function_id and ancestor_id mapping a function
 # to it's ancestors, where a function is considered to be it's own ancestor.
-# if namespace is specified, filter the ancestors to just that namespace.
 # WARNING: don't try to run this on GO terms. GO is much bigger and has a deeper hierarchy
 # than the other systems. It will be very slow.
 get.ancestor.map <- function(con, function_ids=NULL, type=NULL, namespace=NULL) {
@@ -280,6 +263,7 @@ get.ancestor.map <- function(con, function_ids=NULL, type=NULL, namespace=NULL) 
   results <- list()
   for (id in function_ids) {
     results[[as.character(id)]] <- data.frame(function_id=id, ancestor_id=c(id, get.ancestors(con, id)))
+    cat(sprintf("function id: %d\n", id))
   }
   df <- do.call(rbind, results)
   
@@ -299,10 +283,10 @@ get.ancestor.map <- function(con, function_ids=NULL, type=NULL, namespace=NULL) 
   return(df)
 }
 
-# compute enrichment of a network for functions of a type
-compute.and.display.enrichment <- function(network.id, system) {
-  cat(sprintf("enrichment network=%d, type=%s\n", network.id, system))
-  en <- enrichment(network.id, system)
+# compute enrichment of a network for functions of a type and subtype (namespace)
+compute.and.display.enrichment <- function(network.id, system.type, system.namespace) {
+  cat(sprintf("enrichment network=%d, type=%s, namespace=%s\n", network.id, system.type, system.namespace))
+  en <- enrichment(network.id, system.type, system.namespace)
   cat("dim(en) =", dim(en), "\n")
   cat("sum(en$p.bh < 0.05) =", sum(en$p.bh < 0.05), "\n")
   cat("sum(en$p.b < 0.05) =", sum(en$p.b < 0.05), "\n")
@@ -310,31 +294,21 @@ compute.and.display.enrichment <- function(network.id, system) {
   return(en)
 }
 
-# return a list of functional systems and their subcategories
-functional.systems <- function() {
-  return(   list( c(type='kegg', namespace='kegg pathway'),
-                  c(type='kegg', namespace='kegg subcategory'),
-                  c(type='kegg', namespace='kegg category'),
-                  c(type='tigr', namespace='tigr sub1role'),
-                  c(type='tigr', namespace='tigr mainrole'),
-                  c(type='cog',  namespace='cog subcategory'),
-                  c(type='cog',  namespace='cog category') ))
-}
 
-# compute enrichment for all networks, all systems
-let.it.rip <- function(insert=F) {
-  systems = c('kegg', 'tigr', 'cog')
+let.it.rip.GO <- function(insert=F) {
+  systems = list( c(type='go', namespace='biological_process'),
+                  c(type='go', namespace='cellular_component'),
+                  c(type='go', namespace='molecular_function') )
 
   networks <- get.networks()
   for (id in networks$id) {
     for (system in systems) {
-      en <- compute.and.display.enrichment(id, system)
+      en <- compute.and.display.enrichment(id, system['type'], system['namespace'])
       if (insert) {
+        
         # if any filtering is desired, based on p values or gene_count,
-        # here would be the place to do it. It might be a good idea to
-        # filter out namespaces 'cog' and 'tigr' since they mostly correspond
-        # to individual genes, not groups of genes.
-        insert.enrichment(en, method='hypergeometric2')
+        # here would be the place to do it.
+        insert.enrichment(en)
       }
     }
   }

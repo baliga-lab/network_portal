@@ -344,6 +344,12 @@ class Bicluster(models.Model):
     class Meta:
         ordering = ['k']
 
+    def expressions(self):
+        """try to pump out this cluster's expressions as quickly as possible"""
+        cursor = connection.cursor()
+        cursor.execute('select gene_id, condition_id, value from expression where gene_id in (select gene_id from networks_bicluster_genes where bicluster_id = %s) and condition_id in (select condition_id from networks_bicluster_conditions where bicluster_id = %s)', [self.id, self.id])
+        return [(row[0], row[1], row[2]) for row in cursor.fetchall()]
+
 # find biclusters with a given function
 # optionally, restrict to a particular network, or filter by
 # bonferroni p value or benjamini-hochberg p value
@@ -574,5 +580,75 @@ class Bicluster_Function(models.Model):
     p = models.FloatField(blank=True, null=True)
     p_bh = models.FloatField(blank=True, null=True)
     p_b = models.FloatField(blank=True, null=True)
+    #method = models.CharField(max_length=30, blank=True, null=True)
 
+class WorkflowCategories(models.Model):
+    name = models.CharField(max_length=255)
 
+#class ComponentTypes(models.Model):
+#    name = models.CharField(max_length=64)
+#    description = models.CharField(max_length = 255)
+
+#class ComponentIOTypes(models.Model):
+#    name = models.CharField(max_length=64)
+#    description = models.CharField(max_length=1024)
+#    type = models.IntegerField(blank=True, null=True)
+    
+    
+class WorkflowComponents(models.Model):
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=64)
+    category = models.ForeignKey(WorkflowCategories)
+    description = models.CharField(max_length = 1024, blank=True, null=True)
+    imgurl = models.CharField(max_length = 1024, blank=True, null=True)
+    guistring = models.CharField(max_length = 2048, blank=True, null=True)
+    serviceurl = models.CharField(max_length = 1024, blank=True, null=True)
+    downloadurl = models.CharField(max_length = 2048, blank = True, null=True)
+    arguments = models.CharField(max_length=1024, blank = True, null=True)
+
+class Users(models.Model):
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    password = models.CharField(max_length=2048, blank=True, null=True)
+    organization = models.CharField(max_length=255, blank=True, null=True)
+
+class Workflows(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=1024, blank=True, null=True)
+    owner = models.ForeignKey(Users)
+    shared = models.BooleanField(default=True)
+
+class WorkflowNodes(models.Model):
+    serviceuri = models.CharField(max_length=1024)
+    arguments = models.CharField(max_length=1024, blank=True, null=True)
+    subaction = models.CharField(max_length=255, blank=True, null=True)
+    datauri = models.CharField(max_length=1024, blank=True, null=True)
+    isstartnode = models.BooleanField(default=False)
+    workflow = models.ForeignKey(Workflows)
+    component = models.ForeignKey(WorkflowComponents)
+
+class WorkflowEdgeDataTypes(models.Model):
+    name = models.CharField(max_length=64)
+
+class WorkflowEdges(models.Model):
+    workflow = models.ForeignKey(Workflows)
+    sourcenode = models.ForeignKey(WorkflowNodes, related_name='sourcenode')
+    targetnode = models.ForeignKey(WorkflowNodes, related_name='targetnode')
+    #sourceid = models.CharField(max_length = 255)
+    #targetid = models.CharField(max_length = 255)
+    datatype = models.ForeignKey(WorkflowEdgeDataTypes, related_name='datatype')
+    paralleltype = models.IntegerField(default = 1)
+
+class WorkflowSessions(models.Model):
+    workflow = models.ForeignKey(Workflows)
+    sessionid = models.CharField(max_length = 128)
+    date = models.DateTimeField(auto_now_add=True, blank=True)
+
+class WorkflowReportData(models.Model):
+    dataurl = models.CharField(max_length=1024)
+    sessionid = models.CharField(max_length = 128)
+    workflow = models.ForeignKey(Workflows)
+    workflowcomponentname = models.CharField(max_length=255)
+    workflownode = models.ForeignKey(WorkflowNodes)
+    datatype=models.CharField(max_length=32)

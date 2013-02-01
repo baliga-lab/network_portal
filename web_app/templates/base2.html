@@ -6,7 +6,7 @@
     {% block csscommon %}<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/portal-style.css">{% endblock %}
     {% block cssspecial %}{% endblock %}
     {% block jscommon %}<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/json2.min.js"></script>{% endblock %}
     {% block jsspecial %}{% endblock %}
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/main.js"></script>
@@ -36,6 +36,11 @@
       <p id="slogan"><a href="http://www.systemsbiology.org"><img alt="Logo" src="{{ STATIC_PREFIX }}images/isb_logo.png"></a></p>
       <div id="underlinemenu" class="underlinemenu">
 	<ul>
+	  {% if request.user.is_authenticated %}
+	  <li><a href="logout">{{ request.user.email }}</a></li>
+	  {% else %}
+	  <li><a href="openid/login">Login</a></li>
+	  {% endif %}
 	  <li><a href="/about">About</a></li>
 	  <li><a href="/contact">Contact</a></li>
 	  <!-- <li><a href="login" id="selected">Login</a></li> -->
@@ -45,6 +50,7 @@
       <div id="nav">
         <ul>
           <li class="{% active request "^/$" %}"><a href="/">Home</a></li>
+          {# <li class="{% active request "^/workflow" %}"><a href="/workflow">Workflow</a></li> #}
           <li class="{% active request "^/search" %}"><a href="/search">Search</a></li>
           <li class="{% active request "^/species" %}"><a href="/species">Species</a></li>
           <!--<li class="{% active request "^/function" %}"><a href="/functions/">Function</a></li>-->
@@ -63,6 +69,7 @@
          <a href="http://genomicscience.energy.gov/index.shtml#page=news"><img height="40px" src="{{ STATIC_PREFIX }}images/kbase-logo.jpg"></a><br>
 	  &copy; <a href="http://baliga.systemsbiology.net/" title="Baliga Lab">Baliga Lab</a>
           | <a href="http://systemsbiology.org" title="ISB">Institute for Systems Biology</a>
+        | <a href="/workflow">Development</a>
         | <a href="/">Home</a> 
 	</p>
 	{% endblock %}
