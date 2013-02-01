@@ -15,6 +15,8 @@
   <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
   <script src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
   <script src="{{ STATIC_PREFIX }}javascripts/highcharts.js"></script>
+  {% if img_url %}
+  {% else %}
   <script type="text/javascript">
     $(document).ready(function() {
         var chart1 = new Highcharts.Chart({
@@ -31,6 +33,7 @@
         });
     });
   </script>
+  {% endif %}
 {% endblock %}
 {% block content %}
 <div id="bicluster-top">
