@@ -20,6 +20,7 @@ import json
 import networkx as nx
 import re
 import sys, traceback
+import math
 
 
 class Object(object):
@@ -250,8 +251,29 @@ def gene(request, gene=None, network_id=None):
     
     return render_to_response('gene.html', locals())
 
+SVG_MAP = {
+    'dvu': "http://baliga.systemsbiology.net/cmonkey/enigma/cmonkey_4.8.2_dvu_3491x739_11_Mar_02_17:37:51/svgs/",
+    'mmp': "http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/svgs/",
+    'hal': "http://baliga.systemsbiology.net/cmonkey/enigma/hal/cmonkey_4.5.4_hal_2072x268_10_Jul_13_11:04:39_EGRIN1_ORIGINAL_CLUSTERS/svgs/"
+}
+
 def bicluster(request, bicluster_id=None):
     bicluster = Bicluster.objects.get(id=bicluster_id)
+    expressions = bicluster.expressions()
+    expmap = {}
+    genes = bicluster.genes.all()
+    gene_map = { gene.id: gene.name for gene in genes }
+    for gene_id, cond_id, value in expressions:
+        if gene_id not in expmap:
+            expmap[gene_id] = []
+        value = 1.0 if math.isnan(value) else value
+        expmap[gene_id].append(str(value))  # make sure nan's do not reach the frontend
+    # format as javascript
+    exp_js = "["
+    for gene_id in expmap:
+        exp_js += ("{ name: '%s', data: [%s]}," % (gene_map[gene_id], ','.join(expmap[gene_id])))
+    exp_js += "]"
+
     genes = bicluster.genes.all()
     motifs = bicluster.motif_set.all()
     gene_count = len(genes)
@@ -264,22 +286,19 @@ def bicluster(request, bicluster_id=None):
     
     # TODO FIXME this should be in the database on a per-network basis
     species_sh_name =  species.short_name
-    if (species_sh_name == "dvu"):
-        img_url_prefix = "http://baliga.systemsbiology.net/cmonkey/enigma/cmonkey_4.8.2_dvu_3491x739_11_Mar_02_17:37:51/svgs/"
-    elif (species_sh_name == "mmp"):
-        img_url_prefix = "http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/svgs/"
-    else:
-        img_url_prefix = "http://baliga.systemsbiology.net/cmonkey/enigma/hal/cmonkey_4.5.4_hal_2072x268_10_Jul_13_11:04:39_EGRIN1_ORIGINAL_CLUSTERS/svgs/"
+    if species_sh_name in SVG_MAP:
+        # these SVGs are only available when they are generated with the
+        # R version, Python version provides all data to generate it dynamically
+        img_url_prefix = SVG_MAP[species_sh_name]
+        if (len(str(bicluster.k)) <= 1):
+            cluster_id = "cluster000" + str(bicluster.k) 
+        elif (len(str(bicluster.k)) <= 2): 
+            cluster_id = "cluster00" + str(bicluster.k) 
+        else:
+            cluster_id = "cluster0" + str(bicluster.k) 
 
-    if (len(str(bicluster.k)) <= 1):
-        cluster_id = "cluster000" + str(bicluster.k) 
-    elif (len(str(bicluster.k)) <= 2): 
-        cluster_id = "cluster00" + str(bicluster.k) 
-    else:
-        cluster_id = "cluster0" + str(bicluster.k) 
-
-    img_url = img_url_prefix + cluster_id + ".svgz"
-    print img_url
+        img_url = img_url_prefix + cluster_id + ".svgz"
+        print img_url
 
     # create motif object to hand to wei-ju's logo viewer
     pssm_logo_dict = __make_pssms(motifs)
