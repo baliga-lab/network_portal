@@ -517,7 +517,7 @@ def savereportdata(request):
                                     dataurl = url,
                                     datatype = dataType)
         reportdata.save()
-        return HttpResponse("1", mimetype)
+        return HttpResponse("1", content_type="text/plain")
     except Exception as e:
         print str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')

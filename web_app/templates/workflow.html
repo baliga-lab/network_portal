@@ -2,7 +2,7 @@
 {% block title %}Workflow Framework - Welcome{% endblock %}
 
 
-{% block content %}<div class="main">
+{% block content %}<div class="main"><div class="sub-page">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
@@ -110,12 +110,24 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 		<li> 6. Workflow components and connections will be automaticall created and placed into your workspace.</li>
 		<li> 7. You can "Pause" workflow anytime</li>	
 	</ul>
-
+    <h4>API documents for developing Boss and Goose that supports workflow</h4>
+    <a href="/static/apidocuments/index.html">API documents</a>
 </div>
 
 </td>
 <td class="tdlistworkflow" valign="top">
-    <div id="divWorkflow" class="divWorkflow">
+
+    <div id="accordion">
+        {% for workflow in myworkflows %}
+        <h3 id='h3wf_{{workflow.id|stringformat:"i"}}'><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></h3>
+        <div id='divwf_{{workflow.id|stringformat:"i"}}'>
+            <p>{{workflow.description}}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <!--<div id="divWorkflow" class="divWorkflow">
     <ul>
     {% if myworkflows.count > 0 %}
         {% for workflow in myworkflows %}
@@ -123,7 +135,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
         {% endfor %}
     {% endif %}
     </ul>
-    </div>
+    </div> -->
     <div>
         <input type="button" value="Delete" onclick="DeleteSessionReport()" />
     </div>
@@ -154,5 +166,6 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
 <input id="authenticated" type="hidden" value="{{userid}}" />
 <input id="componentstring" type="hidden" value="{{componentstring}}" />
+</div>
 </div>
 {% endblock %}
