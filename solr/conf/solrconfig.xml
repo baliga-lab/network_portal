@@ -85,6 +85,17 @@
   <lib dir="../../dist/" regex="apache-solr-clustering-\d.*\.jar" />
   <lib dir="../../dist/" regex="apache-solr-dataimporthandler-\d.*\.jar" /> -->
 
+  <!-- If a dir option (with or without a regex) is used and nothing
+       is found that matches, it will be ignored
+    -->
+  <lib dir="../../contrib/clustering/lib/" />
+  <lib dir="/total/crap/dir/ignored" /> 
+  <!-- an exact path can be used to specify a specific file.  This
+       will cause a serious error to be logged if it can't be loaded.
+    -->
+  <!--
+  <lib path="../a-jar-that-does-not-exist.jar" /> 
+  -->
   
   <!-- Data Directory
 

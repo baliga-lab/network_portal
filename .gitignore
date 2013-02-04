@@ -9,4 +9,3 @@ public/tb_all_network.xgmml
 solr/conf/dataimport.properties
 *~
 .DS_Store
-db/*.gz

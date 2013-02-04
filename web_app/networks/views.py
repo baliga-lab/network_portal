@@ -275,7 +275,6 @@ def bicluster(request, bicluster_id=None):
         exp_js += ("{ name: '%s', data: [%s]}," % (gene_map[gene_id], ','.join(expmap[gene_id])))
     exp_js += "]"
 
-    genes = bicluster.genes.all()
     motifs = bicluster.motif_set.all()
 
     ### setup annotation Javascript string
