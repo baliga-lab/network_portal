@@ -21,6 +21,7 @@ import networkx as nx
 import re
 import sys, traceback
 import math
+from itertools import chain
 
 
 class Object(object):
@@ -276,6 +277,40 @@ def bicluster(request, bicluster_id=None):
 
     genes = bicluster.genes.all()
     motifs = bicluster.motif_set.all()
+
+    ### setup annotation Javascript string
+    pvalue_threshold = 0.5
+    annots = [[(annot.gene.name, annot.position, annot.reverse, annot.pvalue,
+                motif.position, len(motif.pssm()))
+               for annot in motif.motifannotation_set.all() if annot.pvalue < pvalue_threshold]
+              for motif in motifs]
+    annots = list(chain.from_iterable(annots))
+
+    if len(annots) > 0:
+        gene_annot_map = {}
+        for item in annots:
+            if item[0] not in gene_annot_map:
+                gene_annot_map[item[0]] = []
+            gene_annot_map[item[0]].append(item)
+        gene_jss = []
+        residual = float(bicluster.residual)
+        for gene in gene_annot_map:
+            gene_js = "{\n"
+            gene_js += ("  gene: '%s', log10: %f, boxColor: '#08f', lineColor: '#000', " %
+                        (gene, residual))
+            match_jss = []
+            for match in gene_annot_map[gene]:
+                reverse = 'true' if match[2] else 'false'
+                score = 1.0 - float(match[3])
+                match_js = ("{motif: %d, start: %d, length: %d, reverse: %s, score: %f}" %
+                            (match[4], match[1], match[5], reverse, score))
+                match_jss.append(match_js)
+            gene_js += ("matches: [ %s ]" % ',\n'.join(match_jss))
+            gene_js += "}"
+            gene_jss.append(gene_js)
+        annot_js = "[ %s ];" % (',\n'.join(gene_jss))
+        print annot_js
+
     gene_count = len(genes)
     influences = bicluster.influences.all()
     conditions = bicluster.conditions.all()

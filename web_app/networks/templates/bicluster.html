@@ -14,9 +14,11 @@
   <script src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
   <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
   <script src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
-  <script src="{{ STATIC_PREFIX }}javascripts/highcharts.js"></script>
   {% if img_url %}
   {% else %}
+  <script src="{{ STATIC_PREFIX }}javascripts/raphael-min.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/gene_annotations.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/highcharts.js"></script>
   <script type="text/javascript">
     $(document).ready(function() {
         var chart1 = new Highcharts.Chart({
@@ -30,6 +32,11 @@
                 title: { text: 'log10' }
             },
             series: {{exp_js|safe}}
+        });
+
+        var annotations1 = {{annot_js|safe}}
+        annot.draw('annotation-graph1', {
+          width: 500, height: 300, annotations: annotations1
         });
     });
   </script>
@@ -57,6 +64,7 @@
 	  <object data="{{ img_url }}" type="image/svg+xml"></object>
     {% else %}
     <div id="expression-graph"></div>
+    <div id="annotation-graph1"></div>
     {% endif %}
 	</div>
 	<div id="sidebar">

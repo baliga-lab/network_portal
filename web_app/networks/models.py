@@ -446,6 +446,15 @@ class Motif(models.Model):
         finally:
             cursor.close()
 
+class MotifAnnotation(models.Model):
+    """motif gene annotations from MEME. Used for visualization"""
+    motif = models.ForeignKey(Motif)
+    gene = models.ForeignKey(Gene)
+    position = models.IntegerField()
+    reverse = models.BooleanField()
+    pvalue = models.DecimalField(max_digits=9, decimal_places=6)
+
+
 # A generalized annotation field. Put annotation on any type of object.
 class Annotation(models.Model):
     target_id = models.IntegerField()
