@@ -1,9 +1,9 @@
-﻿{% extends "base2.html" %}
+{% extends "base2.html" %}
 {% block title %}Workflow Framework - Welcome{% endblock %}
 
 
-{% block content %}<div class="main"><div class="sub-page">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+{% block content %}<div class="main">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
@@ -110,8 +110,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 		<li> 6. Workflow components and connections will be automaticall created and placed into your workspace.</li>
 		<li> 7. You can "Pause" workflow anytime</li>	
 	</ul>
-    <h4>API documents for developing Boss and Goose that supports workflow</h4>
-    <a href="/static/apidocuments/index.html">API documents</a>
+    <h4><a href="/static/apidocuments/index.html">API documents</a> for developing Boss and Goose that supports workflow</h4>
 </div>
 
 </td>
@@ -119,7 +118,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
     <div id="accordion">
         {% for workflow in myworkflows %}
-        <h3 id='h3wf_{{workflow.id|stringformat:"i"}}'><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></h3>
+        <h3 id="h3wf_{{workflow.id|stringformat:"i"}}"><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></h3>
         <div id='divwf_{{workflow.id|stringformat:"i"}}'>
             <p>{{workflow.description}}</p>
         </div>
@@ -166,6 +165,5 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
 <input id="authenticated" type="hidden" value="{{userid}}" />
 <input id="componentstring" type="hidden" value="{{componentstring}}" />
-</div>
 </div>
 {% endblock %}
