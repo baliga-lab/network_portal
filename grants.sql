@@ -50,6 +50,8 @@ grant all privileges on networks_network to apache;
 grant all privileges on networks_species to apache;
 grant all privileges on networks_synonym to apache;
 grant all privileges on pssms to apache;
+grant all privileges on networks_motif_annotation to apache;
+grant all privileges on networks_motif_annotation_id_seq to apache;
 
 grant all privileges on networks_species_id_seq to apache;
 grant all privileges on networks_synonym to apache;
@@ -72,4 +74,19 @@ grant all privileges on networks_workflows to apache;
 grant all privileges on networks_workflows_id_seq to apache;
 grant all privileges on networks_workflowsessions to apache;
 grant all privileges on networks_workflowsessions_id_seq to apache;
-
+grant all privileges on auth_user to apache;
+ 
+grant all privileges on auth_group to apache;
+grant all privileges on auth_group_id_seq to apache;
+grant all privileges on auth_group_permissions to apache;
+grant all privileges on auth_group_permissions_id_seq to apache;
+grant all privileges on auth_message to apache;
+grant all privileges on auth_message_id_seq to apache;
+grant all privileges on auth_permission to apache;
+grant all privileges on auth_permission_id_seq to apache;
+grant all privileges on auth_user to apache;
+grant all privileges on auth_user_groups to apache;
+grant all privileges on auth_user_groups_id_seq to apache;
+grant all privileges on auth_user_id_seq to apache;
+grant all privileges on auth_user_user_permissions to apache;
+grant all privileges on auth_user_user_permissions_id_seq to apache;
