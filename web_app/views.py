@@ -21,9 +21,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 
-from web_app.networks.models import *
-from web_app.networks.functions import functional_systems
-from web_app.networks.helpers import get_influence_biclusters
+from .networks.models import *
+from .networks.functions import functional_systems
+from .networks.helpers import get_influence_biclusters
 
 #import jpype
 import openid

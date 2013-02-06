@@ -1,9 +1,9 @@
-# Create your views here.
-#from django.shortcuts import get_object_or_404, render_to_response
-#from django.http import HttpResponseRedirect, HttpResponse
-#from django.core.urlresolvers import reverse
-#from django.template import RequestContext 
-from web_app.networks.models import Gene
+import re
+import sys, traceback
+import math
+from itertools import chain
+from pprint import pprint
+import json
 
 from django.template import RequestContext
 from django.http import HttpResponse
@@ -11,17 +11,13 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.db.models import Q
-from web_app.networks.models import *
-from web_app.networks.functions import functional_systems
-from web_app.networks.helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
-from pprint import pprint
 from django.utils import simplejson
-import json
+
 import networkx as nx
-import re
-import sys, traceback
-import math
-from itertools import chain
+
+from .models import *
+from .functions import functional_systems
+from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
 
 
 class Object(object):
@@ -302,13 +298,12 @@ def bicluster(request, bicluster_id=None):
                 reverse = 'true' if match[2] else 'false'
                 score = 1.0 - float(match[3])
                 match_js = ("{motif: %d, start: %d, length: %d, reverse: %s, score: %f}" %
-                            (match[4], match[1], match[5], reverse, score))
+                            (match[4] - 1, match[1], match[5], reverse, score))
                 match_jss.append(match_js)
             gene_js += ("matches: [ %s ]" % ',\n'.join(match_jss))
             gene_js += "}"
             gene_jss.append(gene_js)
         annot_js = "[ %s ];" % (',\n'.join(gene_jss))
-        print annot_js
 
     gene_count = len(genes)
     influences = bicluster.influences.all()

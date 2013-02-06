@@ -1,8 +1,9 @@
 # Define the 4 functional systems we use: KEGG, COG, TIGRFam, and GO
 # For each system, define a name, display_name, top_level_categories,
 # link to home, link to term, citation?, version?,
-from models import Function
+from .models import Function
 import re
+
 
 class FunctionalSystem(object):
     def __init__(self):
@@ -13,6 +14,7 @@ class FunctionalSystem(object):
     
     def linked_description(self):
         return self.description.replace(self.display_name, "<a href=\"%s\">%s</a>" % (self.link_to_home, self.display_name,))
+
 
 class KEGG(FunctionalSystem):
     def __init__(self):
@@ -25,6 +27,7 @@ class KEGG(FunctionalSystem):
 
     def top_level(self):
         return Function.objects.filter(type='kegg',namespace='kegg category')
+
 
 class GO(FunctionalSystem):
     def __init__(self):
@@ -41,6 +44,7 @@ class GO(FunctionalSystem):
     def linked_description(self):
         return self.description.replace("Gene Ontology", "<a href=\"%s\">Gene Ontology</a>" % (self.link_to_home,))
 
+
 class COG(FunctionalSystem):
     def __init__(self):
         self.name = "cog"
@@ -56,6 +60,7 @@ class COG(FunctionalSystem):
     def linked_description(self):
         return self.description.replace("Clusters of Orthologous Groups", "<a href=\"%s\">Clusters of Orthologous Groups</a>" % (self.link_to_home,))
 
+
 class TIGR(FunctionalSystem):
     def __init__(self):
         self.name = "tigr"
@@ -67,5 +72,6 @@ class TIGR(FunctionalSystem):
     
     def top_level(self):
         return Function.objects.filter(type='tigr',namespace='tigr mainrole')
+
 
 functional_systems = {'kegg':KEGG(), 'go':GO(), 'cog':COG(), 'tigr':TIGR()}
