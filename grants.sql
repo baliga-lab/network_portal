@@ -50,8 +50,8 @@ grant all privileges on networks_network to apache;
 grant all privileges on networks_species to apache;
 grant all privileges on networks_synonym to apache;
 grant all privileges on pssms to apache;
-grant all privileges on networks_motif_annotation to apache;
-grant all privileges on networks_motif_annotation_id_seq to apache;
+grant all privileges on networks_motifannotation to apache;
+grant all privileges on networks_motifannotation_id_seq to apache;
 
 grant all privileges on networks_species_id_seq to apache;
 grant all privileges on networks_synonym to apache;
