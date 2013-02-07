@@ -40,7 +40,7 @@ var targetWFEndpointOptions = {
 $(document).ready(function () {
     $('#accordion').accordion({ active: false,
                                 collapsible: true,
-				heightStyle: "content"});
+				                heightStyle: "content"});
     $('#accordion p').bind('click', function (event) {
        var source = event.target || event.srcElement;
        if (source != null)
@@ -1390,7 +1390,7 @@ function SetWorkflowStatus(componentid, status)
 
 // Applet reports it is ready to use
 function java_socket_bridge_ready() {
-    alert("Proxy ready!");
+    //alert("Proxy ready!");
     java_socket_bridge_ready_flag = true;
 }
 
