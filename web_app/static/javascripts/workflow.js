@@ -38,6 +38,25 @@ var targetWFEndpointOptions = {
 };
 
 $(document).ready(function () {
+    $('#accordion').accordion({ active: false,
+                                collapsible: true,
+				heightStyle: "content"});
+    $('#accordion p').bind('click', function (event) {
+       var source = event.target || event.srcElement;
+       if (source != null)
+       {
+          //alert($(source).attr("id"));
+          var srcid = $(source).attr("id");
+          var splitted = srcid.split("_");
+          var wfid = splitted[1];
+          if (wfid != null)
+          {
+            //alert(wfid);
+            GetWorkflow(wfid);
+          }
+       }
+    } );
+
     $('.component').draggable({
         helper: 'clone'
     });
@@ -51,10 +70,10 @@ $(document).ready(function () {
         drop: componentDropEvent
     });
 
+
+
     GetEdgeDataTypes();
 
-    // Start the timer to check workflow sessions
-    setTimeout(function() { CheckSessions() }, 2000);
 });
 
 function LoadHTML() {
@@ -217,7 +236,7 @@ function componentDropEvent(ev, component) {
                 var uri = window.localStorage.getItem(component.draggable.attr("id"));
                 //alert(uri);
                 if (uri != null)
-                    $(serviceuriinput).attr("value", uri);
+                    $(serviceuriinput).val("value", uri);
             }
             // we include the id of the original component to be able to retrieve it later to generate
             // the workflow
@@ -352,7 +371,7 @@ function ExtractWorkflow() {
 
                     var serviceurlelement = $(source).children()[2];
                     //alert(serviceurlelement);
-                    //alert("Service uri: " + $(serviceurlelement).attr("value"));
+                    //alert("Service uri: " + $(serviceurlelement).val());
                     var argumentselement = $(source).children()[3];
                     //alert(argumentselement);
                     var subactionelement = $(source).children()[4];
@@ -363,17 +382,17 @@ function ExtractWorkflow() {
 
                     var wfnode = {};
                     wfnode.id = srcidstr;
-                    wfnode.wfnodeid = $(componentworkflownodeidelement).attr("value");
+                    wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
 
                     //var namevalueelement = $((nameelement).children())[0];
                     //alert(srcidstr);
-                    wfnode.name = $(nameelement).attr("value");
-                    wfnode.goosename = $(goosenameelement).attr("value");
-                    wfnode.serviceuri = $(serviceurlelement).attr("value");
-                    wfnode.arguments = $(argumentselement).attr("value");
+                    wfnode.name = $(nameelement).val();
+                    wfnode.goosename = $(goosenameelement).val();
+                    wfnode.serviceuri = $(serviceurlelement).val();
+                    wfnode.arguments = $(argumentselement).val();
                     //alert("Service uri arguments: " + wfnode.arguments);
-                    wfnode.subaction = $(subactionelement).attr("value");
-                    wfnode.datauri = $(dataurielement).attr("value");
+                    wfnode.subaction = $(subactionelement).val();
+                    wfnode.datauri = $(dataurielement).val();
                     wfnode.componentid = srcid;
                     WF_nodes[srcidstr] = wfnode;
                     //alert("Source node stored");
@@ -394,13 +413,13 @@ function ExtractWorkflow() {
 
                     var wfnode = {};
                     wfnode.id = targetidstr;
-                    wfnode.wfnodeid = $(componentworkflownodeidelement).attr("value");
-                    wfnode.name = $(nameelement).attr("value");
-                    wfnode.goosename = $(goosenameelement).attr("value");
-                    wfnode.serviceuri = $(serviceurlelement).attr("value");
-                    wfnode.arguments = $(argumentselement).attr("value");
-                    wfnode.subaction = $(subactionelement).attr("value");
-                    wfnode.datauri = $(dataurielement).attr("value");
+                    wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
+                    wfnode.name = $(nameelement).val(); //attr("value");
+                    wfnode.goosename = $(goosenameelement).val();//.attr("value");
+                    wfnode.serviceuri = $(serviceurlelement).val(); //attr("value");
+                    wfnode.arguments = $(argumentselement).val(); //attr("value");
+                    wfnode.subaction = $(subactionelement).val(); //attr("value");
+                    wfnode.datauri = $(dataurielement).val(); //attr("value");
                     wfnode.componentid = targetid;
                     WF_nodes[targetidstr] = wfnode;
                 }
@@ -450,18 +469,20 @@ function ExtractWorkflow() {
                 var dataurielement = $(source).children()[5];
                 //alert($(dataurielement).attr("value"));
                 var goosenameelement = $(source).children()[6];
+                var componentworkflownodeidelement = $(source).children()[8];
 
                 var wfnode = {};
                 wfnode.id = srcidstr;
                 //var namevalueelement = $((nameelement).children())[0];
                 //alert(srcidstr);
-                wfnode.name = $(nameelement).attr("value");
-                wfnode.goosename = $(goosenameelement).attr("value");
-                wfnode.serviceuri = $(serviceurlelement).attr("value");
-                wfnode.arguments = $(argumentselement).attr("value");
+                wfnode.name = $(nameelement).val(); //.attr("value");
+                wfnode.goosename = $(goosenameelement).val(); //.attr("value");
+                wfnode.serviceuri = $(serviceurlelement).val(); //.attr("value");
+                wfnode.arguments = $(argumentselement).val(); //.attr("value");
                 //alert("Service uri arguments: " + wfnode.arguments);
-                wfnode.subaction = $(subactionelement).attr("value");
-                wfnode.datauri = $(dataurielement).attr("value");
+                wfnode.subaction = $(subactionelement).val(); //.attr("value");
+                wfnode.datauri = $(dataurielement).val(); //.attr("value");
+                wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
                 wfnode.componentid = srcid;
 
                 //alert("add node " + srcid);
@@ -524,8 +545,9 @@ function DeleteClicked()
                                             //alert("Remove workflow: " + data);
                                             if (data == "1")
                                             {
-                                                var liid = "#liwf_" + currWorkflowID;
-                                                $(liid).remove();
+                                                //var liid = "#liwf_" + currWorkflowID;
+                                                //$(liid).remove();
+                                                RemoveWorkflowItem(currWorkflowID);
                                                 InitializeWorkflow();
                                             }
                                         }
@@ -690,6 +712,55 @@ function ProcessWorkflowforNode(node, edges, data) {
     }
 }
 
+function AppendOrUpdateWorkflowItem(wfid, workflowjsonstring)
+{
+    if (wfid != null && workflowjsonstring != null)
+    {
+        var wfcontrolid = "a#liwf_" + wfid;
+        var wfdivid = "divwf_" + wfid;
+        var newhtml = "<h3><a href='#' id='liwf_" + wfid + "'>" + workflowjsonstring['name'] + "</a></h3>";
+        var newdivhtml = "<p>" + workflowjsonstring['desc'] + "</p>";
+        //alert(newhtml);
+        //alert(newdivhtml);
+        //alert($(wfdivid));
+        var textdiv = document.getElementById(wfdivid);
+        if (textdiv != null)
+        {
+            // Update the workflow
+            //alert("Update " + $(wfcontrolid).text());
+            $(wfcontrolid).text(workflowjsonstring['name']);
+
+            if ($("#" + wfdivid) != null)
+            {
+                $(("#" + wfdivid)).html(newdivhtml);
+            }
+        }
+        else
+        {
+            var ahrefelement = document.createElement('a');
+            $(ahrefelement).html(newhtml);
+            var divelement = document.createElement("div");
+            divelement.setAttribute("id", ("divwf_" + wfid));
+            $(divelement).html(newdivhtml);
+            alert("Append elements " + $(ahrefelement).html());
+            $("#accordion").append($(ahrefelement));
+            $("#accordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
+
+        }
+    }
+}
+
+function RemoveWorkflowItem(wfid)
+{
+    if (wfid != null)
+    {
+        var wfcontrolid = "#liwf_" + wfid;
+        var wfdivid = "#divwf_" + wfid;
+        $(wfcontrolid).parent().remove();
+        $(wfdivid).remove();
+    }
+}
+
 // Save the workflow to the DB
 function SaveWorkflow(name, desc, workflowid, userid) {
     //alert("save workflow " + workflowid);
@@ -719,7 +790,8 @@ function SaveWorkflow(name, desc, workflowid, userid) {
             //alert(($("#divWorkflow").children().length));
             if (result['id'] != undefined && result['id'].length > 0)
             {
-                var link = "<li class='unselectedworkflow' id=\"liwf_" + result['id'] + "\"><a title=\"" + result['desc'] + "\" href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
+                AppendOrUpdateWorkflowItem(result['id'], result);
+                /*var link = "<li class='unselectedworkflow' id=\"liwf_" + result['id'] + "\"><a title=\"" + result['desc'] + "\" href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
                 //alert(link);
                 var ul = ($("#divWorkflow").children())[0];
                 var liid = "liwf_" + result['id'];
@@ -732,7 +804,7 @@ function SaveWorkflow(name, desc, workflowid, userid) {
                 else
                     $(wflink).html(link);
                 ToggleCurrentWorkflowLink(currWorkflowID, result['id']);
-                currWorkflowID = result['id'];
+                currWorkflowID = result['id'];  */
             }
         }
     });
@@ -1163,6 +1235,7 @@ function CheckSessions()
     }
     if (WF_timercnt < 10)
     {
+        //alert("Check sessions: " + WF_timercnt);
         WF_timercnt++;
         setTimeout(function() { CheckSessions() }, 2000);
     }
