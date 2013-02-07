@@ -1,17 +1,15 @@
-{% extends "base2.html" %}
+﻿{% extends "base2.html" %}
 {% block title %}Workflow Framework - Welcome{% endblock %}
 
 
-{% block content %}<div class="main">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+{% block content %}<div class="sub-page"><div class="main">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.15-all-min.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
-
-
 <div id="container">
 <div>
 <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
@@ -26,28 +24,28 @@
 <table id="tblWorkflow" class="tblWorkflow">
 <tbody>
 <tr>
-<td><h3>Modules</h3></td>
-<td style="width: 600px">
-<a href='/static/jnlp/boss.jnlp'>start the boss</a>
-<input type="button" value="Run" onclick="SubmitWorkflow()" />
-<input type="button" value="Save" onclick="SaveClicked()" />
-<input type="button" value="Delete" onclick="DeleteClicked()" />
-<input type="button" value="Clear" onclick="InitializeWorkflow()" /> || 
-<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" />
-<input id="btnPause" type="button" value="Pause" onclick="TogglePause()" />
-</td>
-<td style="width: 100px"><H3>Workflows</h3>
-</td>
+<th style="width: 10%"><h3>Modules</h3></th>
+<th style="width: 80%">
+<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>
+<input type="button" value="Run" onclick="SubmitWorkflow()" class="button-run" title="Run selected workflow"/>
+<input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
+<input type="button" value="Delete" onclick="DeleteClicked()" class="button" title="Delete current workflow"/>
+<input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>
+<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" class="button-record" title="Start recording new workflow"/>
+<input id="btnPause" type="button" value="Pause" onclick="TogglePause()" class="button-record" title="Pause workflow recording"/>
+</th>
+<th style="width: 20%"><H3> Workflows </H3>
+</th>
 </tr>
 <tr>
 <td valign="top">
-<div id="components" class="divcomponents">
+ <div id="components" class="divcomponents">
     {% if wfentries.count > 0 %}
         {% for wfentry in wfentries %}
-            <p><strong>{{wfentry.Category.name}}</strong></p>
-            <ul>
+            <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
+            
                {% for component in wfentry.Components %}
-                   <li>
+                   
                         <div class="component" id='component_{{component.id|stringformat:"i"}}'>
                         <div class="componenttitle"><a href="javascript:startDownload('{{component.downloadurl}}')">{{component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
@@ -65,9 +63,9 @@
                         <input type="hidden" value="{{component.short_name}}" />
                         <input type="hidden" value="" />
                         </div>
-                   </li>
+                   
                {% endfor %}
-            </ul>
+            
         {% endfor %}
     {% endif %}
 </div>
@@ -116,9 +114,9 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 </td>
 <td class="tdlistworkflow" valign="top">
 
-    <div id="accordion">
+    <div id="accordion" heightStyle: "fill">
         {% for workflow in myworkflows %}
-        <h3 id="h3wf_{{workflow.id|stringformat:"i"}}"><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></h3>
+        <p id="h3wf_{{workflow.id|stringformat:"i"}}"><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></p>
         <div id='divwf_{{workflow.id|stringformat:"i"}}'>
             <p>{{workflow.description}}</p>
         </div>
@@ -135,8 +133,8 @@ This is your worflow canvas. Start adding worflow componens from left, open save
     {% endif %}
     </ul>
     </div> -->
-    <div>
-        <input type="button" value="Delete" onclick="DeleteSessionReport()" />
+    <div><H3> Reports</H3>
+        <input type="button" value="Delete" onclick="DeleteSessionReport()" class="button"/>
     </div>
     <div id="divReport" class="divWorkflow">
        <ul></ul>
@@ -166,4 +164,6 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 <input id="authenticated" type="hidden" value="{{userid}}" />
 <input id="componentstring" type="hidden" value="{{componentstring}}" />
 </div>
+</div>
+
 {% endblock %}
