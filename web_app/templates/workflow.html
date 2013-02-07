@@ -3,7 +3,7 @@
 
 
 {% block content %}<div class="main">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
@@ -26,28 +26,28 @@
 <table id="tblWorkflow" class="tblWorkflow">
 <tbody>
 <tr>
-<td><h3>Modules</h3></td>
-<td style="width: 600px">
-<a href='/static/jnlp/boss.jnlp'>start the boss</a>
-<input type="button" value="Run" onclick="SubmitWorkflow()" />
-<input type="button" value="Save" onclick="SaveClicked()" />
-<input type="button" value="Delete" onclick="DeleteClicked()" />
-<input type="button" value="Clear" onclick="InitializeWorkflow()" /> || 
-<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" />
-<input id="btnPause" type="button" value="Pause" onclick="TogglePause()" />
-</td>
-<td style="width: 100px"><H3>Workflows</h3>
-</td>
+<th style="width: 80px"><h3>Modules</h3></th>
+<th style="width: 600px">
+<span id="boss" class="boss"> <a href='/static/jnlp/boss.jnlp'>start the boss</a></span>
+<input type="button" value="Run" onclick="SubmitWorkflow()" class="button-run" />
+<input type="button" value="Save" onclick="SaveClicked()" class="button" />
+<input type="button" value="Delete" onclick="DeleteClicked()" class="button"/>
+<input type="button" value="Clear" onclick="InitializeWorkflow()" class="button"/> 
+<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" class="button-record" />
+<input id="btnPause" type="button" value="Pause" onclick="TogglePause()" class="button-record"/>
+</th>
+<th style="width: 120px"><H3>Workflows</h3>
+</th>
 </tr>
 <tr>
 <td valign="top">
 <div id="components" class="divcomponents">
     {% if wfentries.count > 0 %}
         {% for wfentry in wfentries %}
-            <p><strong>{{wfentry.Category.name}}</strong></p>
-            <ul>
+            <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
+            
                {% for component in wfentry.Components %}
-                   <li>
+                   
                         <div class="component" id='component_{{component.id|stringformat:"i"}}'>
                         <div class="componenttitle"><a href="javascript:startDownload('{{component.downloadurl}}')">{{component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
@@ -65,9 +65,9 @@
                         <input type="hidden" value="{{component.short_name}}" />
                         <input type="hidden" value="" />
                         </div>
-                   </li>
+                   
                {% endfor %}
-            </ul>
+            
         {% endfor %}
     {% endif %}
 </div>
@@ -118,7 +118,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
     <div id="accordion">
         {% for workflow in myworkflows %}
-        <h3 id="h3wf_{{workflow.id|stringformat:"i"}}"><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></h3>
+        <p id="h3wf_{{workflow.id|stringformat:"i"}}"><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></p>
         <div id='divwf_{{workflow.id|stringformat:"i"}}'>
             <p>{{workflow.description}}</p>
         </div>
@@ -135,7 +135,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
     {% endif %}
     </ul>
     </div> -->
-    <div>
+    <div><h3>Reports</h3>
         <input type="button" value="Delete" onclick="DeleteSessionReport()" />
     </div>
     <div id="divReport" class="divWorkflow">
