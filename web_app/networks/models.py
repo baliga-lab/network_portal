@@ -336,7 +336,7 @@ class Bicluster(models.Model):
     conditions = models.ManyToManyField(Condition)
     genes = models.ManyToManyField(Gene)
     influences = models.ManyToManyField(Influence, symmetrical=False)
-    #functions = models.ManyToManyField('Function', through='Bicluster_Function')
+    functions = models.ManyToManyField('Function', through='Bicluster_Function')
     
     def __unicode__(self):
         return "Bicluster " + str(self.k)
@@ -574,7 +574,7 @@ class Bicluster_Function(models.Model):
     p = models.FloatField(blank=True, null=True)
     p_bh = models.FloatField(blank=True, null=True)
     p_b = models.FloatField(blank=True, null=True)
-    method = models.CharField(max_length=30, blank=True, null=True)
+    #method = models.CharField(max_length=30, blank=True, null=True)
 
 class WorkflowCategories(models.Model):
     name = models.CharField(max_length=255)
