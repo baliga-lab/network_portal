@@ -336,7 +336,7 @@ class Bicluster(models.Model):
     conditions = models.ManyToManyField(Condition)
     genes = models.ManyToManyField(Gene)
     influences = models.ManyToManyField(Influence, symmetrical=False)
-    functions = models.ManyToManyField('Function', through='Bicluster_Function')
+    #functions = models.ManyToManyField('Function', through='Bicluster_Function')
     
     def __unicode__(self):
         return "Bicluster " + str(self.k)
