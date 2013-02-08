@@ -1,10 +1,12 @@
-from django.db import models
-from django.db import connection
-from django.contrib.auth.models import User
-from helpers import synonym
 import re
 import numpy as np
 import StringIO
+
+from django.db import models
+from django.db import connection
+from django.contrib.auth.models import User
+
+from .helpers import synonym
 
 
 class Species(models.Model):
@@ -344,6 +346,12 @@ class Bicluster(models.Model):
     class Meta:
         ordering = ['k']
 
+    def expressions(self):
+        """try to pump out this cluster's expressions as quickly as possible"""
+        cursor = connection.cursor()
+        cursor.execute('select gene_id, condition_id, value from expression where gene_id in (select gene_id from networks_bicluster_genes where bicluster_id = %s) and condition_id in (select condition_id from networks_bicluster_conditions where bicluster_id = %s)', [self.id, self.id])
+        return [(row[0], row[1], row[2]) for row in cursor.fetchall()]
+
 # find biclusters with a given function
 # optionally, restrict to a particular network, or filter by
 # bonferroni p value or benjamini-hochberg p value
@@ -439,6 +447,15 @@ class Motif(models.Model):
             return pssm
         finally:
             cursor.close()
+
+class MotifAnnotation(models.Model):
+    """motif gene annotations from MEME. Used for visualization"""
+    motif = models.ForeignKey(Motif)
+    gene = models.ForeignKey(Gene)
+    position = models.IntegerField()
+    reverse = models.BooleanField()
+    pvalue = models.DecimalField(max_digits=9, decimal_places=6)
+
 
 # A generalized annotation field. Put annotation on any type of object.
 class Annotation(models.Model):
