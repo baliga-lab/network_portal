@@ -414,29 +414,50 @@ def getsessiondata(request, sessionId):
         print str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')
 
+def deletesession(sessionId):
+    sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
+    # delete all the files of a session
+    for data in sessiondata:
+        try:
+            print "remove file " + data.dataurl
+            with open(data.dataurl, 'wb') as f:
+                destination = File(f)
+                destination.delete()
+
+            #shutil.rmtree(data.dataurl)
+        except Exception as e0:
+            print "Failed to delete file: " + data.dataurl
+
+    WorkflowReportData.objects.filter(sessionid = sessionId).delete()
+    WorkflowSessions.objects.filter(sessionid = sessionId).delete()
+
 def deletesessiondata(request, sessionId):
     print 'Delete session data for ' + sessionId
 
     try:
-        # delete all the files of a session
-        sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
-        for data in sessiondata:
-            try:
-                print "remove file " + data.dataurl
-                with open(data.dataurl, 'wb') as f:
-                    destination = File(f)
-                    destination.delete()
-
-                #shutil.rmtree(data.dataurl)
-            except Exception as e0:
-                print "Failed to delete file: " + data.dataurl
-
-        WorkflowReportData.objects.filter(sessionid = sessionId).delete()
-        WorkflowSessions.objects.filter(sessionid = sessionId).delete()
+        deletesession(sessionId)
         return HttpResponse("1")
     except Exception as e:
         print str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')
+
+@csrf_exempt
+def deletesessionreports(request):
+    print "delete session reports"
+    print request.raw_post_data
+
+    try:
+        sessions = json.loads(request.raw_post_data)
+        with transaction.commit_on_success():
+             for key in sessions.keys():
+                sessionId = sessions[key]
+                print "deleting session " + sessionId
+                deletesession(sessionId)
+        return HttpResponse("1")
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'status': str(e) }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
 
 @csrf_exempt
 def savereportdata(request):

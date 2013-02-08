@@ -675,7 +675,7 @@ function OnSubmitWorkflow(jsongooseinfo)
             var componentid = "#" + key;
             var serviceuriinput = ($(componentid).children())[2];
             //alert("Current value: " + $(serviceuriinput).html());
-            $(serviceuriinput).attr("value", exepath);
+            $(serviceuriinput).val(exepath);
             //alert(window.localStorage);
             if (window.localStorage) {
               // window.localStorage is available!
@@ -1214,7 +1214,8 @@ function CheckSessions()
                             var session = result[key];
                             if (session != undefined)
                             {
-                                var link = "<li class='unselectedworkflow' id=\"lisession_" + session['id'] + "\"><a title=\" Retrieve the report of session run at " + session['date'] + "\" href='" + "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")'>" + session['date'] + "</a></li>";
+                                var link = "<li class='unselectedworkflow' id=\"lisession_" + session['id']
+                                 + "\"><label class='reportlabel'><input type='checkbox' /><a title=\" Retrieve the report of session run at " + session['date'] + "\" href='" + "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")'>" + session['date'] + "</a></label></li>";
                                 //alert(link);
                                 var liid = "lisession_" + session['id'];
                                 //alert("li ID: " + liid);
@@ -1283,52 +1284,71 @@ function GetWorkflowSessionReport(sessionid)
 
 function DeleteSessionReport()
 {
-    if (currSessionID != "")
+    var jsonobj = {};
+    var i = 0;
+    $(".reportlabel").each(function()
     {
-        alert(currSessionID);
+        var checkbox = $(this).children()[0];
+        //alert(checkbox);
+        if ($(checkbox).is(':checked'))
+        {
+            var parentli = $(this).parent();
+            //alert("Parent li id: " + parentli.attr('id'));
+            var parentid = parentli.attr('id');
+            var splitted = parentid.split("_");
+            var sessionid = splitted[1];
+            //alert("sessionid: " + sessionid);
+            jsonobj[i] = sessionid;
+            i++;
+        }
+    });
 
-        $.get("/workflow/deletesession/" + currSessionID + "/",
-                                                        function (data) {
-                                                            //alert("Get workflow " + wfid);
-                                                            //alert("Remove workflow: " + data);
-                                                            if (data == "1")
-                                                            {
-                                                                var liid = "#lisession_" + currSessionID;
-                                                                $(liid).remove();
-                                                                //InitializeWorkflow();
-                                                            }
-                                                        }
-                                                    );
-
-
-        /*$( "#dlgdeletealert" ).dialog({
-                            resizable: false,
-                            height:200,
-                            modal: true,
-                            buttons: {
-                                "Yes": function() {
-                                    // Delete the workflow
-                                    $.get("/workflow/deletesession/" + currSessionID + "/",
-                                                function (data) {
-                                                    //alert("Get workflow " + wfid);
-                                                    //alert("Remove workflow: " + data);
-                                                    if (data == "1")
-                                                    {
-                                                        var liid = "#lisession_" + currSessionID;
-                                                        $(liid).remove();
-                                                        //InitializeWorkflow();
-                                                    }
-                                                }
-                                            );
-
-                                    $( this ).dialog( "close" );
-                                },
-                                Cancel: function() {
-                                    $( this ).dialog( "close" );
-                                }
-                            }
-                        }); */
+    if (i > 0)
+    {
+        jQuery.ajax({
+            url: "/workflow/deletesessionreports/",
+            type: "POST",
+            data: JSON.stringify(jsonobj),
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            beforeSend: function (x) {
+                if (x && x.overrideMimeType) {
+                    x.overrideMimeType("application/json;charset=UTF-8");
+                }
+            },
+            success: function (result) {
+                //Write your code here
+                //alert(result['id']);
+                //alert(($("#divWorkflow").children().length));
+                if (result == "1")
+                {
+                    for (var j = 0; j < i; j++)
+                    {
+                        var currSessionID = jsonobj[j];
+                        var liid = "#lisession_" + currSessionID;
+                        $(liid).remove();
+                    }
+                }
+            }
+        });
     }
+
+
+    /*$.get("/workflow/deletesession/" + currSessionID + "/",
+        function (data) {
+            //alert("Get workflow " + wfid);
+            //alert("Remove workflow: " + data);
+            if (data == "1")
+            {
+                for (var j = 0; j < i; j++)
+                {
+                    var currSessionID = jsonObj[j];
+                    var liid = "#lisession_" + currSessionID;
+                    $(liid).remove();
+                }
+            }
+        }
+    ); */
 }
 
 
