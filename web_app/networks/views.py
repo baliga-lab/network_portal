@@ -1,9 +1,9 @@
-# Create your views here.
-#from django.shortcuts import get_object_or_404, render_to_response
-#from django.http import HttpResponseRedirect, HttpResponse
-#from django.core.urlresolvers import reverse
-#from django.template import RequestContext 
-from web_app.networks.models import Gene
+import re
+import sys, traceback
+import math
+from itertools import chain
+from pprint import pprint
+import json
 
 from django.template import RequestContext
 from django.http import HttpResponse
@@ -11,15 +11,13 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.db.models import Q
-from web_app.networks.models import *
-from web_app.networks.functions import functional_systems
-from web_app.networks.helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
-from pprint import pprint
 from django.utils import simplejson
-import json
+
 import networkx as nx
-import re
-import sys, traceback
+
+from .models import *
+from .functions import functional_systems
+from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
 
 
 class Object(object):
@@ -250,10 +248,63 @@ def gene(request, gene=None, network_id=None):
     
     return render_to_response('gene.html', locals())
 
+SVG_MAP = {
+    'dvu': "http://baliga.systemsbiology.net/cmonkey/enigma/cmonkey_4.8.2_dvu_3491x739_11_Mar_02_17:37:51/svgs/",
+    'mmp': "http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/svgs/",
+    'hal': "http://baliga.systemsbiology.net/cmonkey/enigma/hal/cmonkey_4.5.4_hal_2072x268_10_Jul_13_11:04:39_EGRIN1_ORIGINAL_CLUSTERS/svgs/"
+}
+
 def bicluster(request, bicluster_id=None):
     bicluster = Bicluster.objects.get(id=bicluster_id)
+    expressions = bicluster.expressions()
+    expmap = {}
     genes = bicluster.genes.all()
+    gene_map = { gene.id: gene.name for gene in genes }
+    for gene_id, cond_id, value in expressions:
+        if gene_id not in expmap:
+            expmap[gene_id] = []
+        value = 1.0 if math.isnan(value) else value
+        expmap[gene_id].append(str(value))  # make sure nan's do not reach the frontend
+    # format as javascript
+    exp_js = "["
+    for gene_id in expmap:
+        exp_js += ("{ name: '%s', data: [%s]}," % (gene_map[gene_id], ','.join(expmap[gene_id])))
+    exp_js += "]"
+
     motifs = bicluster.motif_set.all()
+
+    ### setup annotation Javascript string
+    pvalue_threshold = 0.5
+    annots = [[(annot.gene.name, annot.position, annot.reverse, annot.pvalue,
+                motif.position, len(motif.pssm()))
+               for annot in motif.motifannotation_set.all() if annot.pvalue < pvalue_threshold]
+              for motif in motifs]
+    annots = list(chain.from_iterable(annots))
+
+    if len(annots) > 0:
+        gene_annot_map = {}
+        for item in annots:
+            if item[0] not in gene_annot_map:
+                gene_annot_map[item[0]] = []
+            gene_annot_map[item[0]].append(item)
+        gene_jss = []
+        residual = float(bicluster.residual)
+        for gene in gene_annot_map:
+            gene_js = "{\n"
+            gene_js += ("  gene: '%s', log10: %f, boxColor: '#08f', lineColor: '#000', " %
+                        (gene, residual))
+            match_jss = []
+            for match in gene_annot_map[gene]:
+                reverse = 'true' if match[2] else 'false'
+                score = 1.0 - float(match[3])
+                match_js = ("{motif: %d, start: %d, length: %d, reverse: %s, score: %f}" %
+                            (match[4] - 1, match[1], match[5], reverse, score))
+                match_jss.append(match_js)
+            gene_js += ("matches: [ %s ]" % ',\n'.join(match_jss))
+            gene_js += "}"
+            gene_jss.append(gene_js)
+        annot_js = "[ %s ];" % (',\n'.join(gene_jss))
+
     gene_count = len(genes)
     influences = bicluster.influences.all()
     conditions = bicluster.conditions.all()
@@ -264,22 +315,19 @@ def bicluster(request, bicluster_id=None):
     
     # TODO FIXME this should be in the database on a per-network basis
     species_sh_name =  species.short_name
-    if (species_sh_name == "dvu"):
-        img_url_prefix = "http://baliga.systemsbiology.net/cmonkey/enigma/cmonkey_4.8.2_dvu_3491x739_11_Mar_02_17:37:51/svgs/"
-    elif (species_sh_name == "mmp"):
-        img_url_prefix = "http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/svgs/"
-    else:
-        img_url_prefix = "http://baliga.systemsbiology.net/cmonkey/enigma/hal/cmonkey_4.5.4_hal_2072x268_10_Jul_13_11:04:39_EGRIN1_ORIGINAL_CLUSTERS/svgs/"
+    if species_sh_name in SVG_MAP:
+        # these SVGs are only available when they are generated with the
+        # R version, Python version provides all data to generate it dynamically
+        img_url_prefix = SVG_MAP[species_sh_name]
+        if (len(str(bicluster.k)) <= 1):
+            cluster_id = "cluster000" + str(bicluster.k) 
+        elif (len(str(bicluster.k)) <= 2): 
+            cluster_id = "cluster00" + str(bicluster.k) 
+        else:
+            cluster_id = "cluster0" + str(bicluster.k) 
 
-    if (len(str(bicluster.k)) <= 1):
-        cluster_id = "cluster000" + str(bicluster.k) 
-    elif (len(str(bicluster.k)) <= 2): 
-        cluster_id = "cluster00" + str(bicluster.k) 
-    else:
-        cluster_id = "cluster0" + str(bicluster.k) 
-
-    img_url = img_url_prefix + cluster_id + ".svgz"
-    print img_url
+        img_url = img_url_prefix + cluster_id + ".svgz"
+        print img_url
 
     # create motif object to hand to wei-ju's logo viewer
     pssm_logo_dict = __make_pssms(motifs)
