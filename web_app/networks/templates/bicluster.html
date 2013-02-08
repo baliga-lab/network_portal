@@ -8,12 +8,39 @@
   <link href="{{ STATIC_PREFIX }}/javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 {% block jsspecial %}
-  <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
-  <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/cytoscapeweb.min.js"></script>
-  <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/wwu_logo/isblogo.js"></script>
-  <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
-  <script type="text/javascript" src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
-  <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+  <script src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
+  <script src="{{ STATIC_PREFIX }}cytoscapeweb/js/cytoscapeweb.min.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/wwu_logo/isblogo.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
+  <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+  {% if img_url %}
+  {% else %}
+  <script src="{{ STATIC_PREFIX }}javascripts/raphael-min.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/gene_annotations.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/highcharts.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        var chart1 = new Highcharts.Chart({
+            chart: {
+                renderTo: 'expression-graph',
+                type: 'line', width: 500, height: 300
+            },
+            title: { text: 'Gene Expressions' },
+            plotOptions: { line: { marker: { enabled: false } } },
+            yAxis: {
+                title: { text: 'log10' }
+            },
+            series: {{exp_js|safe}}
+        });
+
+        var annotations1 = {{annot_js|safe}}
+        annot.draw('annotation-graph1', {
+          width: 500, height: 550, annotations: annotations1
+        });
+    });
+  </script>
+  {% endif %}
 {% endblock %}
 {% block content %}
 <div id="bicluster-top">
@@ -33,7 +60,12 @@
       <div id="tab-main">
 	      <div class="main">
 	  <h3>Regulon {{ bicluster.id }} Profile</h3>
+    {% if img_url %}
 	  <object data="{{ img_url }}" type="image/svg+xml"></object>
+    {% else %}
+    <div id="expression-graph"></div>
+    <div id="annotation-graph1"></div>
+    {% endif %}
 	</div>
 	<div id="sidebar">
 	  <h4>Summary</h4>
