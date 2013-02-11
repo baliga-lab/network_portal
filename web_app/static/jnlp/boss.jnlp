@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://localhost:8000/static/jnlp" href="boss.jnlp">
+<jnlp spec="1.0+" codebase="http://networks.systemsbiology.net/static/jnlp" href="boss.jnlp">
   <information>
     <title>Gaggle Boss</title>
     <vendor>Baliga Lab | Institute for Systems Biology</vendor>
@@ -10,10 +10,31 @@
   <resources>
     <!-- Application Resources -->
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="http://localhost:8000/static/lib/boss.jar" />
+    <jar href="http://networks.systemsbiology.net/static/lib/boss.jar" />
+    <jar href="http://networks.systemsbiology.net/static/lib/clipboardPlugin.jar"/>
+    <property name="server" value="http://networks.systemsbiology.net" />
+  </resources>
+  <resources os="Windows" arch="x64 x86_64 amd64"> 
+      <nativelib href="/static/lib/sigar-win-x64.jar"/> 
+  </resources>
+  <resources os="Windows" arch="x86 x86_64"> 
+      <nativelib href="/static/lib/sigar-win-x86.jar"/> 
+  </resources>
+  <resources os="Linux" arch="x64 x86_64 amd64"> 
+      <nativelib href="/static/lib/sigar-linux-x64.jar"/> 
+  </resources>
+  <resources os="Linux" arch="x86"> 
+      <nativelib href="/static/lib/sigar-linux-x86.jar"/> 
+  </resources>
+  <resources os="Mac OS X" arch="x86_64"> 
+      <nativelib href="/static/lib/sigar-mac-x64.jar"/> 
+  </resources>
+  <resources os="Mac OS X" arch="i386"> 
+      <nativelib href="/static/lib/sigar-mac-x86.jar"/> 
   </resources>
   <application-desc main-class="org.systemsbiology.gaggle.boss.GuiBoss">
-	
+    <argument>-p</argument>	
+    <argument>jar://props</argument>
   </application-desc>
   <update check="background"/>
 </jnlp>
