@@ -133,7 +133,7 @@ function HasLabelOverlay(overlays)
 
 function OnConnectionMouseEnter(connection, event)
 {
-    //alert(connection);
+    //alert("MouseEnter: " + connection);
     currConnection = connection;
 }
 
@@ -143,7 +143,7 @@ function EditCallback(value, settings) {
     if (currConnection != null)
     {
         var overlays = currConnection.overlays;
-        alert(overlays);
+        //alert(overlays);
         var label = overlays[1];
         if (label == undefined || label.getLabel == undefined)
             label = overlays[0];
@@ -159,7 +159,7 @@ function ConnectionClicked(connection)
 {
     var overlays = connection.overlays;
     connection.bind("mouseenter", OnConnectionMouseEnter)
-    //alert(overlays);
+    //alert("ConnectionClicked: " + overlays);
     if (HasLabelOverlay(overlays) < 0)
     {
         // Add label to the connection
@@ -202,6 +202,11 @@ function ConnectionEstablished(connection) {
                                                     }
                                                     );
     */
+    if (connection != null)
+    {
+        //alert("connection established...");
+        connection.bind("click", ConnectionClicked);
+    }
 }
 
 
@@ -1153,6 +1158,7 @@ function DisplayWorkflow(flowdata, workflowid) {
                                 ["Label", { label: edge['datatype'], location: 0.5}]
                             ]
                 });
+                ConnectionEstablished(c);
                 //c.addOverlay(connoverlays);
                 //label.setLabel(edge['datatype']);
             }
@@ -1374,7 +1380,7 @@ jsPlumb.ready(function () {
 
     // Bind to the connection established event
     jsPlumb.bind("jsPlumbConnection", ConnectionEstablished);
-    jsPlumb.bind("click", ConnectionClicked);
+    //jsPlumb.bind("click", ConnectionClicked);
 });
 
 
@@ -1474,8 +1480,3 @@ function get_java_socket_bridge() {
     return document.getElementById('GaggleProxy');
 }
 
-
-//$(function () {
-    // this initializes the dialog (and uses some common options that I do)
-//    $("#dialog").dialog({ autoOpen: false, modal: true, show: "blind", hide: "blind" });
-//});
