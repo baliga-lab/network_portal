@@ -41,24 +41,26 @@
         {% for wfentry in wfentries %}
             <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
             
-               {% for component in wfentry.Components %}
+               {% for component in wfentry.WorkflowComponents %}
                    
-                        <div class="component" id='component_{{component.id|stringformat:"i"}}'>
-                        <div class="componenttitle"><a href="javascript:startDownload('{{component.downloadurl}}')">{{component.short_name}}</a></div>
+                        <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
+                        <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
-                        <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
-                                   placeholder="Enter the url or path to the executable of the component"
-                                   title="Enter the url or path to the executable of the component"/>
-                        <input class="componentchildinput" type="text" value="{{component.arguments}}"
-                                   placeholder="Enter the arguments of the component executable"
-                                   title="Enter the arguments of the component"/>
-                        <input class="componentchildinput" type="text" placeholder="Enter subaction"
-                                   title="Enter subaction (for example, a web handler for firegoose)" value=""/>
+                        <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
+                        <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
+                                   title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
+                        <select class="componentsubactions">
+                            {% for subaction in component.Subactions %}
+                                <option value="{{subaction}}">{{subaction}}</option>
+                            {% endfor %}
+                        </select>
                         <input class="componentchildinput" type="text" placeholder="Enter data url"
                                    title="Enter the url of data to be opened by the component" value=""/>
-                        <input type="hidden" value="{{component.name}}" />
-                        <input type="hidden" value="{{component.short_name}}" />
+                        <input type="hidden" value="{{component.Component.name}}" />
+                        <input type="hidden" value="{{component.Component.short_name}}" />
                         <input type="hidden" value="" />
+                        <input type="hidden" value="{{component.Component.arguments}}" />
+
                         </div>
                    
                {% endfor %}

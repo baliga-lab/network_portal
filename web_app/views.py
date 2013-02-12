@@ -70,9 +70,22 @@ def about(request):
 def contact(request):
     return render_to_response('contact.html', locals())
 
+class WorkflowComponentInfo:
+    def __init__(self, component):
+        self.Component = component
+        self.Subactions = ['Select a subaction', '------------']
+        print component.subactions
+        print component.serviceurl
+        if component.subactions:
+            #split subactions into an array
+            self.Subactions.extend(component.subactions.split(';'))
+        print self.Subactions
+
+
 class WorkFlowEntry:
     def __init__(self, category, components):
         self.Category = category
+        self.WorkflowComponents = []
         for component in components:
             print component.serviceurl
             if (component.arguments is None):
@@ -83,7 +96,8 @@ class WorkFlowEntry:
                 component.downloadurl = ''
             if (component.short_name is None):
                 component.short_name = ''
-        self.Components = components
+            wci = WorkflowComponentInfo(component)
+            self.WorkflowComponents.append(wci)
 
 def createuser(user):
     print 'creating user...'

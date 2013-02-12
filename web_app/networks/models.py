@@ -615,6 +615,7 @@ class WorkflowComponents(models.Model):
     guistring = models.CharField(max_length = 2048, blank=True, null=True)
     serviceurl = models.CharField(max_length = 1024, blank=True, null=True)
     downloadurl = models.CharField(max_length = 2048, blank = True, null=True)
+    subactions = models.CharField(max_length=20480, blank = True, null = True)
     arguments = models.CharField(max_length=1024, blank = True, null=True)
 
 class Users(models.Model):

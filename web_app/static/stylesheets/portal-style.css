@@ -1687,6 +1687,11 @@ table#motif {
     display: none;
 }
 
+.componentsubactions
+{
+    display: none;
+}
+
 .workflowcomponent
 {
     background: none repeat scroll 0 0 papayawhip;
@@ -1720,6 +1725,14 @@ table#motif {
    display: block;
    width: 90%/*190px*/;
    height: 20px;
+   font-size: 1.5em;
+}
+
+.workflowcomponentsubactions
+{
+   display: block;
+   width: 95%/*190px*/;
+   height: 30px;
    font-size: 1.5em;
 }
 
