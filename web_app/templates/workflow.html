@@ -2,9 +2,12 @@
 {% block title %}Workflow Framework - Welcome{% endblock %}
 {% block content %}<div class="sub-page"><div class="main">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.15-all-min.js'></script>
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
 <div id="container">
@@ -47,6 +50,9 @@
                         <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
                         <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
+                        <a class="componentquestion" href="#inlinewfpath">
+                            <img src="/static/images/question.gif" />
+                        </a>
                         <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
                                    title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
                         <select class="componentsubactions">
@@ -162,6 +168,18 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
 <input id="authenticated" type="hidden" value="{{userid}}" />
 <input id="componentstring" type="hidden" value="{{componentstring}}" />
+
+<div id='inlinewfpath' style='padding:10px; background:#fff'>
+    <p align="center"><strong>Get the Path of Gaggle Geese Applications</strong></p>
+    <p align="left">There are two ways to set up the execution path of a goose:</p>
+    <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;If you already know the path of the goose (e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX),
+    simply add the path to the input field.</p>
+    <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;Alternatively, Gaggle can automatically detect the path for you. Here is how it works: First, click the "Start Gaggle boss" button to start the boss. Next, start the goose application and connect to the boss.
+       (most geese connect to boss automatically. MeV, however, needs to be connected manually) and that's it!
+        The Gaggle boss will remember the paths for ALL the workflows.</p>
+
+</div>
+
 </div>
 </div>
 

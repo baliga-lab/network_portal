@@ -234,10 +234,14 @@ function componentDropEvent(ev, component) {
             // Make all the child fields visible
             $(cloned).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
 
+            $($((cloned).children())[0]).removeClass("workflowcomponentchildinput");
+
             var closebutton = ($(cloned).children())[1];
             $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
 
-            $(($(cloned).children())[3]).removeClass("componentsubactions").addClass("workflowcomponentsubactions");
+            $(($(cloned).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
+
+            $(($(cloned).children())[4]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
 
             var serviceuriinput = ($(cloned).children())[2];
             if (window.localStorage != null)
@@ -284,6 +288,8 @@ function componentDropEvent(ev, component) {
             });
 
             $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
+
+            $(".workflowcomponentquestion").colorbox({inline:true, width:"50%"});
         }
     }
 
@@ -374,7 +380,7 @@ function ExtractWorkflow() {
                 // populate the workflow nodes object
                 if (WF_nodes[srcidstr] == undefined)
                 {
-                    var nameelement = ($(source).children())[6];
+                    var nameelement = ($(source).children())[7];
                     //alert(nameelement);
                     //if (nameelement != undefined)
                     //    alert($(nameelement).children()[0]);
@@ -382,13 +388,13 @@ function ExtractWorkflow() {
                     var serviceurlelement = $(source).children()[2];
                     //alert(serviceurlelement);
                     //alert("Service uri: " + $(serviceurlelement).val());
-                    var argumentselement = $(source).children()[8];
+                    var argumentselement = $(source).children()[9];
                     //alert(argumentselement);
-                    var subactionelement = $(source).children()[3];
-                    var dataurielement = $(source).children()[4];
+                    var subactionelement = $(source).children()[4];
+                    var dataurielement = $(source).children()[5];
                     //alert($(dataurielement).attr("value"));
-                    var goosenameelement = $(source).children()[5];
-                    var componentworkflownodeidelement = $(source).children()[7];
+                    var goosenameelement = $(source).children()[6];
+                    var componentworkflownodeidelement = $(source).children()[8];
 
                     var wfnode = {};
                     wfnode.id = srcidstr;
@@ -416,14 +422,14 @@ function ExtractWorkflow() {
                 if (WF_nodes[targetidstr] == undefined)
                 {
                     //alert("Save target node");
-                    var nameelement = $(target).children()[6];
+                    var nameelement = $(target).children()[7];
                     var serviceurlelement = $(target).children()[2];
-                    var argumentselement = $(target).children()[8];
+                    var argumentselement = $(target).children()[9];
                     //alert($(argumentselement).attr("value"));
-                    var subactionelement = $(target).children()[3];
-                    var dataurielement = $(target).children()[4];
-                    var goosenameelement = $(target).children()[5];
-                    var componentworkflownodeidelement = $(target).children()[7];
+                    var subactionelement = $(target).children()[4];
+                    var dataurielement = $(target).children()[5];
+                    var goosenameelement = $(target).children()[6];
+                    var componentworkflownodeidelement = $(target).children()[8];
 
                     var wfnode = {};
                     wfnode.id = targetidstr;
@@ -472,7 +478,7 @@ function ExtractWorkflow() {
             var srcid = GetComponentId(srcidstr);
             if (srcid != undefined && srcid != "")
             {
-                var nameelement = ($(source).children())[6];
+                var nameelement = ($(source).children())[7];
                 //alert(nameelement);
                 //if (nameelement != undefined)
                 //    alert($(nameelement).children()[0]);
@@ -480,13 +486,13 @@ function ExtractWorkflow() {
                 var serviceurlelement = $(source).children()[2];
                 //alert(serviceurlelement);
                 //alert("Service uri: " + $(serviceurlelement).attr("value"));
-                var argumentselement = $(source).children()[3];
+                var argumentselement = $(source).children()[4];
                 //alert(argumentselement);
-                var subactionelement = $(source).children()[8];
-                var dataurielement = $(source).children()[4];
+                var subactionelement = $(source).children()[9];
+                var dataurielement = $(source).children()[5];
                 //alert($(dataurielement).attr("value"));
-                var goosenameelement = $(source).children()[5];
-                var componentworkflownodeidelement = $(source).children()[7];
+                var goosenameelement = $(source).children()[6];
+                var componentworkflownodeidelement = $(source).children()[8];
 
                 var wfnode = {};
                 wfnode.id = srcidstr;
@@ -966,10 +972,15 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                 $(sourcelement).attr('class', 'workflowcomponent');
                 $(sourcelement).attr('id', sourceid);
                 $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+
+                $($((sourcelement).children())[0]).removeClass("workflowcomponentchildinput");
+
                 var closebutton = ($(sourcelement).children())[1];
                 $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
 
-                $(($(sourcelement).children())[3]).removeClass("componentsubactions").addClass("workflowcomponentsubactions");
+                $(($(sourcelement).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
+
+                $(($(sourcelement).children())[4]).removeClass("componentsubactions workflowcomponentchildinput").addClass("workflowcomponentsubactions");
 
                 // configure the parameters of the component
                 var serviceuriinput = $(sourcelement).children()[2];
@@ -981,22 +992,22 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                     if (uri != null)
                         $(serviceuriinput).attr("value", uri);
                 }
-                var argumentsinput = $(sourcelement).children()[8];
+                var argumentsinput = $(sourcelement).children()[9];
                 $(argumentsinput).val(node.arguments);
-                var subactioninput = $(sourcelement).children()[3];
+                var subactioninput = $(sourcelement).children()[4];
                 $(subactioninput).val(node.subaction);
-                var datauriinput = $(sourcelement).children()[4];
+                var datauriinput = $(sourcelement).children()[5];
                 $(datauriinput).val(node.datauri);
 
                 // set the node id
-                var componentworkflownodeid = $(sourcelement).children()[7];
+                var componentworkflownodeid = $(sourcelement).children()[8];
                 $(componentworkflownodeid).val(nodeid);
 
                 var canvasposition = $("#workflowcanvas").position();
                 //var tableposition = $("#tblWorkflow").offset();
                 //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
                 //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 300;
+                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 330;
                 var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
                 var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
                 //alert(stylestr);
@@ -1176,6 +1187,8 @@ function DisplayWorkflow(flowdata, workflowid) {
                                                 placeholder: ""
                                                 }
                                                 );
+
+        $(".workflowcomponentquestion").colorbox({inline: true, width: "50%"});
     }
 }
 
