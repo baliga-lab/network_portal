@@ -301,7 +301,7 @@ function componentDropEvent(ev, component) {
 function startDownload(url)
 {
     //var url='http://server/folder/file.ext';
-    if (url != null)
+    if (url != null && url.length > 0)
     {
         var index = -1;
         if (navigator.appVersion.indexOf("Win") != -1 )
@@ -631,7 +631,7 @@ function ShowSaveWorkflowDlg()
 
     var p2 = ($("#dlgsaveworkflow").children())[1];
     var descinput = ($(p2).children())[0];
-    $(descinput).attr("value", currWorkflowDesc);
+    $(descinput).val(currWorkflowDesc);
 
     $( "#dlgsaveworkflow" ).dialog({
             resizable: false,
