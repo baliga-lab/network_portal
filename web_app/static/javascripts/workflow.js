@@ -1007,7 +1007,7 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                 //var tableposition = $("#tblWorkflow").offset();
                 //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
                 //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 330;
+                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 400;
                 var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
                 var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
                 //alert(stylestr);
