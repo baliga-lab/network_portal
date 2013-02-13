@@ -1729,8 +1729,22 @@ table#motif {
     width: 30px;
     overflow: hidden;
     position: absolute;
-    right: 4px;
+    right: 10px;
     top: 40px;
+}
+
+.componentheader
+{
+   float: left;
+}
+
+.componenthelp
+{
+    display: inline;
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+
 }
 
 .workflowcomponentchildinput
@@ -1740,7 +1754,6 @@ table#motif {
    height: 20px;
    font-size: 1.5em;
    float: left;
-
 }
 
 .workflowcomponentsubactions

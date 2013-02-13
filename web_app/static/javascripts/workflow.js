@@ -70,7 +70,7 @@ $(document).ready(function () {
         drop: componentDropEvent
     });
 
-
+    $(".componenthelp").colorbox({inline: true, width: "50%"});
 
     GetEdgeDataTypes();
 

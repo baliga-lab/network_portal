@@ -24,7 +24,14 @@
 <table id="tblWorkflow" class="tblWorkflow">
 <tbody>
 <tr>
-<th style="width: 10%"><h3>Modules</h3></th>
+<th style="width: 10%">
+    <div>
+        <div class="componentheader"><h3>Modules</h3></div>
+        <a class="componenthelp" href="#inlinecomponenthelp">
+            <img src="/static/images/question.gif" />
+        </a>
+    </div>
+</th>
 <th style="width: 80%">
 <span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>
 <input type="button" value="Run" onclick="SubmitWorkflow()" class="button-run" title="Run selected workflow"/>
@@ -180,6 +187,39 @@ This is your worflow canvas. Start adding worflow componens from left, open save
         The Gaggle boss will remember the paths for ALL the workflows.</p>
 </div>
 </div>
+
+<div style="display:none">
+    <div id='inlinecomponenthelp' style='padding:10px; background:#fff'>
+        <p align="center"><strong>How to Build a Workflow</strong></p>
+        <p align="justify">
+            1. Install each goose by using the links below. (If this is your first time).
+                This will download the updated goose. You will need to install them for your application
+        </p>
+        <p align="justify">
+            2. <strong>Drag the goose you want in your workflow and drop into the Workflow canvas.</strong>
+        </p>
+        <p align="justify">
+            3. For each goose "Enter the url of the executable in your computer"
+                e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX
+        </p>
+        <p align="justify">
+            4. Select any subactions or data you want to open.
+        </p>
+        <p align="justify">
+            5. Input the url (or path) to the data file to be opened by a the component.
+        </p>
+        <p align="justify">
+            6. In order to connect to components in the workflow <strong>drag the circle from the input goose to square of next workflow component.</strong>
+        </p>
+        <p align="justify">
+            7. Save your workflow.
+        </p>
+        </ul>
+        </p>
+    </div>
+</div>
+
+
 
 </div>
 </div>
