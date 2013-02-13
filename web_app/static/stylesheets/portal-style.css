@@ -1597,10 +1597,18 @@ table#motif {
     display: inline;
 }
 
+.workflowmain
+{
+    /*float: left; */
+    width: 100%/*535px*/;
+    padding: 0;
+    margin: 0 0 0 0;
+    /*display: inline; */
+}
 
 .tblWorkflow
 {
-    width: 1100px/*860px*/;
+    width: 100%; /*1300px*/;
 }
 
 .tdcomponents
@@ -1611,26 +1619,26 @@ table#motif {
 
 .divcomponents
 {
-    width:150px/*100px*/;
+    width: 100%; /*150px; */
     height: 1000px;
     overflow: auto;
 }
 
 .tdlistworkflow {
     overflow: hidden;
-    width: 150px/*100px*/;
+    width: 20%/*150px*/;
 }
 
 .divWorkflow
 {
     overflow: auto;
-    width: 200px/*100px*/;
+    width: 200px;
     height: auto;
 }
 
 .tdworkflowcanvas
 {
-    width: 800px/*600px*/;
+    width: 800px;
     height: 1000px;
 }
 
@@ -1643,7 +1651,7 @@ table#motif {
 {
     padding: 0.5em; 
     background:none;
-    width:50px/*50px*/;
+    width:80%/*50px*/;
     height: 25px;
 }
 
@@ -1802,6 +1810,11 @@ table#motif {
     list-style-image: url("/static/images/righthand.jpg");
 }
 
+.workflowaccordion
+{
+    width: 95%; /*220px */;
+    max-width: 220px;
+}
 
 .workflowreportcomponent
 {
