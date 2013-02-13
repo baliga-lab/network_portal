@@ -1632,7 +1632,7 @@ table#motif {
 .divWorkflow
 {
     overflow: auto;
-    width: 200px;
+    width: 100%;
     height: auto;
 }
 
