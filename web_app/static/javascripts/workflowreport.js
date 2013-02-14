@@ -139,7 +139,7 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, startnodeid, sessiondata) {
             var nodediv = "";
             if (sdata != null)
             {
-                nodediv = "<div id='" + sourceid + "' class='workflowreportcomponent' style='" + stylestr + "'><div class='componenttitle'>" + sdata.componentname + "</div>";
+                nodediv = "<div id='" + sourceid + "' class='workflowreportcomponent' style='" + stylestr + "'><div><a href='" + sdata.dataurl + "'>" + sdata.componentname + "</a></div>";
                 if (sdata.type == "file")
                 {
                     nodediv = nodediv + "<div><img class='workflowreportimg' src=\"" + sdata.dataurl + "\" /></div>";
