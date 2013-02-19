@@ -70,7 +70,7 @@ $(document).ready(function () {
         drop: componentDropEvent
     });
 
-
+    $(".componenthelp").colorbox({inline: true, width: "50%"});
 
     GetEdgeDataTypes();
 
@@ -133,12 +133,13 @@ function HasLabelOverlay(overlays)
 
 function OnConnectionMouseEnter(connection, event)
 {
-    //alert(connection);
+    //alert("MouseEnter: " + connection);
     currConnection = connection;
 }
 
 function EditCallback(value, settings) {
     //alert(value);
+    //alert(currConnection);
     if (currConnection != null)
     {
         var overlays = currConnection.overlays;
@@ -158,7 +159,7 @@ function ConnectionClicked(connection)
 {
     var overlays = connection.overlays;
     connection.bind("mouseenter", OnConnectionMouseEnter)
-    //alert(overlays);
+    //alert("ConnectionClicked: " + overlays);
     if (HasLabelOverlay(overlays) < 0)
     {
         // Add label to the connection
@@ -201,6 +202,11 @@ function ConnectionEstablished(connection) {
                                                     }
                                                     );
     */
+    if (connection != null)
+    {
+        //alert("connection established...");
+        connection.bind("click", ConnectionClicked);
+    }
 }
 
 
@@ -227,8 +233,16 @@ function componentDropEvent(ev, component) {
             //alert("cloned!");
             // Make all the child fields visible
             $(cloned).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+
+            $($((cloned).children())[0]).removeClass("workflowcomponentchildinput");
+
             var closebutton = ($(cloned).children())[1];
             $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
+
+            $(($(cloned).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
+
+            $(($(cloned).children())[4]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
+
             var serviceuriinput = ($(cloned).children())[2];
             if (window.localStorage != null)
             {
@@ -236,7 +250,7 @@ function componentDropEvent(ev, component) {
                 var uri = window.localStorage.getItem(component.draggable.attr("id"));
                 //alert(uri);
                 if (uri != null)
-                    $(serviceuriinput).val("value", uri);
+                    $(serviceuriinput).val(uri);
             }
             // we include the id of the original component to be able to retrieve it later to generate
             // the workflow
@@ -274,6 +288,8 @@ function componentDropEvent(ev, component) {
             });
 
             $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
+
+            $(".workflowcomponentquestion").colorbox({inline:true, width:"50%"});
         }
     }
 
@@ -285,7 +301,7 @@ function componentDropEvent(ev, component) {
 function startDownload(url)
 {
     //var url='http://server/folder/file.ext';
-    if (url != null)
+    if (url != null && url.length > 0)
     {
         var index = -1;
         if (navigator.appVersion.indexOf("Win") != -1 )
@@ -372,7 +388,7 @@ function ExtractWorkflow() {
                     var serviceurlelement = $(source).children()[2];
                     //alert(serviceurlelement);
                     //alert("Service uri: " + $(serviceurlelement).val());
-                    var argumentselement = $(source).children()[3];
+                    var argumentselement = $(source).children()[9];
                     //alert(argumentselement);
                     var subactionelement = $(source).children()[4];
                     var dataurielement = $(source).children()[5];
@@ -391,7 +407,11 @@ function ExtractWorkflow() {
                     wfnode.serviceuri = $(serviceurlelement).val();
                     wfnode.arguments = $(argumentselement).val();
                     //alert("Service uri arguments: " + wfnode.arguments);
-                    wfnode.subaction = $(subactionelement).val();
+                    var subaction = $(subactionelement).val();
+                    if (subaction == "Select a subaction" || subaction == "------------")
+                        subaction = "";
+                    wfnode.subaction = subaction;
+
                     wfnode.datauri = $(dataurielement).val();
                     wfnode.componentid = srcid;
                     WF_nodes[srcidstr] = wfnode;
@@ -404,7 +424,7 @@ function ExtractWorkflow() {
                     //alert("Save target node");
                     var nameelement = $(target).children()[7];
                     var serviceurlelement = $(target).children()[2];
-                    var argumentselement = $(target).children()[3];
+                    var argumentselement = $(target).children()[9];
                     //alert($(argumentselement).attr("value"));
                     var subactionelement = $(target).children()[4];
                     var dataurielement = $(target).children()[5];
@@ -418,7 +438,10 @@ function ExtractWorkflow() {
                     wfnode.goosename = $(goosenameelement).val();//.attr("value");
                     wfnode.serviceuri = $(serviceurlelement).val(); //attr("value");
                     wfnode.arguments = $(argumentselement).val(); //attr("value");
-                    wfnode.subaction = $(subactionelement).val(); //attr("value");
+                    var subaction = $(subactionelement).val();
+                    if (subaction == "Select a subaction" || subaction == "------------")
+                        subaction = "";
+                    wfnode.subaction = subaction; //attr("value");
                     wfnode.datauri = $(dataurielement).val(); //attr("value");
                     wfnode.componentid = targetid;
                     WF_nodes[targetidstr] = wfnode;
@@ -463,9 +486,9 @@ function ExtractWorkflow() {
                 var serviceurlelement = $(source).children()[2];
                 //alert(serviceurlelement);
                 //alert("Service uri: " + $(serviceurlelement).attr("value"));
-                var argumentselement = $(source).children()[3];
+                var argumentselement = $(source).children()[4];
                 //alert(argumentselement);
-                var subactionelement = $(source).children()[4];
+                var subactionelement = $(source).children()[9];
                 var dataurielement = $(source).children()[5];
                 //alert($(dataurielement).attr("value"));
                 var goosenameelement = $(source).children()[6];
@@ -480,7 +503,10 @@ function ExtractWorkflow() {
                 wfnode.serviceuri = $(serviceurlelement).val(); //.attr("value");
                 wfnode.arguments = $(argumentselement).val(); //.attr("value");
                 //alert("Service uri arguments: " + wfnode.arguments);
-                wfnode.subaction = $(subactionelement).val(); //.attr("value");
+                var subaction = $(subactionelement).val();
+                if (subaction == "Select a subaction" || subaction == "------------")
+                    subaction = "";
+                wfnode.subaction = subaction; //.attr("value");
                 wfnode.datauri = $(dataurielement).val(); //.attr("value");
                 wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
                 wfnode.componentid = srcid;
@@ -567,7 +593,7 @@ function DeleteClicked()
 function SaveClicked()
 {
     //alert($("#authenticated").attr("value"));
-    if ($("#authenticated").attr("value") != "")
+    if ($("#authenticated").val() != "")
         ShowSaveWorkflowDlg();
     else
         ShowAuthenticationAlert();
@@ -605,7 +631,7 @@ function ShowSaveWorkflowDlg()
 
     var p2 = ($("#dlgsaveworkflow").children())[1];
     var descinput = ($(p2).children())[0];
-    $(descinput).attr("value", currWorkflowDesc);
+    $(descinput).val(currWorkflowDesc);
 
     $( "#dlgsaveworkflow" ).dialog({
             resizable: false,
@@ -634,7 +660,7 @@ function ShowSaveWorkflowDlg()
                     //alert(workflowid);
 
                     //alert("Saving workflow " + currWorkflowID);
-                    var userid = $("#authenticated").attr("value");
+                    var userid = $("#authenticated").val(); //.attr("value");
                     SaveWorkflow(name, desc, workflowid, userid);
                     $( this ).dialog( "close" );
                 },
@@ -652,7 +678,7 @@ function SubmitWorkflow() {
     //if (ConnectToGaggle())
     {
         ExtractWorkflow();
-        var userid = $("#authenticated").attr("value");
+        var userid = $("#authenticated").val(); //.attr("value");
         var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
         var jsonString = JSON.stringify(jsonObj);
         //alert(jsonString);
@@ -817,7 +843,7 @@ function ToggleRecording()
     if (proxy != undefined)
     {
         //alert($("#btnRecord"));
-        if ($("#btnRecord").attr("value") == "Record")
+        if ($("#btnRecord").val() == "Record")
         {
             // First clean up everything
             InitializeWorkflow();
@@ -826,7 +852,7 @@ function ToggleRecording()
             var id = proxy.StartRecording();
             if (id != null)
             {
-               $("#btnRecord").attr("value", "Stop");
+               $("#btnRecord").val("Stop");
                WF_rid = id;
             }
             else
@@ -834,7 +860,7 @@ function ToggleRecording()
         }
         else
         {
-            $("#btnRecord").attr("value", "Record");
+            $("#btnRecord").val("Record");
             //alert(WF_rid);
             var jsonworkflow = proxy.StopRecording(WF_rid);
             //alert(jsonworkflow);
@@ -850,17 +876,17 @@ function TogglePause()
     if (proxy != undefined)
     {
         //alert($("#btnRecord"));
-        if ($("#btnPause").attr("value") == "Pause")
+        if ($("#btnPause").val() == "Pause")
         {
             // Now we pause the recording
             var jsonworkflow = proxy.PauseRecording(WF_rid);
             var jsonobj = JSON.parse(jsonworkflow);
             DisplayWorkflow(jsonobj, "");
-            $("#btnPause").attr("value", "Resume");
+            $("#btnPause").val("Resume");
         }
         else
         {
-            $("#btnPause").attr("value", "Pause");
+            $("#btnPause").val("Pause");
             //alert(WF_rid);
             proxy.ResumeRecording(WF_rid);
         }
@@ -946,8 +972,15 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                 $(sourcelement).attr('class', 'workflowcomponent');
                 $(sourcelement).attr('id', sourceid);
                 $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+
+                $($((sourcelement).children())[0]).removeClass("workflowcomponentchildinput");
+
                 var closebutton = ($(sourcelement).children())[1];
                 $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
+
+                $(($(sourcelement).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
+
+                $(($(sourcelement).children())[4]).removeClass("componentsubactions workflowcomponentchildinput").addClass("workflowcomponentsubactions");
 
                 // configure the parameters of the component
                 var serviceuriinput = $(sourcelement).children()[2];
@@ -959,22 +992,22 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                     if (uri != null)
                         $(serviceuriinput).attr("value", uri);
                 }
-                var argumentsinput = $(sourcelement).children()[3];
-                $(argumentsinput).attr("value", node.arguments);
+                var argumentsinput = $(sourcelement).children()[9];
+                $(argumentsinput).val(node.arguments);
                 var subactioninput = $(sourcelement).children()[4];
-                $(subactioninput).attr("value", node.subaction);
+                $(subactioninput).val(node.subaction);
                 var datauriinput = $(sourcelement).children()[5];
-                $(datauriinput).attr("value", node.datauri);
+                $(datauriinput).val(node.datauri);
 
                 // set the node id
                 var componentworkflownodeid = $(sourcelement).children()[8];
-                $(componentworkflownodeid).attr("value", nodeid);
+                $(componentworkflownodeid).val(nodeid);
 
                 var canvasposition = $("#workflowcanvas").position();
                 //var tableposition = $("#tblWorkflow").offset();
                 //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
                 //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 300;
+                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 400;
                 var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
                 var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
                 //alert(stylestr);
@@ -1093,7 +1126,7 @@ function DisplayWorkflow(flowdata, workflowid) {
         //i = 0;
         nodecnt = 0;
         WF_processednodes = {};
-        var components = $("#componentstring").attr("value");
+        var components = $("#componentstring").val(); //.attr("value");
         //alert(components);
         var componentarray = components.split(";");
 
@@ -1136,6 +1169,7 @@ function DisplayWorkflow(flowdata, workflowid) {
                                 ["Label", { label: edge['datatype'], location: 0.5}]
                             ]
                 });
+                ConnectionEstablished(c);
                 //c.addOverlay(connoverlays);
                 //label.setLabel(edge['datatype']);
             }
@@ -1153,6 +1187,8 @@ function DisplayWorkflow(flowdata, workflowid) {
                                                 placeholder: ""
                                                 }
                                                 );
+
+        $(".workflowcomponentquestion").colorbox({inline: true, width: "50%"});
     }
 }
 
@@ -1357,7 +1393,7 @@ jsPlumb.ready(function () {
 
     // Bind to the connection established event
     jsPlumb.bind("jsPlumbConnection", ConnectionEstablished);
-    jsPlumb.bind("click", ConnectionClicked);
+    //jsPlumb.bind("click", ConnectionClicked);
 });
 
 
@@ -1457,8 +1493,3 @@ function get_java_socket_bridge() {
     return document.getElementById('GaggleProxy');
 }
 
-
-//$(function () {
-    // this initializes the dialog (and uses some common options that I do)
-//    $("#dialog").dialog({ autoOpen: false, modal: true, show: "blind", hide: "blind" });
-//});

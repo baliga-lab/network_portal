@@ -1597,10 +1597,9 @@ table#motif {
     display: inline;
 }
 
-
 .tblWorkflow
 {
-    width: 1100px/*860px*/;
+    width: 100%; /*1300px*/;
 }
 
 .tdcomponents
@@ -1611,41 +1610,39 @@ table#motif {
 
 .divcomponents
 {
-    width:150px/*100px*/;
+    width: 100%; /*150px; */
     height: 1000px;
     overflow: auto;
 }
 
 .tdlistworkflow {
     overflow: hidden;
-    width: 150px/*100px*/;
+    width: 20%/*150px*/;
 }
 
 .divWorkflow
 {
     overflow: auto;
-    width: 200px/*100px*/;
+    width: 100%;
     height: auto;
 }
 
 .tdworkflowcanvas
 {
-    width: 800px/*600px*/;
+    width: 800px;
     height: 1000px;
 }
 
 .workflowcanvas
 {
-    background-color: transparent;
-    width: 800px/*600px*/;
-    height: 600px;
+    background-color: transparent; width: 100%; height: 1000px
 }
 
 .component  
 {
     padding: 0.5em; 
     background:none;
-    width:50px/*50px*/;
+    width:50px;
     height: 25px;
 }
 
@@ -1687,6 +1684,15 @@ table#motif {
     display: none;
 }
 
+.componentquestion
+{
+    display: none;
+}
+.componentsubactions
+{
+    display: none;
+}
+
 .workflowcomponent
 {
     background: none repeat scroll 0 0 papayawhip;
@@ -1700,7 +1706,7 @@ table#motif {
     overflow: auto;
     padding: 0.5em;
     position: absolute;
-    width: 20%/*200px*/;
+    width: 300px;
 }
 
 .workflowcomponentclose
@@ -1715,11 +1721,45 @@ table#motif {
     width: 10px;
 }
 
+.workflowcomponentquestion
+{
+    display: block;
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+    position: absolute;
+    right: 10px;
+    top: 40px;
+}
+
+.componentheader
+{
+   float: left;
+}
+
+.componenthelp
+{
+    display: inline;
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+
+}
+
 .workflowcomponentchildinput
 {
    display: block;
-   width: 90%/*190px*/;
+   width: 85%/*190px*/;
    height: 20px;
+   font-size: 1.5em;
+   float: left;
+}
+
+.workflowcomponentsubactions
+{
+   display: block;
+   width: 90%/*190px*/;
+   height: 30px;
    font-size: 1.5em;
 }
 
@@ -1761,6 +1801,11 @@ table#motif {
     list-style-image: url("/static/images/righthand.jpg");
 }
 
+.workflowaccordion
+{
+    width: 95%; /*220px */;
+    max-width: 250px;
+}
 
 .workflowreportcomponent
 {

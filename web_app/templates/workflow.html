@@ -1,13 +1,18 @@
 ﻿{% extends "base2.html" %}
 {% block title %}Workflow Framework - Welcome{% endblock %}
-{% block content %}<div class="sub-page"><div class="main">
+{% block content %}
+<div class="sub-page">
+<div class="main" style="width: 97%">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
-<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.15-all-min.js'></script>
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.16-all.js'></script>
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
-<div id="container">
+<div id="container" style="width: 100%">
 <div>
 <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
 </applet>
@@ -21,8 +26,15 @@
 <table id="tblWorkflow" class="tblWorkflow">
 <tbody>
 <tr>
-<th style="width: 10%"><h3>Modules</h3></th>
-<th style="width: 80%">
+<th style="width: 15%">
+    <div>
+        <div class="componentheader"><h3>Modules</h3></div>
+        <a class="componenthelp" href="#inlinecomponenthelp">
+            <img src="/static/images/question.gif" />
+        </a>
+    </div>
+</th>
+<th style="width: 65%">
 <span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>
 <input type="button" value="Run" onclick="SubmitWorkflow()" class="button-run" title="Run selected workflow"/>
 <input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
@@ -35,30 +47,35 @@
 </th>
 </tr>
 <tr>
-<td valign="top">
+<td valign="top" style="width: 15%">
  <div id="components" class="divcomponents">
     {% if wfentries.count > 0 %}
         {% for wfentry in wfentries %}
             <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
             
-               {% for component in wfentry.Components %}
+               {% for component in wfentry.WorkflowComponents %}
                    
-                        <div class="component" id='component_{{component.id|stringformat:"i"}}'>
-                        <div class="componenttitle"><a href="javascript:startDownload('{{component.downloadurl}}')">{{component.short_name}}</a></div>
+                        <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
+                        <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a></div>
                         <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
-                        <input class="componentchildinput" type="text" value="{{component.serviceurl}}"
-                                   placeholder="Enter the url or path to the executable of the component"
-                                   title="Enter the url or path to the executable of the component"/>
-                        <input class="componentchildinput" type="text" value="{{component.arguments}}"
-                                   placeholder="Enter the arguments of the component executable"
-                                   title="Enter the arguments of the component"/>
-                        <input class="componentchildinput" type="text" placeholder="Enter subaction"
-                                   title="Enter subaction (for example, a web handler for firegoose)" value=""/>
+                        <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
+                        <a class="componentquestion" href="#inlinewfpath">
+                            <img src="/static/images/question.gif" />
+                        </a>
+                        <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
+                                   title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
+                        <select class="componentsubactions">
+                            {% for subaction in component.Subactions %}
+                                <option value="{{subaction}}">{{subaction}}</option>
+                            {% endfor %}
+                        </select>
                         <input class="componentchildinput" type="text" placeholder="Enter data url"
                                    title="Enter the url of data to be opened by the component" value=""/>
-                        <input type="hidden" value="{{component.name}}" />
-                        <input type="hidden" value="{{component.short_name}}" />
+                        <input type="hidden" value="{{component.Component.name}}" />
+                        <input type="hidden" value="{{component.Component.short_name}}" />
                         <input type="hidden" value="" />
+                        <input type="hidden" value="{{component.Component.arguments}}" />
+
                         </div>
                    
                {% endfor %}
@@ -67,8 +84,8 @@
     {% endif %}
 </div>
 </td>
-<td><h3>Workflow Canvas</h3>
-<div id="workflowcanvas" style="background-color: transparent; width:500px; height: 1000px">
+<td style="width: 65%"><h3>Workflow Canvas</h3>
+<div id="workflowcanvas" class="workflowcanvas" >
 This is your worflow canvas. Start adding worflow componens from left, open saved workflow or read our <a href="#quickhelp">quick start guide.</a>
 </div>
 <div id="quickhelp"> 
@@ -111,7 +128,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 </td>
 <td class="tdlistworkflow" valign="top">
 
-    <div id="accordion">
+    <div id="accordion" class="workflowaccordion">
         {% for workflow in myworkflows %}
         <p id='h3wf_{{workflow.id|stringformat:"i"}}'><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></p>
         <div id='divwf_{{workflow.id|stringformat:"i"}}'>
@@ -133,6 +150,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
     <div><H3> Reports</H3>
         <input type="button" value="Delete" onclick="DeleteSessionReport()" class="button"/>
     </div>
+    <br />
     <div id="divReport" class="divWorkflow">
        <ul></ul>
     </div>
@@ -160,6 +178,53 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
 <input id="authenticated" type="hidden" value="{{userid}}" />
 <input id="componentstring" type="hidden" value="{{componentstring}}" />
+
+<div style="display:none">
+<div id='inlinewfpath' style='padding:10px; background:#fff'>
+    <p align="center"><strong>Configure the Path of Gaggle Geese Applications</strong></p>
+    <p align="left">There are two ways to configure the execution path of a goose:</p>
+    <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;If you already know the path of the goose (e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX),
+    simply add the path to the input field.</p>
+    <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;Alternatively, Gaggle can automatically detect the path for you. Here is how it works: First, click the "Start Gaggle boss" button to start the boss. Next, start the goose application and connect to the boss.
+       (most geese connect to boss automatically. MeV, however, needs to be connected manually) and that's it!
+        The Gaggle boss will remember the paths for ALL the workflows.</p>
+</div>
+</div>
+
+<div style="display:none">
+    <div id='inlinecomponenthelp' style='padding:10px; background:#fff'>
+        <p align="center"><strong>How to Build a Workflow</strong></p>
+        <p align="justify"><strong>Important:</strong> Go to the <a href="http://www.java.com/en/download/testjava.jsp">Java Test Page</a> and verify that the version of your Java is at least Java SE 6 (or 1.6).</p>
+        <p align="justify">
+            1. Install each goose by using the links below. (If this is your first time).
+                This will download the updated goose. You will need to install them for your application
+        </p>
+        <p align="justify">
+            2. <strong>Drag the goose you want in your workflow and drop into the Workflow canvas.</strong>
+        </p>
+        <p align="justify">
+            3. For each goose "Enter the url of the executable in your computer"
+                e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX
+        </p>
+        <p align="justify">
+            4. Select any subactions or data you want to open.
+        </p>
+        <p align="justify">
+            5. Input the url (or path) to the data file to be opened by a the component.
+        </p>
+        <p align="justify">
+            6. In order to connect to components in the workflow <strong>drag the circle from the input goose to square of next workflow component.</strong>
+        </p>
+        <p align="justify">
+            7. Save your workflow.
+        </p>
+        </ul>
+        </p>
+    </div>
+</div>
+
+
+
 </div>
 </div>
 
