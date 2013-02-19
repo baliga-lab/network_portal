@@ -1,22 +1,27 @@
 {% extends "base2.html" %}
 {% block title %}Network Portal - Networks for {{ network.species.name }}{% endblock %}
 {% block content %}
-
+<script>
+$(document).ready(function() { 
+    $("#network-table") 
+    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
+    {#.tablesorterPager({container: $("#tablepager")})#}; 
+});
+</script>
 <div class="main">
-  <h1>{{ network.name }}</h1>
+
+  <h5>{{ network.name }}</h5>
 
   <p>Species: <a href="/species/{{ network.species.name }}">{{ network.species.name }}</a></p>
   <p>Data source: {{ network.data_source }}</p>
 
-  <p>What other network info do we need? link to PDF/SVG of cMonkey stats?</p>
-
-  <table>
-    <caption>a list of biclusters in the network</caption>
+  <table id="network-table" class="tablesorter">
+    <caption> Summary table for the network</caption>
     <thead>
       <tr>
-        <th>k</th>
-        <th>genes</th>
-        <th>residual</th>
+        <th>Bicluster</th>
+        <th># of genes</th>
+        <th>Residual</th>
       </tr>
     </thead>
     <tbody>
@@ -29,8 +34,7 @@
       {% endfor %}
     </tbody>
   </table>
-
-
+  
   <table>
     <thead>
       <tr>
@@ -45,5 +49,6 @@
       {% endfor %}
     </tbody>
   </table>
+  
 </div><!-- End #main -->
 {% endblock %}

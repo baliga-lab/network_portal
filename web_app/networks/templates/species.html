@@ -12,14 +12,31 @@
   </div>
    
   <h5>Networks</h5>
-  {% if species.network_set.count > 0 %}
-  <ul>
-    {% for network in species.network_set.all %}
-    <li><a href="/network/{{ network.id }}">{{ network.name }}</a></li>
-  {% endfor %}</ul>
-  {% else %}
-  <p>No networks for this species, yet.</p>
-  {% endif %}
+  <table>
+    <thead>
+      <tr>
+        <th>Genes</th>
+        <th>Transcription Factors</th>
+        <th>Network</th>
+        <th>Data Sources</th>
+       </tr>
+     </thead>
+     <tbody>
+     	<tr>
+     		<td><a href="/genes/{{ species.short_name }}">{{ gene_count }}</a></td>
+  			<td><a href="/genes/{{ species.short_name }}?filter=tf">{{ transcription_factors|length }}</a></td>
+  			<td>{% if species.network_set.count > 0 %}
+  				    {% for network in species.network_set.all %}
+    				<a href="/network/{{ network.id }}"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></a>
+  					{% endfor %}
+  				{% else %}
+  				No networks for this species, yet.
+  				{% endif %}
+  				</td>
+  			<td>{{ network.data_source }}</td>
+  			</tr>
+  		</tbody>
+  	</table>
 
   <h5>Genome</h5>
   <table>
@@ -43,8 +60,7 @@
     </tbody>
   </table>
   
-  <p>Genes: <a href="/genes/{{ species.short_name }}">{{ gene_count }}</a><br/>
-  Transcription Factors: <a href="/genes/{{ species.short_name }}?filter=tf">{{ transcription_factors|length }}</a></p>
+  
   <!-- <ul>
     {% for tf in transcription_factors %}
     <li><a href="/search/?q=regulator%3A{{ tf.name }}">{{ tf.name }}{% if tf.common_name %} ({{ tf.common_name }}){% endif %}</a></li>
@@ -53,7 +69,25 @@
  
   
   <h5>Functions</h5>
-  <p>Explore gene functional annotation from any of these systems: <a href="">KEGG pathways</a>, <a href="">GO Gene Ontology</a>, <a href="">TIGRFams</a> or <a href="">COGs</a>.</p>
+ Explore gene functional annotation from any of these systems.</br>
+  <table>
+  	 <thead>
+      <tr>
+        <th>KEGG pathways</th>
+        <th>GO Gene Ontology</th>
+        <th>TIGRFams</th>
+        <th>COGs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="">KEGG Pathways</a></td>
+        <td><a href="">GO Gene Ontology</a></td>
+        <td><a href="">TIGRFams</a></td>
+        <td><a href="">COGs</a></td>
+      </tr>
+     </tbody>
+  </table>
 
   <h5>Links</h5>
   <ul>

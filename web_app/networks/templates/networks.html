@@ -1,10 +1,17 @@
 {% extends "base2.html" %}
 {% block content %}
+<script>
+$(document).ready(function() { 
+    $("#networks-list") 
+    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
+    {#.tablesorterPager({container: $("#tablepager")})#}; 
+});
+</script>
 
 <div class="main">
   <h5>Networks</h5>
 
-  <table>
+  <table id="networks-list" class="tablesorter">
     <caption>A complete list of networks in the Network Portal database</caption>
     <thead>
       <tr>
@@ -17,7 +24,7 @@
     <tbody>
       {% for network in networks %}
       <tr>
-        <td><a href="/network/{{ network.id }}">{{ network.name }}</a></td>
+        <td><a href="/network/{{ network.id }}"><img src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></td>
         <td><i><a href="/species/{{ network.species.name }}">{{ network.species.name }}</a></i></td>
         <td>{{ network.created_at|date:"F j, Y" }}</td>
         <td>{{ network.bicluster_set.count }}</td>

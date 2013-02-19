@@ -1,7 +1,13 @@
 {% extends "base2.html" %}
 {% block title %}Network Portal - Welcome{% endblock %}
-{% block cssspecial %}<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/redmond/jquery-ui-1.8.16.custom.css">{% endblock %}
-{% block jsspecial %}<script type="text/javascript">
+{% block cssspecial %}
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery-overlay.css" media="screen" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/accordion-slider.css" media="screen" />
+{% endblock %}
+{% block jsspecial %}
+
+<script type="text/javascript">
   $(document).ready(function() {
     $("#query").autocomplete({
       source: function(request, response) {
@@ -23,57 +29,369 @@
 </script>
 
 {% endblock %}
-{% block content %}<div class="main">
+
+{% block content %} <div class="main">
   <h5>Welcome to Network Portal  <img src="{{ STATIC_PREFIX }}images/logo_small.png" title="Network Portal Icon" style="background:none;border:0px;position:relative; float:right;"></h5>
-  <p> Network Portal provides analysis and visualization tools for selected gene regulatory networks to aid researchers in biological discovery and hypothesis development. [<a href="/about"> ..read more</a>]</p>
+  <p> Network Portal provides analysis and visualization tools for selected gene regulatory networks to aid researchers in biological discovery and hypothesis development. [<a href="/about" title="Read more"> ..read more</a>]</p>
+<p><a class="large blue awesome" href="/"> See in Action</a><a class="large magenta awesome" href="/"> Get Help</a><a class="large yellow awesome" href="/"> Get involved</a>
+<div>
+	<ul id="accordion-slider">
+		<li><a href="workflow"><img src="{{ STATIC_PREFIX }}images/slide-1.jpg"/></a><span>Visit <a href="workflow" title="workflow">Workflow</a> page to give it a try.</span></li>
+		<li><a href="species"><img src="{{ STATIC_PREFIX }}images/slide-2.jpg"/></a><span>You can explore all species and associated information <a href="species">here</a></span></li>
+		<li><a href="http://gaggle.systemsbiology.net"><img src="{{ STATIC_PREFIX }}images/slide-3.jpg"/></a><span>Make sure to check out <a href="http://gaggle.systemsbiology.net">Gaggle Website</a> for the latest updates.</span></li>
+	</ul>
+</div>
 
   <h5>Methodology</h5> 
-  <p> Network Portal integrates identification of conditionally co-regulated group of genes by using <a href="http://baliga.systemsbiology.net/cmonkey">cMonkey</a> and inference of regulatory influences by using <a href="http://baliga.systemsbiology.net/drupal/content/inferelator">Inferelator</a>. In addition, it is integrated with <a href="http://microbesonline.org">MicrobesOnline</a> for genomic information, <a href="http://regprecise.lbl.gov/RegPrecise">RegPrecise</a> for collection of manually curated regulatory inferences, and <a href="http://regpredict.lbl.gov/regpredict">RegPredict</a> for Regulon Inference by Known Position Weight Matrix (PWM). [<a href="/about"> ..read more</a>]</p>
+  <p> Network Portal integrates identification of conditionally co-regulated group of genes by using <a href="http://baliga.systemsbiology.net/cmonkey" title="cMonkey">cMonkey</a> and inference of regulatory influences by using <a href="http://baliga.systemsbiology.net/drupal/content/inferelator">Inferelator</a>. In addition, it is integrated with <a href="http://microbesonline.org">MicrobesOnline</a> for genomic information, <a href="http://regprecise.lbl.gov/RegPrecise">RegPrecise</a> for collection of manually curated regulatory inferences, and <a href="http://regpredict.lbl.gov/regpredict">RegPredict</a> for Regulon Inference by Known Position Weight Matrix (PWM). [<a href="/about"> ..read more</a>]</p>
+
 
 <h5> Organisms </h5>
-<div style="text-align:center; width:312px; margin-left:auto; margin-right:auto;">
-<img id="Image-Maps_4201301272352574" src="{{ STATIC_PREFIX }}images/network_portal_species_tree.png" usemap="#Image-Maps_4201301272352574" border="0" width="312" height="429" alt="" />
-<map id="_Image-Maps_4201301272352574" name="Image-Maps_4201301272352574">
-<area shape="rect" coords="39,0,202,20" href="http://www.ncbi.nlm.nih.gov/genome/669" alt="Methanococcus maripaludis S2" title="Methanococcus maripaludis S2"    />
-<area shape="rect" coords="37,28,200,48" href="http://www.ncbi.nlm.nih.gov/genome/1051" alt="Halobacterium sp. NRC-1" title="Halobacterium sp. NRC-1"    />
-<area shape="rect" coords="32,59,195,79" href="http://www.ncbi.nlm.nih.gov/genome/461" alt="Thermus thermophilus HB8" title="Thermus thermophilus HB8"    />
-<area shape="rect" coords="30,90,241,110" href="http://www.ncbi.nlm.nih.gov/genome/1093" alt="Bacteroides thetaiotamicron VPI-5482" title="Bacteroides thetaiotamicron VPI-5482"    />
-<area shape="rect" coords="46,122,257,142" href="http://www.ncbi.nlm.nih.gov/genome/1022" alt="Clostridium acetobutylicum ATCC 824" title="Clostridium acetobutylicum ATCC 824"    />
-<area shape="rect" coords="62,154,218,174" href="http://www.ncbi.nlm.nih.gov/genome/157" alt="Bacillus cereus ATCC 15579" title="Bacillus cereus ATCC 15579"    />
-<area shape="rect" coords="64,186,269,206" href="http://www.ncbi.nlm.nih.gov/genome/665" alt="Bacillus subtilis subsp. subtilis str. 168" title="Bacillus subtilis subsp. subtilis str. 168"    />
-<area shape="rect" coords="33,218,229,238" href="http://www.ncbi.nlm.nih.gov/genome/430" alt="Synechococcus elongatus PCC 7942" title="Synechococcus elongatus PCC 7942"    />
-<area shape="rect" coords="47,250,221,270" href="http://www.ncbi.nlm.nih.gov/genome/509" alt="Rhodobacter sphaeroides 2.4.1" title="Rhodobacter sphaeroides 2.4.1"    />
-<area shape="rect" coords="62,282,186,302" href="http://www.ncbi.nlm.nih.gov/genome/153" alt="Yersinia pestis CO92" title="Yersinia pestis CO92"    />
-<area shape="rect" coords="63,314,231,334" href="http://www.ncbi.nlm.nih.gov/genome/187" alt="Pseudomonas aeruginosa PA01" title="Pseudomonas aeruginosa PA01"    />
-<area shape="rect" coords="64,348,306,368" href="http://www.ncbi.nlm.nih.gov/genome/149" alt="Campylobacter jejuni subsp. jejuni NCTC 1116" title="Campylobacter jejuni subsp. jejuni NCTC 1116"    />
-<area shape="rect" coords="78,378,255,398" href="http://www.ncbi.nlm.nih.gov/genome/1042" alt="Geobacter sulfurreducens PCA" title="Geobacter sulfurreducens PCA"    />
-<area shape="rect" coords="93,410,296,424" href="http://www.ncbi.nlm.nih.gov/genome/654" alt="Desulfovibrio vulgaris str Hildenborough" title="Desulfovibrio vulgaris str Hildenborough"    />
+<span class="search_help">(Click on organism name to access related resources)</span>
+<div style="text-align:center; width:412px; margin-left:auto; margin-right:auto;">
+
+
+<img id="Image-Maps_5201302180030267" src="{{ STATIC_PREFIX }}images/portal_organisms.png" usemap="#Image-Maps_5201302180030267" border="0" width="412" height="358" alt="" />
+<map id="_Image-Maps_5201302180030267" name="Image-Maps_5201302180030267">
+<area shape="rect" coords="75,0,266,16" href="http://networks.systemsbiology.net/species/mmp" rel="#overlay1" title="mmp"    />
+<area shape="rect" coords="75,27,266,43" href="http://networks.systemsbiology.net/species/hal" rel="#overlay2" title="hal"    />
+<area shape="rect" coords="76,55,318,71" href="http://networks.systemsbiology.net/species/bth" rel="#overlay3" title="bth"    />
+<area shape="rect" coords="102,84,344,100" href="http://networks.systemsbiology.net/species/cac" rel="#overlay4" title="cac"    />
+<area shape="rect" coords="126,112,302,128" href="http://networks.systemsbiology.net/species/bce" rel="#overlay5" title="bce"    />
+<area shape="rect" coords="134,142,367,158" href="http://networks.systemsbiology.net/species/bsu" rel="#overlay6" title="bsu"    />
+<area shape="rect" coords="76,170,291,186" href="http://networks.systemsbiology.net/species/syf" rel="#overlay7" title="syf"    />
+<area shape="rect" coords="103,198,299,214" href="http://networks.systemsbiology.net/species/rsp" rel="#overlay8" title="rsp"    />
+<area shape="rect" coords="131,227,327,243" href="http://networks.systemsbiology.net/species/pae" rel="#overlay9" title="pae"    />
+<area shape="rect" coords="131,255,267,271" href="http://networks.systemsbiology.net/species/eco" rel="#overlay10" title="eco"    />
+<area shape="rect" coords="130,285,350,301" href="http://networks.systemsbiology.net/species/cje" rel="#overlay11" title="cje"    />
+<area shape="rect" coords="158,313,351,329" href="http://networks.systemsbiology.net/species/gsu" rel="#overlay12" title="gsu"    />
+<area shape="rect" coords="179,338,407,353" href="http://networks.systemsbiology.net/species/dvu" rel="#overlay13" title="dvu"    />
 </map>
 </div>
 
+<div class="simple_overlay" id="overlay1">
+  <div class="details">
+ 	<h5>Methanococcus maripaludis S2</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/mmp">1863</a></td>
+  			<td><a href="/genes/mmp?filter=tf">57</a></td>
+  			<td><a href="/network/2"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/mmp">Mmp</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
 
+<div class="simple_overlay" id="overlay2">
+  <div class="details">
+ 	<h5>Halobacterium salinarum NRC-1</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/hal">2701</a></td>
+  			<td><a href="/genes/hal?filter=tf">125</a></td>
+  			<td><a href="/network/3"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/hal">Hal</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
 
-  <h5>Data Sources</h5>
-  <a href="http://enigma.lbl.gov/"><img height=50 src="{{ STATIC_PREFIX }}images/enigma-logo.gif"></a>
-  <a href="http://microbesonline.org"><img height=50 src="{{ STATIC_PREFIX }}images/microbesonline-logo.gif"></a>
-  <a href="http://regprecise.lbl.gov/RegPrecise/"><img height=50 src="{{ STATIC_PREFIX }}images/regprecise-logo.gif"></a>
-  <a href="http://regpredict.lbl.gov/regpredict/"><img height=50 src="{{ STATIC_PREFIX }}images/regpredict-logo.gif"></a><br>
-  <a href="http://www.ncbi.nlm.nih.gov/"><img height=50 src="{{ STATIC_PREFIX }}images/ncbi-logo.gif"></a>
-  <a href="http://www.genome.jp/kegg/"><img height=50 src="{{ STATIC_PREFIX }}images/kegg-logo.gif"></a>
-  <a href="http://www.geneontology.org/"><img height=50 caption="go" src="{{ STATIC_PREFIX }}images/go-logo.gif"></a>
- 
-  <h3> Developed by <a href="http://baliga.systemsbiology.net">Baliga Lab </a>at</h3>
-   
-  <a href="http://systemsbiology.org">  <img  height=60 style="background:none;border:0px; position:relative; bottom:-5px;" src="{{ STATIC_PREFIX }}images/isb_logo.png"></a>
- 
-  <h5>Coming Soon</h5>
-  <ul class="sidemenu">
-    <li> 
-      <b>Gaggle Workflow:</b> Automate repeated analysis with Gaggle workflow. Test drive Gaggle Workflow beta <a href="/workflow">here.</a>
-    </li>
-  </ul> 
+<div class="simple_overlay" id="overlay3">
+  <div class="details">
+ 	<h5>Bacteroides_thetaiotaomicron_VPI-5482</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/bth">4902</a></td>
+  			<td><a href="/genes/bth?filter=tf">0</a></td>
+  			<td><a href="/network/10"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/bth">Bth</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
 
-</div><!-- End #main -->
+<div class="simple_overlay" id="overlay4">
+  <div class="details">
+ 	<h5>Clostridium_acetobutylicum</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/cac">3995</a></td>
+  			<td><a href="/genes/cac?filter=tf">0</a></td>
+  			<td><a href="/network/1"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/cac">Cac</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay5">
+  <div class="details">
+ 	<h5>Bacillus_cereus_ATCC14579</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/bce">5501</a></td>
+  			<td><a href="/genes/bce?filter=tf">0</a></td>
+  			<td><a href="/network/8"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/bce">Bce</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay6">
+  <div class="details">
+ 	<h5>Bacillus_subtilis</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/bsu">4313</a></td>
+  			<td><a href="/genes/bsu?filter=tf">0</a></td>
+  			<td><a href="/network/9"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/bsu">Bsu</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay7">
+  <div class="details">
+ 	<h5>Synechococcus elongatus PCC 7942</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/syf">2717</a></td>
+  			<td><a href="/genes/syf?filter=tf">0</a></td>
+  			<td><a href="/network/4"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/syf">Syf</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay8">
+  <div class="details">
+ 	<h5>Rhodobacter_sphaeroides_2_4_1</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/rsp">4341</a></td>
+  			<td><a href="/genes/rsp?filter=tf">0</a></td>
+  			<td><a href="/network/13"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/rsp">Rsp</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay9">
+  <div class="details">
+ 	<h5>Pseudomonas_aeruginosa</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/pae">5646</a></td>
+  			<td><a href="/genes/pae?filter=tf">0</a></td>
+  			<td><a href="/network/7"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/pae">Pae</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay10">
+  <div class="details">
+ 	<h5>Escherichia_coli_K12</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/eco">4497</a></td>
+  			<td><a href="/genes/eco?filter=tf">0</a></td>
+  			<td><a href="/network/14"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/eco">Eco</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay11">
+  <div class="details">
+ 	<h5>Campylobacter_jejuni</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/cje">1711</a></td>
+  			<td><a href="/genes/cje?filter=tf">0</a></td>
+  			<td><a href="/network/12"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/cje">Cje</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay12">
+  <div class="details">
+ 	<h5>Geobacter_sulfurreducens</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/gsu">3519</a></td>
+  			<td><a href="/genes/gsu?filter=tf">0</a></td>
+  			<td><a href="/network/6"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/gsu">Gsu</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+<div class="simple_overlay" id="overlay13">
+  <div class="details">
+ 	<h5>Desulfovibrio vulgaris Hildenborough</h5>
+  	<table>
+    	<thead>
+      	<tr>
+        	<th>Genes</th>
+        	<th>Transcription Factors</th>
+        	<th>Network</th>
+        	<th>Organism Page</th>
+       	</tr>
+     	</thead>
+     	<tbody>
+     	<tr>
+     		<td><a href="/genes/dvu">3661</a></td>
+  			<td><a href="/genes/dvu?filter=tf">0</a></td>
+  			<td><a href="/network/1"><img align="center" src="/static/images/network.gif"/>Explore network</a></td>
+  			<td><a href="/species/dvu">Dvu</a></td>
+  		</tr>
+  		</tbody>
+  	</table>
+  </div>
+</div>
+
+  <h5>Data Sources</h5><p>
+  <!--<span id="link-button" class="link-button">-->
+  <a class = "medium blue awesome" href="http://enigma.lbl.gov/" title="Go to http://enigma.lbl.gov/">ENIGMA</a>
+  <a class = "medium blue awesome" href="http://microbesonline.org" title="Go to http://microbesonline.org">MicrobesOnline</a>
+  <a class = "medium blue awesome" href="http://regprecise.lbl.gov/RegPrecise/" title="Go to http://regprecise.lbl.gov/RegPrecise/">RegPrecise</a>
+  <a class = "medium blue awesome" href="http://www.ncbi.nlm.nih.gov/" title="Go to http://www.ncbi.nlm.nih.gov/">NCBI</a>
+  <a class = "medium blue awesome" href="http://www.genome.jp/kegg/" title="Go to http://www.genome.jp/kegg/">KEGG</a>
+  <a class = "medium blue awesome" href="http://www.geneontology.org/" title="Go to http://www.geneontology.org">GO</a>
+  <a class = "medium blue awesome" href="http://baliga.systembiology.net/" title="Go to baliga.systembiology.net">Baliga Lab</a>
+   <p>Network Portal and associated Gaggle Tools are being developed by <a href="http://baliga.systemsbiology.net">Baliga Lab</a> at <a href="http://systemsbiology.org">Institute for Systems Biology</a> as part of the <a href="http://kbase.science.energy.gov/index.php">DOE KnowledgeBase</a> efforts.
+ </div><!-- End #main -->
 
 <div id="sidebar">
   <h3>Quick Search</h3>
@@ -154,6 +472,17 @@ new TWTR.Widget({
 <img src="{{ STATIC_PREFIX }}images/Linkedin-32.png" align="right">
 <img src="{{ STATIC_PREFIX }}images/Rss-32.png" align="right">
 
-
 </div><!-- end #sidebar -->
+<script type="text/javascript" src="http://cdn.jquerytools.org/1.2.7/full/jquery.tools.min.js"></script>
+<script>
+  $(document).ready(function() {
+      $("area[rel]").overlay();
+    });
+</script>
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.kwicks-1.5.1.pack.js'></script>
+<script type="text/javascript">
+	$().ready(function() {
+		$('#accordion-slider').kwicks({ max : 520, spacing : 2 });
+ 		});
+</script>
 {% endblock %}
