@@ -1625,15 +1625,6 @@ table#motif {
     display: inline;
 }
 
-.workflowmain
-{
-    /*float: left; */
-    width: 100%/*535px*/;
-    padding: 0;
-    margin: 0 0 0 0;
-    /*display: inline; */
-}
-
 .tblWorkflow
 {
     width: 100%; /*1300px*/;
@@ -1672,14 +1663,14 @@ table#motif {
 
 .workflowcanvas
 {
-    background-color: transparent; width:100%; height: 1000px
+    background-color: transparent; width: 100%; height: 1000px
 }
 
 .component  
 {
     padding: 0.5em; 
     background:none;
-    width:80%/*50px*/;
+    width:50px;
     height: 25px;
 }
 
@@ -1743,7 +1734,7 @@ table#motif {
     overflow: auto;
     padding: 0.5em;
     position: absolute;
-    width: 20%/*200px*/;
+    width: 300px;
 }
 
 .workflowcomponentclose
@@ -1841,7 +1832,7 @@ table#motif {
 .workflowaccordion
 {
     width: 95%; /*220px */;
-    max-width: 220px;
+    max-width: 250px;
 }
 
 .workflowreportcomponent
