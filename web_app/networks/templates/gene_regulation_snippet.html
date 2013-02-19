@@ -5,7 +5,7 @@
   <script type="text/javascript">
     $(document).ready(function() {
         {{ influence_biclusters|influences_to_gene_description_map }};
-        $('.reggene').live('mouseover', function(event) {
+        $('.reggene').on('mouseover', function(event) {
             var geneName = $(this).html();
             $(this).qtip({
                 prerender: true,
