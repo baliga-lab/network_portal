@@ -508,8 +508,8 @@ def savereportdata(request):
         if (url is None or len(url) == 0):
             print 'Joining os path...'
             dataType = 'file'
-            #sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
-            sessionpath = '/github/baligalab/network_portal/web_app/static/reportdata/' + wfid
+            sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
+            #sessionpath = '/github/baligalab/network_portal/web_app/static/reportdata/' + wfid
             savepath = '/static/reportdata/' + wfid
             print 'Session path: ' + sessionpath
             if not os.path.exists(sessionpath):

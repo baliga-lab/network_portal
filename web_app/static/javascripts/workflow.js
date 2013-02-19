@@ -76,6 +76,7 @@ $(document).ready(function () {
 
 });
 
+
 function LoadHTML() {
     alert($("#htmlLoader").attr('value'));
     ifrm = document.createElement("IFRAME");
@@ -221,7 +222,6 @@ function GetEdgeDataTypes()
 }
 
 function componentDropEvent(ev, component) {
-    //alert($(component.draggable).attr("class"));
     var originalclass = $(component.draggable).attr("class");
     if (originalclass != undefined && originalclass.indexOf("ui-dialog") >= 0)
         return;
@@ -292,9 +292,6 @@ function componentDropEvent(ev, component) {
             $(".workflowcomponentquestion").colorbox({inline:true, width:"50%"});
         }
     }
-
-    //jsPlumb.makeTarget(e2);
-    //jsPlumb.connect({ source: e1, target: e2, anchor: "Continuous" });
 }
 
 // Start download a url based on OS
@@ -684,7 +681,7 @@ function SubmitWorkflow() {
         //alert(jsonString);
         SubmitWorkflowToBoss(jsonString);
         WF_timercnt = 0;
-        setTimeout(function() { CheckSessions() }, 5000);
+        setTimeout(function() { CheckSessions() }, 10000);
     }
 }
 
