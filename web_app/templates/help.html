@@ -68,10 +68,62 @@
     <div class="sub-page">
 	<h5> Workflow Use cases</h5>
 	    <p><div id="accordion" class="">
-			<h4> Case 1 - Discovering cMonkey Biclusters</h4>
-				<div> <img src="{{ STATIC_PREFIX }}images/workflow_case-1.png"></div>
+			<h4> Case 1 - Discovering Detailed Regulon Information</h4>
+				<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-1.png">
+					<p> This exercise starts with a regulon in Network Portal. We will use very simle workflow idea that includes broadcasting data via firegoose to multiple web resources simultaneously.
+						We will broadcast Namelist of regulon members to DAVID for functional enrichment analysis and to Entrez to access NCBI tools. We will also broadcast motif PSSM information to STAMP
+						in order to identify matches to known motifs.</p>
+						<b>STEPS:</b>
+						<ol>
+							<li>Start <span class="small red awesome">Gaggle boss</span></li>
+							<li>First we will collect regulon info from a website by adding a <span class="small awesome">firegoose</span> module. 
+								Path to firefox should be automatically detected. Leave subaction unchanged. Enter data url, or web resource to get regulon information.
+								In this example we will use one of Methanococcus maripaludis GRN regulon. (http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/htmls/cluster0114.html)
+								</li>
+							<li>Add <span class="small awesome">firegoose</span> module for DAVID.
+								Select "DAVID" option from subaction menu and connect to first firegoose module.
+								<code>Manual: You need to convert Namelist to DAVID Id list once its submitted to DAVID.</code></li>
+							<li>Add <span class="small awesome">firegoose</span> module for Entrez
+								Select "Entrez Protein" subaction and connect to first firegoose module.</li>
+							<li>Last, we will add another <span class="small awesome">firegoose</span> module for STAMP
+								Select "STAMP" subaction and connect to first firegoose module.</li>
+								<code>Manual: You need to select appropriate database for motif search on STAMP site</code></li>
+							<li> Optional: Save your workflow</li>
+							<li> Run your workflow by using <span class="small green awesome">"Run"</span> button in the control panel.</li>	
+						</ol>
+				</div>
 			<h4> Case 2 - Analyzing gene expression data</h4>
-				<div> <img src="{{ STATIC_PREFIX }}images/workflow_case-2.png"></div>
+				<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-2.png">
+				<p> The second exercise is slightly more complicated and it includes both desktop applications and web resources. The aim of this workflow is to automate
+				analysis of gene expression data and identify functional associations, functional enrichments and also associated regulatory network modules.
+				We will start with opening gene expression file (tab delimited)in <b>Mev</b>. After performing statistical analyses, we will broadcast 
+				selected genes via <b>firegoose</b> to KEGG (Metabolic pathway enrichment) and EMBL Strings (Functional associations). In the meantime we will also open
+				Network model in <b>Cytoscape</b> and broadcast our gene list to network to select network modules that includes these genes.</p>   
+						<b>STEPS:</b>
+						<ol>
+							<li>Start <span class="small red awesome">Gaggle boss</span></li>
+							<li>We will first add <span class="small awesome">MEV</span> module to open gene expression file. 
+								Leave subaction unchanged. If you are opening the gene expression file from the web enter the url otherwise enter path to the file on your computer.
+								In this example we will use gene expression data coming from studying energy metabolism for Desulfovibrio vulgaris.
+								We will compare gene expression upon growth on Pyruvate+Sulfate versus Pyruvate/Fermentation.
+								<code>Manual: After your workflow started Mev will load the gene expression file. You can perform SAM analyses and then select 
+								genes that are upregulated in Pyruvate/Fermentation conditions and then broadcast them to workflow.</code></li>
+								</li>
+							<li>Add <span class="small awesome">firegoose</span> module for KEGG.
+								Select "KEGG" option from subaction menu and connect to MEV
+								 module.
+								KEGG will show you pathways containing your upregulated genes. You can also access these pathways in your workflow report.</li>
+							<li>Add <span class="small awesome">firegoose</span> module for EMBL Strings
+								Select "EMBL Strings" subaction and connect to MEV module. EMBL Strings website will use Namelist for our selected genes and search against Strings database 
+								to identify functional associations. Resulting functional association network will be shown and captured in the workflow report.</li>
+							<li>Last, we will add <span class="small awesome">Cytoscape</span> module to open a network file. (For this example we will use GRN model for D. vulgaris).
+								Connect Cytoscape module to MEV module and enter path to your cytoscape network file (web or desktop). When workflow is started cytoscape will open 
+								your network file and capture broadcast list from MEV. Upregulated genes will be selected in the network for further network manipulations.
+								</li>
+							<li> Optional: Save your workflow</li>
+							<li> Run your workflow by using <span class="small green awesome">"Run"</span> button in the control panel.</li>	
+						</ol>
+					</div>
 			<h4> Case 3 - Assigning functions to hypothetical proteins</h4>
 				<div><img src="{{ STATIC_PREFIX }}images/workflow_case-3.png"></div>
 		</div></p>
