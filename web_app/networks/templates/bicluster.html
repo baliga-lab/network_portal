@@ -26,10 +26,13 @@
                 renderTo: 'expression-graph',
                 type: 'line', width: 500, height: 300
             },
-            title: { text: 'Gene Expressions' },
+            title: { text: 'Gene Expression Profiles' },
             plotOptions: { line: { marker: { enabled: false } } },
             yAxis: {
                 title: { text: 'log10' }
+            },
+            xAxis: {
+                title: { text: 'conditions' }
             },
             series: {{exp_js|safe}}
         });
