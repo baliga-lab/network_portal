@@ -13,6 +13,9 @@
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/collapsing_divs.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.tablesorter.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.tablesorter.pager.js"></script>
+	<script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.jcarousel.min.js"></script>
+
+
     
     <!-- google analytics -->
     <script type="text/javascript">
@@ -44,6 +47,7 @@
 	  {% endif %}
 	  <li><a href="/about">About</a></li>
 	  <li><a href="/contact">Contact</a></li>
+	  <li><a href="{{ STATIC_PREFIX }}/apidocuments">API</a></li>
 	  <!-- <li><a href="login" id="selected">Login</a></li> -->
 	</ul>
       </div>
@@ -51,12 +55,12 @@
       <div id="nav">
         <ul>
           <li class="{% active request "^/$" %}"><a href="/">Home</a></li>
-          {# <li class="{% active request "^/workflow" %}"><a href="/workflow">Workflow</a></li> #}
           <li class="{% active request "^/search" %}"><a href="/search">Search</a></li>
           <li class="{% active request "^/species" %}"><a href="/species">Species</a></li>
           <!--<li class="{% active request "^/function" %}"><a href="/functions/">Function</a></li>-->
           <li class="{% active request "^/networks" %}"><a href="/networks/">Networks</a></li>
-           <li class="{% active request "^/help" %}"><a href="/help/">Help</a></li>
+          <li class="{% active request "^/workflow" %}"><a href="/workflow">Workflow</a></li>
+          <li class="{% active request "^/help" %}"><a href="/help/">Help</a></li>
 
         <!-- <li class="{% active request "^/analysis/gene" %}"><a href="/analysis/gene">Example</a></li>-->
         </ul>

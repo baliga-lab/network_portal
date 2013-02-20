@@ -1,9 +1,16 @@
 {% extends "base2.html" %}
 {% block title %}Network Portal - Genes for {{ species.name }}{% endblock %}
 {% block content %}
+<script>
+$(document).ready(function() { 
+    $("#genes-table") 
+    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
+    {#.tablesorterPager({container: $("#tablepager")})#}; 
+});
+</script>
 
 <div class="main">
-  <h1>Genes</h1>
+  <h5>Genes</h5>
   <p>species: <a href="/species/{{ species.short_name }}">{{ species.name }}</a><br>
   {% if filter == 'tf' %}
   transcription factors: {{ gene_count }}
@@ -12,7 +19,7 @@
   {% endif %}
   </p>
 
-  <table class="genes-table">
+  <table id="genes-table" class="tablesorter">
     <thead>
       <tr>
         <th>Name</th>
