@@ -19,7 +19,7 @@ $(document).ready(function() {
         <th>Taxonomy id</th>
 		<th>Genes </th>
 		<th>Regulators </th>
-		<th>Version info</th>
+		<!--<th>Version info</th>-->
 		<th>Network</th>
       </tr>
     </thead>
@@ -31,12 +31,12 @@ $(document).ready(function() {
         <td><a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={{ sp.ncbi_taxonomy_id }}">{{ sp.ncbi_taxonomy_id }}</a>(NCBI)</td>
 	<td><a href="/genes/{{ sp.short_name }}">{{ sp.gene_set.count }}</a></td>
 	<td><a href="/genes/{{ sp.short_name }}?filter=tf">{{ sp.transcription_factors|length }}</a></td>
-	<td width="20px">
+	<!--<td width="20px">
 	{% for st in network %}
 	{% if st.species_id == sp.id %} 
 	<a href="/species/{{ sp.short_name }}">{{st.version_id }}</a>
 	  {% endif %}
-	  {% endfor %} </td>
+	  {% endfor %} </td>-->
 	<td>
 	{% for st in network %}
 	{% if st.species_id == sp.id %}
