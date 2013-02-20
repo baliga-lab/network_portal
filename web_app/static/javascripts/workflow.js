@@ -520,7 +520,7 @@ function ExtractWorkflow() {
                 wfnode.componentid = srcid;
                 wfnode.workflowindex = $(componentworkflowindex).val();
 
-                //alert("add nntode " + srcid);
+                //alert("add node " + srcid);
                 WF_nodes[srcidstr] = wfnode;
             }
         }
