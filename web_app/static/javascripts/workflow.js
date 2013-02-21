@@ -235,6 +235,11 @@ function componentDropEvent(ev, component) {
             $(cloned).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
 
             $($((cloned).children())[0]).removeClass("workflowcomponentchildinput");
+            // include workflow index in component name
+            var goosename = $($((cloned).children())[0]).text();
+            $($((cloned).children())[0]).text(goosename + "-" + wfcnt);
+            // include workflow index in the hidden field
+            $($((cloned).children())[10]).val(wfcnt.toString());
 
             var closebutton = ($(cloned).children())[1];
             $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
@@ -392,6 +397,7 @@ function ExtractWorkflow() {
                     //alert($(dataurielement).attr("value"));
                     var goosenameelement = $(source).children()[6];
                     var componentworkflownodeidelement = $(source).children()[8];
+                    var componentworkflowindex = $(source).children()[10];
 
                     var wfnode = {};
                     wfnode.id = srcidstr;
@@ -411,6 +417,8 @@ function ExtractWorkflow() {
 
                     wfnode.datauri = $(dataurielement).val();
                     wfnode.componentid = srcid;
+                    wfnode.workflowindex = $(componentworkflowindex).val();
+
                     WF_nodes[srcidstr] = wfnode;
                     //alert("Source node stored");
                 }
@@ -427,6 +435,7 @@ function ExtractWorkflow() {
                     var dataurielement = $(target).children()[5];
                     var goosenameelement = $(target).children()[6];
                     var componentworkflownodeidelement = $(target).children()[8];
+                    var componentworkflowindex = $(target).children()[10];
 
                     var wfnode = {};
                     wfnode.id = targetidstr;
@@ -441,6 +450,7 @@ function ExtractWorkflow() {
                     wfnode.subaction = subaction; //attr("value");
                     wfnode.datauri = $(dataurielement).val(); //attr("value");
                     wfnode.componentid = targetid;
+                    wfnode.workflowindex = $(componentworkflowindex).val();
                     WF_nodes[targetidstr] = wfnode;
                 }
 
@@ -490,6 +500,7 @@ function ExtractWorkflow() {
                 //alert($(dataurielement).attr("value"));
                 var goosenameelement = $(source).children()[6];
                 var componentworkflownodeidelement = $(source).children()[8];
+                var componentworkflowindex = $(source).children()[10];
 
                 var wfnode = {};
                 wfnode.id = srcidstr;
@@ -507,8 +518,9 @@ function ExtractWorkflow() {
                 wfnode.datauri = $(dataurielement).val(); //.attr("value");
                 wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
                 wfnode.componentid = srcid;
+                wfnode.workflowindex = $(componentworkflowindex).val();
 
-                //alert("add node " + srcid);
+                //alert("add nntode " + srcid);
                 WF_nodes[srcidstr] = wfnode;
             }
         }
@@ -978,6 +990,11 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                 $(($(sourcelement).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
 
                 $(($(sourcelement).children())[4]).removeClass("componentsubactions workflowcomponentchildinput").addClass("workflowcomponentsubactions");
+
+                // include workflow index in component name
+                var goosename = $($((sourcelement).children())[0]).text();
+                $($((sourcelement).children())[0]).text(goosename + "-" + wfcnt);
+                $($((sourcelement).children())[10]).val(wfcnt.toString());
 
                 // configure the parameters of the component
                 var serviceuriinput = $(sourcelement).children()[2];
