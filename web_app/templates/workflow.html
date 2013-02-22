@@ -5,6 +5,7 @@
 <div class="main" style="width: 97%">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+<link type="text/css" rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dropdown.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
@@ -12,6 +13,7 @@
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
 <div id="container" style="width: 100%">
 <div>
 <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
@@ -42,9 +44,41 @@
 <input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>
 <input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" class="button-record" title="Start recording new workflow"/>
 <input id="btnPause" type="button" value="Pause" onclick="TogglePause()" class="button-record" title="Pause workflow recording"/>
+    
+    </div>
+
 </th>
-<th style="width: 20%"><H3> Workflows </H3>
+<th style="width: 20%">
+	<div>
+        <div class="componentheader"><h3>Workflows</h3></div>
+        <a class="componenthelp" href="#workflowshelp">
+            <img src="/static/images/question.gif" />
+        </a>
+    </div>
 </th>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	    		<select>
+        		<option value = "" selected>Select an organism for the workflow</option>
+        		<option value="bce">Bacillus cereus ATCC14579 | bce</option>
+        		<option value="bsu">Bacillus subtilis | bsu</option>
+		        <option value="bth">Bacteroides thetaiotaomicron VPI-5482 | bth</option>
+		        <option value="cje">Campylobacter jejuni | cje</option>
+		        <option value="cac">Clostridium acetobutylicum | cac</option>
+		        <option value="eco">Escherichia coli K12 | eco</option>
+		        <option value="gsu">Geobacter sulfurreducens | gsu</option>
+		        <option value="hal">Halobacterium salinarum NRC-1 | hal</option>
+		        <option value="mmp">Methanococcus maripaludis S2 | mmp</option>
+		        <option value="pae">Pseudomonas aeruginosa | pae</option>
+		        <option value="rsp">Rhodobacter sphaeroides 2.4.1 | rsp</option>
+		        <option value="syf">Synechococcus elongatus PCC 7942 | syf</option>
+		    </select>
+	
+
+	</td>
+	<td></td>
 </tr>
 <tr>
 <td valign="top" style="width: 15%">
@@ -87,43 +121,43 @@
 </td>
 <td style="width: 65%"><h3>Workflow Canvas</h3>
 <div id="workflowcanvas" class="workflowcanvas" >
-This is your worflow canvas. Start adding worflow componens from left, open saved workflow or read our <a href="#quickhelp">quick start guide.</a>
-</div>
-<div id="quickhelp"> 
-	<h3>Quick Start Guide</h3>
-	<h4> Initial Setup</h4>
+<div><span class="search_help">This is your workflow canvas. Start adding workflow components from the left, open a saved workflow or read our <a class="componenthelp" href="#quickhelp">quick start guide.</a></span></div>
+<div style="display:none">
+ <div id="quickhelp"> 
+	<h2>Quick Start Guide</h2>
+	<h5> Initial Setup</h5>
 	<ul>
-		<li>1. Install each goose by using the links on the left. (If this is your first time) 
-			This will download the updated goose. You will need to install them for your application</li>
-		<li>2. Start The Gaggle Boss by clicking on the <b>"Start the Boss"</b> link</li>
+		<li>1. Install each goose by using the links on the left (if this is your first time). This will download the updated goose.</li>
+		<li>2. Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link</li>
                 <li>3. Click on the Gaggle toolbar in Firefox and <b>Connect to Gaggle</b></li>
-		<li>4. Drag the goose you want in your workflow and drop into the Workflow canvas</li>
+		<li>4. Drag and drop the goose you want into your workflow canvas</li>
 		<li>5. For each goose "Enter the url of the executable in your computer" 
 			e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX</li>
 		<li>6. Enter any subactions or data you want to open</li>
 		<li>7. In order to connect to components in the workflow drag the circle from the input goose to square of next workflow component</li>
  		<li>8. Save your workflow </li>
 	</ul>
-	<h4> Running the Workflow</h4>
+	<h5> Running the Workflow</h5>
 	<ul>
 		<li> 1. Create a new workflow or open a saved one</li>
-		<li> 2. Click "Run" to start the workflow</li>
-		<li> 3. For firegoose this will open a new tab and will take you to the page you specified in your workflow</li>
-		<li> 4. Select the type of the data you want for the next component from the firegoose toolbar and select "Next"</li>
-		<li> 5. Your data will be broadcasted to the next component in your workflow and your next application or webpage will be open.</li>
+		<li> 2. Click <span class="small green awesome">"Run"</span> to start the workflow</li>
+		<li> 3. For Firegoose, this will open a new tab and will take you to the page you specified in your workflow</li>
+		<li> 4. Select the type of the data you want for the next component from the Firegoose toolbar and select "Next"</li>
+		<li> 5. Your data will be broadcast to the next component in your workflow and your next application or webpage will be opened.</li>
 		<li> 6. For each workflow component you need to select specific data and click "Next"</li>
 	</ul>
-	<h4> Recording the Workflow</h4>
+	<h5> Recording the Workflow</h5>
 	<ul>
 		<li> 1. Gaggle can follow your actions and record them into your workflow for automated tasks</li>
 		<li> 2. Before recording make sure that the Gaggle bos has started</li>
-		<li> 3. Click on "Record" button to start recording</li>
+		<li> 3. Click on <span class="small awesome">"Record"</span> button to start recording</li>
 		<li> 4. Create workflow and follow the steps to complete your analysis</li>
-		<li> 5. Go back to your workspace and "Stop" your recording Once you are done</li>
-		<li> 6. Workflow components and connections will be automaticall created and placed into your workspace.</li>
-		<li> 7. You can "Pause" workflow anytime</li>	
+		<li> 5. Go back to your workspace and <span class="small awesome">"Stop"</span> your recording Once you are done</li>
+		<li> 6. Workflow components and connections will be automatically created and placed into your workspace.</li>
+		<li> 7. You can <span class="small awesome">"Pause"</span> workflow anytime</li>	
 	</ul>
     <h4><a href="/static/apidocuments/index.html">API documents</a> for developing Boss and Goose that supports workflow</h4>
+ </div>
 </div>
 
 </td>
@@ -182,7 +216,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
 <div style="display:none">
 <div id='inlinewfpath' style='padding:10px; background:#fff'>
-    <p align="center"><strong>Configure the Path of Gaggle Geese Applications</strong></p>
+    <h5>Configure the Path of Gaggle Geese Applications</h5>
     <p align="left">There are two ways to configure the execution path of a goose:</p>
     <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;If you already know the path of the goose (e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX),
     simply add the path to the input field.</p>
@@ -194,7 +228,7 @@ This is your worflow canvas. Start adding worflow componens from left, open save
 
 <div style="display:none">
     <div id='inlinecomponenthelp' style='padding:10px; background:#fff'>
-        <p align="center"><strong>How to Build a Workflow</strong></p>
+        <h5>How to Build a Workflow</h5>
         <p align="justify"><strong>Important:</strong> Go to the <a href="http://www.java.com/en/download/testjava.jsp">Java Test Page</a> and verify that the version of your Java is at least Java SE 6 (or 1.6).</p>
         <p align="justify">
             1. Install each goose by using the links below. (If this is your first time).
@@ -222,6 +256,16 @@ This is your worflow canvas. Start adding worflow componens from left, open save
         </ul>
         </p>
     </div>
+</div>
+
+<div style="display:none">
+    <div id='workflowshelp' style='background:#fff'>
+        <H5>Saved Workflows</H5>
+        <p>You can save workflows into your personal workspace if you are logged in or you can save them into public workspace.
+        Please remember that public workflows can be edited/deleted by others.</p>
+        <p> It is a good practise to provide a descriptive text for the workflow for future reference.</p>
+        <p> Clicking on the workflow title will bring workflow components into the canvas and will also list associated reports under the reports section.</p>
+      </div>
 </div>
 
 

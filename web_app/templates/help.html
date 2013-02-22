@@ -105,44 +105,38 @@
 			<div id="tabs-1"> <h5> Discover Network Portal</h5>
 				<div id="accordion-portal">
 					<h4>What is Network Portal</h4>
-					<div><p>The Network Portal is a database of gene transcription regulatory networks, enabling exploration, annotation and comparative analysis.</p>
-						<p>Deciphering the complexity of biological systems requires system level view of the regulatory players and their interactions. However, complexity of these interactions and uncertainty in their inference present a challenge for analysis and biological discovery. Furthermore, visualizing and analyzing these interactions often requires advanced computational expertise, tools and resources.</p> 
-						<p>Network Portal provides analysis and visualization tools for selected gene regulatory networks to aid researchers in biological discovery and hypothesis development.
-							It provides user-friendly interface, extensive search capabilities and number of visualization tools. We are also constantly adding regulatory networks for new species.
-							Increasing number of network models will also enable comparative network biology. We are also developing tools for comparing network models and they will be integrated into the portal as soon as they are available.</p>
-						 <p>The Network Portal also acts as a gateway for Gaggle Workflow. Gaggle workflow makes life of researchers easier by taking over the burden of repetitive analysis tasks. Integration with Network Portal 
-						 provides full access to automated analysis of network models and associated biological information. <p>
+					<div><p>The Network Portal is a database of gene transcription regulatory networks and enables exploration, annotation and comparative analysis.</p>
+					<p> Deciphering the complexity of biological systems requires a systems-level view of regulatory players and their interactions. However, inference of these complex interactions is challenging, and further, visualizing and analyzing these interactions often requires advanced computational expertise, tools and resources.</p> 
+					<p>Network Portal provides analysis and visualization tools for selected gene regulatory networks to aid researchers in biological discovery and hypothesis development. It provides a user-friendly interface, extensive search capabilities and a number of visualization tools. We are also constantly adding regulatory networks for new species. Increasing the number of network models will also enable comparative network biology. We are also developing tools for comparing network models and these will be integrated into the portal as soon as they are available.</p>
+					<p> The Network Portal also acts as a gateway for the Gaggle Workflow. Gaggle Workflow makes the life of researchers easier by taking over the burden of repetitive analysis tasks. Integration with Network Portal provides full access to automated analysis of network models and associated biological information.</p>
 					</div>
 					<h4>Navigating Network Portal</h4>
 					<div>
 						<div id="tab-help">
 							<h5 id="network">Network Tab</h5>
-							<img src="{{ STATIC_PREFIX }}images/help_images/gene-network.png" align="right"><p> If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as network by using CytoscapeWeb. In this view, each green colored circular nodes represent regulon member genes, purple colored diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon (Bicluster) via edges. This representation provides quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among different regulons. <br><br>
-								Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details. For genes, Locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor or not and any associated functional information will be shown. For regulators, number of regulons are shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown.<br>
-								You can pin information boxes by using button in the box title and open up additional ones on the same screen for comparative analysis.<br>
-								<h5 id="regulation">Regulation Tab</h5>   
-								<img src="{{ STATIC_PREFIX }}images/help_images/gene-regulation.png" align="right"> <p> Regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. Regulators table list total number of regulatory influences, regulators, regulons and type of the influence. You can see description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as combiner in the column labeled "Operator". Fo transcription factors, an additional table next to regulator table will be show. This table show regulons that are influenced by the transcription factor. </br>
+							<img src="{{ STATIC_PREFIX }}images/help_images/gene-network.png" align="right"><p>If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as a network using CytoscapeWeb. In this view, green circular nodes represent regulon member genes, purple diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon(s) (Biclusters) via edges. This representation provides a quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among different regulons. Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details.</br> The information shown for genes includes the locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor and any associated functional information. For regulators, the number of regulons is shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown. You can pin information boxes by using the button in the box title and open up additional ones on the same screen for comparative analysis.</p>								
+							<h5 id="regulation">Regulation Tab</h5>   
+								<img src="{{ STATIC_PREFIX }}images/help_images/gene-regulation.png" align="right"> <p> The regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. The regulators table lists the total number of regulatory influences, regulators, regulons and type of the influence. You can see a description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as a combiner in the column labeled "Operator". For transcription factors, an additional table next to regulator table will be shown. This table shows regulons that are influenced by the transcription factor. </br>
 									<h5 id="motifs">Motifs Tab</h5>   
 									<img src="{{ STATIC_PREFIX }}images/help_images/gene-motifs.png" align="right"><p> Network inference algorithm uses de novo motif prediction for assigning genes to regulons. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
 										<h5 id="functions">Functions Tab</h5>  
-										<img src="{{ STATIC_PREFIX }}images/help_images/gene-functions.png" align="right"> <p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. Function name is linked to its explanation and more details<br>
+										<img src="{{ STATIC_PREFIX }}images/help_images/gene-functions.png" align="right"> <p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. The function name is linked to its explanation and more details.<br>
 											<h5 id="regulon-members">Regulon Members Tab</h5> 
 											<img src="{{ STATIC_PREFIX }}images/help_images/gene-regulon-members.png" align="right"><p> Identity of gene members in a regulon may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same regulon(s) with gene under consideration are shown here. For each member, gene name, description and regulons that contain it are listed. <br>
 												<h5 id="help">Help Tab</h5> 
-												<img src="{{ STATIC_PREFIX }}images/help_images/gene-help.png" align="right"> <p> This help page. More general help can be accessed by clicking help menu in the main navigation bar.</p>
+												<img src="{{ STATIC_PREFIX }}images/help_images/gene-help.png" align="right"> <p> More general help can be accessed by clicking the help menu in the main navigation bar.</p>
 													<h5 id="comments">Comments Tab</h5>
-													<img src="{{ STATIC_PREFIX }}images/help_images/gene-comments.png" align="right"> <p> Network Portal is designed to promote collaboration through social interactions. Therefore interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their facebook (or Google) accounts to connect to this page. Each regulon and gene page includes comments tab that lists history of the interactions for that gene. You can browse the history, make updates, raise questions and share these activities with social web. In the next releases of the network portal, we are planning to create personal space for each user where you can share you space that contains all the analysis steps you did along with relevant information. 
-														</p>
+													<img src="{{ STATIC_PREFIX }}images/help_images/gene-comments.png" align="right"> <p> Network Portal is designed to promote collaboration through social interactions. Therefore, interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their Facebook or Google accounts to connect to this page. Each regulon and gene page includes a comments tab that lists the history of interactions for that gene. You can browse the history, make updates, raise questions and share these activities within the social web. In future releases of the network portal, we are planning to create a personal space for each user that contains all the analysis steps performed by the user along with relevant information. It will be possible to share these personal spaces with other users.</p>
 														<h5 id="circvis">CircVis</h5>
-														Our circular regulon explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a> originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use simplified version of visquick to display distribution of regulon members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
+														Our circular regulon explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a>, which was originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use a simplified version of visquick to display distribution of regulon members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
 														<img src="{{ STATIC_PREFIX }}images/help_images/circvis-help.png" align="right"><br>
 															<ul>
-																<li> 1. All genomic elements for the organism are represented as a circle and each element is separated by black tick marks. In this example chromosome and pDV represent main chromosome and plasmid for D. vulgaris Hildenborough, respectively.</li>
+																<li> 1. All genomic elements for the organism are represented as a circle and each element is separated by black tick marks. In this example "chromosome" and "pDV" represent the main chromosome and plasmid for D. vulgaris Hildenborough.</li>
 																<li> 2. Source gene</li>
 																<li> 3. Target genes (other regulon members)</li>
 																<li> 4. Interactions between source and target genes for a particular regulon</li>
-																<li> 5. Regulon(s) that source gene and target genes belong to</li>
-																<li> 6. Visualisation legend</li>
+																<li> 5. Regulon(s) that the source gene and target genes belong to</li>
+																<li> 6. Visualization legend</li>
 															</ul>
 
 						</div>
@@ -161,7 +155,7 @@
 							<li><strong>Bicluster:</strong> Name list combined with a condition list (i.e., these genes are interesting in these conditions)</li>
 							<li><strong>Tuple</strong> (replaces HashMap): a collection of name/value pairs</li>
 							<li><strong>Matrix:</strong> rows and columns, each named, containing numerical data</li>
-							<li><strong>Network:</strong> a collection of nodes and edges, with arbitrary hashmaps associated with each</li>
+							<li><strong>Network:</strong> a collection of nodes and edges, with arbitrary tuples associated with each</li>
 						</ol>
 					</div>
 					
@@ -275,54 +269,41 @@
 				<div id="accordion2" class="">
 					<h4> Workflow Concept</h4>
 					<div>
-						<p><img align="right" src="{{ STATIC_PREFIX }}images/workflow_concept.png">Researchers often come across repetitive analysis tasks where same/different inputs are analyzed by using same/different tools multiple times. In addition, number of analyses tools may need to be used for analyzing the same set of inputs. Workflow idea is based on automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools. </p>
-						<p>Workflow is developed based on our extensive experience with GAGGLE in exchanging data between independently developed software tools and databases to enable interactive exploration of systems biology data. Exporting "boss" and "goose" concept into workflow, each geese becomes a module in the workflow. These modules can be added into workflow sequentially or in parallel and can accept output from other modules in the workflow. Once the workflow is built, it can be saved into personal workspace and can be called out anytime to revoke the same analysis steps.</p> 
+						<p><img align="right" src="{{ STATIC_PREFIX }}images/workflow_concept.png">Researchers often come across repetitive analysis tasks where the same/different inputs are analyzed by using the same/different tools multiple times. In addition, a number of analyses tools may need to be used for analyzing the same set of inputs. The workflow allows automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools. </p>
+						<p>The workflow is developed based on our extensive experience with Gaggle in exchanging data between independently developed software tools and databases to enable interactive exploration of systems biology data. Exporting the "boss" and "goose" concept into the workflow, each goose becomes a module in the workflow. These modules can be added into a workflow sequentially or in parallel and can accept output from other modules in the workflow. Once the workflow is built, it can be saved into a personal workspace and can be called out anytime to invoke the same analysis steps.</p> 
 						
 					</div>
 					<h4> Case 1 - Discovering Detailed Regulon Information</h4>
 					<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-1.png">
-					<p> This exercise starts with a regulon in Network Portal. We will use very simple workflow idea that includes broadcasting data via firegoose to multiple web resources simultaneously.
-						We will broadcast Namelist of regulon members to DAVID for functional enrichment analysis and to Entrez to access NCBI tools. We will also broadcast motif PSSM information to STAMP
-						in order to identify matches to known motifs.</p>
+					<p> This exercise starts with a regulon in Network Portal. We will use a very simple workflow idea that includes broadcasting data via Firegoose to multiple web resources simultaneously. We will broadcast a Namelist of regulon members to DAVID for functional enrichment analysis and to Entrez to access NCBI tools. We will also broadcast motif PSSM information to STAMP in order to identify matches to known motifs.</p>
 						<b>STEPS:</b>
 						<ol>
 							<li>Start <span class="small red awesome">Gaggle boss</span></li>
 							<li>First we will collect regulon info from a website by adding a <span class="small awesome">firegoose</span> module. 
-								Path to firefox should be automatically detected. Leave subaction unchanged. Enter data url, or web resource to get regulon information.
+								Path to Firefox should be automatically detected. Leave subaction unchanged. Enter data url, or web resource to get regulon information.
 								In this example we will use one of Methanococcus maripaludis GRN regulon. (http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/htmls/cluster0114.html)
 								</li>
 							<li>Add <span class="small awesome">firegoose</span> module for DAVID.
-								Select "DAVID" option from subaction menu and connect to first firegoose module.
-								<code>Manual: You need to convert Namelist to DAVID Id list once its submitted to DAVID.</code></li>
-							<li>Add <span class="small awesome">firegoose</span> module for Entrez
-								Select "Entrez Protein" subaction and connect to first firegoose module.</li>
-							<li>Last, we will add another <span class="small awesome">firegoose</span> module for STAMP
-								Select "STAMP" subaction and connect to first firegoose module.</li>
-								<code>Manual: You need to select appropriate database for motif search on STAMP site</code></li>
+								Select the "DAVID" option from subaction menu and connect to the first Firegoose module.
+								<code>Manual: You need to convert the Namelist to a DAVID Id list once it has been submitted to DAVID.</code></li>
+							<li>Add firegoose module for Entrez. Select "Entrez Protein" subaction and connect to the first Firegoose module.</li>
+							<li>Last, we will add another firegoose module for STAMP. Select the "STAMP" subaction and connect to the first Firegoose module.</li>
+								<code>Manual: You need to select an appropriate database for motif searching on the STAMP site.</code></li>
 							<li> Optional: Save your workflow</li>
 							<li> Run your workflow by using <span class="small green awesome">"Run"</span> button in the control panel.</li>	
 						</ol>
 					</div>
 					<h4> Case 2 - Analyzing gene expression data</h4>
 					<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-2.png">
-					<p> The second exercise is slightly more complicated and it includes both desktop applications and web resources. The aim of this workflow is to automate analysis of gene expression data and identify functional associations, functional enrichments and also associated regulatory network modules.<br>
-						We will start with opening gene expression file (tab delimited)in <b>Mev</b>. After performing statistical analyses, we will broadcast 
-						selected genes via <b>firegoose</b> to KEGG (Metabolic pathway enrichment) and EMBL Strings (Functional associations). In the meantime we will also open
-						Network model in <b>Cytoscape</b> and broadcast our gene list to network to select network modules that includes these genes.</p>   
+					<p> The second exercise includes both desktop applications and web resources. The aim of this workflow is to automate analysis of gene expression data and identify functional associations, functional enrichments and associated regulatory network modules. We will start by opening a gene expression file (tab delimited) in Mev. After performing statistical analyses, we will broadcast selected genes via Firegoose to KEGG (Metabolic pathway enrichment) and EMBL Strings (Functional associations). Inparallel, we will also open a Network model in Cytoscape and broadcast our gene list to the network in order to select network modules that include these genes.</p>   
 						<b>STEPS:</b>
 						<ol>
 							<li>Start <span class="small red awesome">Gaggle boss</span></li>
-							<li>We will first add <span class="small awesome">MEV</span> module to open gene expression file. 
-								Leave subaction unchanged. If you are opening the gene expression file from the web enter the url otherwise enter path to the file on your computer.
-								In this example we will use gene expression data coming from studying energy metabolism for Desulfovibrio vulgaris.
+							<li>We will add mev module to open a gene expression file. Leave subaction unchanged. If you are opening the gene expression file from the web, enter the url; otherwise, enter the path to the file on your computer.								In this example we will use gene expression data coming from studying energy metabolism for Desulfovibrio vulgaris.
 								We will compare gene expression upon growth on Pyruvate+Sulfate versus Pyruvate/Fermentation.
-								<code>Manual: After your workflow started Mev will load the gene expression file. You can perform SAM analyses and then select 
-								genes that are upregulated in Pyruvate/Fermentation conditions and then broadcast them to workflow.</code></li>
+								<code>Manual: After your workflow has started Mev will load the gene expression file. You can perform SAM analyses and then select genes that are upregulated in Pyruvate/Fermentation conditions and then broadcast them to the workflow.</code></li>
 								</li>
-							<li>Add <span class="small awesome">firegoose</span> module for KEGG.
-								Select "KEGG" option from subaction menu and connect to MEV
-								 module.
-								KEGG will show you pathways containing your upregulated genes. You can also access these pathways in your workflow report.</li>
+							<li>Add firegoose module for EMBL Strings. Select "EMBL Strings" subaction and connect to MEV module. The EMBL Strings website will use the Namelist for our selected genes and search against the Strings database to identify functional associations. The resulting functional association network will be shown and captured in the workflow report.</li>
 							<li>Add <span class="small awesome">firegoose</span> module for EMBL Strings
 								Select "EMBL Strings" subaction and connect to MEV module. EMBL Strings website will use Namelist for our selected genes and search against Strings database 
 								to identify functional associations. Resulting functional association network will be shown and captured in the workflow report.</li>

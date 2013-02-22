@@ -22,6 +22,7 @@ $(document).ready(function() {
         <th>Bicluster</th>
         <th># of genes</th>
         <th>Residual</th>
+        <th>Conditions</th>
       </tr>
     </thead>
     <tbody>
@@ -30,6 +31,7 @@ $(document).ready(function() {
         <td><a href="/bicluster/{{ bicluster.id }}">{{ bicluster.k }}</a></td>
         <td>{{ bicluster.genes.count }}</td>
         <td>{{ bicluster.residual }}</td>
+        <td>{{bicluster.conditions.count}}</td>
       </tr>
       {% endfor %}
     </tbody>
