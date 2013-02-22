@@ -864,6 +864,16 @@ function SaveWorkflow(name, desc, workflowid, userid) {
             if (result['id'] != undefined && result['id'].length > 0)
             {
                 AppendOrUpdateWorkflowItem(result['id'], result);
+                if (currWorkflowID == null || currWorkflowID.length == 0 || currWorkflowID != result['id'])
+                    // If the saved workflow is a new workflow, we need to reload it so that all the components
+                    // has their workflownodeid saved to be able to generate workflow reports (which requires
+                    // workflownodeid to save to the sessionreportdata table
+                    GetWorkflow(result['id']);
+                else
+                    currWorkflowID = result['id'];
+
+
+
                 /*var link = "<li class='unselectedworkflow' id=\"liwf_" + result['id'] + "\"><a title=\"" + result['desc'] + "\" href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
                 //alert(link);
                 var ul = ($("#divWorkflow").children())[0];
