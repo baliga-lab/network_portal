@@ -62,7 +62,7 @@
 <tr>
 	<td></td>
 	<td>
-	    		<select>
+	    		<select id="organismSelect" onchange="javascript:organismSelected(this);">
         		<option value = "" selected>Select an organism for the workflow</option>
         		<option value="bce">Bacillus cereus ATCC14579 | bce</option>
         		<option value="bsu">Bacillus subtilis | bsu</option>
@@ -112,6 +112,7 @@
                         <input type="hidden" value="" />
                         <input type="hidden" value="{{component.Component.arguments}}" />
                         <input type="hidden" value="" />
+
                         </div>
                    
                {% endfor %}
