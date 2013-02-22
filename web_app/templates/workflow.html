@@ -5,6 +5,7 @@
 <div class="main" style="width: 97%">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+<link type="text/css" rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dropdown.css" />
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <!--<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.js"></script> -->
@@ -12,6 +13,7 @@
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
 <div id="container" style="width: 100%">
 <div>
 <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
@@ -42,6 +44,9 @@
 <input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>
 <input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" class="button-record" title="Start recording new workflow"/>
 <input id="btnPause" type="button" value="Pause" onclick="TogglePause()" class="button-record" title="Pause workflow recording"/>
+    
+    </div>
+
 </th>
 <th style="width: 20%">
 	<div>
@@ -51,6 +56,29 @@
         </a>
     </div>
 </th>
+</tr>
+<tr>
+	<td></td>
+	<td>
+	    		<select>
+        		<option value = "" selected>Select an organism for the workflow</option>
+        		<option value="bce">Bacillus cereus ATCC14579 | bce</option>
+        		<option value="bsu">Bacillus subtilis | bsu</option>
+		        <option value="bth">Bacteroides thetaiotaomicron VPI-5482 | bth</option>
+		        <option value="cje">Campylobacter jejuni | cje</option>
+		        <option value="cac">Clostridium acetobutylicum | cac</option>
+		        <option value="eco">Escherichia coli K12 | eco</option>
+		        <option value="gsu">Geobacter sulfurreducens | gsu</option>
+		        <option value="hal">Halobacterium salinarum NRC-1 | hal</option>
+		        <option value="mmp">Methanococcus maripaludis S2 | mmp</option>
+		        <option value="pae">Pseudomonas aeruginosa | pae</option>
+		        <option value="rsp">Rhodobacter sphaeroides 2.4.1 | rsp</option>
+		        <option value="syf">Synechococcus elongatus PCC 7942 | syf</option>
+		    </select>
+	
+
+	</td>
+	<td></td>
 </tr>
 <tr>
 <td valign="top" style="width: 15%">
