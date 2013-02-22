@@ -75,6 +75,11 @@ grant all privileges on networks_workflows_id_seq to apache;
 grant all privileges on networks_workflowsessions to apache;
 grant all privileges on networks_workflowsessions_id_seq to apache;
 grant all privileges on auth_user to apache;
+grant all privileges on django_openid_auth_association to apache;
+grant all privileges on django_openid_auth_association_id_seq to apache;
+grant all privileges on django_openid_auth_nonce to apache;
+grant all privileges on django_openid_auth_nonce_id_seq to apache;
+grant all privileges on django_openid_auth_useropenid to apache;
  
 grant all privileges on auth_group to apache;
 grant all privileges on auth_group_id_seq to apache;
