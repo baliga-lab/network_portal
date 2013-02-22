@@ -236,8 +236,10 @@ function componentDropEvent(ev, component) {
 
             $($((cloned).children())[0]).removeClass("workflowcomponentchildinput");
             // include workflow index in component name
-            var goosename = $($((cloned).children())[0]).text();
-            $($((cloned).children())[0]).text(goosename + "-" + wfcnt);
+            var titleelement = ($(cloned).children())[0];
+            var titleahref = ($(titleelement).children())[0];
+            var goosename = $(titleahref).text();
+            $(titleahref).text(goosename + "-" + wfcnt);
             // include workflow index in the hidden field
             $($((cloned).children())[10]).val(wfcnt.toString());
 
@@ -493,9 +495,9 @@ function ExtractWorkflow() {
                 var serviceurlelement = $(source).children()[2];
                 //alert(serviceurlelement);
                 //alert("Service uri: " + $(serviceurlelement).attr("value"));
-                var argumentselement = $(source).children()[4];
+                var argumentselement = $(source).children()[9];
                 //alert(argumentselement);
-                var subactionelement = $(source).children()[9];
+                var subactionelement = $(source).children()[4];
                 var dataurielement = $(source).children()[5];
                 //alert($(dataurielement).attr("value"));
                 var goosenameelement = $(source).children()[6];
@@ -561,6 +563,42 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
 
     return jsonObj;
 }
+
+function organismSelected(sel)
+{
+    var nodes = $("#workflowcanvas").children();
+    if (nodes.length > 0)
+    {
+        var organismvalue = sel.value;
+        //alert(organismvalue);
+        if (organismvalue != null && organismvalue.length > 0)
+        {
+            var cytowebstarturl = "http://networks.systemsbiology.net/static/jnlp/cytoscape-" + organismvalue + ".jnlp";
+            var mevwebstarturl = "http://networks.systemsbiology.net/static/jnlp/mev-" + organismvalue + ".jnlp";
+
+            for (var i = 0; i < nodes.length; i++)
+            {
+                var source = nodes[i];
+                var srcidstr = $(source).attr('id');
+                var titleelement = ($(source).children())[0];
+                var titleahref = ($(titleelement).children())[0];
+                var goosename = $(titleahref).text();
+                //alert(goosename);
+                if (goosename.indexOf("Cytoscape") >= 0)
+                {
+                    var serviceurlelement = $(source).children()[2];
+                    $(serviceurlelement).val(cytowebstarturl);
+                }
+                else if (goosename.indexOf("MeV") >= 0)
+                {
+                    var serviceurlelement = $(source).children()[2];
+                    $(serviceurlelement).val(mevwebstarturl);
+                }
+            }
+        }
+    }
+}
+
 
 function DeleteClicked()
 {
@@ -777,7 +815,7 @@ function AppendOrUpdateWorkflowItem(wfid, workflowjsonstring)
             var divelement = document.createElement("div");
             divelement.setAttribute("id", ("divwf_" + wfid));
             $(divelement).html(newdivhtml);
-            alert("Append elements " + $(ahrefelement).html());
+            //alert("Append elements " + $(ahrefelement).html());
             $("#accordion").append($(ahrefelement));
             $("#accordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
 
@@ -983,6 +1021,12 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
                 $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
 
                 $($((sourcelement).children())[0]).removeClass("workflowcomponentchildinput");
+                // include workflow index in component name
+                var titleelement = ($(sourcelement).children())[0];
+                var titleahref = ($(titleelement).children())[0];
+                var goosename = $(titleahref).text();
+                //alert(goosename);
+                $(titleahref).text(goosename + "-" + wfcnt);
 
                 var closebutton = ($(sourcelement).children())[1];
                 $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
@@ -991,10 +1035,6 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
 
                 $(($(sourcelement).children())[4]).removeClass("componentsubactions workflowcomponentchildinput").addClass("workflowcomponentsubactions");
 
-                // include workflow index in component name
-                var goosename = $($((sourcelement).children())[0]).text();
-                $($((sourcelement).children())[0]).text(goosename + "-" + wfcnt);
-                $($((sourcelement).children())[10]).val(wfcnt.toString());
 
                 // configure the parameters of the component
                 var serviceuriinput = $(sourcelement).children()[2];
