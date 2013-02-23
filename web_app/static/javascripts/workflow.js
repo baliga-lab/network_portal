@@ -797,7 +797,7 @@ function AppendOrUpdateWorkflowItem(wfid, workflowjsonstring)
     {
         var wfcontrolid = "a#liwf_" + wfid;
         var wfdivid = "divwf_" + wfid;
-        var newhtml = "<h3><a href='#' id='liwf_" + wfid + "'>" + workflowjsonstring['name'] + "</a></h3>";
+        var newhtml = "<p id='h3wf_" + wfid + "'><a href='#' id='liwf_" + wfid + "'>" + workflowjsonstring['name'] + "</a></p>";
         var newdivhtml = "<p>" + workflowjsonstring['desc'] + "</p>";
         //alert(newhtml);
         //alert(newdivhtml);
