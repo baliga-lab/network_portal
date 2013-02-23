@@ -731,7 +731,7 @@ function SubmitWorkflow() {
         //alert(jsonString);
         SubmitWorkflowToBoss(jsonString);
         WF_timercnt = 0;
-        setTimeout(function() { CheckSessions() }, 10000);
+        setTimeout(function() { CheckSessions() }, 15000);
     }
 }
 
@@ -1364,7 +1364,7 @@ function CheckSessions()
     {
         //alert("Check sessions: " + WF_timercnt);
         WF_timercnt++;
-        setTimeout(function() { CheckSessions() }, 2000);
+        setTimeout(function() { CheckSessions() }, 15000);
     }
 }
 
