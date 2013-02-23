@@ -824,7 +824,21 @@ function AppendOrUpdateWorkflowItem(wfid, workflowjsonstring)
             //alert("Append elements " + $(ahrefelement).html());
             $("#accordion").append($(ahrefelement));
             $("#accordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
-
+            $('#accordion p').bind('click', function (event) {
+                   var source = event.target || event.srcElement;
+                   if (source != null)
+                   {
+                      //alert($(source).attr("id"));
+                      var srcid = $(source).attr("id");
+                      var splitted = srcid.split("_");
+                      var wfid = splitted[1];
+                      if (wfid != null)
+                      {
+                        //alert(wfid);
+                        GetWorkflow(wfid);
+                      }
+                   }
+                } );
         }
     }
 }
