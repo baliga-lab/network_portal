@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://networks.systemsbiology.net/static/jnlp" href="boss.jnlp">
+<jnlp spec="1.0+" codebase="http://networks.systemsbiology.net/static/">
   <information>
     <title>Gaggle Boss</title>
     <vendor>Baliga Lab | Institute for Systems Biology</vendor>
