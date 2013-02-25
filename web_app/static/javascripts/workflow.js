@@ -731,7 +731,7 @@ function SubmitWorkflow() {
         //alert(jsonString);
         SubmitWorkflowToBoss(jsonString);
         WF_timercnt = 0;
-        setTimeout(function() { CheckSessions() }, 10000);
+        setTimeout(function() { CheckSessions() }, 15000);
     }
 }
 
@@ -747,18 +747,24 @@ function OnSubmitWorkflow(jsongooseinfo)
         {
             var componentid = "#" + key;
             var serviceuriinput = ($(componentid).children())[2];
-            //alert("Current value: " + $(serviceuriinput).html());
-            $(serviceuriinput).val(exepath);
-            //alert(window.localStorage);
-            if (window.localStorage) {
-              // window.localStorage is available!
-              var componentinfo = key.split("_");
-              //alert(componentinfo[1]);
-              window.localStorage.setItem((componentinfo[1] + "_" + componentinfo[2]), exepath);
-              //alert(componentinfo[2]);
-            } else {
-              // no native support for HTML5 storage :(
-              // maybe try dojox.storage or a third-party solution
+            var serviceuri = $(serviceuriinput).val();
+            if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
+            {
+                // We reset the uri if it is not a jnlp path
+
+                //alert("Current value: " + $(serviceuriinput).html());
+                $(serviceuriinput).val(exepath);
+                //alert(window.localStorage);
+                if (window.localStorage) {
+                  // window.localStorage is available!
+                  var componentinfo = key.split("_");
+                  //alert(componentinfo[1]);
+                  window.localStorage.setItem((componentinfo[1] + "_" + componentinfo[2]), exepath);
+                  //alert(componentinfo[2]);
+                } else {
+                  // no native support for HTML5 storage :(
+                  // maybe try dojox.storage or a third-party solution
+                }
             }
         }
     }
@@ -791,7 +797,7 @@ function AppendOrUpdateWorkflowItem(wfid, workflowjsonstring)
     {
         var wfcontrolid = "a#liwf_" + wfid;
         var wfdivid = "divwf_" + wfid;
-        var newhtml = "<h3><a href='#' id='liwf_" + wfid + "'>" + workflowjsonstring['name'] + "</a></h3>";
+        var newhtml = "<p id='h3wf_" + wfid + "'><a href='#' id='liwf_" + wfid + "'>" + workflowjsonstring['name'] + "</a></p>";
         var newdivhtml = "<p>" + workflowjsonstring['desc'] + "</p>";
         //alert(newhtml);
         //alert(newdivhtml);
@@ -818,7 +824,21 @@ function AppendOrUpdateWorkflowItem(wfid, workflowjsonstring)
             //alert("Append elements " + $(ahrefelement).html());
             $("#accordion").append($(ahrefelement));
             $("#accordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
-
+            $('#accordion p').bind('click', function (event) {
+                   var source = event.target || event.srcElement;
+                   if (source != null)
+                   {
+                      //alert($(source).attr("id"));
+                      var srcid = $(source).attr("id");
+                      var splitted = srcid.split("_");
+                      var wfid = splitted[1];
+                      if (wfid != null)
+                      {
+                        //alert(wfid);
+                        GetWorkflow(wfid);
+                      }
+                   }
+                } );
         }
     }
 }
@@ -864,6 +884,16 @@ function SaveWorkflow(name, desc, workflowid, userid) {
             if (result['id'] != undefined && result['id'].length > 0)
             {
                 AppendOrUpdateWorkflowItem(result['id'], result);
+                if (currWorkflowID == null || currWorkflowID.length == 0 || currWorkflowID != result['id'])
+                    // If the saved workflow is a new workflow, we need to reload it so that all the components
+                    // has their workflownodeid saved to be able to generate workflow reports (which requires
+                    // workflownodeid to save to the sessionreportdata table
+                    GetWorkflow(result['id']);
+                else
+                    currWorkflowID = result['id'];
+
+
+
                 /*var link = "<li class='unselectedworkflow' id=\"liwf_" + result['id'] + "\"><a title=\"" + result['desc'] + "\" href='" + "javascript:GetWorkflow(\"" + result['id'] + "\")'>" + result['name'] + "</a></li>";
                 //alert(link);
                 var ul = ($("#divWorkflow").children())[0];
@@ -1038,14 +1068,20 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
 
                 // configure the parameters of the component
                 var serviceuriinput = $(sourcelement).children()[2];
-                $(serviceuriinput).attr("value", node.serviceuri);
-                if (window.localStorage != null)
+                $(serviceuriinput).val(node.serviceuri);
+                var serviceuri = $(serviceuriinput).val();
+                //alert(serviceuri);
+                if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
                 {
-                    var uri = window.localStorage.getItem(("component_" + nodecomponentid));
-                    //alert(uri);
-                    if (uri != null)
-                        $(serviceuriinput).attr("value", uri);
+                    if (window.localStorage != null)
+                    {
+                        var uri = window.localStorage.getItem(("component_" + nodecomponentid));
+                        //alert(uri);
+                        if (uri != null)
+                            $(serviceuriinput).attr("value", uri);
+                    }
                 }
+
                 var argumentsinput = $(sourcelement).children()[9];
                 $(argumentsinput).val(node.arguments);
                 var subactioninput = $(sourcelement).children()[4];
@@ -1328,7 +1364,7 @@ function CheckSessions()
     {
         //alert("Check sessions: " + WF_timercnt);
         WF_timercnt++;
-        setTimeout(function() { CheckSessions() }, 2000);
+        setTimeout(function() { CheckSessions() }, 15000);
     }
 }
 
