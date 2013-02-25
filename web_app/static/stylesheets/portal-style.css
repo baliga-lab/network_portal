@@ -472,7 +472,7 @@ input.button-record {
     padding: 1px 0 60px 0; /*6px should equal top padding of "ul li a" below, 7px should equal bottom padding + bottom border of "ul li a" below*/
    float:right;
     margin: -50px 2px;
-    text-align: right; //set value to "left", "center", or "right"*/
+    text-align: right; /*set value to "left", "center", or "right"*/
 }
 
 .underlinemenu ul li{
@@ -1937,6 +1937,25 @@ table#motif {
 .yellow.awesome:hover { background-color: #fc9200; }
 .green.awesome, .green.awesome:visited		{ background-color: #91bd09; }
 
+.fancybutton, .fancybutton:visited {
+	background-color: #222;
+	display: inline-block; 
+	padding: 5px 5px 6px; 
+	color: #fff; 
+	text-decoration: none;
+	-moz-border-radius: 10px; 
+	-webkit-border-radius: 10px;
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	position: relative;
+	border-radius:10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+
+
 /* Sizes ---------- */
 .small.awesome {
 font-size: 10px;
@@ -1949,6 +1968,19 @@ font-size: 14px;
 padding: 8px 14px 9px;
 margin: 0px 0px 0px 5px;
 }
+/* Sizes ---------- */
+.small.fancybutton {
+font-size: 10px;
+}
+.medium.fancybutton {
+font-size: 13px;
+}
+.large.fancybutton {
+font-size: 14px;
+padding: 8px 14px 9px;
+margin: 0px 0px 0px 5px;
+}
+
  
 /* Colors ---------- */
 .blue.awesome {
@@ -1966,3 +1998,20 @@ background-color: #ff5c00;
 .yellow.awesome {
 background-color: #ffb515;
 }
+/* Colors ---------- */
+.blue.fancybutton {
+background-color: #2daebf;
+}
+.red.fancybutton {
+background-color: #e33100;
+}
+.magenta.fancybutton {
+background-color: #a9014b;
+}
+.orange.fancybutton {
+background-color: #ff5c00;
+}
+.yellow.fancybutton {
+background-color: #ffb515;
+}
+

@@ -275,32 +275,31 @@
 					</div>
 					<h4> Case 1 - Discovering Detailed Regulon Information</h4>
 					<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-1.png">
-					<p> This exercise starts with a regulon in Network Portal. We will use a very simple workflow idea that includes broadcasting data via Firegoose to multiple web resources simultaneously. We will broadcast a Namelist of regulon members to DAVID for functional enrichment analysis and to Entrez to access NCBI tools. We will also broadcast motif PSSM information to STAMP in order to identify matches to known motifs.</p>
+					<p> This exercise starts with a regulon in Network Portal. We will use a very simple workflow idea that includes broadcasting data via Firegoose to multiple web resources simultaneously. We will broadcast a Namelist of regulon members to EMBL String for functional associations and to KEGG Pathways to access metabolic pathway information. We will also broadcast Namelist to Peptide Atlas in order to identify proteomics data available for this organism.</p>
 						<b>STEPS:</b>
 						<ol>
 							<li>Start <span class="small red awesome">Gaggle boss</span></li>
 							<li>First we will collect regulon info from a website by adding a <span class="small awesome">firegoose</span> module. 
 								Path to Firefox should be automatically detected. Leave subaction unchanged. Enter data url, or web resource to get regulon information.
-								In this example we will use one of Methanococcus maripaludis GRN regulon. (http://baliga.systemsbiology.net/cmonkey/enigma/mmp/cmonkey_4.8.8_mmp_1661x58_11_Oct_11_16:14:07/htmls/cluster0114.html)
+								In this example we will use one of Halobacterium sp. MRC-1 GRN regulon. (http://networks.systemsbiology.net/bicluster/788)
 								</li>
-							<li>Add <span class="small awesome">firegoose</span> module for DAVID.
-								Select the "DAVID" option from subaction menu and connect to the first Firegoose module.
-								<code>Manual: You need to convert the Namelist to a DAVID Id list once it has been submitted to DAVID.</code></li>
-							<li>Add firegoose module for Entrez. Select "Entrez Protein" subaction and connect to the first Firegoose module.</li>
-							<li>Last, we will add another firegoose module for STAMP. Select the "STAMP" subaction and connect to the first Firegoose module.</li>
-								<code>Manual: You need to select an appropriate database for motif searching on the STAMP site.</code></li>
+							<li>Add <span class="small awesome">firegoose</span> module for EMBL String.
+								Select the "EMBL String" option from subaction menu and connect to the first Firegoose module.
+								<code>Manual: You need to click continue once EMBL String page has opened to confirm namelist to organism mapping.</code></li>
+							<li>Add firegoose module for KEGG. Select "KEGG Pathway" subaction and connect to the first Firegoose module.</li>
+							<li>Last, we will add another firegoose module for "Peptide Atlas". Select the "Peptide Atlas" subaction and connect to the first Firegoose module.</li>
+							
 							<li> Optional: Save your workflow</li>
 							<li> Run your workflow by using <span class="small green awesome">"Run"</span> button in the control panel.</li>	
 						</ol>
 					</div>
 					<h4> Case 2 - Analyzing gene expression data</h4>
 					<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-2.png">
-					<p> The second exercise includes both desktop applications and web resources. The aim of this workflow is to automate analysis of gene expression data and identify functional associations, functional enrichments and associated regulatory network modules. We will start by opening a gene expression file (tab delimited) in Mev. After performing statistical analyses, we will broadcast selected genes via Firegoose to KEGG (Metabolic pathway enrichment) and EMBL Strings (Functional associations). Inparallel, we will also open a Network model in Cytoscape and broadcast our gene list to the network in order to select network modules that include these genes.</p>   
+					<p> The second exercise includes both desktop applications and web resources. The aim of this workflow is to automate analysis of gene expression data and identify functional associations, functional enrichments and associated regulatory network modules. We will start by opening a gene expression file (tab delimited) in Mev. After performing statistical analyses, we will broadcast selected genes via Firegoose to KEGG (Metabolic pathway enrichment) and EMBL Strings (Functional associations). In parallel, we will also open a Network model in Cytoscape and broadcast our gene list to the network in order to select network modules that include these genes.</p>   
 						<b>STEPS:</b>
 						<ol>
 							<li>Start <span class="small red awesome">Gaggle boss</span></li>
-							<li>We will add mev module to open a gene expression file. Leave subaction unchanged. If you are opening the gene expression file from the web, enter the url; otherwise, enter the path to the file on your computer.								In this example we will use gene expression data coming from studying energy metabolism for Desulfovibrio vulgaris.
-								We will compare gene expression upon growth on Pyruvate+Sulfate versus Pyruvate/Fermentation.
+							<li>We will add mev module to open a gene expression file. Leave subaction unchanged. If you are opening the gene expression file from the web, enter the url; otherwise, enter the path to the file on your computer. In this example we will use gene expression data coming from Desulfovibrio vulgaris in the Network Portal.
 								<code>Manual: After your workflow has started Mev will load the gene expression file. You can perform SAM analyses and then select genes that are upregulated in Pyruvate/Fermentation conditions and then broadcast them to the workflow.</code></li>
 								</li>
 							<li>Add firegoose module for EMBL Strings. Select "EMBL Strings" subaction and connect to MEV module. The EMBL Strings website will use the Namelist for our selected genes and search against the Strings database to identify functional associations. The resulting functional association network will be shown and captured in the workflow report.</li>
@@ -308,15 +307,15 @@
 								Select "EMBL Strings" subaction and connect to MEV module. EMBL Strings website will use Namelist for our selected genes and search against Strings database 
 								to identify functional associations. Resulting functional association network will be shown and captured in the workflow report.</li>
 							<li>Last, we will add <span class="small awesome">Cytoscape</span> module to open a network file. (For this example we will use GRN model for D. vulgaris).
-								Connect Cytoscape module to MEV module and enter path to your cytoscape network file (web or desktop). When workflow is started cytoscape will open 
-								your network file and capture broadcast list from MEV. Upregulated genes will be selected in the network for further network manipulations.
-								</li>
+								Connect Cytoscape module to MEV module and enter path to your cytoscape network file (For this example network will be automatically downloaded once you select an organism). When workflow is started cytoscape will open 
+								your network file and capture broadcast list from MEV.</li>
+							<li> Make sure to select Desulfovibrio vulgaris Hildenborough from organism selection drowdown menu.</li>
 							<li> Optional: Save your workflow</li>
 							<li> Run your workflow by using <span class="small green awesome">"Run"</span> button in the control panel.</li>	
 						</ol>
 					</div>
-					<h4> Case 3 - Assigning functions to hypothetical proteins</h4>
-					<div><img src="{{ STATIC_PREFIX }}images/workflow_case-3.png"></div>
+					<!--<h4> Case 3 - Assigning functions to hypothetical proteins</h4>
+					<div><img src="{{ STATIC_PREFIX }}images/workflow_case-3.png"></div>-->
 					</div></p>
 				</div>
 		
@@ -325,10 +324,10 @@
 			</div>
 			
 			<div id="tabs-5"><h5> Get Involved</h5><br>
-				<h4 class="medium orange awesome"> Development </h4>
+				<h3> <span class="small red fancybutton">1</span>&nbsp;Development </h3>
 				<p>One of the key benefits of the Gaggle and Gaggle Workflow is that anyone can implement their own Geese. We hope to promote interoperability among bioinformatics applications by making this as easy as possible. Have an application you'd like to see included on this page? Please contact us by email (sturkars at systemsbiology.org) or through the discussion groups.</p>
 				<p> We strongly encourage developers to take advantage of easy implementation features in Gaggle and Network Portal. If you are a developer who would like to integrate his/her desktop/web applications with Gaggle/Network Portal we provide all the support you need.</p>
-				<h4 class="medium orange awesome">Gaggle Subversion Repository</h4>
+				<h3> <span class="small red fancybutton">2</span>&nbsp;Gaggle Subversion Repository </h3>
 				<p>
 				The Gaggle's source code is all open source, licensed under the LGPL,
 				and served using the
@@ -355,23 +354,20 @@
 					</li>
 				</ul>
 				
-				
-				<p>
-				
-				<h4 class="medium orange awesome">Firegoose Source code</h4>
+				<h3> <span class="small red fancybutton">3</span>&nbsp;Firegoose Source code </h3>
 				<ul>
 					<li>Firegoose source is here:
 						<a href="http://gaggle.systemsbiology.net/svn/gaggle/FireGoose/trunk/">http://gaggle.systemsbiology.net/svn/gaggle/FireGoose/trunk/</a></li>
 				</ul>
-				<h4 class="medium orange awesome">Network Portal Source code</h4>
+				<h3> <span class="small red fancybutton">4</span>&nbsp;Network Portal Source code </h3>
 				<ul>
 					<li>Network Portal source is here:
 						<a href="http://baliga-lab/github.com/network_portal">http://baliga-lab/github.com/network_portal</a></li>
 				</ul>
-				<h4 class="medium orange awesome">Gaggle Workflow API</h4>
+				<h3> <span class="small red fancybutton">5</span>&nbsp;Gaggle Workflow API </h3>
 				<ul>
 					<li>Workflow API documentation is here:
-						<a href="http://baliga-lab/github.com/network_portal">http://baliga-lab/github.com/network_portal</a></li>
+						<a href="/static/apidocuments/index.html">http://networks.systemsbiology.net/static/apidocuments</a></li>
 				</ul>
 
 			</div>       
