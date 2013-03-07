@@ -228,8 +228,8 @@ option { padding-right: 0.5em; }
 input.button {
 	padding: 8px 3px;
 	margin-bottom: 5px;
-    display: block;
-	width: 70px;
+    display: inline-block;
+	max-width: 90px;
 	margin:2px;
 	height: 30px;
 	border-radius: 4px;
@@ -472,7 +472,7 @@ input.button-record {
     padding: 1px 0 60px 0; /*6px should equal top padding of "ul li a" below, 7px should equal bottom padding + bottom border of "ul li a" below*/
    float:right;
     margin: -50px 2px;
-    text-align: right; //set value to "left", "center", or "right"*/
+    text-align: right; /*set value to "left", "center", or "right"*/
 }
 
 .underlinemenu ul li{
@@ -1639,8 +1639,25 @@ table#motif {
 .divcomponents
 {
     width: 100%; /*150px; */
+    overflow: auto;
+}
+
+.divdataspace
+{
+    max-width: 200px; /*150px; */
     height: 1000px;
     overflow: auto;
+}
+
+.dataspacelabel
+{
+    display: inline;
+    white-space: nowrap;
+}
+
+.selectDataAppliedHistory
+{
+    width: 100px;
 }
 
 .tdlistworkflow {
@@ -1672,6 +1689,34 @@ table#motif {
     background:none;
     width:50px;
     height: 25px;
+}
+
+.componenttitle
+{
+    margin-bottom: 5px;
+    display: block;
+	width: 100px;
+	height: 25px;
+	border-radius: 4px;
+	text-align: center;
+	line-height: 25px;
+	text-decoration: none;
+	font-family: 'Helvetica';
+	font-weight: bold;
+	font-size: 10pt;
+	float: left;
+	background-color: #D2D2D2;
+	border: 1px solid #8e8e8e;
+	-moz-box-shadow:inset 0px 0px 1px rgba(179,179,179,1);
+	-webkit-box-shadow:inset 0px 0px 1px rgba(179,179,179,1);
+	box-shadow:inset 0px 0px 1px rgba(179,179,179,1);
+	background-image: -o-linear-gradient(90deg , rgb(207,207,207) 0%, rgb(233,233,233) 100%);
+	background-image: -moz-linear-gradient(90deg , rgb(207,207,207) 0%, rgb(233,233,233) 100%);
+	background-image: -webkit-linear-gradient(90deg , rgb(207,207,207) 0%, rgb(233,233,233) 100%);
+	background-image: -ms-linear-gradient(90deg , rgb(207,207,207) 0%, rgb(233,233,233) 100%);
+	background-image: linear-gradient(90deg , rgb(207,207,207) 0%, rgb(233,233,233) 100%);
+	color: #545554;
+	text-shadow: rgba(254,254,254,0.5) 0px 1px 0px;
 }
 
 .componenttitle a
@@ -1909,6 +1954,25 @@ table#motif {
 .yellow.awesome:hover { background-color: #fc9200; }
 .green.awesome, .green.awesome:visited		{ background-color: #91bd09; }
 
+.fancybutton, .fancybutton:visited {
+	background-color: #222;
+	display: inline-block; 
+	padding: 5px 5px 6px; 
+	color: #fff; 
+	text-decoration: none;
+	-moz-border-radius: 10px; 
+	-webkit-border-radius: 10px;
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	position: relative;
+	border-radius:10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+
+
 /* Sizes ---------- */
 .small.awesome {
 font-size: 10px;
@@ -1921,6 +1985,19 @@ font-size: 14px;
 padding: 8px 14px 9px;
 margin: 0px 0px 0px 5px;
 }
+/* Sizes ---------- */
+.small.fancybutton {
+font-size: 10px;
+}
+.medium.fancybutton {
+font-size: 13px;
+}
+.large.fancybutton {
+font-size: 14px;
+padding: 8px 14px 9px;
+margin: 0px 0px 0px 5px;
+}
+
  
 /* Colors ---------- */
 .blue.awesome {
@@ -1938,3 +2015,20 @@ background-color: #ff5c00;
 .yellow.awesome {
 background-color: #ffb515;
 }
+/* Colors ---------- */
+.blue.fancybutton {
+background-color: #2daebf;
+}
+.red.fancybutton {
+background-color: #e33100;
+}
+.magenta.fancybutton {
+background-color: #a9014b;
+}
+.orange.fancybutton {
+background-color: #ff5c00;
+}
+.yellow.fancybutton {
+background-color: #ffb515;
+}
+

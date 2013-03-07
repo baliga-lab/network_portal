@@ -15,16 +15,35 @@
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
 <div id="container" style="width: 100%">
-<div>
-<applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
-</applet>
-
-<!-- <input type="text" id="htmlLoader" />
-<input type="button" value="Load" onclick="LoadHTML()" />
-<input type="button" value="Filter" onclick="FilterHTML()" />
-<div id="divHTMLResult"></div> -->
-
-</div>
+<img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png">
+<h5> Gaggle Workflow</h5>
+<table width="100%">
+	<tbody>
+		<tr>
+			<th>Start Here <img align="right" width="25px" src="{{ STATIC_PREFIX }}images/Redo.png"></th>
+			<th><span class="small blue fancybutton">1</span>&nbsp; <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a> </th>
+			<th><span class="small blue fancybutton">2</span>&nbsp; Add and connect workflow modules </th>
+			<th><span class="small blue fancybutton">3</span>&nbsp; 
+				<select id="organismSelect" onchange="javascript:organismSelected(this);">
+        		<option value = "" selected>Select an organism</option>
+        		<option value="bce">Bacillus cereus ATCC14579 | bce</option>
+        		<option value="bsu">Bacillus subtilis | bsu</option>
+		        <option value="bth">Bacteroides thetaiotaomicron VPI-5482 | bth</option>
+		        <option value="cje">Campylobacter jejuni | cje</option>
+		        <option value="cac">Clostridium acetobutylicum | cac</option>
+		        <!--<option value="eco">Escherichia coli K12 | eco</option>-->
+		        <option value="gsu">Geobacter sulfurreducens | gsu</option>
+		        <option value="hal">Halobacterium salinarum NRC-1 | hal</option>
+		        <option value="mmp">Methanococcus maripaludis S2 | mmp</option>
+		        <option value="pae">Pseudomonas aeruginosa | pae</option>
+		        <option value="rsp">Rhodobacter sphaeroides 2.4.1 | rsp</option>
+		        <option value="syf">Synechococcus elongatus PCC 7942 | syf</option>
+		    </select></th>
+			<th> <span class="small blue fancybutton">4</span>&nbsp; <input type="button" value="Run Workflow" onclick="SubmitWorkflow()" class="small green awesome" title="Run selected workflow"/></th>
+			<th><a class="componenthelp" href="#quickhelp"><img src="/static/images/question.gif" /></a></th>
+		</tr>
+	</tbody>
+</table>
 <table id="tblWorkflow" class="tblWorkflow">
 <tbody>
 <tr>
@@ -37,7 +56,7 @@
     </div>
 </th>
 <th style="width: 65%">
-<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>
+<!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
 <input type="button" value="Run" onclick="SubmitWorkflow()" class="button-run" title="Run selected workflow"/>
 <input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
 <input type="button" value="Delete" onclick="DeleteClicked()" class="button" title="Delete current workflow"/>
@@ -57,7 +76,7 @@
     </div>
 </th>
 </tr>
-<tr>
+<!--<tr>
 	<td></td>
 	<td>
 	    		<select id="organismSelect" onchange="javascript:organismSelected(this);">
@@ -79,7 +98,7 @@
 
 	</td>
 	<td></td>
-</tr>
+</tr>-->
 <tr>
 <td valign="top" style="width: 15%">
  <div id="components" class="divcomponents">
@@ -118,44 +137,66 @@
         {% endfor %}
     {% endif %}
 </div>
+<div>
+    <H3>Data Space</H3>
+</div>
+<br />
+<div>
+    <input type="button" id="btnDeleteData" value="Delete" onclick="javascript:DeleteCollectedData();" class="button"/>
+    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+    <br />
+    <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
+        <option value="-1">Select a data application record to apply to the workflow</option>
+        <option value="-2">---------------------------------------</option>
+    </select>
+    <br />
+    <br />
+    <div id="wfdataspace" class="divdataspace">
+
+    </div>
+</div>
 </td>
 <td style="width: 65%"><h3>Workflow Canvas</h3>
 <div id="workflowcanvas" class="workflowcanvas" >
 <div><span class="search_help">This is your workflow canvas. Start adding workflow components from the left, open a saved workflow or read our <a class="componenthelp" href="#quickhelp">quick start guide.</a></span></div>
 <div style="display:none">
- <div id="quickhelp"> 
-	<h2>Quick Start Guide</h2>
-	<h5> Initial Setup</h5>
-	<ul>
-		<li>1. Install each goose by using the links on the left (if this is your first time). This will download the updated goose.</li>
-		<li>2. Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link</li>
-                <li>3. Click on the Gaggle toolbar in Firefox and <b>Connect to Gaggle</b></li>
-		<li>4. Drag and drop the goose you want into your workflow canvas</li>
-		<li>5. For each goose "Enter the url of the executable in your computer" 
-			e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX</li>
-		<li>6. Enter any subactions or data you want to open</li>
-		<li>7. In order to connect to components in the workflow drag the circle from the input goose to square of next workflow component</li>
- 		<li>8. Save your workflow </li>
-	</ul>
+ <div id="quickhelp" style="text-align:left"> 
+	<h2>Workflow Help</h2>
+	<h5>Quick Start Guide</h5>
+		<p><span class="small blue fancybutton">1</span>&nbsp; Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link and click on the "Gaggle" link in the firegoose toolbar to connect to Gaggle.</p>
+		<p><span class="small blue fancybutton">2</span>&nbsp; Add workflow modules from left sidebar and connect them.</p>
+		<p><span class="small blue fancybutton">3</span>&nbsp; Select an organism to analyze if you would like to use Network Portal organisms in your workflow. This will automatically create necessary attributes specific for the selected organism. Otherwise you can leave this field unselected and enter your custom specifications for each module.</p>
+		<p><span class="small blue fancybutton">4</span>&nbsp; Click <span class="small green awesome">"Run"</span> to start the workflow</li> </p>
+		
+	<h5> Running custom workflows</h5>
+		<p>If you would like to use your own cytoscape or mev files it is possible to create custom workflows. For the initial setup you will need to download and install custom workflow modules. 
+		<p><span class="small blue fancybutton">1</span>&nbsp; Install each goose by using the links on the left (if this is your first time). This will download the updated goose.</p>
+		<p><span class="small blue fancybutton">2</span>&nbsp; Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link</p>
+        <p><span class="small blue fancybutton">3</span>&nbsp; Click on the Gaggle toolbar in Firefox and <b>Connect to Gaggle</b></p>
+		<p><span class="small blue fancybutton">4</span>&nbsp; Drag and drop the goose you want into your workflow canvas</p>
+		<p><span class="small blue fancybutton">5</span>&nbsp; For each module (except firegoose),  workflow will automatically capture path to the executable file in your computer if you open the module (cytoscape or mev) after the gaggle boss has already started.Alternatively, "Enter the url of the executable in your computer" 
+			e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX. </p>
+		<p><span class="small blue fancybutton">6</span>&nbsp; Select any subactions for your modules from the dropdown menu.</p>
+		<p><span class="small blue fancybutton">7</span>&nbsp; If your workflow requires additional files, enter path to data files in your desktop or on the web. For example, this could be link to the expression file in your desktop or web.</p>
+		<p><span class="small blue fancybutton">8</span>&nbsp; In order to connect to components in the workflow drag the circle from the input goose to square of the next workflow component</p>
+ 		<p><span class="small blue fancybutton">9</span>&nbsp; Save your workflow </p>
+
 	<h5> Running the Workflow</h5>
-	<ul>
-		<li> 1. Create a new workflow or open a saved one</li>
-		<li> 2. Click <span class="small green awesome">"Run"</span> to start the workflow</li>
-		<li> 3. For Firegoose, this will open a new tab and will take you to the page you specified in your workflow</li>
-		<li> 4. Select the type of the data you want for the next component from the Firegoose toolbar and select "Next"</li>
-		<li> 5. Your data will be broadcast to the next component in your workflow and your next application or webpage will be opened.</li>
-		<li> 6. For each workflow component you need to select specific data and click "Next"</li>
-	</ul>
+		<p><span class="small blue fancybutton">1</span>&nbsp; Create a new workflow or open a saved one</p>
+		<p><span class="small blue fancybutton">2</span>&nbsp; Click <span class="small green awesome">"Run"</span> to start the workflow</p>
+		<p><span class="small blue fancybutton">3</span>&nbsp; For Firegoose, this will open a new tab and will take you to the page you specified in your workflow</p>
+		<p><span class="small blue fancybutton">4</span>&nbsp; Select the type of the data you want for the next component from the Firegoose toolbar and select "Next"</p>
+		<p><span class="small blue fancybutton">5</span>&nbsp; Your data will be broadcast to the next component in your workflow and your next application or webpage will be opened.</p>
+		<p><span class="small blue fancybutton">6</span>&nbsp; For each workflow component you need to select specific data and click "Next"</p>
+
 	<h5> Recording the Workflow</h5>
-	<ul>
-		<li> 1. Gaggle can follow your actions and record them into your workflow for automated tasks</li>
-		<li> 2. Before recording make sure that the Gaggle bos has started</li>
-		<li> 3. Click on <span class="small awesome">"Record"</span> button to start recording</li>
-		<li> 4. Create workflow and follow the steps to complete your analysis</li>
-		<li> 5. Go back to your workspace and <span class="small awesome">"Stop"</span> your recording Once you are done</li>
-		<li> 6. Workflow components and connections will be automatically created and placed into your workspace.</li>
-		<li> 7. You can <span class="small awesome">"Pause"</span> workflow anytime</li>	
-	</ul>
+		<p><span class="small blue fancybutton">1</span>&nbsp; Gaggle can follow your actions and record them into your workflow for automated tasks</p>
+		<p><span class="small blue fancybutton">2</span>&nbsp; Before recording make sure that the Gaggle bos has started</p>
+		<p><span class="small blue fancybutton">3</span>&nbsp; Click on <span class="small awesome">"Record"</span> button to start recording</p>
+		<p><span class="small blue fancybutton">4</span>&nbsp; Create workflow and follow the steps to complete your analysis</p>
+		<p><span class="small blue fancybutton">5</span>&nbsp; Go back to your workspace and <span class="small awesome">"Stop"</span> your recording Once you are done</p>
+		<p><span class="small blue fancybutton">6</span>&nbsp; Workflow components and connections will be automatically created and placed into your workspace.</p>
+		<p><span class="small blue fancybutton">7</span>&nbsp; You can <span class="small awesome">"Pause"</span> workflow anytime</p>	
     <h4><a href="/static/apidocuments/index.html">API documents</a> for developing Boss and Goose that supports workflow</h4>
  </div>
 </div>
@@ -209,6 +250,15 @@
 
 <div id="dlgdeletealert" class="dlgauthenticationalert" title="Warning">
     <p>Do you really want to delete the workflow?</p>
+</div>
+
+<div id="dlgnodataapplicationalert" class="dlgauthenticationalert" title="Warning">
+    <p>You haven't selected a data application method. Do you want to proceed?</p>
+</div>
+
+<div id="dlgworkflowfinished" class="dlgauthenticationalert" title="Continue Batch Run">
+    <p>Workflow finished. Do you want to execute the next one in the batch?</p>
+    <p><input type="checkbox"/>Do not ask for this batch</p>
 </div>
 
 <input id="authenticated" type="hidden" value="{{userid}}" />
@@ -268,6 +318,23 @@
       </div>
 </div>
 
+<div id="divDataspaceMenu" style="display: none">
+    <ul id="ulctxgoosenames">
+    </ul>
+</div>
+
+<input id="inputDataSignal" type="hidden" value="0" />
+
+<div>
+<applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
+</applet>
+
+<!-- <input type="text" id="htmlLoader" />
+<input type="button" value="Load" onclick="LoadHTML()" />
+<input type="button" value="Filter" onclick="FilterHTML()" />
+<div id="divHTMLResult"></div> -->
+
+</div>
 
 
 </div>

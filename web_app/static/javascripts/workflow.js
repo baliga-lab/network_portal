@@ -13,6 +13,23 @@ var WF_rid = "";
 var WF_startNode = "";
 var WF_timercnt = 0;
 var currSessionID = "";
+var mouseX;
+var mouseY;
+var WF_dataSignal = 0;
+
+var WF_selectedDataApplication = null;
+var WF_processWorkflow = false;
+var WF_batchedData = null;
+var WF_currDatapoint = 0;
+
+// Below are the index of UI elements in the component div.
+// Everytime a UI element is added, we should modify the index here if necessary.
+var serviceuriindex = 2
+var componenttitledivindex = 0;
+var componenttitlelinkindex = 0;
+var componentdatauriindex = 5;
+
+var WF_dataAppliedHistory = [];
 
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
@@ -72,10 +89,84 @@ $(document).ready(function () {
 
     $(".componenthelp").colorbox({inline: true, width: "50%"});
 
+    setTimeout(function() { CheckDataInjection() }, 3000);
     GetEdgeDataTypes();
 
 });
 
+// Periodically polls to check if data has been injected to the page.
+// When detected, add context menu to the newly injected data
+function CheckDataInjection()
+{
+    var newsignal = parseInt($("#inputDataSignal").val());
+    if (newsignal != WF_dataSignal)
+    {
+        $(".dataspacelabel").hover(function(e){
+              //alert("moseover...");
+              //alert($("#divDataspaceMenu").css("display"));
+              //if ($("#divDataspaceMenu").css("display") != "none")
+              //    return;
+              var pos = [e.pageX + 25,e.pageY];
+              $('#divDataspaceMenu').dialog( {position: pos, height:300,
+                buttons: {
+                    "Select All": function() {
+                        $("#ulctxgoosenames").children().each(function() {
+                           var checkbox = $(this).children()[0];
+                           $(checkbox).prop('checked', true);
+                        });
+                    },
+                    "Apply": function() {
+                        var optiontext = "";
+                        var optionvalue = "";
+                        $("#ulctxgoosenames").children().each(function() {
+                               var checkbox = $(this).children()[0];
+                               if ($(checkbox).prop('checked'))
+                               {
+                                  // source object is the label
+                                  var sourceobj = e.delegateTarget;
+                                  //alert(sourceobj);
+                                  var datalink = $(sourceobj).children()[1];
+                                  var link = $(datalink).prop("href");
+                                  var inputcomponentid = $(this).children()[1];
+                                  //alert($(inputcomponentid).val());
+                                  var cid = "#" + $(inputcomponentid).val();
+                                  var dataurlelement = $(cid).children()[componentdatauriindex];
+                                  $(dataurlelement).val(link);
+
+                                  // Record the history for future use
+                                  optiontext += $(this).text();
+                                  optiontext += ";";
+
+                                  optionvalue += $(inputcomponentid).val();
+                                  optionvalue += ";";
+                               }
+                        });
+                        if (optiontext.length > 0)
+                        {
+                            //alert(optiontext);
+                            var option = new Option(optiontext, optionvalue);
+                            /// jquerify the DOM object 'o' so we can use the html method
+                            $(option).html(optiontext);
+                            $("#selectDataAppliedHistory").append(option);
+                        }
+                    },
+                    "Close": function() {
+                        $('#divDataspaceMenu').dialog('close');
+                    }
+
+                }
+              });
+              //$('#divDataspaceMenu').dialog('open');
+            },
+            function()
+            {
+                //$('#divDataspaceMenu').dialog('close');
+            });
+
+        WF_dataSignal = newsignal;
+    }
+    setTimeout(function() { CheckDataInjection() }, 3000);
+}
 
 function LoadHTML() {
     alert($("#htmlLoader").attr('value'));
@@ -118,6 +209,9 @@ function InitializeWorkflow()
     currWorkflowDesc = "";
     WF_startNode = "";
     currSessionID = "";
+
+    // clean up the context menu
+    $("#ulctxgoosenames").empty();
 }
 
 
@@ -240,6 +334,20 @@ function componentDropEvent(ev, component) {
             var titleahref = ($(titleelement).children())[0];
             var goosename = $(titleahref).text();
             $(titleahref).text(goosename + "-" + wfcnt);
+
+            // we include the id of the original component to be able to retrieve it later to generate
+            // the workflow
+            var cid = 'wfcid' + wfcnt + '_' + component.draggable.attr("id");
+            //alert(cid);
+            cloned.attr('id', cid);
+
+            // Add the goose name to the context menu div
+            var li = document.createElement("li");
+            li.id = "ctx_" + goosename + "-" + wfcnt.toString();
+            li.innerHTML = ("<input type='checkbox' />" + goosename + "-" + wfcnt.toString()
+               + "<input type='hidden' value='" + cid + "' />");
+            $("#ulctxgoosenames").append(li);
+
             // include workflow index in the hidden field
             $($((cloned).children())[10]).val(wfcnt.toString());
 
@@ -259,11 +367,7 @@ function componentDropEvent(ev, component) {
                 if (uri != null)
                     $(serviceuriinput).val(uri);
             }
-            // we include the id of the original component to be able to retrieve it later to generate
-            // the workflow
-            var cid = 'wfcid' + wfcnt + '_' + component.draggable.attr("id");
-            //alert(cid);
-            cloned.attr('id', cid);
+
             //var serviceurlelement = ($(cloned).children())[2];
             //alert(serviceurlelement);
 
@@ -395,7 +499,7 @@ function ExtractWorkflow() {
                     var argumentselement = $(source).children()[9];
                     //alert(argumentselement);
                     var subactionelement = $(source).children()[4];
-                    var dataurielement = $(source).children()[5];
+                    var dataurielement = $(source).children()[componentdatauriindex];
                     //alert($(dataurielement).attr("value"));
                     var goosenameelement = $(source).children()[6];
                     var componentworkflownodeidelement = $(source).children()[8];
@@ -580,8 +684,8 @@ function organismSelected(sel)
             {
                 var source = nodes[i];
                 var srcidstr = $(source).attr('id');
-                var titleelement = ($(source).children())[0];
-                var titleahref = ($(titleelement).children())[0];
+                var titleelement = ($(source).children())[componenttitledivindex];
+                var titleahref = ($(titleelement).children())[componenttitlelinkindex];
                 var goosename = $(titleahref).text();
                 //alert(goosename);
                 if (goosename.indexOf("Cytoscape") >= 0)
@@ -724,6 +828,7 @@ function SubmitWorkflow() {
 
     //if (ConnectToGaggle())
     {
+        //alert("submitting workflow...");
         ExtractWorkflow();
         var userid = $("#authenticated").val(); //.attr("value");
         var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
@@ -1052,11 +1157,17 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
 
                 $($((sourcelement).children())[0]).removeClass("workflowcomponentchildinput");
                 // include workflow index in component name
-                var titleelement = ($(sourcelement).children())[0];
-                var titleahref = ($(titleelement).children())[0];
+                var titleelement = ($(sourcelement).children())[componenttitledivindex];
+                var titleahref = ($(titleelement).children())[componenttitlelinkindex];
                 var goosename = $(titleahref).text();
                 //alert(goosename);
                 $(titleahref).text(goosename + "-" + wfcnt);
+                // Also add to the context menu
+                var li = document.createElement("li");
+                li.id = "ctx_" + goosename + "-" + wfcnt.toString();
+                li.innerHTML = ("<input type='checkbox' />" + goosename + "-" + wfcnt.toString()
+                                 + "<input type='hidden' value='" + sourceid + "' />");
+                $("#ulctxgoosenames").append(li);
 
                 var closebutton = ($(sourcelement).children())[1];
                 $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
@@ -1306,6 +1417,12 @@ function RemoveComponent(clicktarget)
      var target = clicktarget;
      var component = $(target).parent();
      var componentid = $(component).attr("id");
+
+     var componenttitlediv = ($(component).children())[componenttitledivindex];
+     var componenttitlelink = ($(componenttitlediv).children())[componenttitlelinkindex];
+     var ctxitemid = "#ctx_" + $(componenttitlelink).text();
+     $(ctxitemid).remove();
+
      //alert($(component).attr("id"));
 
      // Make sure the components are placed with position:absolute. If using
@@ -1477,6 +1594,140 @@ function DeleteSessionReport()
     ); */
 }
 
+function DeleteCollectedData()
+{
+    //alert("Delete collected data");
+    $("#wfdataspace").children().each(function() {
+        //alert("dataspace div: " + $(this).html());
+        var ul = $(this).children()[0];
+        var elementtobedeleted = null;
+        $(ul).children().each(function() {
+           //alert("li: " + $(this).html());
+           var label = $(this).children()[0];
+           //alert($(label).html());
+           var input = $(label).children()[0];
+           //alert($(input).is(':checked'));
+           if ($(input).is(':checked'))
+           {
+               //elementstobedeleted.push($(this));
+               $(this).remove();
+           }
+        });
+    });
+}
+
+// Run the workflow against the selected data in a batch
+// using the selected data application history
+function BatchRun()
+{
+    //alert("Batch Run!");
+    WF_selectedDataApplication = $("#selectDataAppliedHistory").val();
+    //alert(selectedDataApplication);
+    WF_batchedData = [];
+
+    $(".dataspacelabel").each(function() {
+        var input = $(this).children()[0];
+        //alert($(input).prop("checked"));
+        if ($(input).prop("checked"))
+        {
+           //alert($(this).children()[1]);
+           var link = $(this).children()[1];
+           var linkvalue = $(link).prop("href");
+           //alert(linkvalue);
+           WF_batchedData.push(linkvalue);
+        }
+    });
+    //alert(checkValues[0]);
+
+    var passDataApplicationCheck = true;
+    if (parseInt(WF_selectedDataApplication) < 0)  {
+        passDataApplicationCheck = false;
+        // user didnt select a data application record
+        $( "#dlgnodataapplicationalert" ).dialog({
+                    resizable: false,
+                    height:250,
+                    modal: true,
+                    buttons: {
+                        "Yes": function() {
+                            // Delete the workflow
+                            $( this ).dialog( "close" );
+                            WF_processWorkflow = true;
+                            WF_currDatapoint = 0;
+                            StartWorkflowForData();
+                        },
+                        Cancel: function() {
+                            passDataApplicationCheck = false;
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+    }
+
+    if (passDataApplicationCheck)
+    {
+        if (WF_batchedData.length == 0)
+        {
+            alert("No data is selected.");
+            return;
+        }
+
+        // Now we trigger the workflows
+        WF_processWorkflow = true;
+        WF_currDatapoint = 0;
+        StartWorkflowForData();
+    }
+}
+
+// Perform the workflow for a data point
+function StartWorkflowForData()
+{
+    //alert("Starting workflow...");
+    if (WF_batchedData != null && WF_currDatapoint < WF_batchedData.length)
+    {
+        var data = WF_batchedData[WF_currDatapoint];
+        //alert(data);
+        var splittedcids = WF_selectedDataApplication.split(";");
+        for (var j = 0; j < splittedcids.length; j++)
+        {
+            //alert(splittedcids[j]);
+            if (splittedcids[j].length > 0)
+            {
+                var cid = "#" + splittedcids[j];
+                var dataurlelement = $(cid).children()[componentdatauriindex];
+                $(dataurlelement).val(data);
+            }
+        }
+        SubmitWorkflow();
+    }
+}
+
+// Boss notification when a workflow has finished
+// We can start the next one in the batch
+function OnWorkflowFinished()
+{
+    alert("Workflow run finished...");
+
+    // Show the prompt dialog to ask user if they want to run all the rest in a batch
+    /*$( "#dlgworkflowfinished" ).dialog({
+                        resizable: false,
+                        height:250,
+                        modal: true,
+                        buttons: {
+                            "Yes": function() {
+                                // Delete the workflow
+                                $( this ).dialog( "close" );
+
+                            },
+                            "Put on Hold": function() {
+
+                                $( this ).dialog( "close" );
+                            }
+                        }
+                    });    */
+
+    WF_currDatapoint++;
+    StartWorkflowForData();
+}
 
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");
@@ -1521,7 +1772,7 @@ function ProcessAction(sourcename, sourcecommand, targetname, targetcommand, typ
 function SubmitWorkflowToBoss(jsonworkflow) {
     var proxy = get_proxyapplet();
     if (proxy != undefined) {
-        //alert("Submit workflow");
+        //alert("Submit workflow to boss");
         proxy.SubmitWorkflow(jsonworkflow);
         //alert("workflow action done");
     }
