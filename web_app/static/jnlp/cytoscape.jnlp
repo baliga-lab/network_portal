@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://networks.systemsbiology.net/static/">
+  <information>
+    <title>Cytoscape WebStart</title>
+    <vendor>Baliga Lab | Institute for Systems Biology</vendor>
+    <homepage href="http://networks.systemsbiology.net"/>
+    <icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/>
+    <icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+
+    <offline-allowed/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/Cytoscape/cytoscape.jar"/>
+
+    <jar href="applications/cygoose-2.10.0-jar-with-dependencies.jar"/>
+  </recources>
+  <application-desc main-class="cytoscape.CyMain">
+    <argument>-p</argument>
+    <argument>org.systemsbiology.cytoscape.GagglePlugin</argument>
+    <argument>-N</argument>
+    <argument>%s</argument>
+  </application-desc>
+</jnlp>
