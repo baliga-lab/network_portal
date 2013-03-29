@@ -1777,8 +1777,9 @@ function GroupOpen()
            //alert($(this).children()[1]);
            var link = $(this).children()[1];
            var linkvalue = $(link).prop("href");
+
            //alert(linkvalue);
-           WF_batchedData.push(linkvalue);
+           WF_batchedData.push(link);
         }
     });
 
@@ -1803,17 +1804,24 @@ function GroupOpen()
                               //alert($(sourceelement).attr("id"));
                               // Process the batched data
                               var datauri = "";
+                              var prefix = ($("#inputNameValue").prop('checked')) ? "Namelist:" : "URL:";
+                              datauri = prefix;
                               for (var i = 0; i < WF_batchedData.length; i++)
                               {
-                                  datauri += (WF_batchedData[i] + ";");
+                                  var datalink = WF_batchedData[i];
+                                  var data = $(datalink).prop("href");
+                                  if ($("#inputNameValue").prop('checked'))
+                                      data = $(datalink).text();
+                                  datauri += (data + ";");
                               }
+
                               //alert(datauri);
                               var datauriinput = $(sourceelement).children()[componentdatauriindex];
                               //alert(datauriinput)
                               $(datauriinput).val(datauri);
                            }
                     });
-                    SubmitWorkflow();
+                    //SubmitWorkflow();
                     $('#divDataspaceComponentMenu').dialog('close');
                 },
                 "Close": function() {

@@ -22,6 +22,6 @@
     <argument>-p</argument>
     <argument>org.systemsbiology.cytoscape.GagglePlugin</argument>
     <argument>-N</argument>
-    <argument>%s</argument>
+    <argument>NONE</argument>
   </application-desc>
 </jnlp>
