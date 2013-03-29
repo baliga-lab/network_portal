@@ -141,8 +141,9 @@
 <br />
 <div>
     <input type="button" id="btnDeleteData" value="Delete" onclick="javascript:DeleteCollectedData();" class="button"/>
-    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+    <input type="button" id="btnGroup" value="Open" onclick="javascript:GroupOpen();" class="button"/>
     <br />
+    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
     <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
         <option value="-1">Select a data application record to apply to the workflow</option>
         <option value="-2">---------------------------------------</option>
@@ -320,6 +321,12 @@
     <ul id="ulctxgoosenames">
     </ul>
 </div>
+
+<div id="divDataspaceComponentMenu" style="display: none">
+    <ul id="ulctxcomponents">
+    </ul>
+</div>
+
 
 <input id="inputDataSignal" type="hidden" value="0" />
 

@@ -27,6 +27,7 @@ var WF_currDatapoint = 0;
 var serviceuriindex = 2
 var componenttitledivindex = 0;
 var componenttitlelinkindex = 0;
+var componentsubactioninputindex = 4;
 var componentdatauriindex = 5;
 
 var WF_dataAppliedHistory = [];
@@ -91,8 +92,28 @@ $(document).ready(function () {
 
     setTimeout(function() { CheckDataInjection() }, 3000);
     GetEdgeDataTypes();
-
+    LoadDataWorkspaceComponentMenu();
 });
+
+// Load the data workspace menu for group opening feature
+function LoadDataWorkspaceComponentMenu()
+{
+    $("#components").children().each(function() {
+        //alert($(this).attr("id"));
+        // Make all the child fields visible
+        // include workflow index in component name
+        var titleelement = ($(this).children())[0];
+        var titleahref = ($(titleelement).children())[0];
+        var goosename = $(titleahref).text();
+        //alert(goosename);
+
+        // Add the goose name to the context menu div
+        var li = document.createElement("li");
+        li.innerHTML = ("<input type='checkbox' />" + goosename
+           + "<input type='hidden' value='" + $(this).attr("id") + "' />");
+        $("#ulctxcomponents").append(li);
+    });
+}
 
 // Periodically polls to check if data has been injected to the page.
 // When detected, add context menu to the newly injected data
@@ -101,7 +122,7 @@ function CheckDataInjection()
     var newsignal = parseInt($("#inputDataSignal").val());
     if (newsignal != WF_dataSignal)
     {
-        $(".dataspacelabel").hover(function(e){
+        $(".dataspacehoverimage").hover(function(e){
               //alert("moseover...");
               //alert($("#divDataspaceMenu").css("display"));
               //if ($("#divDataspaceMenu").css("display") != "none")
@@ -122,8 +143,10 @@ function CheckDataInjection()
                                var checkbox = $(this).children()[0];
                                if ($(checkbox).prop('checked'))
                                {
+                                  // current object is the hover image
+                                  var imageobj = e.delegateTarget;
                                   // source object is the label
-                                  var sourceobj = e.delegateTarget;
+                                  var sourceobj = $(imageobj).parent();
                                   //alert(sourceobj);
                                   var datalink = $(sourceobj).children()[1];
                                   var link = $(datalink).prop("href");
@@ -356,7 +379,7 @@ function componentDropEvent(ev, component) {
 
             $(($(cloned).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
 
-            $(($(cloned).children())[4]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
+            $(($(cloned).children())[componentsubactioninputindex]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
 
             var serviceuriinput = ($(cloned).children())[2];
             if (window.localStorage != null)
@@ -498,7 +521,7 @@ function ExtractWorkflow() {
                     //alert("Service uri: " + $(serviceurlelement).val());
                     var argumentselement = $(source).children()[9];
                     //alert(argumentselement);
-                    var subactionelement = $(source).children()[4];
+                    var subactionelement = $(source).children()[componentsubactioninputindex];
                     var dataurielement = $(source).children()[componentdatauriindex];
                     //alert($(dataurielement).attr("value"));
                     var goosenameelement = $(source).children()[6];
@@ -537,7 +560,7 @@ function ExtractWorkflow() {
                     var serviceurlelement = $(target).children()[2];
                     var argumentselement = $(target).children()[9];
                     //alert($(argumentselement).attr("value"));
-                    var subactionelement = $(target).children()[4];
+                    var subactionelement = $(target).children()[componentsubactioninputindex];
                     var dataurielement = $(target).children()[5];
                     var goosenameelement = $(target).children()[6];
                     var componentworkflownodeidelement = $(target).children()[8];
@@ -601,7 +624,7 @@ function ExtractWorkflow() {
                 //alert("Service uri: " + $(serviceurlelement).attr("value"));
                 var argumentselement = $(source).children()[9];
                 //alert(argumentselement);
-                var subactionelement = $(source).children()[4];
+                var subactionelement = $(source).children()[componentsubactioninputindex];
                 var dataurielement = $(source).children()[5];
                 //alert($(dataurielement).attr("value"));
                 var goosenameelement = $(source).children()[6];
@@ -1110,15 +1133,132 @@ function FindComponentId(componentname, componentarray)
     return null;
 }
 
+function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
+{
+    //alert(componentid);
+    var nodeobj = {};
+    var sourcelement = null;
+    var source = document.getElementById(componentid); // this is the component in the component list
+    //alert($(source).attr('id'));
+    //$(source).clone().appendTo("#workflowcanvas");
+    //sourcelement = $(source).clone();
+    sourcelement = $(source).clone().removeClass('ui-draggable');
+    //alert(sourcelement);
+    if (sourcelement != undefined) {
+        $(sourcelement).attr('class', 'workflowcomponent');
+        $(sourcelement).attr('id', sourceid);
+        $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+
+        $($((sourcelement).children())[0]).removeClass("workflowcomponentchildinput");
+        // include workflow index in component name
+        var titleelement = ($(sourcelement).children())[componenttitledivindex];
+        var titleahref = ($(titleelement).children())[componenttitlelinkindex];
+        var goosename = $(titleahref).text();
+        //alert(goosename);
+        $(titleahref).text(goosename + "-" + wfcnt);
+        // Also add to the context menu
+        var li = document.createElement("li");
+        li.id = "ctx_" + goosename + "-" + wfcnt.toString();
+        li.innerHTML = ("<input type='checkbox' />" + goosename + "-" + wfcnt.toString()
+                         + "<input type='hidden' value='" + sourceid + "' />");
+        $("#ulctxgoosenames").append(li);
+
+
+        var closebutton = ($(sourcelement).children())[1];
+        $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
+
+        $(($(sourcelement).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
+
+        $(($(sourcelement).children())[componentsubactioninputindex]).removeClass("componentsubactions workflowcomponentchildinput").addClass("workflowcomponentsubactions");
+
+
+        // configure the parameters of the component
+        var serviceuriinput = $(sourcelement).children()[2];
+        if (node != null)
+            $(serviceuriinput).val(node.serviceuri);
+        var serviceuri = $(serviceuriinput).val();
+        //alert(serviceuri);
+        if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
+        {
+            if (window.localStorage != null)
+            {
+                var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
+                //alert(uri);
+                if (uri != null)
+                    $(serviceuriinput).attr("value", uri);
+            }
+        }
+
+        if (node != null) {
+            var argumentsinput = $(sourcelement).children()[9];
+            $(argumentsinput).val(node.arguments);
+            var subactioninput = $(sourcelement).children()[componentsubactioninputindex];
+            $(subactioninput).val(node.subaction);
+            var datauriinput = $(sourcelement).children()[componentdatauriindex];
+            $(datauriinput).val(node.datauri);
+        }
+        // set the node id
+        var componentworkflownodeid = $(sourcelement).children()[8];
+        $(componentworkflownodeid).val(nodeid);
+
+        var canvasposition = $("#workflowcanvas").position();
+        //var tableposition = $("#tblWorkflow").offset();
+        //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
+        //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
+        var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 400;
+        var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
+        var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
+        //alert(stylestr);
+        $(sourcelement).attr('style', stylestr);
+        $(sourcelement).appendTo("#workflowcanvas");
+
+        var srcWFEndpointOptions = {
+                            anchor: "RightMiddle",
+                            endpoint: "Dot",
+                            isSource: true,
+                            maxConnections: -1,
+                            connector: "StateMachine",
+                            connectorStyle: { strokeStyle: "#666" },
+                            connectorOverlays: [
+                                        ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}]
+                                        //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
+                                    ]
+        };
+        srcEP = jsPlumb.addEndpoint(sourceid, sourceWFEndpointOptions);
+        targetEP = jsPlumb.addEndpoint(sourceid, targetWFEndpointOptions);
+        nodeobj.Element = sourcelement;
+        nodeobj.SourceEP = srcEP;
+        nodeobj.TargetEP = targetEP;
+        nodeobj.IsNew = true;
+
+        // store the endpoints for retrieve later
+        WF_endpoints[sourceid] = {};
+        WF_endpoints[sourceid].SourceEP = srcEP;
+        WF_endpoints[sourceid].TargetEP = targetEP;
+        // Save the nodeobj
+        //alert("Node id: " + nodeid);
+        if (nodeid.length > 0)
+            WF_processednodes[nodeid] = sourcelement;
+
+        //  set the component to be draggable
+        jsPlumb.draggable(sourceid, {
+            containment: "parent",
+            helper: "original"
+        });
+    }
+    //alert("component appended");
+    return nodeobj;
+}
+
 // Given a nodeid, search if it is already added to the workflow canvas.
 // If not, create the node and add it to the workflow canvas
 function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid) {
     var node = nodes[nodeid];
+    var nodeobj = {};
     //alert(node);
     var nodecomponentid = node.componentid; // the id of the component in DB
     var componentname = node.name;
-    if (nodecomponentid == undefined)
-    {
+    if (nodecomponentid == undefined) {
         // This is a recorded workflow, we need to find out the componentid
         //alert(componentname);
         nodecomponentid = FindComponentId(componentname, componentarray);
@@ -1134,120 +1274,16 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
         wfcnt++;
 
         //alert(sourceid);
-        var nodeobj = {};
+
         // Find existing node for the same component
         //var searchstr = "[id*='_component_" + nodecomponentid + "']";
         var nodeelement = WF_processednodes[nodeid];
         //alert(elements.length);
-        var sourcelement = null;
         if (nodeelement == undefined) {
             //alert("add node");
             var componentid = "component_" + nodecomponentid; //  nodeid;
             //alert(componentid);
-            var source = document.getElementById(componentid); // this is the component in the component list
-            //alert($(source).attr('id'));
-            //$(source).clone().appendTo("#workflowcanvas");
-            //sourcelement = $(source).clone();
-            sourcelement = $(source).clone().removeClass('ui-draggable');
-            //alert(sourcelement);
-            if (sourcelement != undefined) {
-                $(sourcelement).attr('class', 'workflowcomponent');
-                $(sourcelement).attr('id', sourceid);
-                $(sourcelement).children().removeClass("componentchildinput").addClass("workflowcomponentchildinput");
-
-                $($((sourcelement).children())[0]).removeClass("workflowcomponentchildinput");
-                // include workflow index in component name
-                var titleelement = ($(sourcelement).children())[componenttitledivindex];
-                var titleahref = ($(titleelement).children())[componenttitlelinkindex];
-                var goosename = $(titleahref).text();
-                //alert(goosename);
-                $(titleahref).text(goosename + "-" + wfcnt);
-                // Also add to the context menu
-                var li = document.createElement("li");
-                li.id = "ctx_" + goosename + "-" + wfcnt.toString();
-                li.innerHTML = ("<input type='checkbox' />" + goosename + "-" + wfcnt.toString()
-                                 + "<input type='hidden' value='" + sourceid + "' />");
-                $("#ulctxgoosenames").append(li);
-
-                var closebutton = ($(sourcelement).children())[1];
-                $(closebutton).removeClass("componentclose workflowcomponentchildinput").addClass("workflowcomponentclose");
-
-                $(($(sourcelement).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
-
-                $(($(sourcelement).children())[4]).removeClass("componentsubactions workflowcomponentchildinput").addClass("workflowcomponentsubactions");
-
-
-                // configure the parameters of the component
-                var serviceuriinput = $(sourcelement).children()[2];
-                $(serviceuriinput).val(node.serviceuri);
-                var serviceuri = $(serviceuriinput).val();
-                //alert(serviceuri);
-                if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
-                {
-                    if (window.localStorage != null)
-                    {
-                        var uri = window.localStorage.getItem(("component_" + nodecomponentid));
-                        //alert(uri);
-                        if (uri != null)
-                            $(serviceuriinput).attr("value", uri);
-                    }
-                }
-
-                var argumentsinput = $(sourcelement).children()[9];
-                $(argumentsinput).val(node.arguments);
-                var subactioninput = $(sourcelement).children()[4];
-                $(subactioninput).val(node.subaction);
-                var datauriinput = $(sourcelement).children()[5];
-                $(datauriinput).val(node.datauri);
-
-                // set the node id
-                var componentworkflownodeid = $(sourcelement).children()[8];
-                $(componentworkflownodeid).val(nodeid);
-
-                var canvasposition = $("#workflowcanvas").position();
-                //var tableposition = $("#tblWorkflow").offset();
-                //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
-                //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-                var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 400;
-                var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
-                var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
-                //alert(stylestr);
-                $(sourcelement).attr('style', stylestr);
-                $(sourcelement).appendTo("#workflowcanvas");
-
-                var srcWFEndpointOptions = {
-                    anchor: "RightMiddle",
-                    endpoint: "Dot",
-                    isSource: true,
-                    maxConnections: -1,
-                    connector: "StateMachine",
-                    connectorStyle: { strokeStyle: "#666" },
-                    connectorOverlays: [
-                                ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}]
-                                //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
-                            ]
-                };
-                srcEP = jsPlumb.addEndpoint(sourceid, sourceWFEndpointOptions);
-                targetEP = jsPlumb.addEndpoint(sourceid, targetWFEndpointOptions);
-                nodeobj.Element = sourcelement;
-                nodeobj.SourceEP = srcEP;
-                nodeobj.TargetEP = targetEP;
-                nodeobj.IsNew = true;
-
-                // store the endpoints for retrieve later
-                WF_endpoints[sourceid] = {};
-                WF_endpoints[sourceid].SourceEP = srcEP;
-                WF_endpoints[sourceid].TargetEP = targetEP;
-                // Save the nodeobj
-                //alert("Node id: " + nodeid);
-                WF_processednodes[nodeid] = sourcelement;
-
-                //  set the component to be draggable
-                jsPlumb.draggable(sourceid, {
-                    containment: "parent",
-                    helper: "original"
-                });
-            }
+            nodeobj = AppendComponent(node, nodeid, componentid, sourceid, nodecnt);
         }
         else {
             // The node already exists, we retrieve its jsPlumb endpoints
@@ -1727,6 +1763,68 @@ function OnWorkflowFinished()
 
     WF_currDatapoint++;
     StartWorkflowForData();
+}
+
+function GroupOpen()
+{
+    WF_batchedData = [];
+
+    $(".dataspacelabel").each(function() {
+        var input = $(this).children()[0];
+        //alert($(input).prop("checked"));
+        if ($(input).prop("checked"))
+        {
+           //alert($(this).children()[1]);
+           var link = $(this).children()[1];
+           var linkvalue = $(link).prop("href");
+           //alert(linkvalue);
+           WF_batchedData.push(linkvalue);
+        }
+    });
+
+    if (WF_batchedData.length > 0)
+    {
+          ClearWorkflowCanvas();
+          $('#divDataspaceComponentMenu').dialog( { height:400,
+            buttons: {
+                "Open": function() {
+                    var nodecnt = 0;
+                    $("#ulctxcomponents").children().each(function() {
+                           var checkbox = $(this).children()[0];
+                           if ($(checkbox).prop('checked'))
+                           {
+                              var inputcomponentid = $(this).children()[1];
+                              //alert($(inputcomponentid).val());
+                              var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
+                              var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, nodecnt);
+                              var sourceelement = nodeobj.Element;
+                              nodecnt++;
+
+                              //alert($(sourceelement).attr("id"));
+                              // Process the batched data
+                              var datauri = "";
+                              for (var i = 0; i < WF_batchedData.length; i++)
+                              {
+                                  datauri += (WF_batchedData[i] + ";");
+                              }
+                              //alert(datauri);
+                              var datauriinput = $(sourceelement).children()[componentdatauriindex];
+                              //alert(datauriinput)
+                              $(datauriinput).val(datauri);
+                           }
+                    });
+                    SubmitWorkflow();
+                    $('#divDataspaceComponentMenu').dialog('close');
+                },
+                "Close": function() {
+                    $('#divDataspaceComponentMenu').dialog('close');
+                }
+
+            }
+          });
+          //$('#divDataspaceMenu').dialog('open');
+    }
+
 }
 
 jsPlumb.ready(function () {
