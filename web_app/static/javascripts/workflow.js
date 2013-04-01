@@ -21,6 +21,7 @@ var WF_selectedDataApplication = null;
 var WF_processWorkflow = false;
 var WF_batchedData = null;
 var WF_currDatapoint = 0;
+var WF_nodecnt = 0;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -1247,6 +1248,7 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         });
     }
     //alert("component appended");
+    $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
     return nodeobj;
 }
 
@@ -1361,7 +1363,7 @@ function DisplayWorkflow(flowdata, workflowid) {
         //alert(edges_obj);
         //alert(edges_obj["0"]);
         //i = 0;
-        nodecnt = 0;
+        WF_nodecnt = 0;
         WF_processednodes = {};
         var components = $("#componentstring").val(); //.attr("value");
         //alert(components);
@@ -1370,7 +1372,7 @@ function DisplayWorkflow(flowdata, workflowid) {
         for (var key in nodes_obj)
         {
             //alert(key);
-            SearchAndCreateNode(nodes_obj, key, nodecnt++, componentarray, startnodeid);
+            SearchAndCreateNode(nodes_obj, key, WF_nodecnt++, componentarray, startnodeid);
         }
 
         var j = 0;
@@ -1378,10 +1380,10 @@ function DisplayWorkflow(flowdata, workflowid) {
             edge = edges_obj[j.toString()];
             //alert(edge['sourcenodeid']);
             //alert(edge['target']);
-            var sourcenode = SearchAndCreateNode(nodes_obj, edge['sourcenodeid'], nodecnt, componentarray, startnodeid);
+            var sourcenode = SearchAndCreateNode(nodes_obj, edge['sourcenodeid'], WF_nodecnt, componentarray, startnodeid);
             //if (sourcenode.IsNew)
             //    nodecnt++;
-            var targetnode = SearchAndCreateNode(nodes_obj, edge['targetnodeid'], nodecnt, componentarray, startnodeid);
+            var targetnode = SearchAndCreateNode(nodes_obj, edge['targetnodeid'], WF_nodecnt, componentarray, startnodeid);
             if (sourcenode != null && targetnode != null)
             {
                 //if (targetnode.IsNew)
@@ -1436,6 +1438,7 @@ function ClearWorkflowCanvas() {
     WF_endpoints = {};
     wfcnt = 0;
     wflabelcnt = 0;
+    WF_nodecnt = 0;
 }
 
 // Extract the id of the component from the id string
@@ -1741,7 +1744,7 @@ function StartWorkflowForData()
 // We can start the next one in the batch
 function OnWorkflowFinished()
 {
-    alert("Workflow run finished...");
+    //alert("Workflow run finished...");
 
     // Show the prompt dialog to ask user if they want to run all the rest in a batch
     /*$( "#dlgworkflowfinished" ).dialog({
@@ -1765,6 +1768,8 @@ function OnWorkflowFinished()
     StartWorkflowForData();
 }
 
+// Open a group of data in a goose
+// User can specify whether to open the URL or the name list
 function GroupOpen()
 {
     WF_batchedData = [];
@@ -1785,11 +1790,11 @@ function GroupOpen()
 
     if (WF_batchedData.length > 0)
     {
-          ClearWorkflowCanvas();
+          //ClearWorkflowCanvas();
           $('#divDataspaceComponentMenu').dialog( { height:400,
             buttons: {
                 "Open": function() {
-                    var nodecnt = 0;
+                    // Get all the selected data
                     $("#ulctxcomponents").children().each(function() {
                            var checkbox = $(this).children()[0];
                            if ($(checkbox).prop('checked'))
@@ -1797,12 +1802,14 @@ function GroupOpen()
                               var inputcomponentid = $(this).children()[1];
                               //alert($(inputcomponentid).val());
                               var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
-                              var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, nodecnt);
+                              // Append the selected goose to the canvas
+                              var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
                               var sourceelement = nodeobj.Element;
-                              nodecnt++;
+                              WF_nodecnt++;
 
                               //alert($(sourceelement).attr("id"));
                               // Process the batched data
+                              // Add data to the data uri field according to namelist or URL options
                               var datauri = "";
                               var prefix = ($("#inputNameValue").prop('checked')) ? "Namelist:" : "URL:";
                               datauri = prefix;
@@ -1822,7 +1829,7 @@ function GroupOpen()
                            }
                     });
                     //SubmitWorkflow();
-                    $('#divDataspaceComponentMenu').dialog('close');
+                    //$('#divDataspaceComponentMenu').dialog('close');
                 },
                 "Close": function() {
                     $('#divDataspaceComponentMenu').dialog('close');
