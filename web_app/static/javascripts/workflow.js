@@ -22,6 +22,7 @@ var WF_processWorkflow = false;
 var WF_batchedData = null;
 var WF_currDatapoint = 0;
 var WF_nodecnt = 0;
+var WF_groupcnt = 0;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -75,6 +76,11 @@ $(document).ready(function () {
           }
        }
     } );
+
+    $('#wfgrpaccordion').accordion({ active: false,
+                                collapsible: true,
+                                header: "a",
+    				            heightStyle: "content"});
 
     $('.component').draggable({
         helper: 'clone'
@@ -1768,9 +1774,8 @@ function OnWorkflowFinished()
     StartWorkflowForData();
 }
 
-// Open a group of data in a goose
-// User can specify whether to open the URL or the name list
-function GroupOpen()
+
+function GetSelectedData()
 {
     WF_batchedData = [];
 
@@ -1787,8 +1792,90 @@ function GroupOpen()
            WF_batchedData.push(link);
         }
     });
+}
 
-    if (WF_batchedData.length > 0)
+function GroupData()
+{
+    GetSelectedData();
+    if (WF_batchedData.length > 0) {
+        var firstpara = $('#divDataspaceGroup').children()[0];
+        var groupnameinput = $(firstpara).children()[0];
+        $(groupnameinput).val(("Group " + WF_groupcnt));
+        $('#divDataspaceGroup').dialog( { height:300,
+                   buttons: {
+                       "OK": function() {
+                           var groupname = $(groupnameinput).val();
+                           var ahrefelement = document.createElement('a');
+                           $(ahrefelement).html(groupname);
+                           var divelement = document.createElement("div");
+                           divelement.setAttribute("id", ("divgrp_" + WF_groupcnt));
+                           divelement.className = "datagroupaccordiondiv";
+                           var ul = document.createElement("ul");
+                           $(divelement).append($(ul));
+                           for (var i = 0; i < WF_batchedData.length; i++)
+                           {
+                               var li = document.createElement("li");
+                               $(ul).append($(li));
+                               var urlclone = WF_batchedData[i].cloneNode(true);
+                               $(li).append($(urlclone));
+                           }
+
+                           // Open all the data of the group
+                           var openbutton = document.createElement("input");
+                           openbutton.setAttribute("type", "button");
+                           openbutton.setAttribute("value", "Open");
+                           openbutton.onclick = OpenOneGroup;
+                           $(divelement).append($(openbutton));
+
+
+                           //$(divelement).html(newdivhtml);
+                           //alert("Append elements " + $(ahrefelement).html());
+                           $("#wfgrpaccordion").append($(ahrefelement));
+                           $("#wfgrpaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
+
+                           WF_groupcnt++;
+                           $('#divDataspaceGroup').dialog('close');
+                           /*$('#wfgrpaccordion p').bind('click', function (event) {
+                                  var source = event.target || event.srcElement;
+                                  if (source != null)
+                                  {
+                                     //alert($(source).attr("id"));
+                                     var srcid = $(source).attr("id");
+                                     var splitted = srcid.split("_");
+                                     var wfid = splitted[1];
+                                     if (wfid != null)
+                                     {
+                                       //alert(wfid);
+                                       GetWorkflow(wfid);
+                                     }
+                                  }
+                               } );    */
+                       },
+                       "Cancel":  function() {
+                          $('#divDataspaceGroup').dialog('close');
+                       }
+                   }
+        });
+    }
+}
+
+function OpenOneGroup(event)
+{
+  var source = event.target || event.srcElement;
+  if (source != null) {
+      var grpul = $(source).parent().children()[0];
+      var datatoopen = [];
+      $(grpul).children().each(function() {
+          var link = $(this).children()[0];
+          datatoopen.push(link);
+      });
+      OpenDataGroup(datatoopen);
+  }
+}
+
+function OpenDataGroup(group)
+{
+    if (group.length > 0)
     {
           //ClearWorkflowCanvas();
           $('#divDataspaceComponentMenu').dialog( { height:400,
@@ -1813,9 +1900,9 @@ function GroupOpen()
                               var datauri = "";
                               var prefix = ($("#inputNameValue").prop('checked')) ? "Namelist:" : "URL:";
                               datauri = prefix;
-                              for (var i = 0; i < WF_batchedData.length; i++)
+                              for (var i = 0; i < group.length; i++)
                               {
-                                  var datalink = WF_batchedData[i];
+                                  var datalink = group[i];
                                   var data = $(datalink).prop("href");
                                   if ($("#inputNameValue").prop('checked'))
                                       data = $(datalink).text();
@@ -1839,7 +1926,14 @@ function GroupOpen()
           });
           //$('#divDataspaceMenu').dialog('open');
     }
+}
 
+// Open a group of data in a goose
+// User can specify whether to open the URL or the name list
+function GroupOpen()
+{
+    GetSelectedData();
+    OpenDataGroup(WF_batchedData);
 }
 
 jsPlumb.ready(function () {

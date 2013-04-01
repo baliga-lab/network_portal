@@ -141,7 +141,8 @@
 <br />
 <div>
     <input type="button" id="btnDeleteData" value="Delete" onclick="javascript:DeleteCollectedData();" class="button"/>
-    <input type="button" id="btnGroup" value="Open" onclick="javascript:GroupOpen();" class="button"/>
+    <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
+    <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
     <br />
     <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
     <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
@@ -150,9 +151,14 @@
     </select>
     <br />
     <br />
+    <div id="wfgrpaccordion" class="datagroupaccordion">
+
+    </div>
+    <br />
     <div id="wfdataspace" class="divdataspace">
 
     </div>
+
 </div>
 </td>
 <td valign="top" style="width: 65%"><h3>Workflow Canvas</h3>
@@ -329,6 +335,9 @@
     <p><input id="inputNameValue" type="checkbox" checked="true"/>Pass Names</p>
 </div>
 
+<div id="divDataspaceGroup" style="display: none">
+    <p>Group Name: <input type="text" /></p>
+</div>
 
 <input id="inputDataSignal" type="hidden" value="0" />
 

@@ -2032,3 +2032,24 @@ background-color: #ff5c00;
 background-color: #ffb515;
 }
 
+.datagroupaccordion
+{
+    width: 95%; /*220px */;
+    max-width: 250px;
+}
+
+#wfgrpaccordion ul
+{
+    list-style-type: circle;
+}
+
+.datagroupaccordiondiv
+{
+    max-height: 150px;
+    scroll: auto;
+}
+
+#wfgrpaccordion ul li
+{
+    list-style-type: circle;
+}
