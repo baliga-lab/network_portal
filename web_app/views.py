@@ -99,6 +99,17 @@ class WorkFlowEntry:
             wci = WorkflowComponentInfo(component)
             self.WorkflowComponents.append(wci)
 
+class DataGroupEntry:
+    def __init__(self, group, contents):
+        print group.id
+        print group.name
+        print group.description
+
+        self.ID = group.id
+        self.Name = group.name
+        self.Description = group.description
+        self.Contents = contents
+
 def createuser(user):
     print 'creating user...'
     if user.is_authenticated():
@@ -138,7 +149,13 @@ def workflow(request):
         user = createuser(request.user)
     userid = str(user.id)
     myworkflows = Workflows.objects.filter(owner_id = user.id)
-
+    mydatagroups = WorkflowDataGroups.objects.filter(owner_id = user.id)
+    datagroups = []
+    for group in mydatagroups:
+        print("Group ID: " + str(group.id))
+        groupcontents = WorkflowDataGroupContent.objects.filter(group_id = group.id)
+        datagroup = DataGroupEntry(group, groupcontents)
+        datagroups.append(datagroup)
 
     # jpype executes java code
     #try:
@@ -575,6 +592,51 @@ def saveedge(request):
     edgedatatype = WorkflowEdgeDataTypes.objects.filter(id = edgetypeid)[0]
     #print edgedatatype.name
     return HttpResponse(edgedatatype.name)
+
+@csrf_exempt
+def saveworkflowdatagroup(request):
+    try:
+        datagroup = json.loads(request.raw_post_data)
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'desc': 'Failed to load json' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    try:
+        name = datagroup['name']
+        print name
+        group = WorkflowDataGroups(owner_id = datagroup['userid'],
+                                   name = datagroup['name'],
+                                   description = datagroup['desc'])
+        group.save()
+        groupid = group.id
+        print str(groupid)
+
+        nodelist = datagroup['data']
+        nodeobjs = {}
+        for key in nodelist.keys():
+            link = nodelist[key]
+            content = WorkflowDataGroupContent(group_id = groupid, dataurl = link['url'], urltext = link['text'])
+            content.save()
+            print "Data group content saved with id: " + str(content.id)
+    except Exception as e1:
+        print str(e1)
+
+    data = {'id': str(groupid) }
+    return HttpResponse(json.dumps(data), mimetype='application/json')
+
+@csrf_exempt
+def deleteworkflowdatagroup(request, datagroupid):
+    print 'delete data group ' + str(datagroupid)
+
+    try:
+        WorkflowDataGroups.objects.filter(id = datagroupid).delete()
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    return HttpResponse("1")
 
 def search(request):
     if request.GET.has_key('q'):

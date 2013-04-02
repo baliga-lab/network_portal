@@ -152,7 +152,25 @@
     <br />
     <br />
     <div id="wfgrpaccordion" class="datagroupaccordion">
-
+        {% for datagroup in datagroups %}
+        <a href='#' id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</a>
+        <div id='divgrp_{{datagroup.ID|stringformat:"i"}}'>
+            <div>{{datagroupentry.Description}}</div>
+            <ul>
+                {% for content in datagroup.Contents %}
+                    <li>
+                        <a href="{{content.dataurl}}">{{content.urltext}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
+            <input type="hidden" value="{{datagroup.Name}}" />
+            <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
+            <input type="button" value="Open" onclick="javascript:OpenOneGroup(this);" />
+            <input type="button" value="Save" onclick="javascript:SaveOneGroup(this);" />
+            <input type="button" value="Delete" onclick="javascript:DeleteOneGroup(this);" />
+        </div>
+        {% endfor %}
     </div>
     <br />
     <div id="wfdataspace" class="divdataspace">
@@ -337,6 +355,7 @@
 
 <div id="divDataspaceGroup" style="display: none">
     <p>Group Name: <input type="text" /></p>
+    <p>Description: <input type="text" /></p>
 </div>
 
 <input id="inputDataSignal" type="hidden" value="0" />

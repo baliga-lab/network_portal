@@ -664,3 +664,14 @@ class WorkflowReportData(models.Model):
     workflowcomponentname = models.CharField(max_length=255)
     workflownode = models.ForeignKey(WorkflowNodes)
     datatype=models.CharField(max_length=32)
+
+class WorkflowDataGroups(models.Model):
+    owner = models.ForeignKey(Users)
+    name = models.CharField(max_length = 1024)
+    description = models.CharField(max_length = 2048)
+
+class WorkflowDataGroupContent(models.Model):
+    group = models.ForeignKey(WorkflowDataGroups)
+    dataurl = models.CharField(max_length = 2048)
+    urltext = models.CharField(max_length = 1024)
+

@@ -22,7 +22,7 @@ var WF_processWorkflow = false;
 var WF_batchedData = null;
 var WF_currDatapoint = 0;
 var WF_nodecnt = 0;
-var WF_groupcnt = 0;
+var WF_groupcnt = 10000;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -697,6 +697,25 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
 
     return jsonObj;
 }
+
+function ConstructDataGroupJSON(name, description, workflowid, userid, data) {
+    //alert("ContructJSON workflowid: " + workflowid);
+
+    var jsonObj = {}; //declare array
+    jsonObj.type = "datagroup";
+    jsonObj.data = data;
+    jsonObj.groupid = workflowid;
+    jsonObj.name = name;
+    jsonObj.desc = description;
+    jsonObj.userid = userid.toString();
+    //jsonObj.edgelist = WF_edges;
+
+    //alert(jsonObj["name"]);
+    //alert(jsonObj["edgelist"]);
+
+    return jsonObj;
+}
+
 
 function organismSelected(sel)
 {
@@ -1806,10 +1825,22 @@ function GroupData()
                        "OK": function() {
                            var groupname = $(groupnameinput).val();
                            var ahrefelement = document.createElement('a');
+                           ahrefelement.setAttribute("id", ("agrp_" + WF_groupcnt));
                            $(ahrefelement).html(groupname);
+                           //alert("ahref");
+
                            var divelement = document.createElement("div");
-                           divelement.setAttribute("id", ("divgrp_" + WF_groupcnt));
                            divelement.className = "datagroupaccordiondiv";
+
+                           var descdiv = document.createElement('div');
+                           descdiv.className = "datagroupdescriptiondiv";
+                           var groupdescpara = $('#divDataspaceGroup').children()[1];
+                           var groupdescinput = $(groupdescpara).children()[0];
+                           //alert($(groupdescinput).val());
+                           $(descdiv).html($(groupdescinput).val());
+                           $(divelement).append($(descdiv));
+                           //alert("descdiv");
+
                            var ul = document.createElement("ul");
                            $(divelement).append($(ul));
                            for (var i = 0; i < WF_batchedData.length; i++)
@@ -1820,12 +1851,47 @@ function GroupData()
                                $(li).append($(urlclone));
                            }
 
+                           // The hidden input that stores the group id
+                           var hidden = document.createElement("input");
+                           hidden.setAttribute("type", "hidden");
+                           hidden.setAttribute("value", "");
+                           $(divelement).append($(hidden));
+
+                           // The hidden input that stores the group name
+                           var hidden1 = document.createElement("input");
+                           hidden1.setAttribute("type", "hidden");
+                           hidden1.setAttribute("value", groupname);
+                           $(divelement).append($(hidden1));
+                           //alert("hidden1");
+
+                           // The hidden input that stores id of the corresponding heading in the
+                           // accordion. We need this info for deleting the group
+                           var hidden2 = document.createElement("input");
+                           hidden2.setAttribute("type", "hidden");
+                           hidden2.setAttribute("value", WF_groupcnt);
+                           $(divelement).append($(hidden2));
+                           //alert("hidden2");
+
                            // Open all the data of the group
                            var openbutton = document.createElement("input");
                            openbutton.setAttribute("type", "button");
                            openbutton.setAttribute("value", "Open");
                            openbutton.onclick = OpenOneGroup;
                            $(divelement).append($(openbutton));
+
+                           // Save the group
+                           var savebutton = document.createElement("input");
+                           savebutton.setAttribute("type", "button");
+                           savebutton.setAttribute("value", "Save");
+                           savebutton.onclick = SaveOneGroup;
+                           $(divelement).append($(savebutton));
+
+                           // Delete the group
+                           var deletebutton = document.createElement("input");
+                           deletebutton.setAttribute("type", "button");
+                           deletebutton.setAttribute("value", "Delete");
+                           deletebutton.onclick = DeleteOneGroup;
+                           $(divelement).append($(deletebutton));
 
 
                            //$(divelement).html(newdivhtml);
@@ -1859,11 +1925,124 @@ function GroupData()
     }
 }
 
+function SaveOneGroup(event)
+{
+   //alert("save group");
+   var source = event.target || event.srcElement;
+   if (source == null)
+       source = event;
+   if (source != null) {
+       var datacnt = 0;
+       var divelement = $(source).parent();
+       //alert(divelement);
+       var nameinput = $(divelement).children()[3];
+       //alert(nameinput);
+       var groupcntinpt = $(divelement).children()[4];
+       var groupidinput = $(divelement).children()[2];
+       var descdiv = $(divelement).children()[0];
+       //alert($(descdiv).html());
+       var grpul = $(divelement).children()[1];
+       //alert(grpul);
+       var datatoopen = {};
+       $(grpul).children().each(function() {
+           var link = $(this).children()[0];
+           //alert($(link).text());
+           //alert($(link).prop("href"));
+           var linkobj = {};
+           linkobj.text = $(link).text();
+           linkobj.url = $(link).prop("href");
+           datatoopen[("data" + datacnt)] = linkobj;
+           datacnt++;
+       });
+
+       var userid = $("#authenticated").val();
+       var groupid = $(groupidinput).val();
+       var name = $(nameinput).val();
+       var desc = $(descdiv).html();
+       var jsonObj = ConstructDataGroupJSON(name, desc, groupid, userid, datatoopen);
+       //alert(JSON.stringify(jsonObj));
+
+       //alert("Send workflow");
+       // Send the workflow data for saving
+       jQuery.ajax({
+           url: "/workflow/saveworkflowdatagroup",
+           type: "POST",
+           data: JSON.stringify(jsonObj), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+           contentType: "application/json; charset=UTF-8",
+           dataType: "json",
+           beforeSend: function (x) {
+               if (x && x.overrideMimeType) {
+                   x.overrideMimeType("application/json;charset=UTF-8");
+               }
+           },
+           success: function (result) {
+               //Write your code here
+               //alert(result['id']);
+               //alert(($("#divWorkflow").children().length));
+               if (result['id'] != undefined && result['id'].length > 0)
+               {
+                   //alert(result['id']);
+                   //ahrefelement.setAttribute("id", ("agrp_" + result['id']));
+                   //divelement.setAttribute("id", ("divgrp_" + result['id']));
+                   $(groupidinput).val(result['id']);
+               }
+           }
+       });
+   }
+}
+
+function DeleteOneGroup(event)
+{
+    //alert("delete group");
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+       var divelement = $(source).parent();
+       var groupidinput = $(divelement).children()[2];
+       var groupid = $(groupidinput).val();
+       var groupcntinput = $(divelement).children()[4];
+       var groupcnt = $(groupcntinput).val();
+       if (groupid != null && groupid.length > 0)
+       {
+           //alert("Send workflow");
+           // Send the workflow data for saving
+           $.get("/workflow/deleteworkflowdatagroup/" + groupid + "/",
+                   function (data) {
+                       //alert("Get workflow " + wfid);
+                       //alert("Remove workflow: " + data);
+                       if (data == "1")
+                       {
+                           $(divelement).remove();
+                           var grpahrefid = "#agrp_" + groupcnt;
+                           $(grpahrefid).remove();
+                       }
+                   }
+               );
+       }
+       else {
+           $(divelement).remove();
+           var grpahrefid = "#agrp_" + groupcnt;
+           $(grpahrefid).remove();
+       }
+    }
+}
+
+function DeleteGroupElements(elementid)
+{
+
+    var grpdivid = "#divgrp_" + elementid;
+
+    $(grpdivid).remove();
+}
+
 function OpenOneGroup(event)
 {
   var source = event.target || event.srcElement;
+  if (source == null)
+      source = event;
   if (source != null) {
-      var grpul = $(source).parent().children()[0];
+      var grpul = $(source).parent().children()[1];
       var datatoopen = [];
       $(grpul).children().each(function() {
           var link = $(this).children()[0];
