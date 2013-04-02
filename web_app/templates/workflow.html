@@ -182,7 +182,7 @@
         <ul id="ulcaptureddata">
             {% for data in captureddata %}
             <li>
-                <label>
+                <label class="dataspacelabel">
                     <input type="checkbox" checked="false" />
                     <a href='{{data.dataurl}}'>{{data.urltext}}</a>
                     <input type="hidden" value='{{data.id}}' />

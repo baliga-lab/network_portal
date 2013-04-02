@@ -1707,7 +1707,7 @@ function SaveCollectedData()
                        //Write your code here
                        //alert(result['id']);
                        //alert(($("#divWorkflow").children().length));
-                       alert(result);
+                       //alert(result);
                        if (result != null)
                        {
                            // Need to update the id of each saved data
