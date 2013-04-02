@@ -23,6 +23,7 @@ var WF_batchedData = null;
 var WF_currDatapoint = 0;
 var WF_nodecnt = 0;
 var WF_groupcnt = 10000;
+var WF_captureddataid = -1;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -79,7 +80,6 @@ $(document).ready(function () {
 
     $('#wfgrpaccordion').accordion({ active: false,
                                 collapsible: true,
-                                header: "a",
     				            heightStyle: "content"});
 
     $('.component').draggable({
@@ -1658,25 +1658,150 @@ function DeleteSessionReport()
     ); */
 }
 
-function DeleteCollectedData()
+function SaveCollectedData()
 {
-    //alert("Delete collected data");
-    $("#wfdataspace").children().each(function() {
-        //alert("dataspace div: " + $(this).html());
-        var ul = $(this).children()[0];
-        var elementtobedeleted = null;
-        $(ul).children().each(function() {
+    var collecteddata = {};
+    var userid = $("#authenticated").val();
+    collecteddata['userid'] = userid;
+    var data = {};
+    var index = 0;
+    $("#ulcaptureddata").children().each(function() {
+           //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
            var label = $(this).children()[0];
            //alert($(label).html());
-           var input = $(label).children()[0];
-           //alert($(input).is(':checked'));
-           if ($(input).is(':checked'))
+           var link = $(label).children()[1];
+           var linkobj = {};
+           linkobj.text = $(link).text();
+           linkobj.url = $(link).prop("href");
+           var dataidinput = $(label).children()[2];
+           var dataid = $(dataidinput).val();
+           if (dataid == null || dataid.length == 0)
            {
-               //elementstobedeleted.push($(this));
-               $(this).remove();
+              //alert(dataid);
+              dataid = WF_captureddataid.toString();
+              WF_captureddataid--;
+              dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+              dataidinput.setAttribute("value", dataid.toString());
            }
+           linkobj.nodeindex = dataid;
+           data[index.toString()] = linkobj;
+           index++;
+           //alert($(input).is(':checked'));
         });
+        collecteddata['data'] = data;
+
+        //alert(JSON.stringify(collecteddata));
+        jQuery.ajax({
+                   url: "/workflow/savecaptureddata",
+                   type: "POST",
+                   data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+                   contentType: "application/json; charset=UTF-8",
+                   dataType: "json",
+                   beforeSend: function (x) {
+                       if (x && x.overrideMimeType) {
+                           x.overrideMimeType("application/json;charset=UTF-8");
+                       }
+                   },
+                   success: function (result) {
+                       //Write your code here
+                       //alert(result['id']);
+                       //alert(($("#divWorkflow").children().length));
+                       alert(result);
+                       if (result != null)
+                       {
+                           // Need to update the id of each saved data
+                           var index = 0;
+                           var finished = false;
+                           do
+                           {
+                               var pair = result[index.toString()];
+                               if (pair != null)
+                               {
+                                  var originalindex = pair['nodeindex'];
+                                  var dataid = pair['id'];
+                                  var originalinputid = "#cdata-" + originalindex;
+                                  $(originalinputid).val(dataid);
+                                  index++;
+                               }
+                               else
+                                  finished = true;
+                           }
+                           while (!finished);
+                       }
+                   }
+               });
+}
+
+function DeleteCollectedData(selected)
+{
+    //alert("Delete collected data");
+    var datatodelete = {};
+    var data = {};
+    var index = 0;
+    $("#ulcaptureddata").children().each(function() {
+       //alert("dataspace div: " + $(this).html());
+       //alert("li: " + $(this).html());
+       var label = $(this).children()[0];
+       //alert($(label).html());
+       var input = $(label).children()[0];
+       //alert($(input).is(':checked'));
+       var dataidinput = $(label).children()[2];
+       var dataid = $(dataidinput).val();
+       if ((selected && $(input).is(':checked')) || (!selected && !($(input).is(':checked'))))
+       {
+           //elementstobedeleted.push($(this));
+           if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
+              $(this).remove();
+           else {
+              var obj = {};
+              obj['id'] = dataid;
+              data[index.toString()] = obj;
+              index++;
+              $(this).remove();
+           }
+       }
+    });
+    datatodelete['data'] = data;
+    JSON.stringify(datatodelete);
+
+    jQuery.ajax({
+       url: "/workflow/deletecaptureddata",
+       type: "POST",
+       data: JSON.stringify(datatodelete), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+       contentType: "application/json; charset=UTF-8",
+       dataType: "json",
+       beforeSend: function (x) {
+           if (x && x.overrideMimeType) {
+               x.overrideMimeType("application/json;charset=UTF-8");
+           }
+       },
+       success: function (result) {
+           //Write your code here
+           //alert(result['id']);
+           //alert(($("#divWorkflow").children().length));
+           alert(result);
+           if (result != null)
+           {
+               // Need to update the id of each saved data
+               var index = 0;
+               var finished = false;
+               do
+               {
+                   var pair = result[index.toString()];
+                   if (pair != null)
+                   {
+                      var originalindex = pair['nodeindex'];
+                      var dataid = pair['id'];
+                      var originalinputid = "#cdata-" + originalindex;
+                      $(originalinputid).val(dataid);
+                   }
+                   else
+                      finished = true;
+               }
+               while (!finished);
+           }
+       }
     });
 }
 
@@ -2114,6 +2239,7 @@ function GroupOpen()
     GetSelectedData();
     OpenDataGroup(WF_batchedData);
 }
+
 
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");

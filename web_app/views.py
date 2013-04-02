@@ -157,6 +157,8 @@ def workflow(request):
         datagroup = DataGroupEntry(group, groupcontents)
         datagroups.append(datagroup)
 
+    captureddata = WorkflowCapturedData.objects.filter(owner_id = user.id)
+
     # jpype executes java code
     #try:
     #    jvmpath = jpype.getDefaultJVMPath()
@@ -637,6 +639,58 @@ def deleteworkflowdatagroup(request, datagroupid):
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     return HttpResponse("1")
+
+@csrf_exempt
+def savecaptureddata(request):
+    try:
+        captureddata = json.loads(request.raw_post_data)
+        print captureddata
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'desc': 'Failed to load json' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    try:
+        print captureddata['userid']
+        responsedata = {}
+        idx = 0
+        nodelist = captureddata['data']
+        nodeobjs = {}
+        for key in nodelist.keys():
+            link = nodelist[key]
+            if int(link['nodeindex']) < 0:
+                content = WorkflowCapturedData(owner_id = captureddata['userid'], dataurl = link['url'], urltext = link['text'])
+                content.save()
+                print "Data group content saved with id: " + str(content.id)
+                pair = {'nodeindex': link['nodeindex'], 'id': str(content.id) }
+                responsedata[str(idx)] = pair
+                idx = idx + 1
+    except Exception as e1:
+        print str(e1)
+
+    print json.dumps(responsedata)
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+@csrf_exempt
+def deletecaptureddata(request):
+    try:
+        datatodelete = json.loads(request.raw_post_data)
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'desc': 'Failed to load json' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    try:
+        nodelist = datatodelete['data']
+        for key in nodelist.keys():
+            link = nodelist[key]
+            if int(link['id']) >= 0:
+               WorkflowCapturedData.objects.filter(id = int(link['id'])).delete()
+    except Exception as e1:
+        print str(e1)
+
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
 
 def search(request):
     if request.GET.has_key('q'):

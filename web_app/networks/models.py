@@ -668,10 +668,14 @@ class WorkflowReportData(models.Model):
 class WorkflowDataGroups(models.Model):
     owner = models.ForeignKey(Users)
     name = models.CharField(max_length = 1024)
-    description = models.CharField(max_length = 2048)
+    description = models.CharField(max_length = 2048, blank=True, null=True)
 
 class WorkflowDataGroupContent(models.Model):
     group = models.ForeignKey(WorkflowDataGroups)
-    dataurl = models.CharField(max_length = 2048)
-    urltext = models.CharField(max_length = 1024)
+    dataurl = models.CharField(max_length = 2048, blank=True, null=True)
+    urltext = models.CharField(max_length = 1024, blank=True, null=True)
 
+class WorkflowCapturedData(models.Model):
+    owner = models.ForeignKey(Users)
+    dataurl = models.CharField(max_length = 2048, blank=True, null=True)
+    urltext = models.CharField(max_length = 1024, blank=True, null=True)

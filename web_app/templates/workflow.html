@@ -140,17 +140,6 @@
 </div>
 <br />
 <div>
-    <input type="button" id="btnDeleteData" value="Delete" onclick="javascript:DeleteCollectedData();" class="button"/>
-    <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
-    <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
-    <br />
-    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
-    <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
-        <option value="-1">Select a data application record to apply to the workflow</option>
-        <option value="-2">---------------------------------------</option>
-    </select>
-    <br />
-    <br />
     <div id="wfgrpaccordion" class="datagroupaccordion">
         {% for datagroup in datagroups %}
         <a href='#' id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</a>
@@ -158,9 +147,9 @@
             <div>{{datagroupentry.Description}}</div>
             <ul>
                 {% for content in datagroup.Contents %}
-                    <li>
-                        <a href="{{content.dataurl}}">{{content.urltext}}</a>
-                    </li>
+                <li>
+                    <a href="{{content.dataurl}}">{{content.urltext}}</a>
+                </li>
                 {% endfor %}
             </ul>
             <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
@@ -173,8 +162,34 @@
         {% endfor %}
     </div>
     <br />
-    <div id="wfdataspace" class="divdataspace">
 
+    <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
+    <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
+    <br />
+    <input type="button" id="btnSave" value="Save" onclick="javascript:SaveCollectedData();" class="button"/>
+    <input type="button" id="btnDeleteSelectedData" value="Delete Selected" onclick="javascript:DeleteCollectedData(true);" class="button"/>
+    <input type="button" id="btnDeleteUnselectedData" value="Delete UnSelected" onclick="javascript:DeleteCollectedData(false);" class="button"/>
+    <br />
+    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+    <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
+        <option value="-1">Select a data application record to apply to the workflow</option>
+        <option value="-2">---------------------------------------</option>
+    </select>
+    <br />
+    <br />
+
+    <div id="wfdataspace" class="divdataspace">
+        <ul id="ulcaptureddata">
+            {% for data in captureddata %}
+            <li>
+                <label>
+                    <input type="checkbox" checked="false" />
+                    <a href='{{data.dataurl}}'>{{data.urltext}}</a>
+                    <input type="hidden" value='{{data.id}}' />
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 
 </div>
