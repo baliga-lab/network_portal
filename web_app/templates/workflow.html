@@ -155,9 +155,9 @@
             <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
             <input type="hidden" value="{{datagroup.Name}}" />
             <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
-            <input type="button" value="Open" onclick="javascript:OpenOneGroup(this);" />
-            <input type="button" value="Save" onclick="javascript:SaveOneGroup(this);" />
-            <input type="button" value="Delete" onclick="javascript:DeleteOneGroup(this);" />
+            <input type="button" value="Open" class="button" onclick="javascript:OpenOneGroup(this);" />
+            <input type="button" value="Save" class="button" onclick="javascript:SaveOneGroup(this);" />
+            <input type="button" value="Delete" class="button" onclick="javascript:DeleteOneGroup(this);" />
         </div>
         {% endfor %}
     </div>

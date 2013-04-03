@@ -1731,6 +1731,7 @@ function SaveCollectedData()
                               finished = true;
                        }
                        while (!finished);
+                       alert("Data saved");
                    }
                }
             });
@@ -2011,6 +2012,7 @@ function GroupData()
 
                            // Open all the data of the group
                            var openbutton = document.createElement("input");
+                           openbutton.className = "button";
                            openbutton.setAttribute("type", "button");
                            openbutton.setAttribute("value", "Open");
                            openbutton.onclick = OpenOneGroup;
@@ -2018,6 +2020,7 @@ function GroupData()
 
                            // Save the group
                            var savebutton = document.createElement("input");
+                           savebutton.className = "button";
                            savebutton.setAttribute("type", "button");
                            savebutton.setAttribute("value", "Save");
                            savebutton.onclick = SaveOneGroup;
@@ -2025,6 +2028,7 @@ function GroupData()
 
                            // Delete the group
                            var deletebutton = document.createElement("input");
+                           deletebutton.className = "button";
                            deletebutton.setAttribute("type", "button");
                            deletebutton.setAttribute("value", "Delete");
                            deletebutton.onclick = DeleteOneGroup;
