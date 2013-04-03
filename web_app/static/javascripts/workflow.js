@@ -22,7 +22,7 @@ var WF_processWorkflow = false;
 var WF_batchedData = null;
 var WF_currDatapoint = 0;
 var WF_nodecnt = 0;
-var WF_groupcnt = 10000;
+var WF_groupcnt = -1;
 var WF_captureddataid = -1;
 
 // Below are the index of UI elements in the component div.
@@ -1665,6 +1665,7 @@ function SaveCollectedData()
     collecteddata['userid'] = userid;
     var data = {};
     var index = 0;
+    var hasdatatosave = false;
     $("#ulcaptureddata").children().each(function() {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
@@ -1679,6 +1680,7 @@ function SaveCollectedData()
            if (dataid == null || dataid.length == 0)
            {
               //alert(dataid);
+              hasdatatosave = true;
               dataid = WF_captureddataid.toString();
               WF_captureddataid--;
               dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
@@ -1691,54 +1693,57 @@ function SaveCollectedData()
         });
         collecteddata['data'] = data;
 
-        //alert(JSON.stringify(collecteddata));
-        jQuery.ajax({
-                   url: "/workflow/savecaptureddata",
-                   type: "POST",
-                   data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
-                   contentType: "application/json; charset=UTF-8",
-                   dataType: "json",
-                   beforeSend: function (x) {
-                       if (x && x.overrideMimeType) {
-                           x.overrideMimeType("application/json;charset=UTF-8");
-                       }
-                   },
-                   success: function (result) {
-                       //Write your code here
-                       //alert(result['id']);
-                       //alert(($("#divWorkflow").children().length));
-                       //alert(result);
-                       if (result != null)
-                       {
-                           // Need to update the id of each saved data
-                           var index = 0;
-                           var finished = false;
-                           do
-                           {
-                               var pair = result[index.toString()];
-                               if (pair != null)
-                               {
-                                  var originalindex = pair['nodeindex'];
-                                  var dataid = pair['id'];
-                                  var originalinputid = "#cdata-" + originalindex;
-                                  $(originalinputid).val(dataid);
-                                  index++;
-                               }
-                               else
-                                  finished = true;
-                           }
-                           while (!finished);
-                       }
+        if (hasdatatosave) {
+            //alert(JSON.stringify(collecteddata));
+            jQuery.ajax({
+               url: "/workflow/savecaptureddata",
+               type: "POST",
+               data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+               contentType: "application/json; charset=UTF-8",
+               dataType: "json",
+               beforeSend: function (x) {
+                   if (x && x.overrideMimeType) {
+                       x.overrideMimeType("application/json;charset=UTF-8");
                    }
-               });
+               },
+               success: function (result) {
+                   //Write your code here
+                   //alert(result['id']);
+                   //alert(($("#divWorkflow").children().length));
+                   //alert(result);
+                   if (result != null)
+                   {
+                       // Need to update the id of each saved data
+                       var index = 0;
+                       var finished = false;
+                       do
+                       {
+                           var pair = result[index.toString()];
+                           if (pair != null)
+                           {
+                              var originalindex = pair['nodeindex'];
+                              var dataid = pair['id'];
+                              var originalinputid = "#cdata-" + originalindex;
+                              $(originalinputid).val(dataid);
+                              index++;
+                           }
+                           else
+                              finished = true;
+                       }
+                       while (!finished);
+                   }
+               }
+            });
+        }
 }
 
 function DeleteCollectedData(selected)
 {
-    //alert("Delete collected data");
+    //alert("Delete collected data " + selected);
     var datatodelete = {};
     var data = {};
     var index = 0;
+    var hasdatatodelete = false;
     $("#ulcaptureddata").children().each(function() {
        //alert("dataspace div: " + $(this).html());
        //alert("li: " + $(this).html());
@@ -1748,12 +1753,16 @@ function DeleteCollectedData(selected)
        //alert($(input).is(':checked'));
        var dataidinput = $(label).children()[2];
        var dataid = $(dataidinput).val();
-       if ((selected && $(input).is(':checked')) || (!selected && !($(input).is(':checked'))))
+       //alert(dataid);
+       if ($(input).is(':checked') == selected)
        {
            //elementstobedeleted.push($(this));
            if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
+           {
               $(this).remove();
+           }
            else {
+              hasdatatodelete = true;
               var obj = {};
               obj['id'] = dataid;
               data[index.toString()] = obj;
@@ -1763,46 +1772,48 @@ function DeleteCollectedData(selected)
        }
     });
     datatodelete['data'] = data;
-    JSON.stringify(datatodelete);
 
-    jQuery.ajax({
-       url: "/workflow/deletecaptureddata",
-       type: "POST",
-       data: JSON.stringify(datatodelete), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
-       contentType: "application/json; charset=UTF-8",
-       dataType: "json",
-       beforeSend: function (x) {
-           if (x && x.overrideMimeType) {
-               x.overrideMimeType("application/json;charset=UTF-8");
-           }
-       },
-       success: function (result) {
-           //Write your code here
-           //alert(result['id']);
-           //alert(($("#divWorkflow").children().length));
-           alert(result);
-           if (result != null)
-           {
-               // Need to update the id of each saved data
-               var index = 0;
-               var finished = false;
-               do
-               {
-                   var pair = result[index.toString()];
-                   if (pair != null)
-                   {
-                      var originalindex = pair['nodeindex'];
-                      var dataid = pair['id'];
-                      var originalinputid = "#cdata-" + originalindex;
-                      $(originalinputid).val(dataid);
-                   }
-                   else
-                      finished = true;
+    if (hasdatatodelete) {
+        //alert(JSON.stringify(datatodelete));
+        jQuery.ajax({
+           url: "/workflow/deletecaptureddata",
+           type: "POST",
+           data: JSON.stringify(datatodelete), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+           contentType: "application/json; charset=UTF-8",
+           dataType: "json",
+           beforeSend: function (x) {
+               if (x && x.overrideMimeType) {
+                   x.overrideMimeType("application/json;charset=UTF-8");
                }
-               while (!finished);
+           },
+           success: function (result) {
+               //Write your code here
+               //alert(result['id']);
+               //alert(($("#divWorkflow").children().length));
+               //alert(result);
+               if (result != null)
+               {
+                   // Need to update the id of each saved data
+                   var index = 0;
+                   var finished = false;
+                   do
+                   {
+                       var pair = result[index.toString()];
+                       if (pair != null)
+                       {
+                          var originalindex = pair['nodeindex'];
+                          var dataid = pair['id'];
+                          var originalinputid = "#cdata-" + originalindex;
+                          $(originalinputid).val(dataid);
+                       }
+                       else
+                          finished = true;
+                   }
+                   while (!finished);
+               }
            }
-       }
-    });
+        });
+    }
 }
 
 // Run the workflow against the selected data in a batch
@@ -1944,11 +1955,12 @@ function GroupData()
     if (WF_batchedData.length > 0) {
         var firstpara = $('#divDataspaceGroup').children()[0];
         var groupnameinput = $(firstpara).children()[0];
-        $(groupnameinput).val(("Group " + WF_groupcnt));
+        $(groupnameinput).val("Group");
         $('#divDataspaceGroup').dialog( { height:300,
                    buttons: {
                        "OK": function() {
                            var groupname = $(groupnameinput).val();
+                           // The group header ahref, its id must be set using WF_groupcnt
                            var ahrefelement = document.createElement('a');
                            ahrefelement.setAttribute("id", ("agrp_" + WF_groupcnt));
                            $(ahrefelement).html(groupname);
@@ -1989,8 +2001,8 @@ function GroupData()
                            $(divelement).append($(hidden1));
                            //alert("hidden1");
 
-                           // The hidden input that stores id of the corresponding heading in the
-                           // accordion. We need this info for deleting the group
+                           // The hidden input that stores id of the corresponding header in the
+                           // accordion. We need this info for deleting the group header
                            var hidden2 = document.createElement("input");
                            hidden2.setAttribute("type", "hidden");
                            hidden2.setAttribute("value", WF_groupcnt);
@@ -2024,7 +2036,7 @@ function GroupData()
                            $("#wfgrpaccordion").append($(ahrefelement));
                            $("#wfgrpaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
 
-                           WF_groupcnt++;
+                           WF_groupcnt--;
                            $('#divDataspaceGroup').dialog('close');
                            /*$('#wfgrpaccordion p').bind('click', function (event) {
                                   var source = event.target || event.srcElement;
@@ -2130,6 +2142,8 @@ function DeleteOneGroup(event)
        var groupcnt = $(groupcntinput).val();
        if (groupid != null && groupid.length > 0)
        {
+           // This group has already been saved
+
            //alert("Send workflow");
            // Send the workflow data for saving
            $.get("/workflow/deleteworkflowdatagroup/" + groupid + "/",

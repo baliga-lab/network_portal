@@ -182,9 +182,9 @@
     <div id="wfdataspace" class="divdataspace">
         <ul id="ulcaptureddata">
             {% for data in captureddata %}
-            <li>
+            <li class="licaptureddata">
                 <label class="dataspacelabel">
-                    <input type="checkbox" checked="false" />
+                    <input type="checkbox" />
                     <a href='{{data.dataurl}}'>{{data.urltext}}</a>
                     <input type="hidden" value='{{data.id}}' />
                 </label>

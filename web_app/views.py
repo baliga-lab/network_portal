@@ -148,6 +148,7 @@ def workflow(request):
     elif (len(dbuser) == 0):
         user = createuser(request.user)
     userid = str(user.id)
+    print 'user ID: ' + userid
     myworkflows = Workflows.objects.filter(owner_id = user.id)
     mydatagroups = WorkflowDataGroups.objects.filter(owner_id = user.id)
     datagroups = []
@@ -674,6 +675,7 @@ def savecaptureddata(request):
 @csrf_exempt
 def deletecaptureddata(request):
     try:
+        print 'deletecaptureddata'
         datatodelete = json.loads(request.raw_post_data)
     except Exception as e:
         print str(e)
