@@ -33,7 +33,7 @@ def networks(request):
     networks = Network.objects.all()
     return render_to_response('networks.html', locals())
 
-def network(request, network_id=None):
+def network(request, species=None, network_id=None):
     network = Network.objects.get(id=network_id)
     biclusters = network.bicluster_set.all()
     return render_to_response('network.html', locals())
@@ -42,19 +42,6 @@ def network_cytoscape_web_test(request):
     network = Object()
     network.name = "Test Network"
     network.bicluster_ids = [2,152,299]
-    return render_to_response('network_cytoscape_web.html', locals())
-
-def network_cytoscape_web(request):
-    network = Object()
-    network.name = "Test Network"
-    if request.GET.has_key('biclusters'):
-        network.bicluster_ids = re.split( r'[\s,;]+', request.GET['biclusters'] )
-        _network = Bicluster.objects.get(id=network.bicluster_ids[0]).network
-        network.id = _network.id
-    if request.GET.has_key('expand') and request.GET['expand']=='true':
-        expand = "&expand=true"
-    else:
-        expand = ""
     return render_to_response('network_cytoscape_web.html', locals())
 
 def network_as_graphml(request):
@@ -94,6 +81,12 @@ def network_as_gml(request):
     return response
 
 def species(request, species=None, species_id=None):
+    # this is a temporary hack for the
+    # url /favicon.ico, which will be redirected to here unless
+    # we redefine it
+    if species == 'favicon.ico':
+        raise Http404("no favicon for now")
+
     try:
         if species:
             try:
@@ -175,7 +168,7 @@ def genes(request, species=None, species_id=None):
         # else:
         #     raise Http404("No species specified.")
 
-def gene(request, gene=None, network_id=None):
+def gene(request, species=None, gene=None, network_id=None):
     if request.GET.has_key('view'):
         view = request.GET['view']
     else:
@@ -254,7 +247,7 @@ SVG_MAP = {
     'hal': "http://baliga.systemsbiology.net/cmonkey/enigma/hal/cmonkey_4.5.4_hal_2072x268_10_Jul_13_11:04:39_EGRIN1_ORIGINAL_CLUSTERS/svgs/"
 }
 
-def bicluster(request, bicluster_id=None):
+def bicluster(request, species=None, network_id=None, bicluster_id=None):
     bicluster = Bicluster.objects.get(id=bicluster_id)
     expressions = bicluster.expressions()
     expmap = {}

@@ -58,21 +58,12 @@ urlpatterns = patterns('',
     url(r'^network/xmltest/$', 'web_app.networks.views.network_as_graphml', name='network'),
 
     url(r'^networks/$', 'web_app.networks.views.networks', name='networks'),
-    url(r'^network/(?P<network_id>\d+)$', 'web_app.networks.views.network', name='network'),
     url(r'^network/graphml', 'web_app.networks.views.network_as_graphml', name='network'),
     url(r'^network/(?P<network_id>\d+)/regulated_by/(?P<regulator>.*)$', 'web_app.networks.views.regulated_by', name='regulated by'),
     url(r'^network/(?P<network_id>\d+)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='network_gene'),
-    url(r'^network', 'web_app.networks.views.network_cytoscape_web', name='network'),
-
-    url(r'^species/(?P<species>[^/]*)/?$', 'web_app.networks.views.species', name='species'),
-    url(r'^species/$', 'web_app.networks.views.species', name='species'),
-    
-    url(r'^genes/(?P<species>.*)$', 'web_app.networks.views.genes', name='genes'),
-    url(r'^gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='gene'),
     
     url(r'^motif/(?P<motif_id>\d+)$', 'web_app.networks.views.motif', name='motif'),
     
-    url(r'^bicluster/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster', name='biclusters'),
 
     url(r'^regulator/(?P<regulator>.*)$', 'web_app.networks.views.regulator', name='regulator'),
     
@@ -99,6 +90,15 @@ urlpatterns = patterns('',
     (r'^json/circvis/$', 'networks.views.circvis'),
     (r'^json/pssm/$', 'networks.views.pssm'),
 
+    # for species-relative links, start here to match the other ones first
+    url(r'^species$', 'web_app.networks.views.species', name='species'),
+    url(r'^species/$', 'web_app.networks.views.species', name='species'),
+    url(r'^(?P<species>.*)/genes/$', 'web_app.networks.views.genes', name='genes'),
+    url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)$', 'web_app.networks.views.network', name='network'),
+    url(r'^(?P<species>[^/]*)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='gene'),
+    url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/module/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster', name='biclusters'),
+    url(r'^(?P<species>[^/]*)/?$', 'web_app.networks.views.species', name='species'),
+    
     #(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL }),
 
 )
