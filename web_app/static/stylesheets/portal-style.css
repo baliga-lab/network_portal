@@ -1625,10 +1625,17 @@ table#motif {
     display: inline;
 }
 
+.tblDataSpace
+{
+    width: 100%; /*1300px*/;
+}
+
+
 .tblWorkflow
 {
     width: 100%; /*1300px*/;
 }
+
 
 .tdcomponents
 {
@@ -1644,8 +1651,7 @@ table#motif {
 
 .divdataspace
 {
-    max-width: 200px; /*150px; */
-    height: 1000px;
+    max-height: 600px;
     overflow: auto;
 }
 

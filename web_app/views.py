@@ -158,7 +158,12 @@ def workflow(request):
         datagroup = DataGroupEntry(group, groupcontents)
         datagroups.append(datagroup)
 
-    captureddata = WorkflowCapturedData.objects.filter(owner_id = user.id)
+
+    # captureddata = WorkflowCapturedData.objects.filter(owner_id = user.id)
+
+    organisms = Organisms.objects.all()
+
+    organismdatatypes = OrganismDataTypes.objects.all()
 
     # jpype executes java code
     #try:
@@ -175,6 +180,55 @@ def workflow(request):
     #jpype.shutdownJVM()
 
     return render_to_response('workflow.html', locals())
+
+@csrf_exempt
+def getdataspace(request):
+    print request.raw_post_data
+
+    try:
+        query = json.loads(request.raw_post_data)
+        print 'Organism: ' + query['organism']
+        print 'user id: ' + query['userid']
+
+        returndata = {}
+        index = 0
+
+        organismobj = Organisms.objects.filter(name = query['organism'])[0]
+
+        print 'Get predefined data'
+        predefinedorganismdata = WorkflowCapturedData.objects.filter(owner_id = 0, organism_id = organismobj.id)
+        for data in predefinedorganismdata:
+            datatypeobj = OrganismDataTypes.objects.filter(id = data.type_id)[0]
+            print 'data type: ' + datatypeobj.type
+            linkobj = {'id': data.id, 'userid': '0', 'organism': organismobj.name, 'datatype': datatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
+            returndata[str(index)] = linkobj
+            index = index + 1
+
+        print 'Get user data'
+        ownerdata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = organismobj.id)
+        for data in ownerdata:
+            datatypeobj = OrganismDataTypes.objects.filter(id = data.type_id)[0]
+            print 'data type: ' + datatypeobj.type
+            linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': datatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
+            returndata[str(index)] = linkobj
+            index = index + 1
+
+        # get captured data (i.e., captured)
+        print 'Get captured data'
+        genericorganismobj = Organisms.objects.filter(name = 'Generic')[0]
+        genericdatatypeobj = OrganismDataTypes.objects.filter(type = 'Generic')[0]
+        ownercaptureddata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = genericorganismobj.id, type_id = genericdatatypeobj.id)
+        for data in ownercaptureddata:
+            print 'data type: ' + datatypeobj.type
+            linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': genericdatatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
+            returndata[str(index)] = linkobj
+            index = index + 1
+
+    except Exception as e:
+        print str(e)
+
+    print json.dumps(returndata)
+    return HttpResponse(json.dumps(returndata), mimetype='application/json')
 
 class WorkflowEdge:
     def __init__(self):
@@ -599,6 +653,7 @@ def saveedge(request):
 @csrf_exempt
 def saveworkflowdatagroup(request):
     try:
+        print 'save workflow group ' + request.raw_post_data
         datagroup = json.loads(request.raw_post_data)
     except Exception as e:
         print str(e)
@@ -617,15 +672,19 @@ def saveworkflowdatagroup(request):
 
         nodelist = datagroup['data']
         nodeobjs = {}
+        index = 0
         for key in nodelist.keys():
             link = nodelist[key]
             content = WorkflowDataGroupContent(group_id = groupid, dataurl = link['url'], urltext = link['text'])
             content.save()
+            groupcontent = { 'inputid': link['inputid'], "id": str(content.id) }
+            nodeobjs[str(index)] = groupcontent
             print "Data group content saved with id: " + str(content.id)
+            index = index + 1
     except Exception as e1:
         print str(e1)
 
-    data = {'id': str(groupid) }
+    data = {'id': str(groupid), 'contents': nodeobjs }
     return HttpResponse(json.dumps(data), mimetype='application/json')
 
 @csrf_exempt
@@ -640,6 +699,29 @@ def deleteworkflowdatagroup(request, datagroupid):
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     return HttpResponse("1")
+
+@csrf_exempt
+def deleteworkflowgroupitem(request):
+    try:
+        itemstodelete = json.loads(request.raw_post_data)
+        print 'delete data group items ' + request.raw_post_data
+
+        data = itemstodelete['data']
+        for key in data.keys():
+            item = data[key]
+            try:
+                print 'item id: ' + str(item['id'])
+                WorkflowDataGroupContent.objects.filter(id = int(item['id'])).delete()
+            except Exception as e1:
+                print str(e1)
+
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    data = {'id': itemstodelete['id'] }
+    return HttpResponse(json.dumps(data))
 
 @csrf_exempt
 def savecaptureddata(request):
@@ -660,10 +742,16 @@ def savecaptureddata(request):
         for key in nodelist.keys():
             link = nodelist[key]
             if int(link['nodeindex']) < 0:
-                content = WorkflowCapturedData(owner_id = captureddata['userid'], dataurl = link['url'], urltext = link['text'])
+                organism = Organisms.objects.filter(name = link['organism'])[0]
+                print 'organism id: ' + str(organism.id)
+
+                dtype =  link['datatype']
+                datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+
+                content = WorkflowCapturedData(owner_id = captureddata['userid'], type_id = datatypeobj.id, dataurl = link['url'], urltext = link['text'], organism_id = organism.id)
                 content.save()
                 print "Data group content saved with id: " + str(content.id)
-                pair = {'nodeindex': link['nodeindex'], 'id': str(content.id) }
+                pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'organism': organism.name, 'datatype': datatypeobj.type }
                 responsedata[str(idx)] = pair
                 idx = idx + 1
     except Exception as e1:
@@ -693,6 +781,64 @@ def deletecaptureddata(request):
 
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
+@csrf_exempt
+def uploaddata(request):
+    print 'Save upload data'
+    try:
+        print request.REQUEST['organismtype']
+        print request.REQUEST['datatype']
+        print request.REQUEST['userid']
+
+        userid = request.REQUEST['userid']
+        organismtype = request.REQUEST['organismtype']
+        organism = Organisms.objects.filter(name = organismtype)[0]
+        print 'organism id: ' + str(organism.id)
+
+        dtype =  request.REQUEST['datatype']
+        datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+
+        #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
+        sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
+        sessionpath = os.path.join(sessionpath, dtype)
+        sessionpath = os.path.join(sessionpath, userid)
+        if not os.path.exists(sessionpath):
+            os.mkdir(sessionpath)
+        print 'save path: ' + sessionpath
+        savepath = '/static/data/' + organismtype + '/' + dtype + '/' + userid
+
+        responsedata = {}
+        #responsedata['organismtype'] = organismtype
+        #responsedata['datatype'] = dtype
+        idx = 0
+        for key in request.FILES.keys():
+            #each file is an UploadedFile object
+            print 'FILE key: ' + key
+            srcfile = request.FILES[key]
+            fullfilename = srcfile.name
+            print fullfilename
+            prefix, filename = os.path.split(fullfilename)
+            print 'File name: ' + filename
+            with open(os.path.join(sessionpath, filename), 'wb') as f:
+                destination = File(f)
+                for chunk in srcfile.chunks():
+                    destination.write(chunk)
+                destination.close()
+
+            dataurl = savepath + '/' + filename
+            print 'File url: ' + dataurl
+            # save to DB
+            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id)
+            data.save()
+
+            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : filename, 'url': dataurl }
+            responsedata[str(idx)] = pair
+            idx = idx + 1
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
 def search(request):
     if request.GET.has_key('q'):
