@@ -20,12 +20,8 @@ from .functions import functional_systems
 from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
 
 
-class Object(object):
-    pass
-
 # I renamed this to make a gene page
 def analysis_gene(request):
-    #return render_to_response('analysis/gene.html')
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
 
@@ -37,12 +33,6 @@ def network(request, species=None, network_id=None):
     network = Network.objects.get(id=network_id)
     biclusters = network.bicluster_set.all()
     return render_to_response('network.html', locals())
-
-def network_cytoscape_web_test(request):
-    network = Object()
-    network.name = "Test Network"
-    network.bicluster_ids = [2,152,299]
-    return render_to_response('network_cytoscape_web.html', locals())
 
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):
@@ -80,7 +70,7 @@ def network_as_gml(request):
 
     return response
 
-def species(request, species=None, species_id=None):
+def species(request, species=None):
     # this is a temporary hack for the
     # url /favicon.ico, which will be redirected to here unless
     # we redefine it
@@ -89,28 +79,17 @@ def species(request, species=None, species_id=None):
 
     try:
         if species:
-            try:
-                species_id = int(species)
-                species = Species.objects.get(id=species_id)
-            except ValueError:
-                species = Species.objects.get(Q(name=species) | Q(short_name=species))
-                # try aliases, too?
-        elif species_id:
-            species = Species.objects.get(id=species_id)
-        elif request.GET.has_key('id'):
-            species_id = request.GET['id']
-            species = Species.objects.get(id=species_id)
+            species = Species.objects.get(Q(short_name=species))
+            networks = Network.objects.all()
+            gene_count = species.gene_set.count()
+            transcription_factors = species.gene_set.filter(transcription_factor=True)
+            chromosomes = species.chromosome_set.all()
+            organism_info = "organism_info/" + species.short_name + ".html"
+            return render_to_response('species.html', locals())
         else:
             species = Species.objects.all()
             network = Network.objects.all()
             return render_to_response('species_list.html', locals())
-
-        networks = Network.objects.all()
-        gene_count = species.gene_set.count()
-        transcription_factors = species.gene_set.filter(transcription_factor=True)
-        chromosomes = species.chromosome_set.all()
-        organism_info = "organism_info/" + species.short_name + ".html"
-        return render_to_response('species.html', locals())
 
     except (ObjectDoesNotExist, AttributeError):
         exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -124,18 +103,10 @@ def species(request, species=None, species_id=None):
         else:
             raise Http404("No species specified.")
 
-def genes(request, species=None, species_id=None):
+def genes(request, species=None):
     try:
         if species:
-            try:
-                species_id = int(species)
-                species = Species.objects.get(id=species_id)
-            except ValueError:
-                species = Species.objects.get(Q(name=species) | Q(short_name=species))
-                # try aliases, too?
-        elif request.GET.has_key('id'):
-                species_id = request.GET['id']
-                species = Species.objects.get(id=species_id)
+            species = Species.objects.get(Q(name=species) | Q(short_name=species))
         else:
             gene_count = Gene.objects.count()
             species_count = Species.objects.count()
@@ -161,12 +132,7 @@ def genes(request, species=None, species_id=None):
         return render_to_response('genes.html', locals())
     except (ObjectDoesNotExist, AttributeError):
         raise
-        # if species:
-        #     raise Http404("Couldn't find genes for species: " + str(species))
-        # elif species_id:
-        #     raise Http404("Couldn't find genes for species with id=" + species_id)
-        # else:
-        #     raise Http404("No species specified.")
+
 
 def gene(request, species=None, gene=None, network_id=None):
     if request.GET.has_key('view'):

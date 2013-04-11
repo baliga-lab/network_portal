@@ -54,9 +54,6 @@ urlpatterns = patterns('',
     url(r'^sviewer/sequence.cgi', 'web_app.views.sviewer_cgi', name='sequence'),
     url(r'^sviewer/tinyURL.cgi', 'web_app.views.sviewer_cgi', name='tinyURL'),
 
-    url(r'^network/test/$', 'web_app.networks.views.network_cytoscape_web_test', name='network'),
-    url(r'^network/xmltest/$', 'web_app.networks.views.network_as_graphml', name='network'),
-
     url(r'^networks/$', 'web_app.networks.views.networks', name='networks'),
     url(r'^network/graphml', 'web_app.networks.views.network_as_graphml', name='network'),
     url(r'^network/(?P<network_id>\d+)/regulated_by/(?P<regulator>.*)$', 'web_app.networks.views.regulated_by', name='regulated by'),

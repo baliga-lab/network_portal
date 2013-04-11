@@ -11,7 +11,7 @@ $(document).ready(function() {
 
 <div class="main">
   <h5>Genes</h5>
-  <p>species: <a href="/species/{{ species.short_name }}">{{ species.name }}</a><br>
+  <p>Species: <a href="/{{ species.short_name }}">{{ species.name }}</a><br>
   {% if filter == 'tf' %}
   transcription factors: {{ gene_count }}
   {% else %}
@@ -37,7 +37,7 @@ $(document).ready(function() {
     <tbody>
       {% for gene in genes %}
       <tr>
-        <td><a href="/gene/{{ gene.name }}">{{ gene.name }}</a></td>
+        <td><a href="/{{ species.short_name }}/gene/{{ gene.name }}">{{ gene.name }}</a></td>
         <td>{{ gene.common_name|default_if_none:"" }}</td>
         <td>{{ gene.type }}</td>
         <td><a href="http://www.ncbi.nlm.nih.gov/gene/{{ gene.geneid }}">{{ gene.geneid }}</a></td>

@@ -34,7 +34,7 @@ def search_result_map(species_genes, species_names):
 @register.filter
 def format_influence(influence):
     if influence.type == 'tf':
-        result = '<a class="reggene" href="/gene/%s">%s</a>' % (influence.name, influence.name)
+        result = '<a class="reggene" href="/%s/gene/%s">%s</a>' % (influence.gene.species.short_name, influence.name, influence.name)
     elif influence.type == 'combiner':
         result = "<br>".join([ format_influence(part) for part in influence.get_parts()])
     else:
