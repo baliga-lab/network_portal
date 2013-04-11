@@ -675,7 +675,20 @@ class WorkflowDataGroupContent(models.Model):
     dataurl = models.CharField(max_length = 2048, blank=True, null=True)
     urltext = models.CharField(max_length = 1024, blank=True, null=True)
 
+class Organisms(models.Model):
+    name = models.CharField(max_length = 256)
+    description = models.CharField(max_length = 1024, blank=True, null=True)
+
+class OrganismDataTypes(models.Model):
+    type = models.CharField(max_length = 256)
+
 class WorkflowCapturedData(models.Model):
     owner = models.ForeignKey(Users)
-    dataurl = models.CharField(max_length = 2048, blank=True, null=True)
+    organism = models.ForeignKey(Organisms)
+    type = models.ForeignKey(OrganismDataTypes)
+    dataurl = models.CharField(max_length = 4096, blank=True)
     urltext = models.CharField(max_length = 1024, blank=True, null=True)
+
+
+
+

@@ -24,25 +24,107 @@
 			<th><span class="small blue fancybutton">1</span>&nbsp; <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a> </th>
 			<th><span class="small blue fancybutton">2</span>&nbsp; Add and connect workflow modules </th>
 			<th><span class="small blue fancybutton">3</span>&nbsp; 
-				<select id="organismSelect" onchange="javascript:organismSelected(this);">
+    		<select id="organismSelect" onchange="javascript:organismSelected(this);">
         		<option value = "" selected>Select an organism</option>
-        		<option value="bce">Bacillus cereus ATCC14579 | bce</option>
-        		<option value="bsu">Bacillus subtilis | bsu</option>
-		        <option value="bth">Bacteroides thetaiotaomicron VPI-5482 | bth</option>
-		        <option value="cje">Campylobacter jejuni | cje</option>
-		        <option value="cac">Clostridium acetobutylicum | cac</option>
-		        <!--<option value="eco">Escherichia coli K12 | eco</option>-->
-		        <option value="gsu">Geobacter sulfurreducens | gsu</option>
-		        <option value="hal">Halobacterium salinarum NRC-1 | hal</option>
-		        <option value="mmp">Methanococcus maripaludis S2 | mmp</option>
-		        <option value="pae">Pseudomonas aeruginosa | pae</option>
-		        <option value="rsp">Rhodobacter sphaeroides 2.4.1 | rsp</option>
-		        <option value="syf">Synechococcus elongatus PCC 7942 | syf</option>
+                <option value="Generic">Generic Data</option>
+                {% for organism in organisms %}
+                {% if organism.name != "Generic"  %}
+                    <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+                {% endif %}
+                {% endfor %}
+
 		    </select></th>
 			<th> <span class="small blue fancybutton">4</span>&nbsp; <input type="button" value="Run Workflow" onclick="SubmitWorkflow()" class="small green awesome" title="Run selected workflow"/></th>
 			<th><a class="componenthelp" href="#quickhelp"><img src="/static/images/question.gif" /></a></th>
 		</tr>
 	</tbody>
+</table>
+<table id="tblDataSpace" class="tblDataSpace">
+<tbody>
+<tr>
+    <th style="width: 80%">
+        <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
+        <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
+        <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
+        <input type="button" id="btnSave" value="Save" onclick="javascript:SaveCollectedData();" class="button"/>
+        <input type="button" id="btnDeleteSelectedData" value="Delete Selected" onclick="javascript:DeleteCollectedData(true);" class="button"/>
+        <input type="button" id="btnDeleteUnselectedData" value="Delete UnSelected" onclick="javascript:DeleteCollectedData(false);" class="button"/>
+        <input type="button" class="button" value="Upload Data" onclick="javascript:UploadDataFiles();">
+        <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+        <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
+            <option value="-1">Select a data application record to apply to the workflow</option>
+            <option value="-2">---------------------------------------</option>
+        </select>
+        <br />
+    </th>
+    <th style="width: 20%">
+        <div class="componentheader"><h3>Groups</h3></div>
+    </th>
+</tr>
+<tr>
+    <td style="width: 75%">
+        <div id="wfdataspace" class="divdataspace">
+            <p>
+            <div id="divExpression">
+                <div class="componentheader"><h3>Expression Data</h3></div><br />
+                <ul id="ulExpression">
+
+                </ul>
+            </div>
+            </p>
+
+            <p>
+            <div id="divString">
+                <div class="componentheader"><h3>String Data</h3></div><br />
+                <ul id="ulString">
+
+                </ul>
+            </div>
+            </p>
+            <p>
+            <div id="divEx">
+
+            </div>
+            </p>
+            <p>
+            <div>
+            <div class="componentheader"><h3>Captured Data</h3></div>
+            <br />
+            <ul id="ulcaptureddata">
+            </ul>
+            </div>
+            </p>
+        </div>
+    </td>
+    <td style="width: 25%">
+        <div id="wfgrpaccordion" class="datagroupaccordion">
+            {% for datagroup in datagroups %}
+            <a href='#' id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</a>
+            <div id='divgrp_{{datagroup.ID|stringformat:"i"}}'>
+                <div>{{datagroupentry.Description}}</div>
+                <ul>
+                    {% for content in datagroup.Contents %}
+                    <li>
+                        <input type="checkbox" />
+                        <a href="{{content.dataurl}}">{{content.urltext}}</a>
+                        <input type="hidden" value='{{content.id|stringformat:"i"}}' />
+                    </li>
+                    {% endfor %}
+                </ul>
+                <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
+                <input type="hidden" value="{{datagroup.Name}}" />
+                <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
+                <input type="button" value="Open" class="button" onclick="javascript:OpenOneGroup(this);" />
+                <input type="button" value="Save" class="button" onclick="javascript:SaveOneGroup(this);" />
+                <input type="button" value="Delete Group" class="button" onclick="javascript:DeleteOneGroup(this);" />
+                <input type="button" value="Delete Selected" class="button" onclick="javascript:DeleteDataInGroup(this);" />
+                <input type="button" value="Delete Unselected" class="button" onclick="javascript:DeleteDataInGroup(this);" />
+            </div>
+            {% endfor %}
+        </div>
+    </td>
+</tr>
+</tbody>
 </table>
 <table id="tblWorkflow" class="tblWorkflow">
 <tbody>
@@ -134,65 +216,6 @@
             
         {% endfor %}
     {% endif %}
-</div>
-<div>
-    <H3>Data Space</H3>
-</div>
-<br />
-<div>
-    <div id="wfgrpaccordion" class="datagroupaccordion">
-        {% for datagroup in datagroups %}
-        <a href='#' id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</a>
-        <div id='divgrp_{{datagroup.ID|stringformat:"i"}}'>
-            <div>{{datagroupentry.Description}}</div>
-            <ul>
-                {% for content in datagroup.Contents %}
-                <li>
-                    <a href="{{content.dataurl}}">{{content.urltext}}</a>
-                </li>
-                {% endfor %}
-            </ul>
-            <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
-            <input type="hidden" value="{{datagroup.Name}}" />
-            <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
-            <input type="button" value="Open" class="button" onclick="javascript:OpenOneGroup(this);" />
-            <input type="button" value="Save" class="button" onclick="javascript:SaveOneGroup(this);" />
-            <input type="button" value="Delete" class="button" onclick="javascript:DeleteOneGroup(this);" />
-        </div>
-        {% endfor %}
-    </div>
-    <br />
-
-    <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
-    <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
-    <input type="button" id="btnSave" value="Save" onclick="javascript:SaveCollectedData();" class="button"/>
-    <br />
-    <input type="button" id="btnDeleteSelectedData" value="Delete Selected" onclick="javascript:DeleteCollectedData(true);" class="button"/>
-    <br />
-    <input type="button" id="btnDeleteUnselectedData" value="Delete UnSelected" onclick="javascript:DeleteCollectedData(false);" class="button"/>
-    <br />
-    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
-    <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
-        <option value="-1">Select a data application record to apply to the workflow</option>
-        <option value="-2">---------------------------------------</option>
-    </select>
-    <br />
-    <br />
-
-    <div id="wfdataspace" class="divdataspace">
-        <ul id="ulcaptureddata">
-            {% for data in captureddata %}
-            <li class="licaptureddata">
-                <label class="dataspacelabel">
-                    <input type="checkbox" />
-                    <a href='{{data.dataurl}}'>{{data.urltext}}</a>
-                    <input type="hidden" value='{{data.id}}' />
-                </label>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
 </div>
 </td>
 <td valign="top" style="width: 65%"><h3>Workflow Canvas</h3>
@@ -372,6 +395,18 @@
 <div id="divDataspaceGroup" style="display: none">
     <p>Group Name: <input type="text" /></p>
     <p>Description: <input type="text" /></p>
+</div>
+
+<div id="dlgUploadData" style="display:none">
+    <p><label id="labelOrganism"></label></p>
+    <p><form method="post" action="upload.php" enctype="multipart/form-data">
+        <input name='uploads[]' id="filesToUpload" type="file" multiple>
+    </form></p>
+    <p>
+        {% for datatype in organismdatatypes %}
+        <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
+        {% endfor %}
+    </p>
 </div>
 
 <input id="inputDataSignal" type="hidden" value="0" />
