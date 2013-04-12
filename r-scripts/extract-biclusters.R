@@ -473,7 +473,9 @@ extract.influences <- function(con=NULL, e.coeffs, network.id, species.id) {
   
   tryCatch(
     {
-      dbBeginTransaction(con)
+      # does not work anymore
+      #dbBeginTransaction(con)
+      dbGetQuery(con, "BEGIN TRANSACTION")
 
       for (bicluster.coeffs in e.coeffs) {
 
