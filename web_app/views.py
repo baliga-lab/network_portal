@@ -778,8 +778,10 @@ def deletecaptureddata(request):
                WorkflowCapturedData.objects.filter(id = int(link['id'])).delete()
     except Exception as e1:
         print str(e1)
+        return HttpResponse(json.dumps(e1), mimetype='application/json')
 
-    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+    response = {'id': '1' }
+    return HttpResponse(json.dumps(response), mimetype='application/json')
 
 @csrf_exempt
 def uploaddata(request):
