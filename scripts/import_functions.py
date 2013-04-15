@@ -23,8 +23,12 @@ vacuum;
 Recreate the tables
 > python manage.py syncdb
 
+KEGG pathways from
+http://www.biowebdb.org/pub/kegg/genes/organisms/
+
 Next, run the script in this sequence to load up KEGG, GO, COG and TIGR functions,
 and link dvu (dvu=DvH), mmp and halo genes to functions.
+For new species, add them to species.py
 
 > python import_functions.py --kegg-pathways ../../data/ko00001.keg
 > python import_functions.py --go-terms ../../data/gene_ontology_ext.obo.txt
@@ -43,8 +47,9 @@ Note that the genomeInfo file for dvu produces some "unknown gene" warnings. We 
 
 import argparse
 import psycopg2
-from species import species_dict
+#from species import species_dict
 from open_struct import OpenStruct
+import auto_species
 import re
 
 
@@ -647,16 +652,15 @@ def insert_gene_kegg_function_associations(gene_kegg_pathways, species, translat
                 gene = translate_genes(gene)
                 if gene in genes:
                     gene_id = genes[gene]
+                    cur.execute("""
+                        insert into networks_gene_function
+                        (function_id, gene_id, source)
+                        values (%s, %s, %s)
+                        """,
+                        (function_id, gene_id, 'kegg'))
+                    pathway_count += 1
                 else:
-                    raise Exception("Unknown gene: " + gene)
-
-                cur.execute("""
-                    insert into networks_gene_function
-                    (function_id, gene_id, source)
-                    values (%s, %s, %s)
-                    """,
-                    (function_id, gene_id, 'kegg'))
-                pathway_count += 1
+                    print("WARNING: Unknown gene: ", gene)
                 
         print "Added %d genes to %d pathways." % (gene_count, pathway_count,)
         
@@ -665,6 +669,39 @@ def insert_gene_kegg_function_associations(gene_kegg_pathways, species, translat
     finally:
         if (cur): cur.close()
         if (con): con.close()
+
+
+def do_kegg_gene_pathways(species, gene_kegg_pathways, test):
+    if test:
+        kegg_pathways = get_kegg_pathways()
+        pathways_in_db = []
+        for gene in sorted(gene_kegg_pathways.keys()):
+            pathways = gene_kegg_pathways[gene]
+            for p in pathways:
+                in_db = str( p in kegg_pathways )
+                pathways_in_db.append(in_db)
+                print "%s : %s, %s" % (gene, p, in_db)
+        # check if KEGG pathways can be found in the DB
+        if all( pathways_in_db ):
+            print "KEGG pathways OK"
+        else:
+            print "pathways missing: %d out of %d." % (len(pathways_in_db) - sum(pathways_in_db),len(gene_kegg_pathways),)
+        # check if genes can be found in the DB
+        gene_ids = get_gene_ids(species)
+        genes_in_db = [ g in gene_ids.keys() for g in gene_kegg_pathways.keys() ]
+        if all( genes_in_db ):
+            print "Genes OK"
+        else:
+            print "pathway genes are: " + str(gene_kegg_pathways.keys())
+            print "gene names in DB are: " + str(gene_ids.keys())
+            print "Some genes not in DB, missing: %d out of %d." % (len(genes_in_db) - sum(genes_in_db),len(gene_kegg_pathways.keys()),)
+
+    else:
+        if species=='Desulfovibrio vulgaris Hildenborough':
+            translate_genes = Lookup({'DVU_tRNA-SeC_p_-1':'DVU_tRNA-SeC(p)-1'})
+        else:
+            translate_genes = Lookup()
+        insert_gene_kegg_function_associations(gene_kegg_pathways, species, translate_genes)
 
 
 def insert_go_terms(terms):
@@ -1095,37 +1132,39 @@ def map_genes_to_go_cog_and_tigr_terms(genes, species):
             if len(gene.COG.strip()) > 0:
                 gene_cog_ids = gene.COG.split(',')
                 for id in gene_cog_ids:
-                    # fix broken COG ids, dammit!
-                    m = re.match(r'COG(\d+)', id)
-                    if m:
-                        fixed_id = "COG%04d" % (int(m.group(1)))
-                    else:
-                        raise Exception("Don't understand COG ID: " + id)
-                    if fixed_id in cog_function_ids:
-                        function_id = cog_function_ids[fixed_id]
-                    else:
-                        raise Exception("Unknown COG ID: " + id + "/" + fixed_id)
-                    cur.execute("""
-                        insert into networks_gene_function
-                        (function_id, gene_id, source)
-                        values (%s, %s, %s)
-                        """,
-                        (function_id, gene_id, 'microbes online'))
-                    count_inserts += 1
+                    try:
+                        # fix broken COG ids, dammit!
+                        m = re.match(r'COG(\d+)', id)
+                        if m:
+                            fixed_id = "COG%04d" % (int(m.group(1)))
+                        else:
+                            raise Exception("Don't understand COG ID: " + id)
+                        if fixed_id in cog_function_ids:
+                            function_id = cog_function_ids[fixed_id]
+                        else:
+                            raise Exception("Unknown COG ID: " + id + "/" + fixed_id)
+                        cur.execute("""
+                            insert into networks_gene_function
+                            (function_id, gene_id, source)
+                            values (%s, %s, %s)
+                            """,
+                            (function_id, gene_id, 'microbes online'))
+                        count_inserts += 1
+                    except:
+                        print "WARNING (COG insert): Skipping the gene id: %s" % id
 
             if len(gene.TIGRFam.strip()) > 0:
                 tigrfam_id = gene.TIGRFam.split(' ', 1)[0]
                 if tigrfam_id in tigr_function_ids:
                     function_id = tigr_function_ids[tigrfam_id]
-                else:
-                    raise Exception("Unknown TIGRFam ID: " + tigrfam_id)
-                cur.execute("""
+                    cur.execute("""
                     insert into networks_gene_function
                     (function_id, gene_id, source)
                     values (%s, %s, %s)
-                    """,
-                    (function_id, gene_id, 'microbes online'))
-                count_inserts += 1
+                    """, (function_id, gene_id, 'microbes online'))
+                    count_inserts += 1
+                else:
+                    print("WARNING (TIGR insert) Unknown TIGRFam ID: ", tigrfam_id)
 
         con.commit()
         print "Inserted %d functions for %d genes." % (count_inserts,len(genes),)
@@ -1134,6 +1173,13 @@ def map_genes_to_go_cog_and_tigr_terms(genes, species):
         if (cur): cur.close()
         if (con): con.close()
         
+
+def map_genes_to_go_cog_and_tigr(species, genes, test):
+        if test:
+            for gene in genes:
+                print str(gene)
+        else:
+            map_genes_to_go_cog_and_tigr_terms(genes, species)
 
 
 def print_hierarchically(kegg_pathways):
@@ -1288,6 +1334,8 @@ def main():
     # map genes to kegg pathways
     if args.kegg_gene_pathways:
         gene_kegg_pathways = read_gene_kegg_pathways(args.kegg_gene_pathways)
+        do_kegg_gene_pathways(species, gene_kegg_pathways, args.test)
+        """
         if args.test:
             kegg_pathways = get_kegg_pathways()
             pathways_in_db = []
@@ -1318,16 +1366,30 @@ def main():
             else:
                 translate_genes = Lookup()
             insert_gene_kegg_function_associations(gene_kegg_pathways, species, translate_genes)
+    """
 
     # map genes to GO COG and TIGR functions
     if args.genome_info:
         genes = read_microbes_online_genome_info(args.genome_info)
-        if args.test:
-            for gene in genes:
-                print str(gene)
-        else:
-            map_genes_to_go_cog_and_tigr_terms(genes, species)
+        map_genes_to_go_cog_and_tigr(species, genes, args.test)
 
 
+def process_batch(test=False, do_mo=False, do_kegg=True):
+    conn = psycopg2.connect("dbname=network_portal user=dj_ango password=django")
+    species_map = auto_species.load_species_info(conn)
+    for code, species in species_map.items():
+        print "Processing organism %s (%s)" % (code, species.name)
+        if do_mo:
+            genomeinfo_file = auto_species.download_mo_genomeinfo_file(code,
+                                                                       species.taxonomy_id)
+            genes = read_microbes_online_genome_info(genomeinfo_file)
+            map_genes_to_go_cog_and_tigr(species.name, genes, test)
+
+        if do_kegg:
+            kegg_file = auto_species.download_keggfile(code)
+            gene_kegg_pathways = read_gene_kegg_pathways(kegg_file)
+            do_kegg_gene_pathways(species.name, gene_kegg_pathways, test)
+  
 if __name__ == "__main__":
-    main()
+    #main()
+    process_batch()

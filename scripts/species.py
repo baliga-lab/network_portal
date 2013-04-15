@@ -16,3 +16,13 @@ species_dict['mmp'] = Species("Methanococcus maripaludis S2",
                               {'chromosome':'chromosome'})
 species_dict['syf'] = Species("Synechococcus elongatus PCC 7942",
                               {'chromosome':'chromosome', 'plasmid':'plasmid'})
+
+
+species_dict['gsu'] = Species("Geobacter sulfurreducens",
+                              {'chromosome':'chromosome'})
+species_dict['pae'] = Species("Pseudomonas aeruginosa",
+                              {'chromosome':'chromosome'})
+species_dict['bce'] = Species("Bacillus cereus ATCC14579",
+                              {'chromosome':'chromosome', 'plasmid':'plasmid'})
+species_dict['bsu'] = Species("Bacillus subtilis",
+                              {'chromosome':'chromosome'})
