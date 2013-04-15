@@ -23,11 +23,11 @@
      </thead>
      <tbody>
      	<tr>
-     		<td><a href="/genes/{{ species.short_name }}">{{ gene_count }}</a></td>
-  			<td><a href="/genes/{{ species.short_name }}?filter=tf">{{ transcription_factors|length }}</a></td>
+     		<td><a href="/{{ species.short_name }}/genes">{{ gene_count }}</a></td>
+  			<td><a href="/{{ species.short_name }}/genes?filter=tf">{{ transcription_factors|length }}</a></td>
   			<td>{% if species.network_set.count > 0 %}
   				    {% for network in species.network_set.all %}
-    				<a href="/network/{{ network.id }}"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></a>
+    				<a href="/{{ species.short_name }}/network/{{ network.id }}"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></a>
   					{% endfor %}
   				{% else %}
   				No networks for this species, yet.
