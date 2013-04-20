@@ -84,6 +84,10 @@ $(document).ready(function () {
                                 collapsible: true,
     				            heightStyle: "content"});
 
+    $('#divstatedataaccordion').accordion({ active: false,
+                                    collapsible: true,
+        				            heightStyle: "content"});
+
     $('.component').draggable({
         helper: 'clone'
     });
@@ -2705,6 +2709,131 @@ function UpdateRecordingInfo(params)
             var trgt = HandleGooseRecording(target);
             ConnectNodes(src, trgt);
         }
+    }
+}
+
+
+// Save the current state (i.e., all the opened geese and the data they are processing)
+function SaveState()
+{
+    $('#dlgSaveState').dialog( { height:300,
+        buttons: {
+            "Save": function() {
+                // Save state
+                var userid = $("#authenticated").val();
+                var p1 = ($("#dlgSaveState").children())[0];
+                var nameinput = ($(p1).children())[0];
+                var name = $(nameinput).val();
+
+                var p2 = ($("#dlgSaveState").children())[1];
+                var descinput = ($(p2).children())[0];
+                var desc = $(descinput).val();
+                //alert(userid);
+                var proxy = get_proxyapplet();
+                if (proxy != undefined) {
+                    alert(name + " " + desc);
+                    proxy.SaveStateDelegate(userid, name, desc);
+                    //alert("workflow action done");
+                }
+                 $('#dlgSaveState').dialog('close');
+            },
+            "Cancel": function() {
+                $('#dlgSaveState').dialog('close');
+            }
+
+        }
+    });
+
+}
+
+function OnSaveState(param)
+{
+    //alert("state saved " + param);
+    // Insert into saved state accordion
+
+    /*<a href='#' id='astate_{{state.ID|stringformat:"i"}}'>{{state.name}}</a>
+    <div id='divstate_{{datagroup.ID|stringformat:"i"}}'>
+        <div>{{state.description}}</div>
+        <input type="hidden" value='{{state.ID|stringformat:"i"}}' />
+        <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
+        <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
+    </div> */
+    var splitted = param.split(";;");
+    var name = splitted[1];
+    var desc = splitted[2];
+    var stateid = splitted[0];
+    //alert(name + " " + desc + " " + stateid);
+    var newhtml = "<a href='#' id='astate_" + stateid + "'>" + name + "</a>";
+    var newdivhtml = "<div>" + desc + "</div><input type='hidden' value='" + stateid
+                        + "' /><input type='button' value='Load' class='button' onclick='javascript:LoadState(this);' />"
+                        + "<input type='button' class='button' value='Delete' onclick='javascript:DeleteState(this);' />";
+    //alert(newhtml);
+    //alert(newdivhtml);
+    //alert($(wfdivid));
+
+    var ahrefelement = document.createElement('a');
+    ahrefelement.setAttribute("id", 'astate_' + stateid);
+    ahrefelement.innerHTML = name;
+    var divelement = document.createElement("div");
+    divelement.setAttribute("id", ("divstate_" + stateid));
+    $(divelement).html(newdivhtml);
+    //alert("Append elements " + $(ahrefelement).html());
+    $("#divstatedataaccordion").append($(ahrefelement));
+    $("#divstatedataaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
+}
+
+
+function LoadState(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        var divelement = $(source).parent();
+        var stateidinput = $(divelement).children()[1];
+        var stateid = $(stateidinput).val();
+        //alert(stateid);
+        var proxy = get_proxyapplet();
+        if (proxy != undefined) {
+            //alert("Submit workflow to boss");
+            proxy.LoadStateDelegate(stateid);
+            //alert("workflow action done");
+        }
+    }
+}
+
+function DeleteState(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+       var divelement = $(source).parent();
+       var stateidinput = $(divelement).children()[1];
+       var stateid = $(stateidinput).val();
+       alert(stateid);
+
+       if (stateid != null && stateid.length > 0)
+       {
+           //var jsonObj = {};
+           //jsonObj.id = stateid;
+
+           // This group has already been saved
+           //alert("Send workflow");
+           // Send the workflow data for saving
+           $.get("/workflow/deletesavedstate/" + stateid + "/",
+               function (data) {
+                   //alert("Get workflow " + wfid);
+                   //alert("Remove workflow: " + data);
+                   if (data == "1")
+                   {
+                       $(divelement).remove();
+                       var stateahrefid = "#astate_" + stateid;
+                       $(stateahrefid).remove();
+                   }
+               }
+           );
+       }
     }
 }
 

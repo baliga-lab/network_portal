@@ -179,6 +179,8 @@ def workflow(request):
 
     organismdatatypes = OrganismDataTypes.objects.all()
 
+    savedstates = SavedStates.objects.filter(owner_id = user.id)
+
     # jpype executes java code
     #try:
     #    jvmpath = jpype.getDefaultJVMPath()
@@ -789,7 +791,14 @@ def deletecaptureddata(request):
         for key in nodelist.keys():
             link = nodelist[key]
             if int(link['id']) >= 0:
-               WorkflowCapturedData.objects.filter(id = int(link['id'])).delete()
+               try:
+                   captureddata = WorkflowCapturedData.objects.filter(id = int(link['id']))[0]
+                   with open(captureddata.dataurl, 'wb') as f:
+                        destination = File(f)
+                        destination.delete()
+               except Exception as e2:
+                   print str(e2)
+
     except Exception as e1:
         print str(e1)
         return HttpResponse(json.dumps(e1), mimetype='application/json')
@@ -818,7 +827,7 @@ def uploaddata(request):
         sessionpath = os.path.join(sessionpath, dtype)
         sessionpath = os.path.join(sessionpath, userid)
         if not os.path.exists(sessionpath):
-            os.mkdir(sessionpath)
+            os.makedirs(sessionpath)
         print 'save path: ' + sessionpath
         savepath = '/static/data/' + organismtype + '/' + dtype + '/' + userid
 
@@ -855,6 +864,118 @@ def uploaddata(request):
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+@csrf_exempt
+def getstateinfo(request, stateid):
+    print 'get state info'
+    print stateid
+
+    try:
+        #stateid = int(request.REQUEST['stateid'])
+        files = StateFiles.objects.filter(state_id = int(stateid))
+        index = 0
+        fileobjs = {}
+        for file in files:
+            print file.name
+            goosefilename = re.split('_', file.name)[2]
+            print goosefilename
+            goosename = os.path.splitext(goosefilename)[0]
+            print 'goose name: ' + goosename
+            component = WorkflowComponents.objects.filter(short_name = goosename)[0]
+            state = SavedStates.objects.filter(id = int(stateid))[0]
+            fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
+            print fileurl
+            pair = { 'fileurl': fileurl, 'goosename': goosename, 'serviceurl': component.serviceurl }
+            fileobjs[str(index)] = pair
+            index = index + 1
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+    return HttpResponse(json.dumps(fileobjs), mimetype='application/json')
+
+@csrf_exempt
+def deletesavedstate(request, stateid):
+    print 'delete saved state'
+    try:
+        #stateid = request.REQUEST['stateid']
+        print 'state id ' + stateid
+        #delete files
+        files = StateFiles.objects.filter(state_id = int(stateid))
+        for file in files:
+            print "remove file " + file.url
+            try:
+                hostname = request.get_host()
+                fileurl = 'http://' + hostname + '/' + file.url
+                with open(fileurl, 'wb') as f:
+                    destination = File(f)
+                    destination.delete()
+                #os.remove(file.url)
+            except Exception as e0:
+                print str(e0)
+        print 'remove state DB object'
+        SavedStates.objects.filter(id = int(stateid)).delete()
+
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+    return HttpResponse("1")
+
+
+@csrf_exempt
+def savestate(request):
+    print 'Save state'
+    try:
+        print request.REQUEST['userid']
+
+        userid = request.REQUEST['userid']
+        statename = request.REQUEST['name']
+        statedesc = request.REQUEST['desc']
+        #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
+        statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
+        statepath = os.path.join(statepath, userid)
+        if not os.path.exists(statepath):
+            os.makedirs(statepath)
+        print 'save path: ' + statepath
+        savepath = '/static/data/states/' + userid
+
+        responsedata = {}
+        #responsedata['organismtype'] = organismtype
+        #responsedata['datatype'] = dtype
+
+        # save to DB
+        data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
+        data.save()
+        pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc }
+        responsedata['state'] = pair
+
+        for key in request.FILES.keys():
+            #each file is an UploadedFile object
+            print 'FILE key: ' + key
+            srcfile = request.FILES[key]
+            fullfilename = srcfile.name
+            print fullfilename
+            prefix, filename = os.path.split(fullfilename)
+            print 'File name: ' + filename
+            with open(os.path.join(statepath, filename), 'wb') as f:
+                destination = File(f)
+                for chunk in srcfile.chunks():
+                    destination.write(chunk)
+                destination.close()
+
+            dataurl = savepath + '/' + filename
+            print 'File url: ' + dataurl
+            sf = StateFiles(state_id = data.id, name = filename, url = dataurl)
+            sf.save()
+
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
 
 def search(request):
     if request.GET.has_key('q'):
