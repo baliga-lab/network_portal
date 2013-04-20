@@ -152,7 +152,7 @@
         <div id="sidebar">
           <h5>Gene Info</h5>
           
-            <strong> Organism:</strong><br> <a href="/species/{{ gene.species.short_name }}">{{ gene.species.name }}</a><br/>
+            <strong> Organism:</strong><br> <a href="/{{ gene.species.short_name }}">{{ gene.species.name }}</a><br/>
             <strong> Locus tag:</strong><br> {{ gene.name }} <br/>
             <strong> Aliases:</strong> <br><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=gene&term={{ gene.geneid }}">{{ gene.geneid }} (NCBI) </a>, <a href="http://microbesonline.org/cgi-bin/fetchLocus.cgi?locus=206275&disp=0">206275 (MicrobesOnline) </a><br/>
             <strong> Gene Name:</strong><br> <i> {% if gene.common_name %} {{ gene.common_name }} {% else %} N/A {% endif %}</i><br/>
@@ -168,7 +168,7 @@
             {% if member_biclusters %}
             {% for bicluster in member_biclusters %}
             <tr>
-              <td><a href="/bicluster/{{ bicluster.id }}">{{ bicluster.id }}</a></td>
+              <td><a href="/{{ gene.species.short_name }}/network/1/module/{{ bicluster.id }}">{{ bicluster.id }}</a></td>
               <td><a href="?view=regulation">{{ bicluster.influences.count }}</a></td>
               <td>{{ bicluster.conditions.count }}</td>
             </tr>

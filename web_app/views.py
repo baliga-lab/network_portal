@@ -21,9 +21,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 
-from web_app.networks.models import *
-from web_app.networks.functions import functional_systems
-from web_app.networks.helpers import get_influence_biclusters
+from .networks.models import *
+from .networks.functions import functional_systems
+from .networks.helpers import get_influence_biclusters
 
 #import jpype
 import openid
@@ -35,6 +35,9 @@ import urllib2
 from django.core.files import File
 import os
 import shutil
+from collections import namedtuple
+
+Dialog = namedtuple('Dialog', ['name', 'short_name', 'network_url', 'ngenes', 'ntfs', 'coords'])
 
 class GeneResultEntry:
     def __init__(self, id, name, species,
@@ -50,10 +53,6 @@ class GeneResultEntry:
 
 
 def home(request):
-    #print request.REQUEST
-    #print request.user.username
-    #print request.user.first_name  + ' ' + request.user.last_name + ' ' + request.user.email
-
     genes = Gene.objects.all()
     bicl_count = Bicluster.objects.count()
     sp_count = Species.objects.count()
@@ -61,6 +60,21 @@ def home(request):
     motif_count = Motif.objects.count()
     influence_count = Influence.objects.count()
     version = "0.0.1"
+    dialogs = [
+        Dialog('Methanococcus maripaludis S2', 'mmp', '/mmp/network/2', 1863, 57, '75,0,266,16'),
+        Dialog('Halobacterium salinarum NRC-1', 'hal', '/hal/network/3', 2701, 125, '75,27,266,43'),
+        Dialog('Bacteroides_thetaiotaomicron_VPI-5482', 'bth', '/bth/network/10', 4902, 0, '76,55,318,71'),
+        Dialog('Clostridium_acetobutylicum', 'cac', '/cac/network/11', 3995, 259, '102,84,344,100'),
+        Dialog('Bacillus_cereus_ATCC14579', 'bce', '/bce/network/8', 5501, 376, '126,112,302,128'),
+        Dialog('Bacillus_subtilis', 'bsu', '/bsu/network/9', 4313, 319, '134,142,367,158'),
+        Dialog('Synechococcus elongatus PCC 7942', 'syf', '/syf/network/4', 2717, 'Pending Inferelator', '76,170,291,186'),
+        Dialog('Rhodobacter_sphaeroides_2_4_1', 'rsp', '/rsp/network/13', 4341, 231, '103,198,299,214'),
+        Dialog('Pseudomonas_aeruginosa', 'pae', '/pae/network/7', 5646, 475, '131,227,327,243'),
+        Dialog('Escherichia_coli_K12', 'eco', '/eco/network/14', 4497, 'Pending Inferelator', '131,255,267,271'),
+        Dialog('Campylobacter_jejuni', 'cje', '/cje/network/12', 1711, 39, '130,285,350,301'),
+        Dialog('Geobacter_sulfurreducens', 'gsu', '/gsu/network/6', 3519, 156, '158,313,351,329'),
+        Dialog('Desulfovibrio vulgaris Hildenborough', 'dvu', '/dvu/network/1', 3661, 128, '179,338,407,353')
+        ]
     return render_to_response('home.html', locals())
 
 def about(request):
@@ -778,8 +792,10 @@ def deletecaptureddata(request):
                WorkflowCapturedData.objects.filter(id = int(link['id'])).delete()
     except Exception as e1:
         print str(e1)
+        return HttpResponse(json.dumps(e1), mimetype='application/json')
 
-    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+    response = {'id': '1' }
+    return HttpResponse(json.dumps(response), mimetype='application/json')
 
 @csrf_exempt
 def uploaddata(request):

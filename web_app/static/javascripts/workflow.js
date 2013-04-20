@@ -187,7 +187,7 @@ function LoadDataSpace()
                        index++;
                    }
                    else {
-                      alert("terminated at " + index);
+                      //alert("terminated at " + index);
                       finished = true;
                    }
                 }
@@ -1304,6 +1304,8 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         var componentworkflownodeid = $(sourcelement).children()[8];
         $(componentworkflownodeid).val(nodeid);
 
+        $($((sourcelement).children())[10]).val(wfcnt.toString());
+
         var canvasposition = $("#workflowcanvas").position();
         //var tableposition = $("#tblWorkflow").offset();
         //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
@@ -1375,7 +1377,6 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
         if (componentname == WF_startNode || nodeid == startnodeid)
             // Record the ID of the start node if there is one
             WF_startNode = sourceid;
-        wfcnt++;
 
         //alert(sourceid);
 
@@ -1388,6 +1389,7 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
             var componentid = "component_" + nodecomponentid; //  nodeid;
             //alert(componentid);
             nodeobj = AppendComponent(node, nodeid, componentid, sourceid, nodecnt);
+            wfcnt++;
         }
         else {
             // The node already exists, we retrieve its jsPlumb endpoints
@@ -1873,31 +1875,15 @@ function DeleteCollectedData(selected)
                //alert(result['id']);
                //alert(($("#divWorkflow").children().length));
                //alert(result);
-               if (result != null)
+               if (result != null && result['id'] != null)
                {
-                   // Need to update the id of each saved data
-                   var index = 0;
-                   var finished = false;
-                   do
-                   {
-                       var pair = result[index.toString()];
-                       if (pair != null)
-                       {
-                          var originalindex = pair['nodeindex'];
-                          var dataid = pair['id'];
-                          var originalinputid = "#cdata-" + originalindex;
-                          $(originalinputid).val(dataid);
-                       }
-                       else
-                          finished = true;
-                   }
-                   while (!finished);
                }
            }
         });
     }
 }
 
+// Insert data to target element
 function InsertDataToTarget(targetid, linkpair)
 {
     //alert("Insert data to target: " + targetid);
@@ -1916,9 +1902,11 @@ function InsertDataToTarget(targetid, linkpair)
         var url = linkpair['url'];
         var text = linkpair['text'];
         var link = document.createElement("a");
-        var html = "<a href='" + url + "'>" + text + "</a>";
+        link.href = url;
+        link.innerHTML = text;
+        //var html = "<a href='" + url + "'>" + text + "</a>";
         //alert(html);
-        $(link).html(html);
+        //$(link).html(html);
         $(label).append($(link));
 
         var idinput = document.createElement("input");
@@ -2175,9 +2163,10 @@ function GetSelectedData()
         {
            //alert($(this).children()[1]);
            var link = $(this).children()[1];
+           //alert(link);
            var linkvalue = $(link).prop("href");
-
            //alert(linkvalue);
+
            WF_batchedData.push(link);
         }
     });
@@ -2604,6 +2593,120 @@ function GroupOpen()
     OpenDataGroup(WF_batchedData);
 }
 
+function FindComponent(gname)
+{
+    $("#components").children().each(function() {
+        //alert($(this).attr("id"));
+        // Make all the child fields visible
+        // include workflow index in component name
+        var titleelement = ($(this).children())[0];
+        var titleahref = ($(titleelement).children())[0];
+        var goosename = $(titleahref).text();
+        if (gname.indexOf(goosename) >= 0)
+            return $(this);
+    });
+    return null;
+}
+
+// Check if a goose has already been added to the workflow canvas
+function GetGooseFromCanvas(gooseid)
+{
+    if (gooseid.indexOf("_") >= 0)
+        return null;
+
+    var nodes = $("#workflowcanvas").children();
+    if (nodes.length > 0)
+    {
+        for (var i = 0; i < nodes.length; i++)
+        {
+            var source = nodes[i];
+            var titleelement = ($(source).children())[componenttitledivindex];
+            var goosename = $(titleahref).text();
+            if (gooseid.indexOf(goosename) >= 0) {
+                return source;
+            }
+        }
+    }
+    return null;
+}
+
+function HandleGooseRecording(gooseid)
+{
+    //alert(gooseid);
+    var component = GetGooseFromCanvas(gooseid);
+    if (component == null)
+    {
+        // The component is not there, we need to insert it to the canvas
+        //alert(gooseid);
+        var goosecomponent = FindComponent(gooseid);
+        if (goosecomponent != null) {
+            var inputcomponentid = $(goosecomponent).children()[1];
+            var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
+            component = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
+        }
+    }
+    return component;
+}
+
+function ConnectNodes(source, target)
+{
+    //alert("connect nodes...");
+    var connectionList = jsPlumb.getConnections();
+    var found = false;
+    //alert(connectionList.length);
+    for (i = 0; i < connectionList.length; i++) {
+        var conn = connectionList[i];
+        var src = conn.source;
+        var trgt = conn.target;
+
+        if (src != null && target != null && source != null && target != null) {
+            if (source.attr("id") == src.attr("id") && target.attr("id") == trgt.attr("id")) {
+                found = true;
+                break;
+            }
+        }
+    }
+    if (!found) {
+        var sourceid = source.attr("id");
+        var targetid = target.attr("id");
+        //alert(sourceid + " " + targetid);
+        var srcEP = WF_endpoints[sourceid].SourceEP;
+        //alert(srcEP);
+        var targetEP = WF_endpoints[targetid].TargetEP;
+        var c = jsPlumb.connect({
+            source: srcEP,
+            target: targetEP,
+            //overlays: connoverlays
+            overlays: [
+                        ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
+                        ["Label", { label: "data", location: 0.5}]
+                    ]
+        });
+        ConnectionEstablished(c);
+    }
+}
+
+// Receive the recording info from Boss and update the workflow
+function UpdateRecordingInfo(params)
+{
+    //alert("Recording info received " + params);
+    // We get the recording info, update workflow canvas
+    if (params != null)
+    {
+        var paramstring = params;
+        var paramssplitted = paramstring.split(";");
+        var datatype = paramssplitted[0];
+        var source = paramssplitted[1];
+        var target = paramssplitted[2];
+        //alert(source + " " + target);
+
+        if (source != target) {
+            var src = HandleGooseRecording(source);
+            var trgt = HandleGooseRecording(target);
+            ConnectNodes(src, trgt);
+        }
+    }
+}
 
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");
