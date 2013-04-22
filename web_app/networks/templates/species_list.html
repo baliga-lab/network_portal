@@ -40,7 +40,7 @@ $(document).ready(function() {
 	<td>
 	{% for st in network %}
 	{% if st.species_id == sp.id %}
-	<a href="/network/{{ st.id }}"><img src="{{ STATIC_PREFIX }}images/network.gif"/></a>
+	<a href="/{{sp.short_name}}/network/{{ st.id }}"><img src="{{ STATIC_PREFIX }}images/network.gif"/></a>
 		{% endif %}
 		{% endfor %}</td>
       </tr>

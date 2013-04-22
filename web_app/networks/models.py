@@ -688,7 +688,3 @@ class WorkflowCapturedData(models.Model):
     type = models.ForeignKey(OrganismDataTypes)
     dataurl = models.CharField(max_length = 4096, blank=True)
     urltext = models.CharField(max_length = 1024, blank=True, null=True)
-
-
-
-
