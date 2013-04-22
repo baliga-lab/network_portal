@@ -84,6 +84,10 @@ $(document).ready(function () {
                                 collapsible: true,
     				            heightStyle: "content"});
 
+    $('#divstatedataaccordion').accordion({ active: false,
+                                    collapsible: true,
+        				            heightStyle: "content"});
+
     $('.component').draggable({
         helper: 'clone'
     });
@@ -187,7 +191,7 @@ function LoadDataSpace()
                        index++;
                    }
                    else {
-                      alert("terminated at " + index);
+                      //alert("terminated at " + index);
                       finished = true;
                    }
                 }
@@ -1304,6 +1308,8 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         var componentworkflownodeid = $(sourcelement).children()[8];
         $(componentworkflownodeid).val(nodeid);
 
+        $($((sourcelement).children())[10]).val(wfcnt.toString());
+
         var canvasposition = $("#workflowcanvas").position();
         //var tableposition = $("#tblWorkflow").offset();
         //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
@@ -1375,7 +1381,6 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
         if (componentname == WF_startNode || nodeid == startnodeid)
             // Record the ID of the start node if there is one
             WF_startNode = sourceid;
-        wfcnt++;
 
         //alert(sourceid);
 
@@ -1388,6 +1393,7 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
             var componentid = "component_" + nodecomponentid; //  nodeid;
             //alert(componentid);
             nodeobj = AppendComponent(node, nodeid, componentid, sourceid, nodecnt);
+            wfcnt++;
         }
         else {
             // The node already exists, we retrieve its jsPlumb endpoints
@@ -1873,31 +1879,15 @@ function DeleteCollectedData(selected)
                //alert(result['id']);
                //alert(($("#divWorkflow").children().length));
                //alert(result);
-               if (result != null)
+               if (result != null && result['id'] != null)
                {
-                   // Need to update the id of each saved data
-                   var index = 0;
-                   var finished = false;
-                   do
-                   {
-                       var pair = result[index.toString()];
-                       if (pair != null)
-                       {
-                          var originalindex = pair['nodeindex'];
-                          var dataid = pair['id'];
-                          var originalinputid = "#cdata-" + originalindex;
-                          $(originalinputid).val(dataid);
-                       }
-                       else
-                          finished = true;
-                   }
-                   while (!finished);
                }
            }
         });
     }
 }
 
+// Insert data to target element
 function InsertDataToTarget(targetid, linkpair)
 {
     //alert("Insert data to target: " + targetid);
@@ -1916,9 +1906,11 @@ function InsertDataToTarget(targetid, linkpair)
         var url = linkpair['url'];
         var text = linkpair['text'];
         var link = document.createElement("a");
-        var html = "<a href='" + url + "'>" + text + "</a>";
+        link.href = url;
+        link.innerHTML = text;
+        //var html = "<a href='" + url + "'>" + text + "</a>";
         //alert(html);
-        $(link).html(html);
+        //$(link).html(html);
         $(label).append($(link));
 
         var idinput = document.createElement("input");
@@ -2175,9 +2167,10 @@ function GetSelectedData()
         {
            //alert($(this).children()[1]);
            var link = $(this).children()[1];
+           //alert(link);
            var linkvalue = $(link).prop("href");
-
            //alert(linkvalue);
+
            WF_batchedData.push(link);
         }
     });
@@ -2604,6 +2597,245 @@ function GroupOpen()
     OpenDataGroup(WF_batchedData);
 }
 
+function FindComponent(gname)
+{
+    $("#components").children().each(function() {
+        //alert($(this).attr("id"));
+        // Make all the child fields visible
+        // include workflow index in component name
+        var titleelement = ($(this).children())[0];
+        var titleahref = ($(titleelement).children())[0];
+        var goosename = $(titleahref).text();
+        if (gname.indexOf(goosename) >= 0)
+            return $(this);
+    });
+    return null;
+}
+
+// Check if a goose has already been added to the workflow canvas
+function GetGooseFromCanvas(gooseid)
+{
+    if (gooseid.indexOf("_") >= 0)
+        return null;
+
+    var nodes = $("#workflowcanvas").children();
+    if (nodes.length > 0)
+    {
+        for (var i = 0; i < nodes.length; i++)
+        {
+            var source = nodes[i];
+            var titleelement = ($(source).children())[componenttitledivindex];
+            var goosename = $(titleahref).text();
+            if (gooseid.indexOf(goosename) >= 0) {
+                return source;
+            }
+        }
+    }
+    return null;
+}
+
+function HandleGooseRecording(gooseid)
+{
+    //alert(gooseid);
+    var component = GetGooseFromCanvas(gooseid);
+    if (component == null)
+    {
+        // The component is not there, we need to insert it to the canvas
+        //alert(gooseid);
+        var goosecomponent = FindComponent(gooseid);
+        if (goosecomponent != null) {
+            var inputcomponentid = $(goosecomponent).children()[1];
+            var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
+            component = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
+        }
+    }
+    return component;
+}
+
+function ConnectNodes(source, target)
+{
+    //alert("connect nodes...");
+    var connectionList = jsPlumb.getConnections();
+    var found = false;
+    //alert(connectionList.length);
+    for (i = 0; i < connectionList.length; i++) {
+        var conn = connectionList[i];
+        var src = conn.source;
+        var trgt = conn.target;
+
+        if (src != null && target != null && source != null && target != null) {
+            if (source.attr("id") == src.attr("id") && target.attr("id") == trgt.attr("id")) {
+                found = true;
+                break;
+            }
+        }
+    }
+    if (!found) {
+        var sourceid = source.attr("id");
+        var targetid = target.attr("id");
+        //alert(sourceid + " " + targetid);
+        var srcEP = WF_endpoints[sourceid].SourceEP;
+        //alert(srcEP);
+        var targetEP = WF_endpoints[targetid].TargetEP;
+        var c = jsPlumb.connect({
+            source: srcEP,
+            target: targetEP,
+            //overlays: connoverlays
+            overlays: [
+                        ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
+                        ["Label", { label: "data", location: 0.5}]
+                    ]
+        });
+        ConnectionEstablished(c);
+    }
+}
+
+// Receive the recording info from Boss and update the workflow
+function UpdateRecordingInfo(params)
+{
+    //alert("Recording info received " + params);
+    // We get the recording info, update workflow canvas
+    if (params != null)
+    {
+        var paramstring = params;
+        var paramssplitted = paramstring.split(";");
+        var datatype = paramssplitted[0];
+        var source = paramssplitted[1];
+        var target = paramssplitted[2];
+        //alert(source + " " + target);
+
+        if (source != target) {
+            var src = HandleGooseRecording(source);
+            var trgt = HandleGooseRecording(target);
+            ConnectNodes(src, trgt);
+        }
+    }
+}
+
+
+// Save the current state (i.e., all the opened geese and the data they are processing)
+function SaveState()
+{
+    $('#dlgSaveState').dialog( { height:300,
+        buttons: {
+            "Save": function() {
+                // Save state
+                var userid = $("#authenticated").val();
+                var p1 = ($("#dlgSaveState").children())[0];
+                var nameinput = ($(p1).children())[0];
+                var name = $(nameinput).val();
+
+                var p2 = ($("#dlgSaveState").children())[1];
+                var descinput = ($(p2).children())[0];
+                var desc = $(descinput).val();
+                //alert(userid);
+                var proxy = get_proxyapplet();
+                if (proxy != undefined) {
+                    alert(name + " " + desc);
+                    proxy.SaveStateDelegate(userid, name, desc);
+                    //alert("workflow action done");
+                }
+                 $('#dlgSaveState').dialog('close');
+            },
+            "Cancel": function() {
+                $('#dlgSaveState').dialog('close');
+            }
+
+        }
+    });
+
+}
+
+function OnSaveState(param)
+{
+    //alert("state saved " + param);
+    // Insert into saved state accordion
+
+    /*<a href='#' id='astate_{{state.ID|stringformat:"i"}}'>{{state.name}}</a>
+    <div id='divstate_{{datagroup.ID|stringformat:"i"}}'>
+        <div>{{state.description}}</div>
+        <input type="hidden" value='{{state.ID|stringformat:"i"}}' />
+        <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
+        <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
+    </div> */
+    var splitted = param.split(";;");
+    var name = splitted[1];
+    var desc = splitted[2];
+    var stateid = splitted[0];
+    //alert(name + " " + desc + " " + stateid);
+    var newhtml = "<a href='#' id='astate_" + stateid + "'>" + name + "</a>";
+    var newdivhtml = "<div>" + desc + "</div><input type='hidden' value='" + stateid
+                        + "' /><input type='button' value='Load' class='button' onclick='javascript:LoadState(this);' />"
+                        + "<input type='button' class='button' value='Delete' onclick='javascript:DeleteState(this);' />";
+    //alert(newhtml);
+    //alert(newdivhtml);
+    //alert($(wfdivid));
+
+    var ahrefelement = document.createElement('a');
+    ahrefelement.setAttribute("id", 'astate_' + stateid);
+    ahrefelement.innerHTML = name;
+    var divelement = document.createElement("div");
+    divelement.setAttribute("id", ("divstate_" + stateid));
+    $(divelement).html(newdivhtml);
+    //alert("Append elements " + $(ahrefelement).html());
+    $("#divstatedataaccordion").append($(ahrefelement));
+    $("#divstatedataaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
+}
+
+
+function LoadState(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        var divelement = $(source).parent();
+        var stateidinput = $(divelement).children()[1];
+        var stateid = $(stateidinput).val();
+        //alert(stateid);
+        var proxy = get_proxyapplet();
+        if (proxy != undefined) {
+            //alert("Submit workflow to boss");
+            proxy.LoadStateDelegate(stateid);
+            //alert("workflow action done");
+        }
+    }
+}
+
+function DeleteState(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+       var divelement = $(source).parent();
+       var stateidinput = $(divelement).children()[1];
+       var stateid = $(stateidinput).val();
+       alert(stateid);
+
+       if (stateid != null && stateid.length > 0)
+       {
+           //var jsonObj = {};
+           //jsonObj.id = stateid;
+
+           // This group has already been saved
+           //alert("Send workflow");
+           // Send the workflow data for saving
+           $.get("/workflow/deletesavedstate/" + stateid + "/",
+               function (data) {
+                   //alert("Get workflow " + wfid);
+                   //alert("Remove workflow: " + data);
+                   if (data == "1")
+                   {
+                       $(divelement).remove();
+                       var stateahrefid = "#astate_" + stateid;
+                       $(stateahrefid).remove();
+                   }
+               }
+           );
+       }
+    }
+}
 
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");

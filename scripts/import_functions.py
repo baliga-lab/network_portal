@@ -1335,38 +1335,6 @@ def main():
     if args.kegg_gene_pathways:
         gene_kegg_pathways = read_gene_kegg_pathways(args.kegg_gene_pathways)
         do_kegg_gene_pathways(species, gene_kegg_pathways, args.test)
-        """
-        if args.test:
-            kegg_pathways = get_kegg_pathways()
-            pathways_in_db = []
-            for gene in sorted(gene_kegg_pathways.keys()):
-                pathways = gene_kegg_pathways[gene]
-                for p in pathways:
-                    in_db = str( p in kegg_pathways )
-                    pathways_in_db.append(in_db)
-                    print "%s : %s, %s" % (gene, p, in_db)
-            # check if KEGG pathways can be found in the DB
-            if all( pathways_in_db ):
-                print "KEGG pathways OK"
-            else:
-                print "pathways missing: %d out of %d." % (len(pathways_in_db) - sum(pathways_in_db),len(gene_kegg_pathways),)
-            # check if genes can be found in the DB
-            gene_ids = get_gene_ids(species)
-            genes_in_db = [ g in gene_ids.keys() for g in gene_kegg_pathways.keys() ]
-            if all( genes_in_db ):
-                print "Genes OK"
-            else:
-                print "pathway genes are: " + str(gene_kegg_pathways.keys())
-                print "gene names in DB are: " + str(gene_ids.keys())
-                print "Some genes not in DB, missing: %d out of %d." % (len(genes_in_db) - sum(genes_in_db),len(gene_kegg_pathways.keys()),)
-                        
-        else:
-            if species=='Desulfovibrio vulgaris Hildenborough':
-                translate_genes = Lookup({'DVU_tRNA-SeC_p_-1':'DVU_tRNA-SeC(p)-1'})
-            else:
-                translate_genes = Lookup()
-            insert_gene_kegg_function_associations(gene_kegg_pathways, species, translate_genes)
-    """
 
     # map genes to GO COG and TIGR functions
     if args.genome_info:
@@ -1374,21 +1342,24 @@ def main():
         map_genes_to_go_cog_and_tigr(species, genes, args.test)
 
 
-def process_batch(test=False, do_mo=False, do_kegg=True):
+EXISTING_SPECIES = ['hal', 'dvu', 'dvh', 'mmp', 'syf']
+
+def process_batch(test=False, do_mo=True, do_kegg=True):
     conn = psycopg2.connect("dbname=network_portal user=dj_ango password=django")
     species_map = auto_species.load_species_info(conn)
     for code, species in species_map.items():
         print "Processing organism %s (%s)" % (code, species.name)
-        if do_mo:
-            genomeinfo_file = auto_species.download_mo_genomeinfo_file(code,
-                                                                       species.taxonomy_id)
-            genes = read_microbes_online_genome_info(genomeinfo_file)
-            map_genes_to_go_cog_and_tigr(species.name, genes, test)
+        if not code in EXISTING_SPECIES:
+            if do_mo:
+                genomeinfo_file = auto_species.download_mo_genomeinfo_file(code,
+                                                                           species.taxonomy_id)
+                genes = read_microbes_online_genome_info(genomeinfo_file)
+                map_genes_to_go_cog_and_tigr(species.name, genes, test)
 
-        if do_kegg:
-            kegg_file = auto_species.download_keggfile(code)
-            gene_kegg_pathways = read_gene_kegg_pathways(kegg_file)
-            do_kegg_gene_pathways(species.name, gene_kegg_pathways, test)
+            if do_kegg:
+                kegg_file = auto_species.download_keggfile(code)
+                gene_kegg_pathways = read_gene_kegg_pathways(kegg_file)
+                do_kegg_gene_pathways(species.name, gene_kegg_pathways, test)
   
 if __name__ == "__main__":
     #main()

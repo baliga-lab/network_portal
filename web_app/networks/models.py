@@ -688,3 +688,13 @@ class WorkflowCapturedData(models.Model):
     type = models.ForeignKey(OrganismDataTypes)
     dataurl = models.CharField(max_length = 4096, blank=True)
     urltext = models.CharField(max_length = 1024, blank=True, null=True)
+
+class SavedStates(models.Model):
+    owner = models.ForeignKey(Users)
+    name = models.CharField(max_length = 1024, blank = True)
+    description = models.CharField(max_length = 1024, blank=True, null=True)
+
+class StateFiles(models.Model):
+    state = models.ForeignKey(SavedStates)
+    name = models.CharField(max_length = 1024, blank = True)
+    url = models.CharField(max_length = 4096, blank = True)

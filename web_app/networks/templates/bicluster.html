@@ -1,11 +1,13 @@
 {% extends "base2.html" %}
-{% block title %}Network Portal - Bicluster {{ bicluster.id }}{% endblock %}
+{% block title %}Network Portal - Module {{ bicluster.id }}{% endblock %}
 {% load filters %}
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 {% block cssspecial %}
-  <link href="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.css" rel="stylesheet" type="text/css">
-  <link href="{{ STATIC_PREFIX }}/javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+	<link href="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.css" rel="stylesheet" type="text/css">
+	<link href="{{ STATIC_PREFIX }}/javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
+	<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/portal-style.css">
 {% endblock %}
 {% block jsspecial %}
   <script src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
@@ -14,6 +16,7 @@
   <script src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
   <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
   <script src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+
   {% if img_url %}
   {% else %}
   <script src="{{ STATIC_PREFIX }}javascripts/raphael-min.js"></script>
@@ -24,7 +27,7 @@
         var chart1 = new Highcharts.Chart({
             chart: {
                 renderTo: 'expression-graph',
-                type: 'line', width: 500, height: 300
+                type: 'line', width: 500, height: 400
             },
             title: { text: 'Gene Expression Profiles' },
             plotOptions: { line: { marker: { enabled: false } } },
@@ -44,109 +47,145 @@
     });
   </script>
   {% endif %}
+  <script>
+        $(function() {
+            $( "#tabs" ).tabs();
+        });
+    </script>
 {% endblock %}
 {% block content %}
 <div id="bicluster-top">
-  <div class="post-top">
-    <div id="top-tabs">
+  <div class="sub-page">
+    <div id="tabs" class="sub-page">
       <ul>
-	<li><a class="name" href="#tab-main">Regulon {{ bicluster.id }}</a></li>
-	<li><a class="network" href="#tab-network">Network</a></li>
-	<li><a class="regulator" href="#tab-regulator">Regulators</a></li>
-	<li><a class="motif" href="#tab-motif">Motifs</a></li>
-	<li><a class="function" href="#tab-function">Functions</a></li>
-	<li><a class="genes" href="#tab-gene">Genes</a></li>
-	{# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
-	<li><a class="help" href="#tab-help">Help</a></li>
+		<li><a class="name" href="#tab-main">Module {{ bicluster.id }}</a></li>
+		<li><a class="network" href="#tab-network">Network</a></li>
+		<li><a class="regulator" href="#tab-regulator">Regulators</a></li>
+		<li><a class="motif" href="#tab-motif">Motifs</a></li>
+		<li><a class="function" href="#tab-function">Functions</a></li>
+		<li><a class="genes" href="#tab-gene">Genes</a></li>
+		{# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
+		<li><a class="help" href="#tab-help">Help</a></li>
+		<li><a class="social" href="#tab-social">Social</a></li>
       </ul>
-
+	  
       <div id="tab-main">
-	      <div class="main">
-	  <h3>Regulon {{ bicluster.id }} Profile</h3>
-    {% if img_url %}
-	  <object data="{{ img_url }}" type="image/svg+xml"></object>
-    {% else %}
-    <div id="expression-graph"></div>
-    <div id="annotation-graph1"></div>
-    {% endif %}
+	  <div class="main">
+	      
+			<h5>Module {{ bicluster.id }} Profile </h5><br>
+	
+			{% if img_url %}
+			<object data="{{ img_url }}" type="image/svg+xml"></object>
+			{% else %}
+			<div id="expression-graph"></div>
+			<div id="annotation-graph1"></div>
+			{% endif %}
+		</div>
+		<div id="sidebar">
+			<h5>Summary</h5>
+			<table>
+				<tr>
+					<th class="help">Organism</th>
+				</tr>
+				<tr>
+					<td><a href="/species/{{ bicluster.network.species.short_name }}">{{ bicluster.network.species }}</a></td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<th class="help">Residual</th>
+					<th>Genes</th>
+					<th>Conditions</th>
+				</tr>
+				<tr>
+				<td>{{ bicluster.residual }}</td>
+				<td>{{ gene_count }}</td>
+				<td>{{ conditions.count }}</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<th>Motif 1 Evalue</th>
+					<th>Motif 2 Evalue</th>
+				</tr>
+				<tr>
+					{% if motifs  %}
+					<td>{{motifs.0.e_value}}</td>
+					<td>{{motifs.1.e_value}}</td>
+					{% else %}
+					<td>NA</td>
+					<td>NA</td>
+					{% endif %}
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<th>Regulators ({{ inf_count }})</th>
+					<th>Type</th>
+					</tr>
+						{% for influence in influences %}
+					<tr>
+						<td>{{ influence|format_influence }}</td>
+						<td>{{ influence.type }}</td>
+					</tr>
+						{% endfor %}
+			</table>
+		</div><!-- #sidebar -->
 	</div>
-	<div id="sidebar">
-	  <h4>Summary</h4>
-	  <table>
-	    <tr>
-	      <th class="help">Organism</th>
-	    </tr>
-	    <tr>
-	      <td><a href="/{{ bicluster.network.species.short_name }}">{{ bicluster.network.species }}</a></td>
-	    </tr>
-	  </table>
-	  <table>
-	    <tr>
-	      <th class="help">Residual</th>
-	      <th>Genes</th>
-	      <th>Conditions</th>
-	    </tr>
-	    <tr>
-	      <td>{{ bicluster.residual }}</td>
-	      <td>{{ gene_count }}</td>
-	      <td>{{ conditions.count }}</td>
-	    </tr>
-	  </table>
-	  <table>
-	    <tr>
-	      <th>Motif 1 Evalue</th>
-	      <th>Motif 2 Evalue</th>
-	    </tr>
-	    <tr>
-	      {% if motifs  %}
-	      <td>{{motifs.0.e_value}}</td>
-	      <td>{{motifs.1.e_value}}</td>
-	      {% else %}
-	      <td>NA</td>
-	      <td>NA</td>
-	      {% endif %}
-	    </tr>
-	  </table>
-	  <table>
-	    <tr>
-	      <th>Regulators ({{ inf_count }})</th>
-	      <th>Type</th>
-	    </tr>
-	    {% for influence in influences %}
-	    <tr>
-	      <td>{{ influence|format_influence }}</td>
-	      <td>{{ influence.type }}</td>
-	      </tr>
-	    {% endfor %}
-	  </table>
-	</div><!-- #sidebar -->
-      </div>
-      <div id="tab-network">
+	  
+      <div id="tab-network" class="sub-page">
+
 	{% include 'bicl_network_snippet.html' %}
       </div>
-      <div id="tab-regulator">
+	  
+      <div id="tab-regulator" class="sub-page">
 	{% include 'bicl_regulator_snippet.html' %}
       </div>
-      <div id="tab-motif">
+	  
+      <div id="tab-motif" class="sub-page">
 	{% include 'bicl_motif_snippet.html' %}
       </div>
-      <div id="tab-function">
+	  
+      <div id="tab-function" class="sub-page">
 	{% include 'bicl_functions_snippet.html' %}
       </div>
-      <div id="tab-gene">
+	  
+      <div id="tab-gene" class="sub-page">
 	{% include 'bicl_gene_snippet.html' %}
       </div>
+	  
       <!--
       <div id="tab-add-cart">
 	add cart tab <br />
 	...TO BE DONE...
       </div>
       -->
-      <div id="tab-help">
-	HELP tab
+      <div id="tab-social" class="sub-page">
+	  <h5> Comments for Module {{ bicluster.id }}</h5><br>
+		<div id="disqus_thread" class="main"></div> <!-- Commenting from Disqus-->
+			<script type="text/javascript">
+			/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+				var disqus_shortname = 'thenetworkportal'; // required: replace example with your forum shortname
+
+			/* * * DON'T EDIT BELOW THIS LINE * * */
+				(function() {
+				var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+				dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+				(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+			})();
+		</script>
+		<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+		<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    <!-- Commenting from Disqus-->
       </div>
+	  
+      <div id="tab-help" class="sub-page">
+		<h5> Help </h5>
+      </div>
+	  
     </div><!-- #top-tabs -->
   </div><!-- #post-top -->
+
 </div><!-- #bicluster-top-->
 
 {% endblock %}

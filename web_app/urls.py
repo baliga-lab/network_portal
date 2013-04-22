@@ -35,6 +35,10 @@ urlpatterns = patterns('',
     url(r'^workflow/deletecaptureddata', 'web_app.views.deletecaptureddata', name='deletecaptureddata'),
     url(r'^workflow/uploaddata', 'web_app.views.uploaddata', name='uploaddata'),
     url(r'^workflow/getdataspace', 'web_app.views.getdataspace', name='getdataspace'),
+    url(r'^workflow/savestate', 'web_app.views.savestate', name='savestate'),
+    url(r'^workflow/deletesavedstate/(?P<stateid>\d+)/', 'web_app.views.deletesavedstate', name='deletesavedstate'),
+    url(r'^workflow/getstateinfo/(?P<stateid>\d+)/$', 'web_app.views.getstateinfo', name='getstateinfo'),
+
 
     url(r'^workflow/save', 'web_app.views.saveworkflow', name='saveworkflow'),
     url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'web_app.views.deleteworkflow', name='deleteworkflow'),
