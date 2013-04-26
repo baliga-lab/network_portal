@@ -21,17 +21,29 @@ class MicrobesOnline:
     def __init__(self):
         self.conn = mo_conn()
 
+    """
     def lookup_for(self, ncbi_taxonomy_id):
         cursor = self.conn.cursor()
         cursor.execute('select scaffoldId from Scaffold where taxonomyId = %s and isActive = 1', [ncbi_taxonomy_id])
         scaffold_ids = [row[0] for row in cursor.fetchall()]
         print "Scaffold ids: ", scaffold_ids
+    """
+
+    def find_synonym(self, ncbi_taxonomy_id, synonym):
+        """returns the MicrobesOnline locus id for the synonym"""
+        cursor = self.conn.cursor()
+        cursor.execute('select distinct sy.locusId, sy.version from Synonym sy join Locus l on sy.locusId = l.locusId join Scaffold s on l.scaffoldId = s.scaffoldId where taxonomyId = %s and sy.name = %s',
+                       [ncbi_taxonomy_id, synonym])
+        synonyms = cursor.fetchall()
+        return synonyms[0][0] if len(synonyms) > 0 else None
+
 
 class KBase:
     """KBase lookup table connection"""
     def __init__(self):
         self.conn = kbase_conn()
-        self.locus_maps = {}
+        self.locustag_maps = {}
+        self.locusid_maps = {}
     
     def genome_kbaseid(self, ncbi_taxonomy_id):
         """lookup the kbase id for a genome, given the NCBI taxonomy id"""
@@ -41,13 +53,23 @@ class KBase:
 
     def locustag_kbaseid(self, ncbi_taxonomy_id, name):
         """lookup the kbase id for a locus tag, given the locus tag name"""
-        if ncbi_taxonomy_id not in self.locus_maps:
+        if ncbi_taxonomy_id not in self.locustag_maps:
             cursor = self.conn.cursor()
             cursor.execute('select value, kbaseId from KBaseLookup where taxonomyId = %s and termId = 2', [ncbi_taxonomy_id])
-            self.locus_maps[ncbi_taxonomy_id] = {row[0]: row[1]
-                                                 for row in cursor.fetchall()}
-            #print self.locus_maps[ncbi_taxonomy_id]
-        return self.locus_maps[ncbi_taxonomy_id].get(name, None)
+            self.locustag_maps[ncbi_taxonomy_id] = {row[0]: row[1]
+                                                    for row in cursor.fetchall()}
+            #print self.locustag_maps[ncbi_taxonomy_id]
+        return self.locustag_maps[ncbi_taxonomy_id].get(name, None)
+
+    def locusid_kbaseid(self, ncbi_taxonomy_id, locus_id):
+        """lookup the kbase id for a locus id, given the locus id"""
+        if ncbi_taxonomy_id not in self.locusid_maps:
+            cursor = self.conn.cursor()
+            cursor.execute('select value, kbaseId from KBaseLookup where taxonomyId = %s and termId = 1', [ncbi_taxonomy_id])
+            self.locusid_maps[ncbi_taxonomy_id] = {int(row[0]): row[1]
+                                                   for row in cursor.fetchall()}
+        return self.locusid_maps[ncbi_taxonomy_id].get(locus_id, None)
+
 
 
 def get_gene_name(row):
@@ -77,7 +99,6 @@ if __name__ == '__main__':
         genome_kbaseid = kbase.genome_kbaseid(ncbi_taxonomy_id)
         if DEBUG == True:
             print "/* ncbi: %d -> kbase id = '%s' */" % (ncbi_taxonomy_id, genome_kbaseid)
-            mo.lookup_for(ncbi_taxonomy_id)
             
         cur.execute('select id, name, common_name from networks_gene where species_id = %s', [entry[1]])
         id_genes = {row[0]: get_gene_name(row[1:]) for row in cur.fetchall()}
@@ -96,9 +117,7 @@ if __name__ == '__main__':
         print 'insert into Dataset (datasetId,name,description,networkType,sourceReference,genomeKBaseId) values (%d,\'%s\',\'%s\',\'REGULATORY_NETWORK\',\'CMONKEY\',\'%s\');' % (dsid, entry[2], entry[3], genome_kbaseid)
 
         for cluster_id, cluster in id_clusters.items():
-            """
             print 'insert into Bicluster (biclusterId,datasetId,name) values (%d,%d,\'%s\');' % (dest_cluster_id, dsid, str(cluster))
-            """
             gene_ids = cluster_genes[cluster_id] if cluster_id in cluster_genes else []
             dest_genes = [id_genes[gene_id] for gene_id in gene_ids]
             #print dest_genes
@@ -106,10 +125,19 @@ if __name__ == '__main__':
             for gene in dest_genes:
                 gkbase_id = kbase.locustag_kbaseid(ncbi_taxonomy_id, gene)
                 if gkbase_id == None:
-                    print "Locus not found: '%s'" % gene
-            """
+                    # we could not find the locus tag, but we can try to look up
+                    # the id in the synonyms
+                    locus_id = mo.find_synonym(ncbi_taxonomy_id, gene)
+                    if locus_id != None:
+                        gkbase_id = kbase.locusid_kbaseid(ncbi_taxonomy_id, locus_id)
+                        #print "found gkbase id in synonyms: ", gkbase_id
+
                 gene = gene.replace("'", "\\'")
-                print 'insert into Gene (geneId,datasetId,biclusterId,name) values (%d,%d,%d,\'%s\');' % (dest_gene_id, dsid, dest_cluster_id, gene)
+                if gkbase_id != None:
+                    print "insert into Gene (geneId,datasetId,biclusterId,name,kbaseId) values (%d,%d,%d,'%s','%s');" % (dest_gene_id, dsid, dest_cluster_id, gene, gkbase_id)
+                else:
+                    print "insert into Gene (geneId,datasetId,biclusterId,name) values (%d,%d,%d,'%s');" % (dest_gene_id, dsid, dest_cluster_id, gene)
+                    #print "WARNING - not found: '%s'" % gene
+
                 dest_gene_id += 1
             dest_cluster_id += 1
-            """

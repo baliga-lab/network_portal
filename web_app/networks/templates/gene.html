@@ -54,7 +54,7 @@
     var django_pssms = {{bicluster_pssms}};
           $(document).ready(function() {
               var loaded = [false, false, false, false, false, false, false, false];
-              $('#top-tabs').tabs({
+              $('#tabs').tabs({
                   select: function (event, ui) {
                       if (!loaded[ui.index]) {
                           switch (ui.index) {
@@ -75,7 +75,7 @@
               });
 
               {% if view == "regulation" %}
-              $('#top-tabs').tabs("select", 2);
+              $('#tabs').tabs("select", 2);
               {% endif %}
               var circle_vis = new vq.CircVis();
               $.ajax({
@@ -92,7 +92,7 @@
               nwhelpers.initCanvas2(django_pssms, 'previewcanvas_', {{preview_motifs}});
 
               $('[id^=previewcanvas]').click(function() {
-                  $('#top-tabs').tabs('select', 3);
+                  $('#tabs').tabs('select', 3);
               });
           });
         </script>

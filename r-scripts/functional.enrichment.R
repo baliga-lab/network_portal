@@ -154,12 +154,16 @@ enrichment <- function(network.id, type=NULL, gene.ids=NULL) {
     
     # for each bicluster count genes grouped by function
     # return a data.frame w/ columns bicluster_id, function_id, count
-    bicluster.function.counts <- get.bicluster.function.counts(con, network.id, type, ancestor.map)
+    bicluster.function.counts <- 0
+    tryCatch(bicluster.function.counts <- get.bicluster.function.counts(con, network.id, type, ancestor.map),
+             error=function(e) message("FUCKED UP BICLUSTERS COUNTS"))
     cat(sprintf("constructed bicluster.function.counts %s\n", paste(dim(bicluster.function.counts), collapse='x')))
     
     # for each function, count all genes in genome with that function
     # return a data.frame w/ columns function_id, count
-    function.gene.counts <- get.function.gene.counts(con, gene.ids, type, ancestor.map)
+    function.gene.counts <- 0
+    tryCatch(function.gene.counts <- get.function.gene.counts(con, gene.ids, type, ancestor.map),
+             error=function(e) message("FUCKED UP GENE COUNTS"))
     cat(sprintf("constructed function.gene.counts %s\n", paste(dim(function.gene.counts), collapse='x')))
     
     # phyper(q, m, n, k)
@@ -217,12 +221,14 @@ insert.enrichment <- function(en,method='hypergeometric') {
       row <- en[i,]
       sql <- sprintf(paste(
         "insert into networks_bicluster_function",
-        "(bicluster_id, function_id, gene_count, m, n, k, p, p_bh, p_b, method)",
-        "values (%d, %d, %d, %d, %d, %d, %f, %f, %f, '%s');"),
+        #"(bicluster_id, function_id, gene_count, m, n, k, p, p_bh, p_b, method)",
+        #"values (%d, %d, %d, %d, %d, %d, %f, %f, %f, '%s');"),
+        "(bicluster_id, function_id, gene_count, m, n, k, p, p_bh, p_b)",
+        "values (%d, %d, %d, %d, %d, %d, %f, %f, %f);"),
             row$bicluster.id, row$function.id, row$gene.count,
             row$m, row$n, row$k,
-            row$p, row$p.bh, row$p.b,
-            method)
+            row$p, row$p.bh, row$p.b) #,
+            #method)
       dbGetQuery(con, sql)
     }
   },
@@ -328,14 +334,16 @@ let.it.rip <- function(insert=F) {
   networks <- get.networks()
   for (id in networks$id) {
     for (system in systems) {
-      en <- compute.and.display.enrichment(id, system)
-      if (insert) {
-        # if any filtering is desired, based on p values or gene_count,
-        # here would be the place to do it. It might be a good idea to
-        # filter out namespaces 'cog' and 'tigr' since they mostly correspond
-        # to individual genes, not groups of genes.
-        insert.enrichment(en, method='hypergeometric2')
-      }
+      tryCatch(expr={
+          en <- compute.and.display.enrichment(id, system)
+        if (insert) {
+          # if any filtering is desired, based on p values or gene_count,
+          # here would be the place to do it. It might be a good idea to
+          # filter out namespaces 'cog' and 'tigr' since they mostly correspond
+          # to individual genes, not groups of genes.
+          insert.enrichment(en, method='hypergeometric2')
+        }
+      }, error=function (e) message("FUCKING ERROR, skipping"))
     }
   }
 }

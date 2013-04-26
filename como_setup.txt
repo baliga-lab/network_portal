@@ -16,7 +16,7 @@ apache2
 python 2.7.3 or latest
 python-pip
 libraries: python-dev build-essential libpq-dev libapache2-mod-wsgi
-Python modules: django, psycopg2, networkx, numpy
+Python modules: django, psycopg2, networkx, numpy, python-openid
 Postgres
 Java 1.6+
 Jetty

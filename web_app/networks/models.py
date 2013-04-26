@@ -698,5 +698,3 @@ class StateFiles(models.Model):
     state = models.ForeignKey(SavedStates)
     name = models.CharField(max_length = 1024, blank = True)
     url = models.CharField(max_length = 4096, blank = True)
-
-
