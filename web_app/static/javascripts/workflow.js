@@ -2616,7 +2616,9 @@ function FindComponent(gname)
 function GetGooseFromCanvas(gooseid)
 {
     if (gooseid.indexOf("_") >= 0)
-        return null;
+    {
+        return $("#" + gooseid);
+    }
 
     var nodes = $("#workflowcanvas").children();
     if (nodes.length > 0)
@@ -2729,13 +2731,16 @@ function SaveState()
                 var descinput = ($(p2).children())[0];
                 var desc = $(descinput).val();
                 //alert(userid);
+                $('#dlgSaveState').dialog('close');
+
                 var proxy = get_proxyapplet();
                 if (proxy != undefined) {
-                    alert(name + " " + desc);
+
+                    //alert(name + " " + desc);
                     proxy.SaveStateDelegate(userid, name, desc);
                     //alert("workflow action done");
                 }
-                 $('#dlgSaveState').dialog('close');
+
             },
             "Cancel": function() {
                 $('#dlgSaveState').dialog('close');
@@ -2811,7 +2816,7 @@ function DeleteState(event)
        var divelement = $(source).parent();
        var stateidinput = $(divelement).children()[1];
        var stateid = $(stateidinput).val();
-       alert(stateid);
+       //alert(stateid);
 
        if (stateid != null && stateid.length > 0)
        {

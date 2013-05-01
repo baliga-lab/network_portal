@@ -21,9 +21,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 
-from .networks.models import *
-from .networks.functions import functional_systems
-from .networks.helpers import get_influence_biclusters
+from networks.models import *
+from networks.functions import functional_systems
+from networks.helpers import get_influence_biclusters
 
 #import jpype
 import openid
@@ -274,6 +274,31 @@ class WorkflowEdge:
     def getParallelType(self):
         return self.paralleltype
 
+def deletefile(filepath):
+    try:
+        print 'delete file: ' + filepath
+        basepath = '/github/baligalab/network_portal/web_app'
+        fullpath = os.path.join('/github/baligalab/network_portal/web_app', filepath)
+        print 'delete full path: ' + fullpath
+        os.remove(fullpath)
+    except Exception as e:
+        print str(e)
+
+def savefile(filepath, srcfile):
+    try:
+        print 'save file: ' + filepath
+        basepath = '/github/baligalab/network_portal/web_app'
+        #fullpath = os.path.join('/github/baligalab/network_portal/web_app', filepath)
+        #Use / as seperator to make sure everything works in the boss code
+        fullpath = '/github/baligalab/network_portal/web_app/' + filepath
+        print 'save full path: ' + fullpath
+        with open(fullpath, 'wb') as f:
+            destination = File(f)
+            for chunk in srcfile.chunks():
+                destination.write(chunk)
+            destination.close()
+    except Exception as e:
+        print str(e)
 
 @csrf_exempt
 def saveworkflow(request):
@@ -793,9 +818,7 @@ def deletecaptureddata(request):
             if int(link['id']) >= 0:
                try:
                    captureddata = WorkflowCapturedData.objects.filter(id = int(link['id']))[0]
-                   with open(captureddata.dataurl, 'wb') as f:
-                        destination = File(f)
-                        destination.delete()
+                   deletefile(captureddata.dataurl)
                except Exception as e2:
                    print str(e2)
 
@@ -873,26 +896,38 @@ def getstateinfo(request, stateid):
     try:
         #stateid = int(request.REQUEST['stateid'])
         files = StateFiles.objects.filter(state_id = int(stateid))
-        index = 0
-        fileobjs = {}
+        gooseobjs = {}
         for file in files:
             print file.name
             goosefilename = re.split('_', file.name)[2]
             print goosefilename
             goosename = os.path.splitext(goosefilename)[0]
             print 'goose name: ' + goosename
-            component = WorkflowComponents.objects.filter(short_name = goosename)[0]
+
             state = SavedStates.objects.filter(id = int(stateid))[0]
+
+            pair = gooseobjs[goosename]
+            if (pair is None):
+                component = WorkflowComponents.objects.filter(short_name = goosename)[0]
+                pair = { 'goosename': component.name, 'serviceurl': component.serviceurl, 'files': 0 }
+                fileobj = {}
+                pair['fileobj'] = fileobj
+                gooseobjs[goosename] = pair
+
+            print 'goose obj has ' + pair['files'] + ' files'
             fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
             print fileurl
-            pair = { 'fileurl': fileurl, 'goosename': goosename, 'serviceurl': component.serviceurl }
-            fileobjs[str(index)] = pair
-            index = index + 1
+            filecnt = int(pair['files'])
+            fileobj = pair['fileobj']
+            fileinfo = { 'fileurl': fileurl }
+            fileobj[str(filecnt)] = fileinfo
+            pair['files'] = str(filecnt + 1)
+            fileobjs[str(filecnt)] = pair
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': 'Failed to delete workflow data group' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
-    return HttpResponse(json.dumps(fileobjs), mimetype='application/json')
+    return HttpResponse(json.dumps(gooseobjs), mimetype='application/json')
 
 @csrf_exempt
 def deletesavedstate(request, stateid):
@@ -905,12 +940,14 @@ def deletesavedstate(request, stateid):
         for file in files:
             print "remove file " + file.url
             try:
-                hostname = request.get_host()
-                fileurl = 'http://' + hostname + '/' + file.url
-                with open(fileurl, 'wb') as f:
-                    destination = File(f)
-                    destination.delete()
-                #os.remove(file.url)
+                #hostname = request.get_host()
+                #fileurl = os.path.join(BASE_PATH, file.url)
+                print 'file path: ' + file.url
+                #with open(file.url, 'wb') as f:
+                #    destination = File(f)
+                #    destination.delete()
+                #os.remove(fileuurl)
+                deletefile(file.url)
             except Exception as e0:
                 print str(e0)
         print 'remove state DB object'
@@ -938,7 +975,7 @@ def savestate(request):
         if not os.path.exists(statepath):
             os.makedirs(statepath)
         print 'save path: ' + statepath
-        savepath = '/static/data/states/' + userid
+        savepath = 'static/data/states/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -958,13 +995,16 @@ def savestate(request):
             print fullfilename
             prefix, filename = os.path.split(fullfilename)
             print 'File name: ' + filename
-            with open(os.path.join(statepath, filename), 'wb') as f:
-                destination = File(f)
-                for chunk in srcfile.chunks():
-                    destination.write(chunk)
-                destination.close()
+            filesavepath = os.path.join(savepath, filename)
+            savefile(filesavepath, srcfile)
 
-            dataurl = savepath + '/' + filename
+            #with open(os.path.join(statepath, filename), 'wb') as f:
+            #    destination = File(f)
+            #    for chunk in srcfile.chunks():
+            #        destination.write(chunk)
+            #    destination.close()
+
+            dataurl = filesavepath
             print 'File url: ' + dataurl
             sf = StateFiles(state_id = data.id, name = filename, url = dataurl)
             sf.save()
