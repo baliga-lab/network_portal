@@ -277,7 +277,9 @@ class WorkflowEdge:
 def deletefile(filepath):
     try:
         print 'delete file: ' + filepath
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
+        basepath = '/local/network_portal/network_portal/web_app'
+
         fullpath = os.path.join('/github/baligalab/network_portal/web_app', filepath)
         print 'delete full path: ' + fullpath
         os.remove(fullpath)
@@ -287,7 +289,9 @@ def deletefile(filepath):
 def savefile(filepath, srcfile):
     try:
         print 'save file: ' + filepath
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
+        basepath = '/local/network_portal/network_portal/web_app'
+
         #fullpath = os.path.join('/github/baligalab/network_portal/web_app', filepath)
         #Use / as seperator to make sure everything works in the boss code
         fullpath = '/github/baligalab/network_portal/web_app/' + filepath
@@ -299,6 +303,22 @@ def savefile(filepath, srcfile):
             destination.close()
     except Exception as e:
         print str(e)
+
+def makedir(path):
+    try:
+        print 'Make directory ' + path
+
+        #basepath = '/github/baligalab/network_portal/web_app'
+        basepath = '/local/network_portal/network_portal/web_app'
+        fullpath = os.path.join(basepath, path)
+        print 'full path: ' + fullpath
+        if not os.path.exists(fullpath):
+            os.mkdir(fullpath)
+        return fullpath
+    except Exception as e:
+        print str(e)
+        return ''
+
 
 @csrf_exempt
 def saveworkflow(request):
@@ -623,12 +643,11 @@ def savereportdata(request):
         if (url is None or len(url) == 0):
             print 'Joining os path...'
             dataType = 'file'
-            sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
+            #sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
             #sessionpath = '/github/baligalab/network_portal/web_app/static/reportdata/' + wfid
+
+            sessionpath = makedir('static/reportdata/' + wfid)
             savepath = '/static/reportdata/' + wfid
-            print 'Session path: ' + sessionpath
-            if not os.path.exists(sessionpath):
-                os.mkdir(sessionpath)
 
             sessionpath = sessionpath + '/' + sessionId
             savepath = savepath + '/' + sessionId
@@ -846,11 +865,11 @@ def uploaddata(request):
         datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
-        sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
+        #sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
+        sessionpath = os.path.join('static/data', organismtype)
         sessionpath = os.path.join(sessionpath, dtype)
         sessionpath = os.path.join(sessionpath, userid)
-        if not os.path.exists(sessionpath):
-            os.makedirs(sessionpath)
+        sessionpath = makedir(sessionpath)
         print 'save path: ' + sessionpath
         savepath = '/static/data/' + organismtype + '/' + dtype + '/' + userid
 
@@ -971,10 +990,10 @@ def savestate(request):
         statename = request.REQUEST['name']
         statedesc = request.REQUEST['desc']
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
-        statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
+        #statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
+        statepath = os.path.join('data', 'states')
         statepath = os.path.join(statepath, userid)
-        if not os.path.exists(statepath):
-            os.makedirs(statepath)
+        statepath = makedir(statepath)
         print 'save path: ' + statepath
         savepath = 'static/data/states/' + userid
 
