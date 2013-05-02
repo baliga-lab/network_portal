@@ -896,6 +896,9 @@ def getstateinfo(request, stateid):
     try:
         #stateid = int(request.REQUEST['stateid'])
         files = StateFiles.objects.filter(state_id = int(stateid))
+        state = SavedStates.objects.filter(id = int(stateid))[0]
+        print state.id
+
         gooseobjs = {}
         for file in files:
             print file.name
@@ -904,28 +907,26 @@ def getstateinfo(request, stateid):
             goosename = os.path.splitext(goosefilename)[0]
             print 'goose name: ' + goosename
 
-            state = SavedStates.objects.filter(id = int(stateid))[0]
-
-            pair = gooseobjs[goosename]
-            if (pair is None):
+            if gooseobjs.has_key(goosename):
+                pair = gooseobjs[goosename]
+            else:
                 component = WorkflowComponents.objects.filter(short_name = goosename)[0]
                 pair = { 'goosename': component.name, 'serviceurl': component.serviceurl, 'files': 0 }
                 fileobj = {}
                 pair['fileobj'] = fileobj
                 gooseobjs[goosename] = pair
 
-            print 'goose obj has ' + pair['files'] + ' files'
+            print 'goose obj has ' + str(pair['files']) + ' files'
             fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
             print fileurl
-            filecnt = int(pair['files'])
+            filecnt = pair['files']
             fileobj = pair['fileobj']
             fileinfo = { 'fileurl': fileurl }
+            pair['files'] = filecnt + 1
             fileobj[str(filecnt)] = fileinfo
-            pair['files'] = str(filecnt + 1)
-            fileobjs[str(filecnt)] = pair
     except Exception as e:
-        print str(e)
-        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        print 'Failed to get saved state info ' + str(e)
+        error = {'status':500, 'message': 'Failed to get saved state info' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
     return HttpResponse(json.dumps(gooseobjs), mimetype='application/json')
 
