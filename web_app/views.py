@@ -990,7 +990,9 @@ def savestate(request):
         statedesc = request.REQUEST['desc']
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
         #statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
-        statepath = os.path.join('data', 'states')
+
+        statepath = os.path.join('static', 'data')
+        statepath = os.path.join(statepath, 'states')
         statepath = os.path.join(statepath, userid)
         statepath = makedir(statepath)
         print 'save path: ' + statepath
@@ -1033,6 +1035,7 @@ def savestate(request):
         error = {'status':500, 'message': 'Failed to delete workflow data group' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
+    print json.dumps(responsedata)
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
 
