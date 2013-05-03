@@ -280,7 +280,7 @@ def deletefile(filepath):
         #basepath = '/github/baligalab/network_portal/web_app'
         basepath = '/local/network_portal/network_portal/web_app'
 
-        fullpath = os.path.join('/github/baligalab/network_portal/web_app', filepath)
+        fullpath = os.path.join(basepath, filepath)
         print 'delete full path: ' + fullpath
         os.remove(fullpath)
     except Exception as e:
@@ -292,9 +292,8 @@ def savefile(filepath, srcfile):
         #basepath = '/github/baligalab/network_portal/web_app'
         basepath = '/local/network_portal/network_portal/web_app'
 
-        #fullpath = os.path.join('/github/baligalab/network_portal/web_app', filepath)
         #Use / as seperator to make sure everything works in the boss code
-        fullpath = '/github/baligalab/network_portal/web_app/' + filepath
+        fullpath = basepath + "/" + filepath
         print 'save full path: ' + fullpath
         with open(fullpath, 'wb') as f:
             destination = File(f)
@@ -313,7 +312,7 @@ def makedir(path):
         fullpath = os.path.join(basepath, path)
         print 'full path: ' + fullpath
         if not os.path.exists(fullpath):
-            os.mkdir(fullpath)
+            os.makedirs(fullpath)
         return fullpath
     except Exception as e:
         print str(e)

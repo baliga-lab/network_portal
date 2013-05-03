@@ -2188,9 +2188,10 @@ function GroupData()
                        "OK": function() {
                            var groupname = $(groupnameinput).val();
                            // The group header ahref, its id must be set using WF_groupcnt
-                           var ahrefelement = document.createElement('a');
+                           var ahrefelement = document.createElement('p');
                            ahrefelement.setAttribute("id", ("agrp_" + WF_groupcnt));
                            $(ahrefelement).html(groupname);
+                           $(ahrefelement).text(groupname);
                            //alert("ahref");
 
                            var divelement = document.createElement("div");
@@ -2245,6 +2246,13 @@ function GroupData()
                            hidden2.setAttribute("value", WF_groupcnt);
                            $(divelement).append($(hidden2));
                            //alert("hidden2");
+
+                           var selectbutton = document.createElement("input");
+                           selectbutton.className = "button";
+                           selectbutton.setAttribute("type", "button");
+                           selectbutton.setAttribute("value", "Select All");
+                           selectbutton.onclick = SelectAllInGroup;
+                           $(divelement).append($(selectbutton));
 
                            // Open all the data of the group
                            var openbutton = document.createElement("input");
@@ -2313,6 +2321,33 @@ function GroupData()
                           $('#divDataspaceGroup').dialog('close');
                        }
                    }
+        });
+    }
+}
+
+function SelectAllInGroup(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        var text = $(source).val();
+        //alert(text);
+        var selectall = true;
+        if (text == "Select All")
+            $(source).val("Unselect All");
+        else {
+            selectall = false;
+            $(source).val("Select All");
+        }
+        var divelement = $(source).parent();
+        var grpul = $(divelement).children()[1];
+        //alert(grpul);
+        var datatoopen = {};
+        $(grpul).children().each(function() {
+            var checkbox = $(this).children()[0];
+            //alert(checkbox);
+            $(checkbox).prop('checked', selectall);
         });
     }
 }
@@ -2386,7 +2421,7 @@ function SaveOneGroup(event)
                    do {
                       var content = contents[index.toString()];
                       if (content != null) {
-                          alert(content.inputid + " " + content.id);
+                          //alert(content.inputid + " " + content.id);
                           $(("#" + content.inputid)).val(conent.id);
                           index++;
                       }
@@ -2527,10 +2562,13 @@ function OpenOneGroup(event)
       var grpul = $(source).parent().children()[1];
       var datatoopen = [];
       $(grpul).children().each(function() {
+          var checkbox = $(this).children()[0];
           var link = $(this).children()[1];
-          datatoopen.push(link);
+          if ($(checkbox).is(':checked'))
+            datatoopen.push(link);
       });
-      OpenDataGroup(datatoopen);
+      if (datatoopen.length > 0)
+         OpenDataGroup(datatoopen);
   }
 }
 
@@ -2776,9 +2814,9 @@ function OnSaveState(param)
     //alert(newdivhtml);
     //alert($(wfdivid));
 
-    var ahrefelement = document.createElement('a');
+    var ahrefelement = document.createElement('p');
     ahrefelement.setAttribute("id", 'astate_' + stateid);
-    ahrefelement.innerHTML = name;
+    $(ahrefelement).text(name);
     var divelement = document.createElement("div");
     divelement.setAttribute("id", ("divstate_" + stateid));
     $(divelement).html(newdivhtml);
