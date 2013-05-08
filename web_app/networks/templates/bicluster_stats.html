@@ -1,0 +1,60 @@
+{% extends "base2.html" %}
+{% block title %}Network Portal - Module stats for {{ network.species.name }}{% endblock %}
+{% block cssspecial %}
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css">
+{% endblock %}
+{% block content %}
+<script>
+function loadList() {
+  var residRange = $('#residslider').slider("values");
+  var motRange = $('#motslider').slider("values");
+
+  $.ajax({
+    url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/100.0) + '&maxmot=' + (motRange[1]/100.0)
+  }).done(function(data) {
+    $(data).replaceAll('#modulelist');
+  });
+}
+
+function updateLabel(ui, selector, prefix) {
+      var values = ui.values;
+      var min = values[0] / 100.0;
+      var max = values[1] / 100.0;
+      var label = prefix + ' ' + min + '-' + max;
+      $(selector).text(label);
+}
+
+$(document).ready(function() {
+  $("#residslider").slider({
+    range: true,
+    values: [0, 100],
+    change: function (event, ui) { loadList(); },
+    slide: function (event, ui) {
+      updateLabel(ui, '#dispresid', 'Residual');
+    }
+  });
+  $("#motslider").slider({
+    range: true,
+    values: [0, 100],
+    change: function (event, ui) { loadList(); },
+    slide: function (event, ui) {
+      updateLabel(ui, '#dispmot', 'Motif e-value');
+    }
+  });
+  $("#resetfilters").click(function () {
+    $("#residslider").slider("values", [0, 100]);
+    $("#motslider").slider("values", [0, 100]);
+  });
+  loadList();
+});
+</script>
+<div class="main">
+  <span><span id="dispresid">Residual: 0.0-1.0</span><div id="residslider" style="width: 30%"></div></span>
+  <span><span id="dispmot">Motif e-value 0.0-1.0</span><div id="motslider" style="width: 30%"></div></span>
+  <span><input id="resetfilters" type="button" value="Reset Filters"></input>
+
+  <div id="modulelist">
+    This is the section to display the module list
+  </div>
+</div><!-- End #main -->
+{% endblock %}

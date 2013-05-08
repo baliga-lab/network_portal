@@ -1,0 +1,25 @@
+<div id="modulelist">
+  <table>
+    <thead>
+    <tr>
+      <th>Module</th>
+      <th>Residual</th>
+      <th>Expression Profile</th>
+      <th>Motif 1</th>
+      <th>Motif 2</th>
+      <th>Genes</th>
+      <th>Functions</th>
+    </tr>
+    {% for bicl in biclusters %}
+    <tr>
+      <td>{{bicl.id}}</td>
+      <td>{{bicl.residual}}</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>{{bicl.genes.count}}</td>
+      <td>&nbsp;</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
