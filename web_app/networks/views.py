@@ -31,12 +31,12 @@ def biclusterstats(request, species=None, network_id=None):
 
 def biclusterstats_list(request, network_id=None):
     network = Network.objects.get(id=network_id)
+
     minres = float(request.GET['minres'])
     maxres = float(request.GET['maxres'])
     minmot = float(request.GET['minmot'])
     maxmot = float(request.GET['maxmot'])
-    print "minres: ", minres, " maxres: ", maxres
-    print "minmot: ", minmot, " maxmot1: ", maxmot
+
     biclusters = network.bicluster_set.filter(
         residual__gte=minres, residual__lte=maxres,
         motif__e_value__gte=minmot, motif__e_value__lte=maxmot)

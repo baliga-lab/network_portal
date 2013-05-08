@@ -10,9 +10,10 @@ function loadList() {
   var motRange = $('#motslider').slider("values");
 
   $.ajax({
-    url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/100.0) + '&maxmot=' + (motRange[1]/100.0)
+    url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/100.0) + '&maxmot=' + (motRange[1]/100.0),
+    dataType: 'html'
   }).done(function(data) {
-    $(data).replaceAll('#modulelist');
+    $($.parseHTML(data)).replaceAll('#modulelist');
   });
 }
 

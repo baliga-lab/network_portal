@@ -60,3 +60,13 @@ def influences_to_gene_description_map(influence_biclusters):
         result += 'descriptionMap[\'' + key + '\'] = "' + description + '";\n';
     #print "# descriptions: ", len(gene_description_map)
     return mark_safe(result);
+
+@register.filter
+def motif1consensus(bicluster):
+    motifs = [m for m in bicluster.motif_set.all()]
+    return mark_safe(str(motifs[0].consensus())) if len(motifs) > 0 else ""
+
+@register.filter
+def motif2consensus(bicluster):
+    motifs = [m for m in bicluster.motif_set.all()]
+    return mark_safe(str(motifs[1].consensus())) if len(motifs) > 1 else ""
