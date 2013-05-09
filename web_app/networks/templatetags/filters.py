@@ -64,9 +64,9 @@ def influences_to_gene_description_map(influence_biclusters):
 @register.filter
 def motif1consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
-    return mark_safe(str(motifs[0].consensus())) if len(motifs) > 0 else ""
+    return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[0].consensus(), motifs[0].e_value)) if len(motifs) > 0 else ""
 
 @register.filter
 def motif2consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
-    return mark_safe(str(motifs[1].consensus())) if len(motifs) > 1 else ""
+    return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[1].consensus(), motifs[1].e_value)) if len(motifs) > 1 else ""
