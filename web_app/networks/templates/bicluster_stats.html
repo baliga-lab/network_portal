@@ -10,17 +10,17 @@ function loadList() {
   var motRange = $('#motslider').slider("values");
 
   $.ajax({
-    url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/100.0) + '&maxmot=' + (motRange[1]/100.0),
+    url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/10.0) + '&maxmot=' + (motRange[1]/10.0),
     dataType: 'html'
   }).done(function(data) {
     $($.parseHTML(data)).replaceAll('#modulelist');
   });
 }
 
-function updateLabel(ui, selector, prefix) {
+function updateLabel(ui, selector, prefix, scale) {
       var values = ui.values;
-      var min = values[0] / 100.0;
-      var max = values[1] / 100.0;
+      var min = values[0] / scale;
+      var max = values[1] / scale;
       var label = prefix + ' ' + min + '-' + max;
       $(selector).text(label);
 }
@@ -31,7 +31,7 @@ $(document).ready(function() {
     values: [0, 100],
     change: function (event, ui) { loadList(); },
     slide: function (event, ui) {
-      updateLabel(ui, '#dispresid', 'Residual');
+      updateLabel(ui, '#dispresid', 'Residual', 100.0);
     }
   });
   $("#motslider").slider({
@@ -39,7 +39,7 @@ $(document).ready(function() {
     values: [0, 100],
     change: function (event, ui) { loadList(); },
     slide: function (event, ui) {
-      updateLabel(ui, '#dispmot', 'Motif e-value');
+      updateLabel(ui, '#dispmot', 'Motif e-value', 10.0);
     }
   });
   $("#resetfilters").click(function () {
@@ -50,8 +50,8 @@ $(document).ready(function() {
 });
 </script>
 <div class="main">
-  <span><span id="dispresid">Residual: 0.0-1.0</span><div id="residslider" style="width: 30%"></div></span>
-  <span><span id="dispmot">Motif e-value 0.0-1.0</span><div id="motslider" style="width: 30%"></div></span>
+  <span><span id="dispresid">Residual: 0-1</span><div id="residslider" style="width: 30%"></div></span>
+  <span><span id="dispmot">Motif e-value 0-10</span><div id="motslider" style="width: 30%"></div></span>
   <span><input id="resetfilters" type="button" value="Reset Filters"></input>
 
   <div id="modulelist">

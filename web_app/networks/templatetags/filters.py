@@ -70,3 +70,15 @@ def motif1consensus(bicluster):
 def motif2consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
     return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[1].consensus(), motifs[1].e_value)) if len(motifs) > 1 else ""
+
+MAX_BFNAMES = 5
+
+@register.filter
+def biclusterfuncs(bicluster):
+    """render the function names for the given bicluster"""
+    functions = bicluster.functions.all()
+    names = [f.name for f in functions]
+    if len(names) > MAX_BFNAMES:
+        names = names[:MAX_BFNAMES]
+        names.append("...")
+    return mark_safe(", ".join(names))
