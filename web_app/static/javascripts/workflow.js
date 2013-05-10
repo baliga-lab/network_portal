@@ -2009,14 +2009,14 @@ function UploadDataFiles()
                         //                }
                         //            },
                         success: function (result) {
-                            alert("Successfully added the candidate");
+                            //alert("Successfully uploaded files " + result);
                             //var organism = result['organism'];
                             //var datatype = result['datatype'];
                             //alert(organism);
                             if (result != null)
                             {
                                 //alert(targetid);
-
+                                var finished = false;
                                 var index = 0;
                                 do
                                 {

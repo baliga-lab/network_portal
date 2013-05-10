@@ -281,7 +281,7 @@ def deletefile(filepath):
         basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
 
-        fullpath = os.path.join(basepath, filepath)
+        fullpath = basepath + filepath
         print 'delete full path: ' + fullpath
         os.remove(fullpath)
     except Exception as e:
@@ -909,6 +909,7 @@ def uploaddata(request):
         error = {'status':500, 'message': 'Failed to delete workflow data group' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
+    print 'Upload files response: ' + json.dumps(responsedata)
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
 @csrf_exempt
