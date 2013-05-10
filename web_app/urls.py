@@ -95,6 +95,8 @@ urlpatterns = patterns('',
     (r'^json/circvis/$', 'networks.views.circvis'),
     (r'^json/pssm/$', 'networks.views.pssm'),
 
+    url(r'^biclusterstats_list/(?P<network_id>\d+)$', 'web_app.networks.views.biclusterstats_list', name='biclusterstats_list'),
+
     # for species-relative links, start here to match the other ones first
     url(r'^species$', 'web_app.networks.views.species', name='species'),
     url(r'^species/$', 'web_app.networks.views.species', name='species'),
@@ -102,6 +104,8 @@ urlpatterns = patterns('',
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)$', 'web_app.networks.views.network', name='network'),
     url(r'^(?P<species>[^/]*)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='gene'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/module/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster', name='biclusters'),
+    url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/modules$', 'web_app.networks.views.biclusterstats', name='biclusterstats'),
+
     url(r'^(?P<species>[^/]*)/?$', 'web_app.networks.views.species', name='species'),
     
     #(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL }),

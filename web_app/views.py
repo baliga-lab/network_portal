@@ -40,12 +40,13 @@ from collections import namedtuple
 Dialog = namedtuple('Dialog', ['name', 'short_name', 'network_url', 'ngenes', 'ntfs', 'coords'])
 
 class GeneResultEntry:
-    def __init__(self, id, name, species,
+    def __init__(self, id, name, species, species_name,
                  description, bicluster_ids, influence_biclusters,
                  regulated_biclusters):
         self.id = id
         self.name = name
         self.species = species
+        self.species_name = species_name
         self.description = description
         self.bicluster_ids = bicluster_ids
         self.influence_biclusters = influence_biclusters
@@ -1071,6 +1072,7 @@ def search(request):
 
                 genes.append(GeneResultEntry(gene_obj.id, gene_obj.name,
                                              gene_obj.species.id,
+                                             gene_obj.species.short_name,
                                              gene_obj.description,
                                              bicluster_ids,
                                              influence_biclusters,

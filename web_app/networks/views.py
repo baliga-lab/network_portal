@@ -25,6 +25,24 @@ def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
 
+def biclusterstats(request, species=None, network_id=None):
+    network = Network.objects.get(id=network_id)
+    return render_to_response('bicluster_stats.html', locals())
+
+def biclusterstats_list(request, network_id=None):
+    network = Network.objects.get(id=network_id)
+
+    minres = float(request.GET['minres'])
+    maxres = float(request.GET['maxres'])
+    minmot = float(request.GET['minmot'])
+    maxmot = float(request.GET['maxmot'])
+
+    biclusters = network.bicluster_set.filter(
+        residual__gte=minres, residual__lte=maxres,
+        motif__e_value__gte=minmot, motif__e_value__lte=maxmot)
+
+    return render_to_response('bicluster_stats_list.html', locals())
+
 def networks(request):
     networks = Network.objects.all()
     return render_to_response('networks.html', locals())
