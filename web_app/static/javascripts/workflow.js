@@ -181,7 +181,7 @@ function LoadDataSpace()
                 //alert("loading data space...");
                 var index = 0;
                 $("#ulExpression").empty();
-                $("#ulString").empty();
+                $("#ulNetwork").empty();
                 $("#ulcaptureddata").empty();
                 var finished = false;
                 do
