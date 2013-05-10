@@ -1966,6 +1966,7 @@ function InsertDataToTarget(targetid, linkpair)
 function UploadDataFiles()
 {
     WF_currOrganism = $("#organismSelect").val();
+    $("#labelOrganism").html("Upload file for " + WF_currOrganism);
     $( "#dlgUploadData" ).dialog({
         resizable: false,
         height:400,
