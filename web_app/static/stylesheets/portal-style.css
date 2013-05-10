@@ -2051,7 +2051,13 @@ background-color: #ffb515;
 
 .datagroupaccordiondiv
 {
-    max-height: 150px;
+    max-height: 550px;
+    scroll: auto;
+}
+
+.datagrpdivclass
+{
+    max-height: 80px;
     scroll: auto;
 }
 

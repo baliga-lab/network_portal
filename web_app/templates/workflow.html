@@ -92,7 +92,7 @@
 
             <p>
             <div id="divString">
-                <div class="componentheader"><h3>String Data</h3></div><br />
+                <div class="componentheader"><h3>Network Data</h3></div><br />
                 <ul id="ulString">
 
                 </ul>
@@ -117,7 +117,7 @@
         <div id="wfgrpaccordion" class="datagroupaccordion">
             {% for datagroup in datagroups %}
             <p id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</p>
-            <div id='divgrp_{{datagroup.ID|stringformat:"i"}}'>
+            <div id='divgrp_{{datagroup.ID|stringformat:"i"}}' class="datagrpdivclass">
                 <div>{{datagroupentry.Description}}</div>
                 <ul>
                     {% for content in datagroup.Contents %}
@@ -157,7 +157,7 @@
 </th>
 <th style="width: 65%">
 <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
-<input type="button" value="Run" onclick="SubmitWorkflow()" class="button-run" title="Run selected workflow"/>
+<input type="button" value="Run" onclick="SubmitWorkflow(null)" class="button-run" title="Run selected workflow"/>
 <input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
 <input type="button" value="Delete" onclick="DeleteClicked()" class="button" title="Delete current workflow"/>
 <input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>

@@ -103,12 +103,31 @@ $(document).ready(function () {
 
     $(".componenthelp").colorbox({inline: true, width: "50%"});
 
-    setTimeout(function() { CheckDataInjection() }, 3000);
+    setTimeout(function() { TimerFunc() }, 3000);
     GetEdgeDataTypes();
     LoadDataWorkspaceComponentMenu();
 
     LoadDataSpace();
 });
+
+
+function TimerFunc()
+{
+    CheckDataInjection();
+    UpdateGeeseInfo();
+}
+
+function UpdateGeeseInfo()
+{
+    var proxy = get_proxyapplet();
+    if (proxy != undefined) {
+        var geeseList = proxy.getGeeseList();
+        if (geeseList != null) {
+
+        }
+    }
+}
+
 
 // Load the data workspace menu for group opening feature
 function LoadDataWorkspaceComponentMenu()
@@ -551,141 +570,147 @@ function NodeProcessed(node, processednodes) {
 }
 
 // Extract workflow from UI
-function ExtractWorkflow() {
+function ExtractWorkflow(nodelist) {
     WF_edges = {};
     WF_nodes = {};
 
     //var allnodes = new Array();
     var processednodes = new Array();
     // first extract all the nodes
+
     var nodes = $("#workflowcanvas").children();
     //alert("Nodes: " + nodes.length);
+    if (nodelist != null)
+        nodes = nodelist;
 
-    var connectionList = jsPlumb.getConnections();
-    //alert(connectionList.length);
-    for (i = 0; i < connectionList.length; i++) {
-        var conn = connectionList[i];
-        var source = conn.source;
-        var target = conn.target;
-        processednodes.push(source);
-        processednodes.push(target);
-        var srcEP = conn.endpoints[0];
-        //alert(srcEP);
-        //srcEP.
-        var overlays = conn.overlays;
-        //alert(overlays.length);
-        var label = overlays[1];
-        if (label == undefined || label.getLabel == undefined)
-            label = overlays[0];
-        //alert(label.constructor.toString());
-        var connlabel = "Data";  // default
-        if (label.getLabel != undefined)
-        {
-            //alert(label.getLabel());
-            connlabel = label.getLabel();
-        }
+    if (nodelist == null)
+    {
+        var connectionList = jsPlumb.getConnections();
+        //alert(connectionList.length);
+        for (i = 0; i < connectionList.length; i++) {
+            var conn = connectionList[i];
+            var source = conn.source;
+            var target = conn.target;
+            processednodes.push(source);
+            processednodes.push(target);
+            var srcEP = conn.endpoints[0];
+            //alert(srcEP);
+            //srcEP.
+            var overlays = conn.overlays;
+            //alert(overlays.length);
+            var label = overlays[1];
+            if (label == undefined || label.getLabel == undefined)
+                label = overlays[0];
+            //alert(label.constructor.toString());
+            var connlabel = "Data";  // default
+            if (label.getLabel != undefined)
+            {
+                //alert(label.getLabel());
+                connlabel = label.getLabel();
+            }
 
-        var srcidstr = $(conn.source).attr("id");
-        var targetidstr = $(conn.target).attr("id");
+            var srcidstr = $(conn.source).attr("id");
+            var targetidstr = $(conn.target).attr("id");
 
-        if (srcidstr != undefined && targetidstr != undefined) {
-            var srcid = GetComponentId(srcidstr);
-            //alert(srcid);
-            var targetid = GetComponentId(targetidstr);
-            //alert(targetid);
-            if (srcid != undefined && targetid != undefined) {
-                // populate the workflow nodes object
-                if (WF_nodes[srcidstr] == undefined)
-                {
-                    var nameelement = ($(source).children())[7];
-                    //alert(nameelement);
-                    //if (nameelement != undefined)
-                    //    alert($(nameelement).children()[0]);
+            if (srcidstr != undefined && targetidstr != undefined) {
+                var srcid = GetComponentId(srcidstr);
+                //alert(srcid);
+                var targetid = GetComponentId(targetidstr);
+                //alert(targetid);
+                if (srcid != undefined && targetid != undefined) {
+                    // populate the workflow nodes object
+                    if (WF_nodes[srcidstr] == undefined)
+                    {
+                        var nameelement = ($(source).children())[7];
+                        //alert(nameelement);
+                        //if (nameelement != undefined)
+                        //    alert($(nameelement).children()[0]);
 
-                    var serviceurlelement = $(source).children()[2];
-                    //alert(serviceurlelement);
-                    //alert("Service uri: " + $(serviceurlelement).val());
-                    var argumentselement = $(source).children()[9];
-                    //alert(argumentselement);
-                    var subactionelement = $(source).children()[componentsubactioninputindex];
-                    var dataurielement = $(source).children()[componentdatauriindex];
-                    //alert($(dataurielement).attr("value"));
-                    var goosenameelement = $(source).children()[6];
-                    var componentworkflownodeidelement = $(source).children()[8];
-                    var componentworkflowindex = $(source).children()[10];
+                        var serviceurlelement = $(source).children()[2];
+                        //alert(serviceurlelement);
+                        //alert("Service uri: " + $(serviceurlelement).val());
+                        var argumentselement = $(source).children()[9];
+                        //alert(argumentselement);
+                        var subactionelement = $(source).children()[componentsubactioninputindex];
+                        var dataurielement = $(source).children()[componentdatauriindex];
+                        //alert($(dataurielement).attr("value"));
+                        var goosenameelement = $(source).children()[6];
+                        var componentworkflownodeidelement = $(source).children()[8];
+                        var componentworkflowindex = $(source).children()[10];
 
-                    var wfnode = {};
-                    wfnode.id = srcidstr;
-                    wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
+                        var wfnode = {};
+                        wfnode.id = srcidstr;
+                        wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
 
-                    //var namevalueelement = $((nameelement).children())[0];
-                    //alert(srcidstr);
-                    wfnode.name = $(nameelement).val();
-                    wfnode.goosename = $(goosenameelement).val();
-                    wfnode.serviceuri = $(serviceurlelement).val();
-                    wfnode.arguments = $(argumentselement).val();
-                    //alert("Service uri arguments: " + wfnode.arguments);
-                    var subaction = $(subactionelement).val();
-                    if (subaction == "Select a subaction" || subaction == "------------")
-                        subaction = "";
-                    wfnode.subaction = subaction;
+                        //var namevalueelement = $((nameelement).children())[0];
+                        //alert(srcidstr);
+                        wfnode.name = $(nameelement).val();
+                        wfnode.goosename = $(goosenameelement).val();
+                        wfnode.serviceuri = $(serviceurlelement).val();
+                        wfnode.arguments = $(argumentselement).val();
+                        //alert("Service uri arguments: " + wfnode.arguments);
+                        var subaction = $(subactionelement).val();
+                        if (subaction == "Select a subaction" || subaction == "------------")
+                            subaction = "";
+                        wfnode.subaction = subaction;
 
-                    wfnode.datauri = $(dataurielement).val();
-                    wfnode.componentid = srcid;
-                    wfnode.workflowindex = $(componentworkflowindex).val();
+                        wfnode.datauri = $(dataurielement).val();
+                        wfnode.componentid = srcid;
+                        wfnode.workflowindex = $(componentworkflowindex).val();
 
-                    WF_nodes[srcidstr] = wfnode;
-                    //alert("Source node stored");
+                        WF_nodes[srcidstr] = wfnode;
+                        //alert("Source node stored");
+                    }
+
+
+                    if (WF_nodes[targetidstr] == undefined)
+                    {
+                        //alert("Save target node");
+                        var nameelement = $(target).children()[7];
+                        var serviceurlelement = $(target).children()[2];
+                        var argumentselement = $(target).children()[9];
+                        //alert($(argumentselement).attr("value"));
+                        var subactionelement = $(target).children()[componentsubactioninputindex];
+                        var dataurielement = $(target).children()[5];
+                        var goosenameelement = $(target).children()[6];
+                        var componentworkflownodeidelement = $(target).children()[8];
+                        var componentworkflowindex = $(target).children()[10];
+
+                        var wfnode = {};
+                        wfnode.id = targetidstr;
+                        wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
+                        wfnode.name = $(nameelement).val(); //attr("value");
+                        wfnode.goosename = $(goosenameelement).val();//.attr("value");
+                        wfnode.serviceuri = $(serviceurlelement).val(); //attr("value");
+                        wfnode.arguments = $(argumentselement).val(); //attr("value");
+                        var subaction = $(subactionelement).val();
+                        if (subaction == "Select a subaction" || subaction == "------------")
+                            subaction = "";
+                        wfnode.subaction = subaction; //attr("value");
+                        wfnode.datauri = $(dataurielement).val(); //attr("value");
+                        wfnode.componentid = targetid;
+                        wfnode.workflowindex = $(componentworkflowindex).val();
+                        WF_nodes[targetidstr] = wfnode;
+                    }
+
+                    //alert("Save edge");
+                    var fieldname = "sourceid_" + i.toString();
+                    WF_edges[fieldname] = srcidstr;
+                    //alert(WF_edges[fieldname]);
+
+                    fieldname = "targetid_" + i.toString();
+                    WF_edges[fieldname] = targetidstr;
+                    //alert(WF_edges[fieldname]);
+
+                    fieldname = "datatype_" + i.toString();
+                    WF_edges[fieldname] = connlabel;
+
+                    fieldname = "datatypeid_" + i.toString();
+                    WF_edges[fieldname] = FindDataTypeID(connlabel);
+
+                    fieldname = "isparallel_" + i.toString();
+                    WF_edges[fieldname] = "1"; // TODO handle edge parallel type (parallel, sequential, parallel by default)
                 }
-
-
-                if (WF_nodes[targetidstr] == undefined)
-                {
-                    //alert("Save target node");
-                    var nameelement = $(target).children()[7];
-                    var serviceurlelement = $(target).children()[2];
-                    var argumentselement = $(target).children()[9];
-                    //alert($(argumentselement).attr("value"));
-                    var subactionelement = $(target).children()[componentsubactioninputindex];
-                    var dataurielement = $(target).children()[5];
-                    var goosenameelement = $(target).children()[6];
-                    var componentworkflownodeidelement = $(target).children()[8];
-                    var componentworkflowindex = $(target).children()[10];
-
-                    var wfnode = {};
-                    wfnode.id = targetidstr;
-                    wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
-                    wfnode.name = $(nameelement).val(); //attr("value");
-                    wfnode.goosename = $(goosenameelement).val();//.attr("value");
-                    wfnode.serviceuri = $(serviceurlelement).val(); //attr("value");
-                    wfnode.arguments = $(argumentselement).val(); //attr("value");
-                    var subaction = $(subactionelement).val();
-                    if (subaction == "Select a subaction" || subaction == "------------")
-                        subaction = "";
-                    wfnode.subaction = subaction; //attr("value");
-                    wfnode.datauri = $(dataurielement).val(); //attr("value");
-                    wfnode.componentid = targetid;
-                    wfnode.workflowindex = $(componentworkflowindex).val();
-                    WF_nodes[targetidstr] = wfnode;
-                }
-
-                //alert("Save edge");
-                var fieldname = "sourceid_" + i.toString();
-                WF_edges[fieldname] = srcidstr;
-                //alert(WF_edges[fieldname]);
-                
-                fieldname = "targetid_" + i.toString();
-                WF_edges[fieldname] = targetidstr;
-                //alert(WF_edges[fieldname]);
-
-                fieldname = "datatype_" + i.toString();
-                WF_edges[fieldname] = connlabel;
-
-                fieldname = "datatypeid_" + i.toString();
-                WF_edges[fieldname] = FindDataTypeID(connlabel);
-
-                fieldname = "isparallel_" + i.toString();
-                WF_edges[fieldname] = "1"; // TODO handle edge parallel type (parallel, sequential, parallel by default)
             }
         }
     }
@@ -697,7 +722,9 @@ function ExtractWorkflow() {
         {
             var source = nodes[j];
             var srcidstr = $(source).attr('id');
+            //alert(srcidstr);
             var srcid = GetComponentId(srcidstr);
+            //alert(srcid);
             if (srcid != undefined && srcid != "")
             {
                 var nameelement = ($(source).children())[7];
@@ -952,21 +979,24 @@ function ShowSaveWorkflowDlg()
         });
 }
 
-function SubmitWorkflow() {
+function SubmitWorkflow(nodelist) {
     //Start boss
     //SubmitWorkflowToBoss("Test");
 
     //if (ConnectToGaggle())
     {
-        //alert("submitting workflow...");
-        ExtractWorkflow();
-        var userid = $("#authenticated").val(); //.attr("value");
-        var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
-        var jsonString = JSON.stringify(jsonObj);
-        //alert(jsonString);
-        SubmitWorkflowToBoss(jsonString);
-        WF_timercnt = 0;
-        setTimeout(function() { CheckSessions() }, 15000);
+        //alert("submitting workflow..." + nodelist);
+        ExtractWorkflow(nodelist);
+        //alert("nodes to submit " + WF_nodes);
+        //if (WF_nodes.length > 0) {
+            var userid = $("#authenticated").val(); //.attr("value");
+            var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
+            var jsonString = JSON.stringify(jsonObj);
+            //alert(jsonString);
+            SubmitWorkflowToBoss(jsonString);
+            WF_timercnt = 0;
+            setTimeout(function() { CheckSessions() }, 15000);
+        //}
     }
 }
 
@@ -1092,7 +1122,7 @@ function RemoveWorkflowItem(wfid)
 // Save the workflow to the DB
 function SaveWorkflow(name, desc, workflowid, userid) {
     //alert("save workflow " + workflowid);
-    ExtractWorkflow();
+    ExtractWorkflow(null);
     if (WF_edges.length == 0) {
         alert("No workflow components. Save failed");
         return;
@@ -1262,7 +1292,7 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         var titleahref = ($(titleelement).children())[componenttitlelinkindex];
         var goosename = $(titleahref).text();
         //alert(goosename);
-        $(titleahref).text(goosename + "-" + wfcnt);
+        $(titleahref).text(goosename + "-" + nodecnt);
         // Also add to the context menu
         var li = document.createElement("li");
         li.id = "ctx_" + goosename + "-" + wfcnt.toString();
@@ -1357,6 +1387,8 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
     }
     //alert("component appended");
     $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
+    wfcnt++;
+    WF_nodecnt++;
     return nodeobj;
 }
 
@@ -1393,7 +1425,6 @@ function SearchAndCreateNode(nodes, nodeid, nodecnt, componentarray, startnodeid
             var componentid = "component_" + nodecomponentid; //  nodeid;
             //alert(componentid);
             nodeobj = AppendComponent(node, nodeid, componentid, sourceid, nodecnt);
-            wfcnt++;
         }
         else {
             // The node already exists, we retrieve its jsPlumb endpoints
@@ -2115,7 +2146,7 @@ function StartWorkflowForData()
                 $(dataurlelement).val(data);
             }
         }
-        SubmitWorkflow();
+        SubmitWorkflow(null);
     }
 }
 
@@ -2591,7 +2622,6 @@ function OpenDataGroup(group)
                               // Append the selected goose to the canvas
                               var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
                               var sourceelement = nodeobj.Element;
-                              WF_nodecnt++;
 
                               //alert($(sourceelement).attr("id"));
                               // Process the batched data
@@ -2612,6 +2642,11 @@ function OpenDataGroup(group)
                               var datauriinput = $(sourceelement).children()[componentdatauriindex];
                               //alert(datauriinput)
                               $(datauriinput).val(datauri);
+
+                              // Now we form the workflow of this new component and submit the workflow to Boss
+                              var nodelist = [];
+                              nodelist.push(nodeobj.Element);
+                              SubmitWorkflow(nodelist);
                            }
                     });
                     //SubmitWorkflow();

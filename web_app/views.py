@@ -277,8 +277,8 @@ class WorkflowEdge:
 def deletefile(filepath):
     try:
         print 'delete file: ' + filepath
-        #basepath = '/github/baligalab/network_portal/web_app'
-        basepath = '/local/network_portal/web_app'
+        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/local/network_portal/web_app'
 
         fullpath = os.path.join(basepath, filepath)
         print 'delete full path: ' + fullpath
@@ -289,8 +289,8 @@ def deletefile(filepath):
 def savefile(filepath, srcfile):
     try:
         print 'save file: ' + filepath
-        #basepath = '/github/baligalab/network_portal/web_app'
-        basepath = '/local/network_portal/web_app'
+        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/local/network_portal/web_app'
 
         #Use / as seperator to make sure everything works in the boss code
         fullpath = basepath + "/" + filepath
@@ -307,8 +307,8 @@ def makedir(path):
     try:
         print 'Make directory ' + path
 
-        #basepath = '/github/baligalab/network_portal/web_app'
-        basepath = '/local/network_portal/web_app'
+        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/local/network_portal/web_app'
         fullpath = os.path.join(basepath, path)
         print 'full path: ' + fullpath
         if not os.path.exists(fullpath):
@@ -840,6 +840,8 @@ def deletecaptureddata(request):
                except Exception as e2:
                    print str(e2)
 
+               WorkflowCapturedData.objects.filter(id = int(link['id'])).delete()
+
     except Exception as e1:
         print str(e1)
         return HttpResponse(json.dumps(e1), mimetype='application/json')
@@ -857,6 +859,8 @@ def uploaddata(request):
 
         userid = request.REQUEST['userid']
         organismtype = request.REQUEST['organismtype']
+        if organismtype is None:
+            organismtype = 'Generic'
         organism = Organisms.objects.filter(name = organismtype)[0]
         print 'organism id: ' + str(organism.id)
 
@@ -942,6 +946,8 @@ def getstateinfo(request, stateid):
             fileinfo = { 'fileurl': fileurl }
             pair['files'] = filecnt + 1
             fileobj[str(filecnt)] = fileinfo
+            print json.dumps(gooseobjs)
+
     except Exception as e:
         print 'Failed to get saved state info ' + str(e)
         error = {'status':500, 'message': 'Failed to get saved state info' }
