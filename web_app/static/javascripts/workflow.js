@@ -1860,34 +1860,38 @@ function DeleteCollectedData(selected)
     var data = {};
     var index = 0;
     var hasdatatodelete = false;
-    $("#ulGeneric").children().each(function() {
-       //alert("dataspace div: " + $(this).html());
-       //alert("li: " + $(this).html());
-       var label = $(this).children()[0];
-       //alert($(label).html());
-       var input = $(label).children()[0];
-       //alert($(input).is(':checked'));
-       var dataidinput = $(label).children()[2];
-       var dataid = $(dataidinput).val();
-       //alert(dataid);
-       if ($(input).is(':checked') == selected)
-       {
-           //elementstobedeleted.push($(this));
-           if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
+
+    $("#wfdataspace").children().each(function() {
+        var uldata = $(this).children()[2];
+        $(uldata).children().each(function() {
+           //alert("dataspace div: " + $(this).html());
+           //alert("li: " + $(this).html());
+           var label = $(this).children()[0];
+           //alert($(label).html());
+           var input = $(label).children()[0];
+           //alert($(input).is(':checked'));
+           var dataidinput = $(label).children()[2];
+           var dataid = $(dataidinput).val();
+           //alert(dataid);
+           if ($(input).is(':checked') == selected)
            {
-              $(this).remove();
+               //elementstobedeleted.push($(this));
+               if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
+               {
+                  $(this).remove();
+               }
+               else {
+                  hasdatatodelete = true;
+                  var obj = {};
+                  obj['id'] = dataid;
+                  data[index.toString()] = obj;
+                  index++;
+                  $(this).remove();
+               }
            }
-           else {
-              hasdatatodelete = true;
-              var obj = {};
-              obj['id'] = dataid;
-              data[index.toString()] = obj;
-              index++;
-              $(this).remove();
-           }
-       }
+        });
+        datatodelete['data'] = data;
     });
-    datatodelete['data'] = data;
 
     if (hasdatatodelete) {
         //alert(JSON.stringify(datatodelete));
@@ -2025,11 +2029,7 @@ function UploadDataFiles()
                                        var organism = pair['organism'];
                                        var datatype = pair['datatype'];
                                        //alert(organism);
-                                       if (datatype == "Generic")
-                                       {
-                                           targetid += "captureddata";
-                                       }
-                                       else if (organism == WF_currOrganism)
+                                       if (organism == WF_currOrganism)
                                        {
                                             targetid += datatype;
                                        }
