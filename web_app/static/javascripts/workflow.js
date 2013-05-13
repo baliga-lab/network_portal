@@ -143,11 +143,34 @@ function LoadDataWorkspaceComponentMenu()
 
         // Add the goose name to the context menu div
         var li = document.createElement("li");
-        li.innerHTML = ("<input type='checkbox' />" + goosename
+        var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
+        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />" + goosename
            + "<input type='hidden' value='" + $(this).attr("id") + "' />");
         $("#ulctxcomponents").append(li);
     });
 }
+
+function SetDataPass(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        var checked = $(source).prop("checked");
+        if (checked) {
+            var li = $(source).parent();
+            var goosename = $(li).text();
+            //alert(goosename);
+            $("#inputNameValue").prop("checked", false);
+            if (goosename.toLowerCase().indexOf("firegoose") >= 0)
+            {
+                // Pass name to Firegoose by default
+                $("#inputNameValue").prop("checked", true);
+            }
+        }
+    }
+}
+
 
 // Load data space data
 function LoadDataSpace()
@@ -2596,8 +2619,7 @@ function OpenOneGroup(event)
           if ($(checkbox).is(':checked'))
             datatoopen.push(link);
       });
-      if (datatoopen.length > 0)
-         OpenDataGroup(datatoopen);
+      OpenDataGroup(datatoopen);
   }
 }
 
@@ -2658,12 +2680,15 @@ function OpenDataGroup(group)
           });
           //$('#divDataspaceMenu').dialog('open');
     }
+    else
+        alert("No data is selected!");
 }
 
 // Open a group of data in a goose
 // User can specify whether to open the URL or the name list
 function GroupOpen()
 {
+    //alert("Open data...");
     GetSelectedData();
     OpenDataGroup(WF_batchedData);
 }
