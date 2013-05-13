@@ -80,36 +80,15 @@
     </td>
     <td style="width: 60%">
         <div id="wfdataspace" class="divdataspace">
-            <p>
-            <div id="divExpression">
-                <div class="componentheader"><h3>Expression Data</h3></div><br />
-                <ul id="ulExpression">
+            {% for organismdatatype in organismdatatypes %}
+                <div id='div{{organismdatatype.type}}'>
+                    <div class="componentheader"><h3>{{organismdatatype.type}} Data</h3></div><br />
+                    <ul id='ul{{organismdatatype.type}}'>
+                    </ul>
+                </div>
+                <br />
+            {% endfor %}
 
-                </ul>
-            </div>
-            </p>
-
-            <p>
-            <div id="divNetwork">
-                <div class="componentheader"><h3>Network Data</h3></div><br />
-                <ul id="ulNetwork">
-
-                </ul>
-            </div>
-            </p>
-            <p>
-            <div id="divEx">
-
-            </div>
-            </p>
-            <p>
-            <div>
-            <div class="componentheader"><h3>Captured Data</h3></div>
-            <br />
-            <ul id="ulcaptureddata">
-            </ul>
-            </div>
-            </p>
         </div>
     </td>
     <td style="width: 20%">

@@ -180,9 +180,10 @@ function LoadDataSpace()
             {
                 //alert("loading data space...");
                 var index = 0;
-                $("#ulExpression").empty();
-                $("#ulNetwork").empty();
-                $("#ulcaptureddata").empty();
+                $("#wfdataspace").children().each(function() {
+                    uldata = $(this).children()[2];
+                    $(uldata).empty();
+                });
                 var finished = false;
                 do
                 {
@@ -195,11 +196,7 @@ function LoadDataSpace()
                        var datatype = pair['datatype'];
                        //alert("organism: " + organism);
                        //alert("data type: " + datatype);
-                       if (datatype == "Generic")
-                       {
-                           targetid += "captureddata";
-                       }
-                       else if (organism == WF_currOrganism)
+                       if (organism == WF_currOrganism)
                        {
                             targetid += datatype;
                        }

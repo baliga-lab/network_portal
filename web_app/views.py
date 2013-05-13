@@ -178,7 +178,7 @@ def workflow(request):
 
     organisms = Organisms.objects.all()
 
-    organismdatatypes = OrganismDataTypes.objects.all()
+    organismdatatypes = OrganismDataTypes.objects.all().order_by('id')
 
     savedstates = SavedStates.objects.filter(owner_id = user.id)
 
