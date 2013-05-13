@@ -1777,7 +1777,7 @@ function SaveCollectedData()
     var data = {};
     var index = 0;
     var hasdatatosave = false;
-    $("#ulcaptureddata").children().each(function() {
+    $("#ulGeneric").children().each(function() {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
            var label = $(this).children()[0];
@@ -1860,7 +1860,7 @@ function DeleteCollectedData(selected)
     var data = {};
     var index = 0;
     var hasdatatodelete = false;
-    $("#ulcaptureddata").children().each(function() {
+    $("#ulGeneric").children().each(function() {
        //alert("dataspace div: " + $(this).html());
        //alert("li: " + $(this).html());
        var label = $(this).children()[0];
