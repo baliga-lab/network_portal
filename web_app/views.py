@@ -231,15 +231,16 @@ def getdataspace(request):
             index = index + 1
 
         # get captured data (i.e., captured)
-        print 'Get captured data'
-        genericorganismobj = Organisms.objects.filter(name = 'Generic')[0]
-        genericdatatypeobj = OrganismDataTypes.objects.filter(type = 'Generic')[0]
-        ownercaptureddata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = genericorganismobj.id, type_id = genericdatatypeobj.id)
-        for data in ownercaptureddata:
-            print 'data type: ' + datatypeobj.type
-            linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': genericdatatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
-            returndata[str(index)] = linkobj
-            index = index + 1
+        if query['organism'] != 'Genric':
+            print 'Get captured data'
+            genericorganismobj = Organisms.objects.filter(name = 'Generic')[0]
+            genericdatatypeobj = OrganismDataTypes.objects.filter(type = 'Generic')[0]
+            ownercaptureddata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = genericorganismobj.id, type_id = genericdatatypeobj.id)
+            for data in ownercaptureddata:
+                print 'data type: ' + datatypeobj.type
+                linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': genericdatatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
+                returndata[str(index)] = linkobj
+                index = index + 1
 
     except Exception as e:
         print str(e)

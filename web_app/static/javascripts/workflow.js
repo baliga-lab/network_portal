@@ -1924,8 +1924,13 @@ function DeleteCollectedData(selected)
            //alert($(input).is(':checked'));
            var dataidinput = $(label).children()[2];
            var dataid = $(dataidinput).val();
+
+           var useridinput = $(label).children()[5];
+           var userid = $(useridinput).val();
+
            //alert(dataid);
-           if ($(input).is(':checked') == selected)
+           //alert(userid + " " + $("#authenticated").val());
+           if ($(input).is(':checked') == selected && userid == $("#authenticated").val())
            {
                //elementstobedeleted.push($(this));
                if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
@@ -2013,6 +2018,11 @@ function InsertDataToTarget(targetid, linkpair)
         datatypeinput.setAttribute("type", "hidden");
         datatypeinput.setAttribute("value", linkpair['datatype']);
         $(label).append($(datatypeinput));
+
+        var useridinput = document.createElement("input");
+        useridinput.setAttribute("type", "hidden");
+        useridinput.setAttribute("value", linkpair['userid']);
+        $(label).append($(useridinput));
     }
 }
 
@@ -2461,7 +2471,7 @@ function SaveOneGroup(event)
            linkobj.text = $(link).text();
            linkobj.url = $(link).prop("href");
            linkobj.inputid = $(idinput).attr('id');
-           alert(linkobj.inputid);
+           //alert(linkobj.inputid);
            datatoopen[("data" + datacnt)] = linkobj;
            datacnt++;
        });
