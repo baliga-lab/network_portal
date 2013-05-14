@@ -1,7 +1,11 @@
 {% extends "base2.html" %}
+{% load filters %}
 {% block title %}Network Portal - Module stats for {{ network.species.name }}{% endblock %}
 {% block cssspecial %}
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css">
+{% endblock %}
+{% block jsspecial %}
+  <script src="{{ STATIC_PREFIX }}javascripts/highcharts-3.0.1.js"></script>
 {% endblock %}
 {% block content %}
 <script>
@@ -13,7 +17,7 @@ function loadList() {
     url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/10.0) + '&maxmot=' + (motRange[1]/10.0),
     dataType: 'html'
   }).done(function(data) {
-    $($.parseHTML(data)).replaceAll('#modulelist');
+    $('#modulelist').html(data);
   });
 }
 
