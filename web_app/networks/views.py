@@ -70,6 +70,7 @@ def networks(request):
 
 def network(request, species=None, network_id=None):
     network = Network.objects.get(id=network_id)
+    biclusters = network.bicluster_set.all()
     return render_to_response('network.html', locals())
 
 def network_as_graphml(request):

@@ -91,7 +91,7 @@ $(document).ready(function() {
         {% else %}
 	<td><a href="/{{ gene.species_name }}/gene/{{ gene.name }}?view=regulation#regulates">regulates {{ gene.regulated_biclusters|length }}</a></td>
         {% endif %}
-	<td>{{ gene.bicluster_ids|bicluster_id_links}}</td>
+	<td>{{ gene.biclusters|bicluster_links}}</td>
       </tr>
       {% endfor %} <!-- for result in genes -->
     </tbody>

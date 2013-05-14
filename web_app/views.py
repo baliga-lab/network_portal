@@ -41,13 +41,16 @@ Dialog = namedtuple('Dialog', ['name', 'short_name', 'network_url', 'ngenes', 'n
 
 class GeneResultEntry:
     def __init__(self, id, name, species, species_name,
-                 description, bicluster_ids, influence_biclusters,
+                 description,
+                 biclusters,
+                 bicluster_ids, influence_biclusters,
                  regulated_biclusters):
         self.id = id
         self.name = name
         self.species = species
         self.species_name = species_name
         self.description = description
+        self.biclusters = biclusters
         self.bicluster_ids = bicluster_ids
         self.influence_biclusters = influence_biclusters
         self.regulated_biclusters = regulated_biclusters
@@ -1064,7 +1067,8 @@ def search(request):
             genes = []
             for gene_obj in gene_objs:
                 species_names[gene_obj.species.id] = gene_obj.species.name
-                bicluster_ids = [b.id for b in gene_obj.bicluster_set.all()]
+                biclusters = gene_obj.bicluster_set.all()
+                bicluster_ids = [b.id for b in biclusters]
                 regulates = Bicluster.objects.filter(influences__name__contains=gene_obj.name)
                 _, influence_biclusters = get_influence_biclusters(gene_obj)
 
@@ -1076,6 +1080,7 @@ def search(request):
                                              gene_obj.species.id,
                                              gene_obj.species.short_name,
                                              gene_obj.description,
+                                             biclusters,
                                              bicluster_ids,
                                              influence_biclusters,
                                              regulates))

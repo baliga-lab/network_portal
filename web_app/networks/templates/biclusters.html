@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+{% load filters %}
 {% block title %}Network Portal - Biclusters regulated by {{ regulator }}{% endblock %}
 {% block content %}
 <div class="main">
@@ -15,7 +16,7 @@
   <tbody>
     {% for bicluster in biclusters %}
     <tr>
-      <td><a href="/bicluster/{{ bicluster.id }}">{{ bicluster.k }}</a></td>
+      <td>{{bicluster|bicluster_link}}</a></td>
       <td>{{ bicluster.genes.count }}</td>
       <td>{{ bicluster.residual }}</td>
     </tr>
