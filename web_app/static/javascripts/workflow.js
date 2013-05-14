@@ -143,10 +143,62 @@ function LoadDataWorkspaceComponentMenu()
 
         // Add the goose name to the context menu div
         var li = document.createElement("li");
-        li.innerHTML = ("<input type='checkbox' />" + goosename
-           + "<input type='hidden' value='" + $(this).attr("id") + "' />");
+        var subactionselect = $(this).children()[4];
+        //alert(subactionselect);
+        var values = [];
+        $(subactionselect).children("option").each(function() {
+            //alert($(this).val());
+            values.push( $(this).val() );
+        });
+
+        var subactionhtml = "";
+        if (values.length > 2)
+        {
+            // we have subactions
+            subactionhtml = $(subactionselect).html();
+            subactionhtml = "<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+        }
+        var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
+        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />" + goosename
+           + "<input type='hidden' value='" + $(this).attr("id") + "' />" + subactionhtml);
         $("#ulctxcomponents").append(li);
     });
+}
+
+// Set the Pass Name value according to the goose
+// TODO: Should add a field in DB and load from DB instead of hard coding here
+function SetDataPass(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        var checked = $(source).prop("checked");
+        if (checked) {
+            $("#inputContextSubaction").val("");
+
+            var li = $(source).parent();
+            var goosename = $(li).text();
+            //alert(goosename);
+            $("#inputNameValue").prop("checked", false);
+            if (goosename.toLowerCase().indexOf("firegoose") >= 0)
+            {
+                // Pass name to Firegoose by default
+                $("#inputNameValue").prop("checked", true);
+            }
+        }
+    }
+}
+
+function ContextSubactionSelected(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        //alert($(source).val());
+        $("#inputContextSubaction").val($(source).val());
+    }
 }
 
 // Load data space data
@@ -1777,7 +1829,7 @@ function SaveCollectedData()
     var data = {};
     var index = 0;
     var hasdatatosave = false;
-    $("#ulcaptureddata").children().each(function() {
+    $("#ulGeneric").children().each(function() {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
            var label = $(this).children()[0];
@@ -1860,34 +1912,43 @@ function DeleteCollectedData(selected)
     var data = {};
     var index = 0;
     var hasdatatodelete = false;
-    $("#ulcaptureddata").children().each(function() {
-       //alert("dataspace div: " + $(this).html());
-       //alert("li: " + $(this).html());
-       var label = $(this).children()[0];
-       //alert($(label).html());
-       var input = $(label).children()[0];
-       //alert($(input).is(':checked'));
-       var dataidinput = $(label).children()[2];
-       var dataid = $(dataidinput).val();
-       //alert(dataid);
-       if ($(input).is(':checked') == selected)
-       {
-           //elementstobedeleted.push($(this));
-           if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
+
+    $("#wfdataspace").children().each(function() {
+        var uldata = $(this).children()[2];
+        $(uldata).children().each(function() {
+           //alert("dataspace div: " + $(this).html());
+           //alert("li: " + $(this).html());
+           var label = $(this).children()[0];
+           //alert($(label).html());
+           var input = $(label).children()[0];
+           //alert($(input).is(':checked'));
+           var dataidinput = $(label).children()[2];
+           var dataid = $(dataidinput).val();
+
+           var useridinput = $(label).children()[5];
+           var userid = $(useridinput).val();
+
+           //alert(dataid);
+           //alert(userid + " " + $("#authenticated").val());
+           if ($(input).is(':checked') == selected && userid == $("#authenticated").val())
            {
-              $(this).remove();
+               //elementstobedeleted.push($(this));
+               if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
+               {
+                  $(this).remove();
+               }
+               else {
+                  hasdatatodelete = true;
+                  var obj = {};
+                  obj['id'] = dataid;
+                  data[index.toString()] = obj;
+                  index++;
+                  $(this).remove();
+               }
            }
-           else {
-              hasdatatodelete = true;
-              var obj = {};
-              obj['id'] = dataid;
-              data[index.toString()] = obj;
-              index++;
-              $(this).remove();
-           }
-       }
+        });
+        datatodelete['data'] = data;
     });
-    datatodelete['data'] = data;
 
     if (hasdatatodelete) {
         //alert(JSON.stringify(datatodelete));
@@ -1957,6 +2018,11 @@ function InsertDataToTarget(targetid, linkpair)
         datatypeinput.setAttribute("type", "hidden");
         datatypeinput.setAttribute("value", linkpair['datatype']);
         $(label).append($(datatypeinput));
+
+        var useridinput = document.createElement("input");
+        useridinput.setAttribute("type", "hidden");
+        useridinput.setAttribute("value", linkpair['userid']);
+        $(label).append($(useridinput));
     }
 }
 
@@ -2025,11 +2091,7 @@ function UploadDataFiles()
                                        var organism = pair['organism'];
                                        var datatype = pair['datatype'];
                                        //alert(organism);
-                                       if (datatype == "Generic")
-                                       {
-                                           targetid += "captureddata";
-                                       }
-                                       else if (organism == WF_currOrganism)
+                                       if (organism == WF_currOrganism)
                                        {
                                             targetid += datatype;
                                        }
@@ -2409,7 +2471,7 @@ function SaveOneGroup(event)
            linkobj.text = $(link).text();
            linkobj.url = $(link).prop("href");
            linkobj.inputid = $(idinput).attr('id');
-           alert(linkobj.inputid);
+           //alert(linkobj.inputid);
            datatoopen[("data" + datacnt)] = linkobj;
            datacnt++;
        });
@@ -2596,8 +2658,7 @@ function OpenOneGroup(event)
           if ($(checkbox).is(':checked'))
             datatoopen.push(link);
       });
-      if (datatoopen.length > 0)
-         OpenDataGroup(datatoopen);
+      OpenDataGroup(datatoopen);
   }
 }
 
@@ -2606,7 +2667,7 @@ function OpenDataGroup(group)
     if (group.length > 0)
     {
           //ClearWorkflowCanvas();
-          $('#divDataspaceComponentMenu').dialog( { height:400,
+          $('#divDataspaceComponentMenu').dialog( { height:400, width:500,
             buttons: {
                 "Open": function() {
                     // Get all the selected data
@@ -2620,6 +2681,17 @@ function OpenDataGroup(group)
                               // Append the selected goose to the canvas
                               var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
                               var sourceelement = nodeobj.Element;
+
+                              // Set the subaction of the appended goose if necessary
+                              //alert("getting subaction value");
+                              var subaction = $("#inputContextSubaction").val();
+                              //alert(subaction);
+                              if (subaction != null && subaction.length > 0)
+                              {
+                                  var subactionselect = $(sourceelement).children()[componentsubactioninputindex];
+                                  //alert(subactionselect);
+                                  $(subactionselect).val(subaction);
+                              }
 
                               //alert($(sourceelement).attr("id"));
                               // Process the batched data
@@ -2658,12 +2730,15 @@ function OpenDataGroup(group)
           });
           //$('#divDataspaceMenu').dialog('open');
     }
+    else
+        alert("No data is selected!");
 }
 
 // Open a group of data in a goose
 // User can specify whether to open the URL or the name list
 function GroupOpen()
 {
+    //alert("Open data...");
     GetSelectedData();
     OpenDataGroup(WF_batchedData);
 }
