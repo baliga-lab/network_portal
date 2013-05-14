@@ -143,13 +143,30 @@ function LoadDataWorkspaceComponentMenu()
 
         // Add the goose name to the context menu div
         var li = document.createElement("li");
+        var subactionselect = $(this).children()[4];
+        //alert(subactionselect);
+        var values = [];
+        $(subactionselect).children("option").each(function() {
+            //alert($(this).val());
+            values.push( $(this).val() );
+        });
+
+        var subactionhtml = "";
+        if (values.length > 2)
+        {
+            // we have subactions
+            subactionhtml = $(subactionselect).html();
+            subactionhtml = "<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+        }
         var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
         li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />" + goosename
-           + "<input type='hidden' value='" + $(this).attr("id") + "' />");
+           + "<input type='hidden' value='" + $(this).attr("id") + "' />" + subactionhtml);
         $("#ulctxcomponents").append(li);
     });
 }
 
+// Set the Pass Name value according to the goose
+// TODO: Should add a field in DB and load from DB instead of hard coding here
 function SetDataPass(event)
 {
     var source = event.target || event.srcElement;
@@ -158,6 +175,8 @@ function SetDataPass(event)
     if (source != null) {
         var checked = $(source).prop("checked");
         if (checked) {
+            $("#inputContextSubaction").val("");
+
             var li = $(source).parent();
             var goosename = $(li).text();
             //alert(goosename);
@@ -171,6 +190,16 @@ function SetDataPass(event)
     }
 }
 
+function ContextSubactionSelected(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        //alert($(source).val());
+        $("#inputContextSubaction").val($(source).val());
+    }
+}
 
 // Load data space data
 function LoadDataSpace()
@@ -2628,7 +2657,7 @@ function OpenDataGroup(group)
     if (group.length > 0)
     {
           //ClearWorkflowCanvas();
-          $('#divDataspaceComponentMenu').dialog( { height:400,
+          $('#divDataspaceComponentMenu').dialog( { height:400, width:500,
             buttons: {
                 "Open": function() {
                     // Get all the selected data
@@ -2642,6 +2671,17 @@ function OpenDataGroup(group)
                               // Append the selected goose to the canvas
                               var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
                               var sourceelement = nodeobj.Element;
+
+                              // Set the subaction of the appended goose if necessary
+                              //alert("getting subaction value");
+                              var subaction = $("#inputContextSubaction").val();
+                              //alert(subaction);
+                              if (subaction != null && subaction.length > 0)
+                              {
+                                  var subactionselect = $(sourceelement).children()[componentsubactioninputindex];
+                                  //alert(subactionselect);
+                                  $(subactionselect).val(subaction);
+                              }
 
                               //alert($(sourceelement).attr("id"));
                               // Process the batched data
