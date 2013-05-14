@@ -25,10 +25,6 @@ def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
 
-def biclusterstats(request, species=None, network_id=None):
-    network = Network.objects.get(id=network_id)
-    return render_to_response('bicluster_stats.html', locals())
-
 def biclusterstats_list(request, network_id=None):
     network = Network.objects.get(id=network_id)
 
@@ -70,8 +66,8 @@ def networks(request):
 
 def network(request, species=None, network_id=None):
     network = Network.objects.get(id=network_id)
-    biclusters = network.bicluster_set.all()
     return render_to_response('network.html', locals())
+
 
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):

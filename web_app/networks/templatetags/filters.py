@@ -26,6 +26,12 @@ def bicluster_links(biclusters):
     return mark_safe(", ".join([make_bicluster_link(b) for b in biclusters]))
 
 @register.filter
+def tf_link(tf, network):
+    return mark_safe("<a href=\"/network/%d/regulated_by/%s\">%s</a>" % (
+            network.id, tf.name, tf.display_name()))
+
+
+@register.filter
 def lookup(dict, key):
     if key in dict:
         return dict[key]
