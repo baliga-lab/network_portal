@@ -299,6 +299,8 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
             gene_js += "}"
             gene_jss.append(gene_js)
         annot_js = "[ %s ];" % (',\n'.join(gene_jss))
+    else:
+        annot_js = "[];"
 
     gene_count = len(genes)
     influences = bicluster.influences.all()
@@ -322,7 +324,7 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
             cluster_id = "cluster0" + str(bicluster.k) 
 
         img_url = img_url_prefix + cluster_id + ".svgz"
-        print img_url
+        #print img_url
 
     # create motif object to hand to wei-ju's logo viewer
     pssm_logo_dict = __make_pssms(motifs)
@@ -339,13 +341,13 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
         function = Function.objects.get(id=f.function_id)
         if f.p_b <= 0.05:
             ret_bicl_functions[function.name] = f.gene_count
+            """
             print ", ".join([ str(x) for x in (function.type,
                                                function.namespace, function.name, f.gene_count, f.m, f.n, f.k, f.p,
-                                               f.p_bh, f.p_b)])
+                                               f.p_bh, f.p_b)])"""
 
     variables = locals()
-    variables.update({'functional_systems':functional_systems})
-    
+    variables.update({'functional_systems':functional_systems})    
     return render_to_response('bicluster.html', variables)
 
 def __make_pssms(motifs):
