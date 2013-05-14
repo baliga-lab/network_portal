@@ -1930,7 +1930,9 @@ function DeleteCollectedData(selected)
 
            //alert(dataid);
            //alert(userid + " " + $("#authenticated").val());
-           if ($(input).is(':checked') == selected && userid == $("#authenticated").val())
+
+           // Note: userid == "*" means it is inserted by the firegoose
+           if ($(input).is(':checked') == selected && (userid == "*" || userid == $("#authenticated").val()))
            {
                //elementstobedeleted.push($(this));
                if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
