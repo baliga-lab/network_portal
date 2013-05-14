@@ -13,7 +13,7 @@
     </tr>
     {% for bicl in biclusters %}
     <tr>
-      <td>{{bicl.id}}</td>
+      <td>{{bicl|bicluster_link}}</td>
       <td>{{bicl.residual}}</td>
       <td><div id="chart-{{bicl.id}}"></div></td>
       <td>{{bicl|motif1consensus}}</td>

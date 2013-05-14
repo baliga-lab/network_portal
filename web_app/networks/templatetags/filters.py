@@ -10,13 +10,20 @@ def id(value):
     except:
         return value
 
-@register.filter
-def bicluster_links(biclusters):
-    return mark_safe(", ".join([ "<a href=\"/bicluster/%d\">%d</a>" % (b.id,b.id) for b in biclusters]))
+def make_bicluster_link(bicl):
+    """reusable version of making a link to a bicluster"""
+    network = bicl.network
+    species = network.species.short_name
+    return "<a href=\"/%s/network/%d/module/%d\">%d</a>" % (
+        species, network.id, bicl.id, bicl.k)
 
 @register.filter
-def bicluster_id_links(bicluster_ids):
-    return mark_safe(", ".join(["<a href=\"/bicluster/%d\">%d</a>" % (bid, bid) for bid in bicluster_ids]))
+def bicluster_link(bicl):
+    return mark_safe(make_bicluster_link(bicl))
+
+@register.filter
+def bicluster_links(biclusters):
+    return mark_safe(", ".join([make_bicluster_link(b) for b in biclusters]))
 
 @register.filter
 def lookup(dict, key):

@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+{% load filters %}
 {% block title %}Network Portal - Networks for {{ network.species.name }}{% endblock %}
 {% block content %}
 <script>
@@ -28,7 +29,7 @@ $(document).ready(function() {
     <tbody>
       {% for bicluster in biclusters %}
       <tr>
-        <td><a href="/{{ network.species.short_name }}/network/1/module/{{ bicluster.id }}">{{ bicluster.k }}</a></td>
+        <td>{{bicluster|bicluster_link}}</td>
         <td>{{ bicluster.genes.count }}</td>
         <td>{{ bicluster.residual }}</td>
         <td>{{bicluster.conditions.count}}</td>
