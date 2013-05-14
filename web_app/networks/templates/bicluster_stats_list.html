@@ -15,7 +15,7 @@
     <tr>
       <td>{{bicl.id}}</td>
       <td>{{bicl.residual}}</td>
-      <td>&nbsp;</td>
+      <td><div id="chart-{{bicl.id}}"></div></td>
       <td>{{bicl|motif1consensus}}</td>
       <td>{{bicl|motif2consensus}}</td>
       <td>{{bicl.genes.count}}</td>
@@ -23,4 +23,23 @@
     </tr>
     {% endfor %}
   </table>
+  <script>
+    {% for bicl in biclusters %}
+    $.ajax({
+      url: '/bicluster_hcseries/{{bicl.id}}'
+    }).done(function(data) {
+        $('#chart-{{bicl.id}}').highcharts({
+          chart: {
+            type: 'line', width: 200, height: 100
+          },
+          plotOptions: { line: { marker: {enabled: false} } },
+          legend: { enabled: false },
+          title: { text: null },
+          yAxis: { labels: { enabled: false }, title: { enabled: false }},
+          xAxis: { labels: { enabled: false }, title: { enabled: false}},
+          series: data
+        });
+      });
+    {% endfor %}
+  </script>
 </div>

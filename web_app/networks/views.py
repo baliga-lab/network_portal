@@ -39,9 +39,30 @@ def biclusterstats_list(request, network_id=None):
 
     biclusters = network.bicluster_set.filter(
         residual__gte=minres, residual__lte=maxres,
-        motif__e_value__gte=minmot, motif__e_value__lte=maxmot)
+        motif__e_value__gte=minmot, motif__e_value__lte=maxmot).distinct()
 
     return render_to_response('bicluster_stats_list.html', locals())
+
+def bicluster_hcseries(request, bicluster_id=None):
+    bicluster = Bicluster.objects.get(id=bicluster_id)
+    data = []
+    if bicluster != None:
+        exps = {}
+        genes = []
+        conds = []
+        for gene, condition, value in bicluster.expressions():
+            genes.append(gene)
+            conds.append(condition)
+            if gene not in exps:
+                exps[gene] = {}
+            exps[gene][condition] = value
+        genes = sorted(set(genes))
+        conds = sorted(set(conds))
+        data = []
+        for gene in genes:
+            data.append({ 'name': gene,
+                          'data': [exps[gene][cond] for cond in conds] })
+    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def networks(request):
     networks = Network.objects.all()
@@ -49,7 +70,6 @@ def networks(request):
 
 def network(request, species=None, network_id=None):
     network = Network.objects.get(id=network_id)
-    biclusters = network.bicluster_set.all()
     return render_to_response('network.html', locals())
 
 def network_as_graphml(request):

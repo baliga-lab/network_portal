@@ -96,6 +96,7 @@ urlpatterns = patterns('',
     (r'^json/pssm/$', 'networks.views.pssm'),
 
     url(r'^biclusterstats_list/(?P<network_id>\d+)$', 'web_app.networks.views.biclusterstats_list', name='biclusterstats_list'),
+    url(r'^bicluster_hcseries/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster_hcseries', name='bicluster_hcseries'),
 
     # for species-relative links, start here to match the other ones first
     url(r'^species$', 'web_app.networks.views.species', name='species'),
