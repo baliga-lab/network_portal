@@ -26,6 +26,7 @@ var WF_nodecnt = 0;
 var WF_groupcnt = -1;
 var WF_captureddataid = -1;
 var WF_currOrganism = "Generic";
+var FG_currentDataToOpen = null;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -180,6 +181,23 @@ function SetDataPass(event)
             var li = $(source).parent();
             var goosename = $(li).text();
             //alert(goosename);
+
+            if (FG_currentDataToOpen != null) {
+                //alert(FG_currentDataToOpen.length);
+                for (var i = 0; i < FG_currentDataToOpen.length; i++)
+                {
+                    var url = FG_currentDataToOpen[i].toString().toLowerCase();
+                    //alert(url);
+                    if (url.indexOf(".txt") >= 0)
+                    {
+                        // If there is a txt file, we should NOT pass names
+                        //alert("Set check to false");
+                        $("#inputNameValue").prop("checked", false);
+                        return;
+                    }
+                }
+            }
+
             $("#inputNameValue").prop("checked", false);
             if (goosename.toLowerCase().indexOf("firegoose") >= 0)
             {
@@ -2669,6 +2687,7 @@ function OpenDataGroup(group)
     if (group.length > 0)
     {
           //ClearWorkflowCanvas();
+          FG_currentDataToOpen = group;
           $('#divDataspaceComponentMenu').dialog( { height:400, width:500,
             buttons: {
                 "Open": function() {
