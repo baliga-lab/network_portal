@@ -250,6 +250,11 @@ SVG_MAP = {
 }
 
 def bicluster(request, species=None, network_id=None, bicluster_id=None):
+    def is_functiontype(f, ftype):
+        """filtering on type, bonferroni p value cutoff of 0.05"""
+        return (f.function.type == ftype and f.p_bh < 0.05 and
+                f.gene_count > 2)
+
     bicluster = Bicluster.objects.get(id=bicluster_id)
     expressions = bicluster.expressions()
     expmap = {}
@@ -334,18 +339,17 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
         if format == 'html':
             return render_to_response('bicluster_snippet.html', locals())
        
-    # get the functions for a bicluster, filtering on a bonferroni p value cutoff of 0.05
     bicluster_functions = bicluster.bicluster_function_set.all()
-    ret_bicl_functions = {}
-    for f in bicluster_functions:
-        function = Function.objects.get(id=f.function_id)
-        if f.p_b <= 0.05:
-            ret_bicl_functions[function.name] = f.gene_count
-            """
-            print ", ".join([ str(x) for x in (function.type,
-                                               function.namespace, function.name, f.gene_count, f.m, f.n, f.k, f.p,
-                                               f.p_bh, f.p_b)])"""
+    kegg_functions = [f for f in bicluster_functions
+                      if is_functiontype(f, 'kegg')]
+    go_functions = [f for f in bicluster_functions
+                    if is_functiontype(f, 'go')]
+    tigr_functions = [f for f in bicluster_functions
+                      if is_functiontype(f, 'tigr')]
+    cog_functions = [f for f in bicluster_functions
+                     if is_functiontype(f, 'cog')]
 
+    # move the functional_systems global into local space for rendering
     variables = locals()
     variables.update({'functional_systems':functional_systems})    
     return render_to_response('bicluster.html', variables)

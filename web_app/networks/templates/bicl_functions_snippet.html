@@ -41,21 +41,12 @@
 	<h5> Functional Enrichment</h5><p>
 	    <b>Regulon {{ bicluster.id }}</b> is enriched for following functions.
   		</p>
-<!--		<div id="tabs">
-			<ul>
-				<li><a href="#tabs-1">KEGG</a></li>
-				<li><a href="#tabs-2">GO</a></li>
-				<li><a href="#tabs-3">TIGR</a></li>
-				<li><a href="#tabs-4">COG</a></li>
-			</ul>
-
-<!--  <p class="table-top"><a class="link-desc">Jump to</a> | <a class="table-link" href="#kegg"> KEGG </a> | <a class="table-link" href="#go"> GO </a> | <a class="table-link" href="#tigr"> TIGRFam </a> | <a class="table-link" href="#cog"> COG </a></p> --> 
   <!-- KEGG Table -->
+  {% if kegg_functions %}
  <div id="tabs-1">
  <div id="kegg-accordion">
  <h3>KEGG Enrichment Table</h3>
   <table id="kegg-functions-table" class="tablesorter">
-   <!-- <caption>KEGG Enrichment Table <span class="search_help">(Click on a column name to sort)</span></caption> -->
     <thead>
       <tr>
         <th>Function Name</th>
@@ -67,7 +58,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for s in bicluster_functions %}{% if s.function.type == "kegg" %}{% if s.p_bh < 0.05 %}{% if s.gene_count > 2 %}
+      {% for s in kegg_functions %}
       <tr>
         <td><a href="/function/{{ s.function.id }}">{{ s.function.name }}</a></td>
         <td>{{ s.function.namespace }}</td>
@@ -76,16 +67,17 @@
         <td>{{ s.gene_count }}/{{ gene_count }}</td>
         <td>{{ s.method }}</td>
       </tr>
-      {% endif %}{% endif %}{% endif %}{% endfor %}
+      {% endfor %}
     </tbody>
   </table>
 </div> {# kegg-accordion #}
-</div> {# kegg #}<br>
+</div><br>
+{% endif %}{# kegg #}
+{% if go_functions %}
 <div id="tabs-2">
 <div id="go-accordion">
 <h3>GO Enrichment Table</h3>
   <table id="go-functions-table" class="tablesorter">
- <!--    <caption>GO Enrichment Table <span class="search_help">(Click on a column name to sort)</span></caption> -->
     <thead>
       <tr>
         <th>Function Name</th>
@@ -97,7 +89,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for s in bicluster_functions %}{% if s.function.type == "go" %}{% if s.p_bh < 0.05 %}{% if s.gene_count > 2 %}
+      {% for s in go_functions %}
       <tr>
         <td><a href="/function/{{ s.function.id }}">{{ s.function.name }}</a></td>
         <td>{{ s.function.namespace }}</td>
@@ -105,16 +97,18 @@
         <td>{{ s.p_bh }}</td>
         <td>{{ s.gene_count }}/{{ gene_count }}</td>
         <td>{{ s.method }}</td>
-        </tr>{% endif %}{% endif %}{% endif %}{% endfor %}
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div> {# go-accordion #}
-</div> {# go #}<br>
+</div><br>
+{% endif %}{# go #}
+{% if tigr_functions %}
 <div id="tabs-3">
 <div id="tigr-accordion">
  <h3>TIGRFam Enrichment Table</h3>
   <table id="tigr-functions-table" class="tablesorter">
-    <!-- <caption>TIGRFam Enrichment Table <span class="search_help">(Click on a column name to sort)</span></caption> -->
     <thead>
       <tr>
         <th>Function Name</th>
@@ -126,7 +120,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for s in bicluster_functions %}{% if s.function.type == "tigr" %}{% if s.p_bh < 0.05 %}{% if s.gene_count > 2 %}
+      {% for s in tigr_functions %}
       <tr>
         <td><a href="/function/{{ s.function.id }}">{{ s.function.name }}</a></td>
         <td>{{ s.function.namespace }}</td>
@@ -134,16 +128,17 @@
         <td>{{ s.p_bh }}</td>
         <td>{{ s.gene_count }}/{{ gene_count }}</td>
         <td>{{ s.method }}</td>
-        </tr>{% endif %}{% endif %}{% endif %}{% endfor %}
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div> {# tigr-accordion #}
-</div> {# tigr #}<br>
+</div><br>{% endif %}{# tigr #}
+{% if cog_functions %}
 <div id="tabs-4">
 <div id="cog-accordion">
 <h3>COG Enrichment Table </h3>
   <table id="cog-functions-table" class="tablesorter">
-    <!-- <caption>COG Enrichment Table <span class="search_help">(Click on a column name to sort)</span></caption> -->
     <thead>
       <tr>
         <th>Function Name</th>
@@ -155,7 +150,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for s in bicluster_functions %}{% if s.function.type == "cog" %}{% if s.p_bh < 0.05 %}{% if s.gene_count > 2 %}
+      {% for s in cog_functions %}
       <tr>
         <td><a href="/function/{{s.function.id}}">{{ s.function.name }}</a></td>
         <td>{{ s.function.namespace }}</td>
@@ -163,10 +158,10 @@
         <td>{{ s.p_bh }}</td>
         <td>{{ s.gene_count }}/{{ gene_count }}</td>
         <td>{{ s.method }}</td>
-        </tr>{% endif %}{% endif %}{% endif %}{% endfor %}
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
   </div> {# cog-accordion #}
-</div> {# cog #}
+</div>{% endif %}{# cog #}
 </div>
-<!-- </div> -->
