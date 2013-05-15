@@ -1,64 +1,40 @@
 {% load static %}{% get_static_prefix as STATIC_PREFIX %}
   <script>
-        $(function() {
-            $( "#tabs" ).tabs();
-        });
-    </script>
-
-	<script>
-			$(function() {
-				$( "#kegg-accordion" ).accordion({
-				collapsible: true,
-				active: 0,
-				heightStyle: "content"
-				});
-			});
-	</script>
-		<script>
-			$(function() {
-				$( "#go-accordion" ).accordion({
-				collapsible: true,
-				heightStyle: "content"
-				});
-			});
-	</script>
-	<script>
-			$(function() {
-				$( "#tigr-accordion" ).accordion({
-				collapsible: true,
-				heightStyle: "content"
-				});
-			});
-	</script>
-
-	<script>
-			$(function() {
-				$( "#cog-accordion" ).accordion({
-				collapsible: true,
-				heightStyle: "content"
-				});
-			});
-	</script>
-
-  <script>
     $(document).ready(function() {
+      $("#tabs").tabs();
+		  $("#kegg-accordion" ).accordion({
+        collapsible: true,
+        active: 0,
+        heightStyle: "content"
+      });
+		  $("#go-accordion" ).accordion({
+		    collapsible: true,
+				heightStyle: "content"
+      });
+		  $("#tigr-accordion" ).accordion({
+		    collapsible: true,
+		    heightStyle: "content"
+		  });
+		  $( "#cog-accordion" ).accordion({
+		    collapsible: true,
+		    heightStyle: "content"
+		  });
 
-    $("#kegg-functions-table")
-    .tablesorter({widthFixed: true, widgets: ['zebra']})
-    {#.tablesorterPager({container: $("#tablepager")})#};
+      $("#kegg-functions-table")
+      .tablesorter({widthFixed: true, widgets: ['zebra']})
+      {#.tablesorterPager({container: $("#tablepager")})#};
 
-    $("#cog-functions-table")
-    .tablesorter({widthFixed: true, widgets: ['zebra']})
-    {#.tablesorterPager({container: $("#tablepager")})#};
+      $("#cog-functions-table")
+      .tablesorter({widthFixed: true, widgets: ['zebra']})
+      {#.tablesorterPager({container: $("#tablepager")})#};
 
-    $("#go-functions-table")
-    .tablesorter({widthFixed: true, widgets: ['zebra']})
-    {#.tablesorterPager({container: $("#tablepager")})#};
+      $("#go-functions-table")
+      .tablesorter({widthFixed: true, widgets: ['zebra']})
+      {#.tablesorterPager({container: $("#tablepager")})#};
 
-    $("#tigr-functions-table")
-    .tablesorter({widthFixed: true, widgets: ['zebra']})
-    {#.tablesorterPager({container: $("#tablepager")})#};
-
+      $("#tigr-functions-table")
+      .tablesorter({widthFixed: true, widgets: ['zebra']})
+      {#.tablesorterPager({container: $("#tablepager")})#};
     });
   </script>
   <div class="subpage">
