@@ -103,9 +103,10 @@ urlpatterns = patterns('',
     url(r'^species/$', 'web_app.networks.views.species', name='species'),
     url(r'^(?P<species>.*)/genes/$', 'web_app.networks.views.genes', name='genes'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)$', 'web_app.networks.views.network', name='network'),
+
+
     url(r'^(?P<species>[^/]*)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='gene'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/module/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster', name='biclusters'),
-    url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/modules$', 'web_app.networks.views.biclusterstats', name='biclusterstats'),
 
     url(r'^(?P<species>[^/]*)/?$', 'web_app.networks.views.species', name='species'),
     

@@ -25,10 +25,6 @@ def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
 
-def biclusterstats(request, species=None, network_id=None):
-    network = Network.objects.get(id=network_id)
-    return render_to_response('bicluster_stats.html', locals())
-
 def biclusterstats_list(request, network_id=None):
     network = Network.objects.get(id=network_id)
 
@@ -61,7 +57,8 @@ def bicluster_hcseries(request, bicluster_id=None):
         data = []
         for gene in genes:
             data.append({ 'name': gene,
-                          'data': [exps[gene][cond] for cond in conds] })
+                          'data': [exps[gene][cond] for cond in conds
+                                   if gene in exps and cond in exps[gene]] })
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def networks(request):
@@ -70,8 +67,8 @@ def networks(request):
 
 def network(request, species=None, network_id=None):
     network = Network.objects.get(id=network_id)
-    biclusters = network.bicluster_set.all()
     return render_to_response('network.html', locals())
+
 
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):
@@ -302,6 +299,8 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
             gene_js += "}"
             gene_jss.append(gene_js)
         annot_js = "[ %s ];" % (',\n'.join(gene_jss))
+    else:
+        annot_js = "[];"
 
     gene_count = len(genes)
     influences = bicluster.influences.all()
@@ -325,7 +324,7 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
             cluster_id = "cluster0" + str(bicluster.k) 
 
         img_url = img_url_prefix + cluster_id + ".svgz"
-        print img_url
+        #print img_url
 
     # create motif object to hand to wei-ju's logo viewer
     pssm_logo_dict = __make_pssms(motifs)
@@ -342,13 +341,13 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
         function = Function.objects.get(id=f.function_id)
         if f.p_b <= 0.05:
             ret_bicl_functions[function.name] = f.gene_count
+            """
             print ", ".join([ str(x) for x in (function.type,
                                                function.namespace, function.name, f.gene_count, f.m, f.n, f.k, f.p,
-                                               f.p_bh, f.p_b)])
+                                               f.p_bh, f.p_b)])"""
 
     variables = locals()
-    variables.update({'functional_systems':functional_systems})
-    
+    variables.update({'functional_systems':functional_systems})    
     return render_to_response('bicluster.html', variables)
 
 def __make_pssms(motifs):

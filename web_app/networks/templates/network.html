@@ -1,57 +1,71 @@
 {% extends "base2.html" %}
 {% load filters %}
-{% block title %}Network Portal - Networks for {{ network.species.name }}{% endblock %}
+{% block title %}Network Portal - Module stats for {{ network.species.name }}{% endblock %}
+{% block cssspecial %}
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css">
+{% endblock %}
+{% block jsspecial %}
+  <script src="{{ STATIC_PREFIX }}javascripts/highcharts-3.0.1.js"></script>
+{% endblock %}
 {% block content %}
 <script>
-$(document).ready(function() { 
-    $("#network-table") 
-    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
-    {#.tablesorterPager({container: $("#tablepager")})#}; 
+function loadList() {
+  var residRange = $('#residslider').slider("values");
+  var motRange = $('#motslider').slider("values");
+
+  $.ajax({
+    url: '/biclusterstats_list/{{network.id}}?minres=' + (residRange[0]/100.0) + '&maxres=' + (residRange[1] / 100.0) + '&minmot=' + (motRange[0]/10.0) + '&maxmot=' + (motRange[1]/10.0),
+    dataType: 'html'
+  }).done(function(data) {
+    $('#modulelist').html(data);
+  });
+}
+
+function updateLabel(ui, selector, prefix, scale) {
+      var values = ui.values;
+      var min = values[0] / scale;
+      var max = values[1] / scale;
+      var label = prefix + ' ' + min + '-' + max;
+      $(selector).text(label);
+}
+
+$(document).ready(function() {
+  $("#residslider").slider({
+    range: true,
+    values: [0, 30],
+    change: function (event, ui) { loadList(); },
+    slide: function (event, ui) {
+      updateLabel(ui, '#dispresid', 'Residual', 100.0);
+    }
+  });
+  $("#motslider").slider({
+    range: true,
+    values: [0, 100],
+    change: function (event, ui) { loadList(); },
+    slide: function (event, ui) {
+      updateLabel(ui, '#dispmot', 'Motif e-value', 10.0);
+    }
+  });
+  $("#resetfilters").click(function () {
+    $("#residslider").slider("values", [0, 30]);
+    $("#motslider").slider("values", [0, 100]);
+  });
+  loadList();
 });
 </script>
 <div class="main">
+  <span><span id="dispresid">Residual: 0-0.3</span><div id="residslider" style="width: 30%"></div></span>
+  <span><span id="dispmot">Motif e-value 0-10</span><div id="motslider" style="width: 30%"></div></span>
+  <span><input id="resetfilters" type="button" value="Reset Filters"></input>
 
-  <h5>{{ network.name }}</h5>
-
-  <p>Species: <a href="/{{ network.species.short_name }}">{{ network.species.name }}</a></p>
-  <p>Data source: {{ network.data_source }}</p>
-
-  <table id="network-table" class="tablesorter">
-    <caption> Summary table for the network</caption>
-    <thead>
-      <tr>
-        <th>Bicluster</th>
-        <th># of genes</th>
-        <th>Residual</th>
-        <th>Conditions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for bicluster in biclusters %}
-      <tr>
-        <td>{{bicluster|bicluster_link}}</td>
-        <td>{{ bicluster.genes.count }}</td>
-        <td>{{ bicluster.residual }}</td>
-        <td>{{bicluster.conditions.count}}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  
-  <table>
-    <thead>
-      <tr>
-        <th>Influences</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for tf in network.species.transcription_factors %}
-      <tr>
-        <td><a href="/network/{{ network.id}}/regulated_by/{{ tf.name }}">{{ tf.display_name }}</a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  
+  <div id="modulelist">
+    This is the section to display the module list
+  </div>
+  <div>
+    <h2>Influences</h2>
+    {% for tf in network.species.transcription_factors %}
+    {{tf|tf_link:network}} 
+    {% endfor %}
+  </div>
 </div><!-- End #main -->
 {% endblock %}

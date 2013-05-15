@@ -90,13 +90,15 @@ if (!annot) {
     }
 
     annot.draw = function (id, params) {
-        var paper = Raphael(document.getElementById(id),
-                            params.width, params.height);
-        var border = paper.rect(0, 0, params.width, params.height);
-        base1_x = params.width - 140;
-        drawVerticals(paper, params);
-        drawScale(paper, params);
-        //drawCaption(paper, params);
-        drawAnnotations(paper, params);
+        if (params.annotations && params.annotations.length > 0) {
+            var paper = Raphael(document.getElementById(id),
+                                params.width, params.height);
+            var border = paper.rect(0, 0, params.width, params.height);
+            base1_x = params.width - 140;
+            drawVerticals(paper, params);
+            drawScale(paper, params);
+            //drawCaption(paper, params);
+            drawAnnotations(paper, params);
+        }
     };
 })();
