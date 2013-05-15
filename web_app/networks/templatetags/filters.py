@@ -30,6 +30,10 @@ def tf_link(tf, network):
     return mark_safe("<a href=\"/network/%d/regulated_by/%s\">%s</a>" % (
             network.id, tf.name, tf.display_name()))
 
+@register.filter
+def gene_gaggle_link(gene):
+    return mark_safe("<a href=\"/%s/gene/%s\"><span class=\"gaggle-gene-names\">%s</span></a>" % (gene.species.short_name, gene.name, gene.name))
+
 
 @register.filter
 def lookup(dict, key):

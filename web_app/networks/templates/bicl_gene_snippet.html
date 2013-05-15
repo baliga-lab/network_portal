@@ -1,3 +1,4 @@
+{% load filters %}
 <h5> Members for Module {{ bicluster.id }} </h5>
 <p>
   {% if filter == 'tf' %}
@@ -41,7 +42,7 @@ $(document).ready(function() {
   <tbody>
     {% for gene in genes %}
     <tr>
-      <td><a href="/gene/{{ gene.name }}"><span class="gaggle-gene-names">{{ gene.name }}</span></a></td>
+      <td>{{ gene|gene_gaggle_link }}</td>
       <td>{{ gene.common_name|default_if_none:"" }}</td>
       <td>{{ gene.type }}</td>
       <td><a href="http://www.ncbi.nlm.nih.gov/gene/{{ gene.geneid }}">{{ gene.geneid }}</a></td>
