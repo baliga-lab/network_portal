@@ -1,18 +1,7 @@
 <img alt="Gene" src="{{ STATIC_PREFIX }}images/network_gene.png" style="background:none;border:0px;position:relative;bottom:-10px;">Regulon member <img alt="Regulator" src="{{ STATIC_PREFIX }}images/network_regulator.png" style="background:none;border:0px;position:relative; bottom:-10px;">Regulator  <img alt="Motif" src="{{ STATIC_PREFIX }}images/network_motif.png" style="background:none;border:0px;position:relative; bottom:-10px;">Motif <p>
 
-{% if member_biclusters %}
-<script type="text/javascript">
-$(document).ready(function() {
-var vis = nwhelpers.initNetworkTab({{member_biclusters|length}},
-  "{{gene}}",
-  "{{ STATIC_PREFIX }}cytoscapeweb/swf/CytoscapeWeb",
-  "{{ STATIC_PREFIX }}cytoscapeweb/swf/playerProductInstall",
-  nwhelpers.load_popup);
-});
-</script>
-{% endif %}
 <div id="cytoscapeweb">
-  {% if member_biclusters %}{% for bicluster in member_biclusters %}{{ bicluster.id }}{% endfor %}
+  {% if member_biclusters %}
   Cytoscape Web
   {% else %}
   <p>{{ gene }} is not assigned to any regulons</p>

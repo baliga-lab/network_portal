@@ -25,99 +25,97 @@
     <script type="text/javascript">window.sv_base_url = "/sviewer/"</script>-->
 <!-- These are required for loading NCBI sequence viewer in gene page -->
 <!--<script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/projects/sviewer/js/main.js"/>-->
-<script>
-        $(function() {
-            $( "#tabs" ).tabs();
-        });
-    </script>
-
     {% endblock %}
 
 {% block content %}
 <div id="bicluster-top">
  <div class="sub-page">
-    <div id="tabs" class="sub-page">
-    <ul>
-	  <li><a class="name" href="#tab-main">{{ gene.name }}</a></li>
-	  <li><a class="network" href="#tab-network">Network</a></li>
-	  <li><a class="regulator" href="#tab-regulator">Regulation</a></li>
-	  <li><a class="motif" href="#tab-motif">Motifs</a></li>
-	  <li><a class="function" href="#tab-function">Functions</a></li>
-	  <li><a class="genes" href="#tab-gene">Regulon Members</a></li>
-	  {# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
-	  <li><a class="help" href="#tab-help">Help</a></li>
-	  <li><a class="social" href="#tab-social">Social</a></li>
-    </ul>
-    <div id="tab-main">
-		<div class="main">
-    <script type="text/javascript">
-    var django_pssms = {{bicluster_pssms}};
-          $(document).ready(function() {
-              var loaded = [false, false, false, false, false, false, false, false];
-              $('#tabs').tabs({
-                  select: function (event, ui) {
-                      if (!loaded[ui.index]) {
-                          switch (ui.index) {
-                          case 1:
-                              var vis =  nwhelpers.initNetworkTab({{ gene.bicluster_set.count }}, "{{ gene.name }}",
-                                                                  "{{ STATIC_PREFIX }}cytoscapeweb/swf/CytoscapeWeb",
-                                                                  "{{ STATIC_PREFIX }}cytoscapeweb/swf/playerProductInstall",
-                                                                  nwhelpers.load_popup);
-                              break;
-                          case 3:
-                              setTimeout(function () { nwhelpers.initCanvas(django_pssms); }, 500);
-                          default:
-                              break;
-                          }
-                          loaded[ui.index] = true;
-                      }
+   <div id="tabs" class="sub-page">
+     <ul>
+	     <li><a class="name" href="#tab-main">{{ gene.name }}</a></li>
+	     <li><a class="network" href="#tab-network">Network</a></li>
+	     <li><a class="regulator" href="#tab-regulator">Regulation</a></li>
+	     <li><a class="motif" href="#tab-motif">Motifs</a></li>
+	     <li><a class="function" href="#tab-function">Functions</a></li>
+	     <li><a class="genes" href="#tab-gene">Regulon Members</a></li>
+	     {# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
+	     <li><a class="help" href="#tab-help">Help</a></li>
+	     <li><a class="social" href="#tab-social">Social</a></li>
+     </ul>
+     <div id="tab-main">
+		   <div class="main">
+         <script type="text/javascript">
+           var django_pssms = {{bicluster_pssms}};
+           $(document).ready(function() {
+             var loaded = [false, false, false, false, false, false, false, false];
+             $('#tabs').tabs({
+               // load network and motif tabs on demand
+               activate: function (event, ui) {
+                 var index = $('#tabs').tabs("option", "active");
+                 if (!loaded[index]) {
+                   switch (index) {
+                     case 1:
+                       var vis = nwhelpers.initNetworkTab({{ gene.bicluster_set.count }}, "{{ gene.name }}",
+                          "{{ STATIC_PREFIX }}cytoscapeweb/swf/CytoscapeWeb",
+                          "{{ STATIC_PREFIX }}cytoscapeweb/swf/playerProductInstall",
+                          nwhelpers.load_popup);
+                        break;
+                      case 3:
+                        setTimeout(function() {
+                          nwhelpers.initCanvas(django_pssms);
+                        }, 500);
+                      default:
+                        break;
+                    }
+                    loaded[index] = true;
                   }
+                }
               });
-
-              {% if view == "regulation" %}
+            {% if view == "regulation" %}
               $('#tabs').tabs("select", 2);
-              {% endif %}
+            {% endif %}
               var circle_vis = new vq.CircVis();
               $.ajax({
-                  url: '/json/circvis/?species=1&gene={{ gene.name }}',
+                url: '/json/circvis/?species=1&gene={{ gene.name }}',
                   success: function(json) {
-                      var cvdata = vqhelpers.makeCircVisData('circvis', json.chromosomes,
-                                                             json.genes, json.network);
+                    var cvdata = vqhelpers.makeCircVisData('circvis', json.chromosomes,
+                      json.genes, json.network);
                       circle_vis.draw(cvdata);
-                  },
-                  error: function() {
+                    },
+                    error: function() {
                       console.debug('could not read data');
-                  }
-              });              
-              nwhelpers.initCanvas2(django_pssms, 'previewcanvas_', {{preview_motifs}});
-
-              $('[id^=previewcanvas]').click(function() {
+                    }
+                  });              
+                nwhelpers.initCanvas2(django_pssms, 'previewcanvas_',
+                                      {{preview_motifs}});
+           
+                $('[id^=previewcanvas]').click(function() {
                   $('#tabs').tabs('select', 3);
+                });
               });
-          });
         </script>
-	<div class="sub-page">
-	  <h5>{{ gene.display_name }}</h5>
-	  <p><span id="gene_description">{{ gene.description }}</span></p>
-    <div id="circvis">CircVis</div>
-    <h5>Functional Annotations ({{ gene.functions.count }})</h5>
-	  {% if gene.functions.count %}
-	  <table id="gene-function-table">
-	     <thead>
-	      <tr>
-		<th>Function</th>
-		<th>System</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      {% for function in gene.functions.all %}
-	      <tr>
-		<td><a href="/function/{{ function.id }}">{{ function.name }}</a></td>
-		<td>{{ function.type }}/ {{ function.namespace}}</td>
-	     {% endfor %}
-	      </tr>
-	    </tbody>
-	  </table>
+	       <div class="sub-page">
+	         <h5>{{ gene.display_name }}</h5>
+	         <p><span id="gene_description">{{ gene.description }}</span></p>
+           <div id="circvis">CircVis</div>
+           <h5>Functional Annotations ({{ gene.functions.count }})</h5>
+	         {% if gene.functions.count %}
+	         <table id="gene-function-table">
+	           <thead>
+	             <tr>
+		             <th>Function</th>
+		             <th>System</th>
+	             </tr>
+	           </thead>
+	           <tbody>
+	             {% for function in gene.functions.all %}
+	             <tr>
+		             <td><a href="/function/{{ function.id }}">{{ function.name }}</a></td>
+		             <td>{{ function.type }}/ {{ function.namespace}}</td>
+	               {% endfor %}
+	             </tr>
+	           </tbody>
+	         </table>
 	  
 	  {% else %}
 	 <div class="sub-page">
