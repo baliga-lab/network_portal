@@ -69,7 +69,7 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
             graph.add_edge("bicluster:%d" %(bicluster.id,), gene)
         for inf in bicluster.influences.all():
             graph.add_edge("bicluster:%d" %(bicluster.id,), "inf:%d" % (inf.id,))
-            print ">>> " + str(inf)
+            #print ">>> " + str(inf)
         for motif in bicluster.motif_set.all():
             graph.add_node("motif:%d" % (motif.id,), {'type':'motif', 'consensus':motif.consensus(), 'e_value':motif.e_value, 'name':"motif:%d" % (motif.id,)})
             graph.add_edge("bicluster:%d" %(bicluster.id,), "motif:%d" % (motif.id,))
