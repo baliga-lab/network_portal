@@ -27,10 +27,10 @@
       <th>Regulon</th>
       <th>Operator</th>
     </tr>
-    {% for bicluster_id, influence in influence_biclusters %}
+    {% for bicluster, influence in influence_biclusters %}
     <tr>
       <td>{{ influence|format_influence }}</td>
-      <td><a href="/bicluster/{{ bicluster_id }}">{{ bicluster_id }}</a></td>
+      <td>{{ bicluster|bicluster_link}}</td>
       <td>{{ influence.type }}</td>
     </tr>
     {% endfor %}

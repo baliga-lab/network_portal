@@ -193,7 +193,12 @@ class Gene(models.Model):
     functions = models.ManyToManyField('Function', through='Gene_Function')
     
     def display_name(self):
-        return self.name if self.common_name is None or self.common_name=='' else self.name + " " + self.common_name
+        if self.common_name is None or self.common_name == '':
+            return self.name
+        elif self.common_name == self.name:
+            return self.name
+        else:
+            return self.name + " " + self.common_name
     
     def location(self):
         if self.chromosome:

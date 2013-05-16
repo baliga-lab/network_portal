@@ -30,14 +30,11 @@ def get_influence_biclusters(gene):
     # get all biclusters that the gene is a member of
     member_biclusters = gene.bicluster_set.all()
     
-    # list of IDs for biclusters that this gene belongs to
-    bicluster_ids = [b.id for b in member_biclusters]
-
     # get regulatory influences for this gene
     influence_biclusters = []
     for bicluster in member_biclusters:
         for influence in bicluster.influences.all():
-            influence_biclusters.append((bicluster.id, influence))
+            influence_biclusters.append((bicluster, influence))
     return member_biclusters, sorted(influence_biclusters, key=lambda bi: (bi[0], bi[1].name))
 
 def get_nx_graph_for_biclusters(biclusters, expand=False):
