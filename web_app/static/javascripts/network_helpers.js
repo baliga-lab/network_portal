@@ -15,7 +15,7 @@ if (!nwhelpers) {
                 $("#pop_up").html("<p>Error!!</p>");
             }
         });
-        if (motifURL !== null) {
+        if (motifURL) {
             $.ajax({
                 url: motifURL,
                 success: function (pssm) {
@@ -113,9 +113,11 @@ if (!nwhelpers) {
 
     nwhelpers.addCytoscapeClickListener = function (vis, load_content) {
         var node_click_listener = vis.addListener("click", "nodes", function (event) {
-            var data = event.target.data, url, motifURL = null;
+            var data = event.target.data; //, url, motifURL = null;
+            /*
             if (data.type === 'gene') {
-                url = "/gene/" + data.id + "?format=html";
+                //url = "/gene/" + data.id + "?format=html";
+                url = data.url;
             } else if (data.type === 'regulator') {
                 if (data.name.indexOf("~~") < 0) {
                     url = "/gene/" + data.name + "?format=html";
@@ -133,8 +135,8 @@ if (!nwhelpers) {
                 motifURL = "/json/pssm?motif_id=" + id;
             } else {
                 return;
-            }
-            load_content(url, motifURL);
+            }*/
+            load_content(data.url, data.motifURL);
             $("#pop_up").wijdialog({
                 autoOpen: true,
                 title: event.target.data.name,

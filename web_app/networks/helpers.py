@@ -49,9 +49,17 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
 
     # build networkx graph
     for gene in genes:
-        graph.add_node(gene, {'type':'gene', 'name':gene.display_name()})
+        graph.add_node(gene,
+                       {'type':'gene',
+                        'name':gene.display_name(),
+                        'url': '/gene_popup/%d' % (gene.id, )
+                        })
     for influence in influences:
-        graph.add_node("inf:%d" % (influence.id,), {'type':'regulator', 'name':influence.name})
+        graph.add_node("inf:%d" % (influence.id,),
+                       {'type':'regulator',
+                        'name':influence.name,
+                        'url': 'TODO'
+                        })
         
         # on request, we can add links for combiners (AND gates) to
         # the influences they're combining. This makes a mess of larger
@@ -60,18 +68,33 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
             parts = influence.get_parts()
             for part in parts:
                 if part not in influences:
-                    graph.add_node("inf:%d" % (part.id,), {'type':'regulator', 'name':part.name, 'expanded':True})
+                    graph.add_node("inf:%d" % (part.id,),
+                                   {'type':'regulator',
+                                    'name':part.name,
+                                    'url': 'TODO',
+                                    'expanded':True})
                 graph.add_edge("inf:%d" % (influence.id,), "inf:%d" % (part.id,), {'expanded':True})
         
     for bicluster in biclusters:
-        graph.add_node("bicluster:%d" %(bicluster.id,), {'type':'bicluster', 'name':str(bicluster)})
+        graph.add_node("bicluster:%d" %(bicluster.id,),
+                       {'type':'bicluster',
+                        'name':str(bicluster),
+                        'url': 'TODO'
+                        })
+
         for gene in bicluster.genes.all():
             graph.add_edge("bicluster:%d" %(bicluster.id,), gene)
         for inf in bicluster.influences.all():
             graph.add_edge("bicluster:%d" %(bicluster.id,), "inf:%d" % (inf.id,))
-            #print ">>> " + str(inf)
+
         for motif in bicluster.motif_set.all():
-            graph.add_node("motif:%d" % (motif.id,), {'type':'motif', 'consensus':motif.consensus(), 'e_value':motif.e_value, 'name':"motif:%d" % (motif.id,)})
+            graph.add_node("motif:%d" % (motif.id,),
+                           {'type':'motif',
+                            'consensus':motif.consensus(),
+                            'e_value':motif.e_value,
+                            'name':"motif:%d" % (motif.id,),
+                            'url': 'TODO'
+                            })
             graph.add_edge("bicluster:%d" %(bicluster.id,), "motif:%d" % (motif.id,))
     
     return graph

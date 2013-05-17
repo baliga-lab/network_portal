@@ -78,7 +78,6 @@ def network_as_graphml(request):
         biclusters = Bicluster.objects.filter(genes__name=request.GET['gene'])
     
     expand = request.GET.has_key('expand') and request.GET['expand']=='true'
-    
     graph = get_nx_graph_for_biclusters(biclusters, expand)
     
     # write graphml to response
@@ -86,25 +85,8 @@ def network_as_graphml(request):
     writer.add_graph_element(graph)
     response = HttpResponse(content_type='application/xml')
     writer.dump(response)
-
     return response
 
-def network_as_gml(request):
-    if request.GET.has_key('biclusters'):
-        bicluster_ids = re.split( r'[\s,;]+', request.GET['biclusters'] )
-        biclusters = Bicluster.objects.filter(id__in=bicluster_ids)
-    elif request.GET.has_key('gene'):
-        biclusters = Bicluster.objects.filter(genes__name=request.GET['gene'])
-    
-    expand = request.GET.has_key('expand') and request.GET['expand']=='true'
-    
-    graph = get_nx_graph_for_biclusters(biclusters, expand)
-    
-    # write graphml to response
-    response = HttpResponse(content_type='application/xml')
-    nx.write_gml(graph, response)
-
-    return response
 
 def species(request, species=None):
     # this is a temporary hack for the
@@ -140,42 +122,53 @@ def species(request, species=None):
             raise Http404("No species specified.")
 
 def genes(request, species=None):
-    try:
-        if species:
-            species = Species.objects.get(Q(name=species) | Q(short_name=species))
-        else:
-            gene_count = Gene.objects.count()
-            species_count = Species.objects.count()
-            return render_to_response('genes_empty.html', locals())
-        
-        # handle filters or just get all genes for the species
-        if request.GET.has_key('filter'):
-            filter = request.GET['filter']
-            if filter == 'tf':
-                genes = species.gene_set.filter(transcription_factor=True)
-        else:
-            genes = species.gene_set.all()
-        
-        if request.GET.has_key('format'):
-            format = request.GET['format']
-            if format=='tsv':
-                response = HttpResponse(content_type='application/tsv')
-                for gene in genes:
-                    response.write("\t".join([nice_string(field) for field in (gene.name, gene.common_name, gene.geneid, gene.type, gene.description, gene.location(),)]) + "\n")
-                return response
-        
-        gene_count = len(genes)
-        return render_to_response('genes.html', locals())
-    except (ObjectDoesNotExist, AttributeError):
-        raise
+    if species:
+        species = Species.objects.get(Q(name=species) | Q(short_name=species))
+    else:
+        gene_count = Gene.objects.count()
+        species_count = Species.objects.count()
+        return render_to_response('genes_empty.html', locals())
 
+    # handle filters or just get all genes for the species
+    if request.GET.has_key('filter'):
+        filter = request.GET['filter']
+        if filter == 'tf':
+            genes = species.gene_set.filter(transcription_factor=True)
+    else:
+        genes = species.gene_set.all()
+
+    if request.GET.has_key('format'):
+        format = request.GET['format']
+        if format=='tsv':
+            response = HttpResponse(content_type='application/tsv')
+            for gene in genes:
+                response.write("\t".join([nice_string(field) for field in (gene.name, gene.common_name, gene.geneid, gene.type, gene.description, gene.location(),)]) + "\n")
+            return response
+
+    gene_count = len(genes)
+    return render_to_response('genes.html', locals())
+
+
+def gene_popup(request, gene_id=None):
+    """This serves the popup content displayed when clicking on
+    a gene node in cytoscape web"""
+    gene = Gene.objects.get(id=gene_id)
+    # duplicated functionality from gene(), how to write this nicer ?
+    systems = []
+    for key, functions in gene.functions_by_type().items():
+        system = {}
+        system['name'] = functional_systems[key].display_name
+        system['functions'] = [ "(<a href=\"%s\">%s</a>) %s" % (function.link_to_term(), function.native_id, function.name,) \
+                                for function in functions ]
+        systems.append(system)
+    return render_to_response('gene_snippet.html', locals())
+    
 
 def gene(request, species=None, gene=None, network_id=None):
-    if request.GET.has_key('view'):
-        view = request.GET['view']
-    else:
-        view = ""
-
+    """TODO: What is this ? This handler does too much !!!
+    Make it stop
+    """
+    view = request.GET.get('view', '')
     if gene:
         try:
             gene_id = int(gene)
@@ -190,7 +183,8 @@ def gene(request, species=None, gene=None, network_id=None):
         species_count = Species.objects.count()
         return render_to_response('genes_empty.html', locals())
     
-    # TODO: need to figure out how to handle cases where there's more than one network
+    # TODO: need to figure out how to handle cases where there's
+    # more than one network
     if network_id:
         network_id = int(network_id)
     elif gene.species.network_set.count() > 0:
@@ -235,11 +229,6 @@ def gene(request, species=None, gene=None, network_id=None):
                 preview_added = True
     motifs = all_motifs  # used in template
     preview_motifs = preview_motifs[:2]  # restrict to 2 motifs on the front tab to improve load time
-
-    if request.GET.has_key('format'):
-        format = request.GET['format']
-        if format == 'html':
-            return render_to_response('gene_snippet.html', locals())
     
     return render_to_response('gene.html', locals())
 

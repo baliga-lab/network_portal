@@ -109,7 +109,13 @@ urlpatterns = patterns('',
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/module/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster', name='biclusters'),
 
     url(r'^(?P<species>[^/]*)/?$', 'web_app.networks.views.species', name='species'),
-    
+ 
+    # URLs to the content displayed in the Cytoscape popups
+    url(r'^gene_popup/(?P<gene_id>.*)$', 'web_app.networks.views.gene_popup',
+        name='gene_popup'),
+
+    #### Other stuff
+
     #(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_URL }),
 
 )

@@ -1,5 +1,5 @@
 {% load humanize %}
-<h1>{{ gene.name }}{% if gene.common_name %}&nbsp;{{ gene.common_name }}{% endif %}</h1>
+<h1>{{ gene.display_name }}</h1>
 <p>{{ gene.description }}</p>
 
 <p>species: <a href="/species/{{ gene.species.short_name }}">{{ gene.species.name }}</a><br>
