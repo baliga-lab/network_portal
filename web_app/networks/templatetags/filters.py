@@ -26,14 +26,35 @@ def bicluster_links(biclusters):
 
 
 @register.filter
-def tf_link(tf, network):
-    return mark_safe("<a href=\"/network/%d/regulated_by/%s\">%s</a>" % (
-            network.id, tf.name, tf.display_name()))
+def gene_link(gene):
+    """gene list: make link to gene view"""
+    return mark_safe("<a href=\"/%s/gene/%s\">%s</a>" % (gene.species.short_name, gene.name, gene.name))
 
 
 @register.filter
 def gene_gaggle_link(gene):
     return mark_safe("<a href=\"/%s/gene/%s\"><span class=\"gaggle-gene-names\">%s</span></a>" % (gene.species.short_name, gene.name, gene.name))
+
+
+@register.filter
+def gene_ncbi_link(gene):
+    """gene list: make link to NCBI for gene"""
+    if gene.geneid:
+        return mark_safe("<a href=\"http://www.ncbi.nlm.nih.gov/gene/%s\">%s</a>" % (gene.geneid, gene.geneid))
+    else:
+        return mark_safe("-")
+
+
+@register.filter
+def network_link(network):
+    """make link to network view"""
+    return mark_safe("<a href=\"/%s/network/%d\">%s</a>" % (
+            network.species.short_name, network.id, network.name))
+
+
+@register.filter
+def pssm_json_url(motif_id):
+    return mark_safe("/json/pssm?motif_id=%s" % motif_id)
 
 
 @register.filter
@@ -51,9 +72,16 @@ def searchgene_regulation_link(gene):
 def searchgene_regulates_link(gene):
     return mark_safe("<a href=\"/%s/gene/%s?view=regulation#regulates\">regulates %d</a>" % (gene.species.short_name, gene.name, len(gene.regulated_biclusters)))
 
+
 @register.filter
-def pssm_json_url(motif_id):
-    return mark_safe("/json/pssm?motif_id=%s" % motif_id)
+def species_link(species):
+    return mark_safe("<a href=\"/%s\">%s</a>" % (species.short_name,
+                                                         species.name))
+
+@register.filter
+def tf_link(tf, network):
+    return mark_safe("<a href=\"/network/%d/regulated_by/%s\">%s</a>" % (
+            network.id, tf.name, tf.display_name()))
 
 
 ######################################################################

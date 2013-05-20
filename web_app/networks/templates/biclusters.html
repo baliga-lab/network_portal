@@ -3,7 +3,7 @@
 {% block title %}Network Portal - Biclusters regulated by {{ regulator }}{% endblock %}
 {% block content %}
 <div class="main">
-<p>The are {{ biclusters|length }} biclusters regulated by <b><a href="/gene/{{gene.name}}">{{ gene.display_name }}</a></b> in the network <a href="/network/{{network.id}}">{{network.name}}</a>.</p>
+<p>The are {{bicluster_ids|length}} biclusters regulated by <b>{{gene|gene_link}}</b> in the network {{network|network_link}}.</p>
 
 <table>
   <thead>
@@ -17,13 +17,13 @@
     {% for bicluster in biclusters %}
     <tr>
       <td>{{bicluster|bicluster_link}}</a></td>
-      <td>{{ bicluster.genes.count }}</td>
-      <td>{{ bicluster.residual }}</td>
+      <td>{{bicluster.genes.count}}</td>
+      <td>{{bicluster.residual}}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
-<p><a href="/network?biclusters={{ bicluster_ids|join:"," }}">view network for these {{ bicluster_ids|length }} biclusters</a></p>
+<p><a href="/network?biclusters={{bicluster_ids|join:","}}">view network for these {{bicluster_ids|length}} biclusters</a></p>
 </div>
 {% endblock %}
