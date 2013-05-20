@@ -113,6 +113,9 @@ urlpatterns = patterns('',
     # URLs to the content displayed in the Cytoscape popups
     url(r'^gene_popup/(?P<gene_id>.*)$', 'web_app.networks.views.gene_popup',
         name='gene_popup'),
+    url(r'^bicluster_popup/(?P<bicluster_id>.*)$',
+        'web_app.networks.views.bicluster_popup',
+        name='bicluster_popup'),
 
     #### Other stuff
 

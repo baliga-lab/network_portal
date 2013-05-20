@@ -323,11 +323,6 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
     # create motif object to hand to wei-ju's logo viewer
     pssm_logo_dict = __make_pssms(motifs)
 
-    if request.GET.has_key('format'):
-        format = request.GET['format']
-        if format == 'html':
-            return render_to_response('bicluster_snippet.html', locals())
-       
     bicluster_functions = bicluster.bicluster_function_set.all()
     kegg_functions = [f for f in bicluster_functions
                       if is_functiontype(f, 'kegg')]
@@ -342,6 +337,14 @@ def bicluster(request, species=None, network_id=None, bicluster_id=None):
     variables = locals()
     variables.update({'functional_systems':functional_systems})    
     return render_to_response('bicluster.html', variables)
+
+
+def bicluster_popup(request, bicluster_id=None):
+    """This serves the popup content displayed when clicking on
+    a bicluster node in cytoscape web"""
+    bicluster = Bicluster.objects.get(id=bicluster_id)
+    return render_to_response('bicluster_snippet.html', locals())
+
 
 def __make_pssms(motifs):
     """reusable function to generate a dictionary of motif id -> PSSMs"""

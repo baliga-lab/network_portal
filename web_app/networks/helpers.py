@@ -38,6 +38,15 @@ def get_influence_biclusters(gene):
     return member_biclusters, sorted(influence_biclusters, key=lambda bi: (bi[0], bi[1].name))
 
 def get_nx_graph_for_biclusters(biclusters, expand=False):
+    def gene_popup_url(gene):
+        return '/gene_popup/%d' % (gene.id, )
+
+    def motif_popup_url(motif):
+        return '/motif_popup/%d' % (motif.id, )
+
+    def bicluster_popup_url(bicluster):
+        return '/bicluster_popup/%d' % (bicluster.id, )
+
     graph = nx.Graph()
 
     # compile sets of genes and influences from all requested biclusters
@@ -52,7 +61,7 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
         graph.add_node(gene,
                        {'type':'gene',
                         'name':gene.display_name(),
-                        'url': '/gene_popup/%d' % (gene.id, )
+                        'url': gene_popup_url(gene)
                         })
     for influence in influences:
         graph.add_node("inf:%d" % (influence.id,),
@@ -79,7 +88,7 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
         graph.add_node("bicluster:%d" %(bicluster.id,),
                        {'type':'bicluster',
                         'name':str(bicluster),
-                        'url': 'TODO'
+                        'url': bicluster_popup_url(bicluster)
                         })
 
         for gene in bicluster.genes.all():
@@ -93,7 +102,7 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
                             'consensus':motif.consensus(),
                             'e_value':motif.e_value,
                             'name':"motif:%d" % (motif.id,),
-                            'url': 'TODO'
+                            'url': motif_popup_url(motif)
                             })
             graph.add_edge("bicluster:%d" %(bicluster.id,), "motif:%d" % (motif.id,))
     

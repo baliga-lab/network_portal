@@ -113,21 +113,14 @@ if (!nwhelpers) {
 
     nwhelpers.addCytoscapeClickListener = function (vis, load_content) {
         var node_click_listener = vis.addListener("click", "nodes", function (event) {
-            var data = event.target.data; //, url, motifURL = null;
+            var data = event.target.data;
             /*
-            if (data.type === 'gene') {
-                //url = "/gene/" + data.id + "?format=html";
-                url = data.url;
-            } else if (data.type === 'regulator') {
+            if (data.type === 'regulator') {
                 if (data.name.indexOf("~~") < 0) {
                     url = "/gene/" + data.name + "?format=html";
                 } else {
                     url = "/regulator/" + data.name + "?format=html";
                 }
-            } else if (data.type === 'bicluster') {
-                var pattern = /bicluster:(\d+)/;
-                var id = pattern.exec(data.id)[1];
-                url = "/bicluster/" + id + "?format=html";
             } else if (data.type === 'motif') {
                 var pattern = /motif:(\d+)/;
                 var id = pattern.exec(data.id)[1];
@@ -219,8 +212,8 @@ if (!nwhelpers) {
                        };
             var canvas_id = prefix + motifId;
             var canvasOptions = {
-                width: 220, //400,
-                height: 120, //300,
+                width: 220,
+                height: 120,
                 glyphStyle: '20pt Helvetica'
             };
             isblogo.makeLogo(canvas_id, pssm, canvasOptions);
