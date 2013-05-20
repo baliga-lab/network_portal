@@ -1,6 +1,7 @@
+{% load filters %}
 <h1>Bicluster {{ bicluster.k }}</h1>
 
-<p>k: <a href="/bicluster/{{ bicluster.id }}">{{ bicluster.k }}</a></p>
+<p>k: {{bicluster|bicluster_link}}</p>
 <p>id: {{ bicluster.id }}</p>
 <p>residual: {{ bicluster.residual }}</p>
 <p>Genes: {{ bicluster.genes.count }}</p>

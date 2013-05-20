@@ -115,19 +115,11 @@ if (!nwhelpers) {
         var node_click_listener = vis.addListener("click", "nodes", function (event) {
             var data = event.target.data;
             /*
-            if (data.type === 'regulator') {
-                if (data.name.indexOf("~~") < 0) {
-                    url = "/gene/" + data.name + "?format=html";
-                } else {
-                    url = "/regulator/" + data.name + "?format=html";
-                }
-            } else if (data.type === 'motif') {
+            if (data.type === 'motif') {
                 var pattern = /motif:(\d+)/;
                 var id = pattern.exec(data.id)[1];
                 url = "/motif/" + id + "?format=html";
                 motifURL = "/json/pssm?motif_id=" + id;
-            } else {
-                return;
             }*/
             load_content(data.url, data.motifURL);
             $("#pop_up").wijdialog({

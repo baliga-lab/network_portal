@@ -1,5 +1,6 @@
 from django.db import connection
 import networkx as nx
+import models
 
 # maybe this should be a static method of synomym?
 
@@ -41,6 +42,14 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
     def gene_popup_url(gene):
         return '/gene_popup/%d' % (gene.id, )
 
+    def influence_popup_url(influence):
+        if influence.is_combiner():
+            return '/regulator_popup/%d' % (influence.id, )
+        elif not influence.type == 'ef':
+            return gene_popup_url(models.find_gene_by_name(influence.name))
+        else:
+            return ""  # environmental factor -> not a gene, no mapping
+
     def motif_popup_url(motif):
         return '/motif_popup/%d' % (motif.id, )
 
@@ -67,20 +76,19 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
         graph.add_node("inf:%d" % (influence.id,),
                        {'type':'regulator',
                         'name':influence.name,
-                        'url': 'TODO'
+                        'url': influence_popup_url(influence)
                         })
         
         # on request, we can add links for combiners (AND gates) to
         # the influences they're combining. This makes a mess of larger
         # networks, but works OK in very small networks (1-3 biclusters)
         if expand and influence.is_combiner():
-            parts = influence.get_parts()
-            for part in parts:
+            for part in influence.parts:
                 if part not in influences:
                     graph.add_node("inf:%d" % (part.id,),
                                    {'type':'regulator',
                                     'name':part.name,
-                                    'url': 'TODO',
+                                    'url': influence_popup_url(part),
                                     'expanded':True})
                 graph.add_edge("inf:%d" % (influence.id,), "inf:%d" % (part.id,), {'expanded':True})
         

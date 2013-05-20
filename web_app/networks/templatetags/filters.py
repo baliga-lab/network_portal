@@ -53,7 +53,7 @@ def format_influence(influence):
     if influence.type == 'tf':
         result = '<a class="reggene" href="/%s/gene/%s">%s</a>' % (influence.gene.species.short_name, influence.name, influence.name)
     elif influence.type == 'combiner':
-        result = "<br>".join([ format_influence(part) for part in influence.get_parts()])
+        result = "<br>".join([ format_influence(part) for part in influence.parts])
     else:
         result = influence.name
     return mark_safe(result)
@@ -66,9 +66,8 @@ def influences_to_gene_description_map(influence_biclusters):
         if influence.type == 'tf':
             gene_description_map[influence.gene.name] = influence.gene.description
         elif influence.type == 'combiner':
-            parts = influence.get_parts()
             # note that parts might not be a gene - could be environmental factor
-            for part in parts:
+            for part in influence.parts:
                 # print "part=%s" % (str(part),)
                 if part.gene:
                     gene_description_map[part.name] = part.gene.description.strip()

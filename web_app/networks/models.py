@@ -322,17 +322,6 @@ class Influence(models.Model):
     def is_combiner(self):
         return self.type=='combiner'
     
-    # these two methods are redundant with parts
-    def get_part_names(self):
-        # return ~~ delimited parts, removing the last bit which is the combining operation ('min')
-        return self.name.split('~~')[:-1]
-
-    def get_parts(self):
-        parts = []
-        for part_name in self.get_part_names():
-            parts.append(Influence.objects.get(name=part_name))
-        return parts
-    
     def __unicode__(self):
         return self.name
 

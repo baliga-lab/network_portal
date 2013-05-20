@@ -67,11 +67,7 @@ urlpatterns = patterns('',
     url(r'^network/(?P<network_id>\d+)/regulated_by/(?P<regulator>.*)$', 'web_app.networks.views.regulated_by', name='regulated by'),
     url(r'^network/(?P<network_id>\d+)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='network_gene'),
     
-    url(r'^motif/(?P<motif_id>\d+)$', 'web_app.networks.views.motif', name='motif'),
-    
-
-    url(r'^regulator/(?P<regulator>.*)$', 'web_app.networks.views.regulator', name='regulator'),
-    
+    url(r'^motif/(?P<motif_id>\d+)$', 'web_app.networks.views.motif', name='motif'),    
     url(r'^functions/(?P<type>[^/]*)/?$', 'web_app.networks.views.functions', name='functions'),
     url(r'^function/(?P<name>[^/]*)/?$', 'web_app.networks.views.function', name='function'),
 
@@ -104,7 +100,6 @@ urlpatterns = patterns('',
     url(r'^(?P<species>.*)/genes/$', 'web_app.networks.views.genes', name='genes'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)$', 'web_app.networks.views.network', name='network'),
 
-
     url(r'^(?P<species>[^/]*)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='gene'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/module/(?P<bicluster_id>\d+)$', 'web_app.networks.views.bicluster', name='biclusters'),
 
@@ -116,6 +111,9 @@ urlpatterns = patterns('',
     url(r'^bicluster_popup/(?P<bicluster_id>.*)$',
         'web_app.networks.views.bicluster_popup',
         name='bicluster_popup'),
+    url(r'^regulator_popup/(?P<influence_id>.*)$',
+        'web_app.networks.views.regulator_popup',
+        name='regulator_popup'),
 
     #### Other stuff
 
@@ -123,4 +121,3 @@ urlpatterns = patterns('',
 
 )
 #urlpatterns += staticfiles_urlpatterns()
-

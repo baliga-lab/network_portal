@@ -346,6 +346,12 @@ def bicluster_popup(request, bicluster_id=None):
     return render_to_response('bicluster_snippet.html', locals())
 
 
+def regulator_popup(request, influence_id=None):
+    influence = Influence.objects.get(id=influence_id)
+    parts = influence.parts.all()
+    biclusters = influence.bicluster_set.all()
+    return render_to_response('influence_snippet.html', locals())
+
 def __make_pssms(motifs):
     """reusable function to generate a dictionary of motif id -> PSSMs"""
     pssm_logo_dict = {}
@@ -370,11 +376,6 @@ def regulated_by(request, network_id, regulator):
     bicluster_ids = [bicluster.id for bicluster in biclusters]
     return render_to_response('biclusters.html', locals())
 
-def regulator(request, regulator=None):
-    influence = Influence.objects.get(name=regulator)
-    parts = influence.parts.all()
-    biclusters = influence.bicluster_set.all()
-    return render_to_response('influence_snippet.html', locals())
 
 def functions(request, type):
     system = None
