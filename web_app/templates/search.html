@@ -13,7 +13,7 @@ $(document).ready(function() {
     $("#query").autocomplete({
       source: function(request, response) {
         $.ajax({
-          url:      "http://networks.systemsbiology.net:8983/solr/suggest/?wt=json&json.wrf=?",
+          url: "http://networks.systemsbiology.net:8983/solr/suggest/?wt=json&json.wrf=?",
           crossDomain: true,
           dataType: "jsonp",
           async: false,
@@ -83,15 +83,15 @@ $(document).ready(function() {
       {% for gene in genes %}
       <tr>
         <td><input type="checkbox" id="sel_gene_{{species_id}}_{{gene.id}}"></input></td>
-        <td><a href="/{{gene.species_name}}/gene/{{ gene.name }}">{{ gene.name }}</a></td>
+        <td>{{gene|searchgene_link}}</td>
         <td>{{ gene.description }}</td>
-	<td><a href="/{{ gene.species_name }}/gene/{{ gene.name }}?view=regulation">{{ gene.influence_biclusters|length }} influences</a></td>
+	      <td>{{gene|searchgene_regulation_link}}</td>
         {% if gene.regulated_biclusters|length == 0 %}
         <td>-</td>
         {% else %}
-	<td><a href="/{{ gene.species_name }}/gene/{{ gene.name }}?view=regulation#regulates">regulates {{ gene.regulated_biclusters|length }}</a></td>
+	      <td>{{gene|searchgene_regulates_link}}</td>
         {% endif %}
-	<td>{{ gene.biclusters|bicluster_links}}</td>
+	      <td>{{ gene.biclusters|bicluster_links}}</td>
       </tr>
       {% endfor %} <!-- for result in genes -->
     </tbody>

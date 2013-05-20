@@ -3,12 +3,9 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-@register.filter
-def id(value):
-    try:
-        return [o.id for o in value]
-    except:
-        return value
+######################################################################
+#### Link tags
+######################################################################
 
 def make_bicluster_link(bicl):
     """reusable version of making a link to a bicluster"""
@@ -17,32 +14,66 @@ def make_bicluster_link(bicl):
     return "<a href=\"/%s/network/%d/module/%d\">%d</a>" % (
         species, network.id, bicl.id, bicl.k)
 
+
 @register.filter
 def bicluster_link(bicl):
     return mark_safe(make_bicluster_link(bicl))
 
+
 @register.filter
 def bicluster_links(biclusters):
     return mark_safe(", ".join([make_bicluster_link(b) for b in biclusters]))
+
 
 @register.filter
 def tf_link(tf, network):
     return mark_safe("<a href=\"/network/%d/regulated_by/%s\">%s</a>" % (
             network.id, tf.name, tf.display_name()))
 
+
 @register.filter
 def gene_gaggle_link(gene):
     return mark_safe("<a href=\"/%s/gene/%s\"><span class=\"gaggle-gene-names\">%s</span></a>" % (gene.species.short_name, gene.name, gene.name))
 
+
+@register.filter
+def searchgene_link(gene):
+    """search result list: make link to gene view"""
+    return mark_safe("<a href=\"/%s/gene/%s\">%s</a>" % (gene.species.short_name, gene.name, gene.name))
+
+
+@register.filter
+def searchgene_regulation_link(gene):
+    """search result list: make link to regulation view of a gene"""
+    return mark_safe("<a href=\"/%s/gene/%s?view=regulation\">%d influences</a>" % (gene.species.short_name, gene.name, len(gene.influence_biclusters)))
+
+@register.filter
+def searchgene_regulates_link(gene):
+    return mark_safe("<a href=\"/%s/gene/%s?view=regulation#regulates\">regulates %d</a>" % (gene.species.short_name, gene.name, len(gene.regulated_biclusters)))
+
 @register.filter
 def pssm_json_url(motif_id):
     return mark_safe("/json/pssm?motif_id=%s" % motif_id)
+
+
+######################################################################
+#### Utility filters
+######################################################################
+
+@register.filter
+def id(value):
+    try:
+        return [o.id for o in value]
+    except:
+        return value
+
 
 @register.filter
 def lookup(dict, key):
     if key in dict:
         return dict[key]
     return ''
+
 
 @register.filter
 def search_result_map(species_genes, species_names):
@@ -51,15 +82,18 @@ def search_result_map(species_genes, species_names):
         result += ("<li><a href=\"#species_%d\">%d results</a> for '%s'</li>" % (species_id, len(genes), species_names[species_id]))
     return mark_safe(result + '</ul>')
 
+
 @register.filter
 def format_influence(influence):
     if influence.type == 'tf':
         result = '<a class="reggene" href="/%s/gene/%s">%s</a>' % (influence.gene.species.short_name, influence.name, influence.name)
     elif influence.type == 'combiner':
-        result = "<br>".join([ format_influence(part) for part in influence.parts])
+        result = "<br>".join([format_influence(part)
+                              for part in influence.parts.all()])
     else:
         result = influence.name
     return mark_safe(result)
+
 
 @register.filter
 def influences_to_gene_description_map(influence_biclusters):
@@ -70,7 +104,7 @@ def influences_to_gene_description_map(influence_biclusters):
             gene_description_map[influence.gene.name] = influence.gene.description
         elif influence.type == 'combiner':
             # note that parts might not be a gene - could be environmental factor
-            for part in influence.parts:
+            for part in influence.parts.all():
                 # print "part=%s" % (str(part),)
                 if part.gene:
                     gene_description_map[part.name] = part.gene.description.strip()
@@ -80,17 +114,21 @@ def influences_to_gene_description_map(influence_biclusters):
     #print "# descriptions: ", len(gene_description_map)
     return mark_safe(result);
 
+
 @register.filter
 def motif1consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
     return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[0].consensus(), motifs[0].e_value)) if len(motifs) > 0 else ""
+
 
 @register.filter
 def motif2consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
     return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[1].consensus(), motifs[1].e_value)) if len(motifs) > 1 else ""
 
+
 MAX_BFNAMES = 5
+
 
 @register.filter
 def biclusterfuncs(bicluster):

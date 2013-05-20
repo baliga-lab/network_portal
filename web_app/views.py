@@ -9,7 +9,6 @@ from django.template.loader import get_template
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
-#from social_auth.backends.google import GoogleOAuth2
 from django.utils import simplejson as json
 from django.utils import formats
 from django.utils.formats import get_format
@@ -40,21 +39,20 @@ from collections import namedtuple
 Dialog = namedtuple('Dialog', ['name', 'short_name', 'network_url', 'ngenes', 'ntfs', 'coords'])
 
 class GeneResultEntry:
-    def __init__(self, id, name, species, species_name,
-                 description,
-                 biclusters,
-                 bicluster_ids, influence_biclusters,
+    def __init__(self, gene,
+                 influence_biclusters,
                  regulated_biclusters):
-        self.id = id
-        self.name = name
-        self.species = species
-        self.species_name = species_name
-        self.description = description
-        self.biclusters = biclusters
-        self.bicluster_ids = bicluster_ids
+        self.id = gene.id
+        self.name = gene.name
+        self.description = gene.description
+        self.species = gene.species
+        self.biclusters = gene.bicluster_set.all()
+        self.gene = gene
         self.influence_biclusters = influence_biclusters
         self.regulated_biclusters = regulated_biclusters
 
+    def bicluster_ids(self):
+        return [b.id for b in self.biclusters]
 
 def home(request):
     genes = Gene.objects.all()
@@ -1068,7 +1066,6 @@ def search(request):
             for gene_obj in gene_objs:
                 species_names[gene_obj.species.id] = gene_obj.species.name
                 biclusters = gene_obj.bicluster_set.all()
-                bicluster_ids = [b.id for b in biclusters]
                 regulates = Bicluster.objects.filter(influences__name__contains=gene_obj.name)
                 _, influence_biclusters = get_influence_biclusters(gene_obj)
 
@@ -1076,12 +1073,7 @@ def search(request):
                     species_genes[gene_obj.species.id] = []
                 genes = species_genes[gene_obj.species.id]
 
-                genes.append(GeneResultEntry(gene_obj.id, gene_obj.name,
-                                             gene_obj.species.id,
-                                             gene_obj.species.short_name,
-                                             gene_obj.description,
-                                             biclusters,
-                                             bicluster_ids,
+                genes.append(GeneResultEntry(gene_obj,
                                              influence_biclusters,
                                              regulates))
         except Exception as e:

@@ -72,7 +72,7 @@
                 }
               });
             {% if view == "regulation" %}
-              $('#tabs').tabs("select", 2);
+              $('#tabs').tabs("option", "active", 2);
             {% endif %}
               var circle_vis = new vq.CircVis();
               $.ajax({
@@ -90,7 +90,7 @@
                                       {{preview_motifs}});
            
                 $('[id^=previewcanvas]').click(function() {
-                  $('#tabs').tabs('select', 3);
+                  $('#tabs').tabs("option", "active", 3);
                 });
               });
         </script>
