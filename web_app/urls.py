@@ -7,12 +7,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'network_portal.views.home', name='home'),
-    # url(r'^network_portal/', include('network_portal.foo.urls')),
-
-    # url('', include('social_auth.urls')),
-
     url(r'^$', 'web_app.views.home', name='home'),
     #url(r'^openid/complete/\w*$', 'web_app.views.logincomplete', name='about'),
 
@@ -67,7 +61,6 @@ urlpatterns = patterns('',
     url(r'^network/(?P<network_id>\d+)/regulated_by/(?P<regulator>.*)$', 'web_app.networks.views.regulated_by', name='regulated by'),
     url(r'^network/(?P<network_id>\d+)/gene/(?P<gene>.*)$', 'web_app.networks.views.gene', name='network_gene'),
     
-    url(r'^motif/(?P<motif_id>\d+)$', 'web_app.networks.views.motif', name='motif'),    
     url(r'^functions/(?P<type>[^/]*)/?$', 'web_app.networks.views.functions', name='functions'),
     url(r'^function/(?P<name>[^/]*)/?$', 'web_app.networks.views.function', name='function'),
 
@@ -111,6 +104,8 @@ urlpatterns = patterns('',
     url(r'^bicluster_popup/(?P<bicluster_id>.*)$',
         'web_app.networks.views.bicluster_popup',
         name='bicluster_popup'),
+    url(r'^motif_popup/(?P<motif_id>.*)$', 'web_app.networks.views.motif_popup',
+        name='motif_popup'),
     url(r'^regulator_popup/(?P<influence_id>.*)$',
         'web_app.networks.views.regulator_popup',
         name='regulator_popup'),

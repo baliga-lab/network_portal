@@ -1,3 +1,22 @@
+{% load filters %}
+<script>
+  $(document).ready(function() {
+    $.ajax({
+      url: '{{motif.id|pssm_json_url}}',
+      success: function (pssm) {
+        var options = {
+          width: 300,
+          height: 150,
+          glyphStyle: '20pt Helvetica'
+        };
+        isblogo.makeLogo("canvas", pssm, options);
+      },
+      error: function () {
+        $("#pop_up").html("<p>Error!!</p>");
+      }
+    });
+  });
+</script>
 <h1>Motif: {{motif.id}}</h1>
 
 <p><b>e-value:</b> {{motif.e_value}}</p>

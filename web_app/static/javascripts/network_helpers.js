@@ -15,22 +15,6 @@ if (!nwhelpers) {
                 $("#pop_up").html("<p>Error!!</p>");
             }
         });
-        if (motifURL) {
-            $.ajax({
-                url: motifURL,
-                success: function (pssm) {
-                    var options = {
-                        width: 300,
-                        height: 150,
-                        glyphStyle: '20pt Helvetica'
-                    };
-                    isblogo.makeLogo("canvas", pssm, options);
-                },
-                error: function () {
-                    $("#pop_up").html("<p>Error!!</p>");
-                }
-            });
-        }
     };
 
     nwhelpers.show_msg = function (options) {
@@ -113,14 +97,7 @@ if (!nwhelpers) {
 
     nwhelpers.addCytoscapeClickListener = function (vis, load_content) {
         var node_click_listener = vis.addListener("click", "nodes", function (event) {
-            var data = event.target.data;
-            /*
-            if (data.type === 'motif') {
-                var pattern = /motif:(\d+)/;
-                var id = pattern.exec(data.id)[1];
-                url = "/motif/" + id + "?format=html";
-                motifURL = "/json/pssm?motif_id=" + id;
-            }*/
+            var data = event.target.data, motifURL;
             load_content(data.url, data.motifURL);
             $("#pop_up").wijdialog({
                 autoOpen: true,
@@ -187,8 +164,8 @@ if (!nwhelpers) {
                        };
             var canvas_id = 'canvas_' + motif_id;
             var canvasOptions = {
-                width: 300, //400,
-                height: 150, //300,
+                width: 300,
+                height: 150,
                 glyphStyle: '20pt Helvetica'
             };
             isblogo.makeLogo(canvas_id, pssm, canvasOptions);

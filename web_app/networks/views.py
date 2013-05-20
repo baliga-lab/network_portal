@@ -393,7 +393,7 @@ def function(request, name):
         function = Function.objects.get(name=name)
     return render_to_response('function.html', locals())
 
-def motif(request, motif_id=None):
+def motif_popup(request, motif_id=None):
     """This renders the motif popup dialog"""
     motif = Motif.objects.get(id=motif_id)
     return render_to_response('motif_snippet.html', locals())

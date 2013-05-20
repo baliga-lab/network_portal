@@ -34,6 +34,9 @@ def tf_link(tf, network):
 def gene_gaggle_link(gene):
     return mark_safe("<a href=\"/%s/gene/%s\"><span class=\"gaggle-gene-names\">%s</span></a>" % (gene.species.short_name, gene.name, gene.name))
 
+@register.filter
+def pssm_json_url(motif_id):
+    return mark_safe("/json/pssm?motif_id=%s" % motif_id)
 
 @register.filter
 def lookup(dict, key):
