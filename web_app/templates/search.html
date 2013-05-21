@@ -1,11 +1,10 @@
 {% extends "base2.html" %}
-{% load static %}
+{% load staticfiles %}
 {% load filters %}
-{% get_static_prefix as STATIC_PREFIX %}
 {% block title %}Network Portal - Search{% endblock %}
-{% block cssspecial %}<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/redmond/jquery-ui-1.8.16.custom.css">{% endblock %}
+{% block cssspecial %}<link rel="stylesheet" href="{% static "stylesheets/redmond/jquery-ui-1.8.16.custom.css" %}">{% endblock %}
 {% block jsspecial %}
-<script src="{{ STATIC_PREFIX }}/javascripts/search_helpers.js"></script>
+<script src="{% static "javascripts/search_helpers.js" %}"></script>
 {% endblock %}
 {% block content %}
 <script type="text/javascript">

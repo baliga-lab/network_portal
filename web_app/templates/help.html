@@ -1,18 +1,19 @@
 {% extends "base2.html" %}
+{% load staticfiles %}
 {% block title %}Network Portal - Help {% endblock %}
 {% block cssspecial %}<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/cupertino/jquery-ui.css" />
 
-<link href="{{ STATIC_PREFIX }}/javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />{% endblock %}
-{% block jsspecial %}<script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/cytoscapeweb.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/wwu_logo/isblogo.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+<link href="{% static "javascripts/jquery.qtip.min.css" %}" rel="stylesheet" type="text/css" />{% endblock %}
+{% block jsspecial %}<script type="text/javascript" src="{% static "cytoscapeweb/js/AC_OETags.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "cytoscapeweb/js/cytoscapeweb.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/wwu_logo/isblogo.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/network_helpers.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/jquery.qtip.min.js" %}"></script>
     <script type="text/javascript" src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/protovis.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/visquick-min/vq.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/visquick-min/vq.circvis.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/visquick_helpers.js"></script>
+    <script type="text/javascript" src="{% static "javascripts/protovis.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/visquick-min/vq.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/visquick-min/vq.circvis.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/visquick_helpers.js" %}"></script>
     <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/ext-all.js"></script>
     <script type="text/javascript">window.sv_base_url = "/sviewer/"</script>
@@ -32,7 +33,7 @@
     <meta http-equiv="content-type" content="text/html;charset=iso-8859-1" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
     <meta http-equiv="Content-Script-Type" content="text/Javascript" />
-    <script type="text/javascript" src="{{STATIC_PREFIX}}Network_Portal_Screencast_01/com/js/swfobject/swfobject.js"></script>
+    <script type="text/javascript" src="{% static "Network_Portal_Screencast_01/com/js/swfobject/swfobject.js" %}"></script>
     <script type="text/javascript">
       var flashvars = {};
       var params = {};
@@ -40,9 +41,9 @@
       params.bgcolor = "#000000";
       params.allowscriptaccess = "always";
       
-      flashvars.videoPath = "{{STATIC_PREFIX}}Network_Portal_Screencast_01/movie.f4v";
-      flashvars.posterPath = "{{STATIC_PREFIX}}Network_Portal_Screencast_01/com/poster/myPosterFrame.jpg";
-      flashvars.skinPath = "{{STATIC_PREFIX}}Network_Portal_Screencast_01/com/skin/skin.swf";
+      flashvars.videoPath = "{% static "Network_Portal_Screencast_01/movie.f4v" %}";
+      flashvars.posterPath = "{% static "Network_Portal_Screencast_01/com/poster/myPosterFrame.jpg" %}";
+      flashvars.skinPath = "{% static "Network_Portal_Screencast_01/com/skin/skin.swf" %}";
       
       var stageW = 572;
       var stageH = 564;
@@ -50,7 +51,8 @@
       var attributes = {};
       attributes.id = "flashcontent";
 
-      swfobject.embedSWF("{{STATIC_PREFIX}}Network_Portal_Screencast_01/player.swf", "flashcontent", stageW, stageH, "9.0.0", false, flashvars, params, attributes);
+      swfobject.embedSWF("{% static "Network_Portal_Screencast_01/player.swf" %}",
+        "flashcontent", stageW, stageH, "9.0.0", false, flashvars, params, attributes);
     </script>
 		<script>
 			$(function() {
@@ -87,11 +89,7 @@
      <!-- These are required for loading NCBI sequence viewer in gene page -->
     <!--<script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/projects/sviewer/js/main.js"/>-->
     {% endblock %}
-    {% block content %}
-    
-    {% load static %}
-    {% get_static_prefix as STATIC_PREFIX %}
-    
+    {% block content %}    
     <div class="sub-page">
 	<h5> Network Portal Help</h5><p>
 		<div id="tabs">
@@ -114,22 +112,22 @@
 					<div>
 						<div id="tab-help">
 							<h5 id="network">Network Tab</h5>
-							<img src="{{ STATIC_PREFIX }}images/help_images/gene-network.png" align="right"><p>If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as a network using CytoscapeWeb. In this view, green circular nodes represent regulon member genes, purple diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon(s) (Biclusters) via edges. This representation provides a quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among different regulons. Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details.</br> The information shown for genes includes the locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor and any associated functional information. For regulators, the number of regulons is shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown. You can pin information boxes by using the button in the box title and open up additional ones on the same screen for comparative analysis.</p>								
+							<img src="{% static "images/help_images/gene-network.png" %}" align="right"><p>If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as a network using CytoscapeWeb. In this view, green circular nodes represent regulon member genes, purple diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon(s) (Biclusters) via edges. This representation provides a quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among different regulons. Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details.</br> The information shown for genes includes the locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor and any associated functional information. For regulators, the number of regulons is shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown. You can pin information boxes by using the button in the box title and open up additional ones on the same screen for comparative analysis.</p>								
 							<h5 id="regulation">Regulation Tab</h5>   
-								<img src="{{ STATIC_PREFIX }}images/help_images/gene-regulation.png" align="right"> <p> The regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. The regulators table lists the total number of regulatory influences, regulators, regulons and type of the influence. You can see a description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as a combiner in the column labeled "Operator". For transcription factors, an additional table next to regulator table will be shown. This table shows regulons that are influenced by the transcription factor. </br>
+								<img src="{% static "images/help_images/gene-regulation.png" %}" align="right"> <p> The regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. The regulators table lists the total number of regulatory influences, regulators, regulons and type of the influence. You can see a description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as a combiner in the column labeled "Operator". For transcription factors, an additional table next to regulator table will be shown. This table shows regulons that are influenced by the transcription factor. </br>
 									<h5 id="motifs">Motifs Tab</h5>   
-									<img src="{{ STATIC_PREFIX }}images/help_images/gene-motifs.png" align="right"><p> Network inference algorithm uses de novo motif prediction for assigning genes to regulons. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
+									<img src="{% static "images/help_images/gene-motifs.png" %}" align="right"><p> Network inference algorithm uses de novo motif prediction for assigning genes to regulons. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
 										<h5 id="functions">Functions Tab</h5>  
-										<img src="{{ STATIC_PREFIX }}images/help_images/gene-functions.png" align="right"> <p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. The function name is linked to its explanation and more details.<br>
+										<img src="{% static "images/help_images/gene-functions.png" %}" align="right"> <p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. The function name is linked to its explanation and more details.<br>
 											<h5 id="regulon-members">Regulon Members Tab</h5> 
-											<img src="{{ STATIC_PREFIX }}images/help_images/gene-regulon-members.png" align="right"><p> Identity of gene members in a regulon may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same regulon(s) with gene under consideration are shown here. For each member, gene name, description and regulons that contain it are listed. <br>
+											<img src="{% static "images/help_images/gene-regulon-members.png" %}" align="right"><p> Identity of gene members in a regulon may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same regulon(s) with gene under consideration are shown here. For each member, gene name, description and regulons that contain it are listed. <br>
 												<h5 id="help">Help Tab</h5> 
-												<img src="{{ STATIC_PREFIX }}images/help_images/gene-help.png" align="right"> <p> More general help can be accessed by clicking the help menu in the main navigation bar.</p>
+												<img src="{% static "images/help_images/gene-help.png" %}" align="right"> <p> More general help can be accessed by clicking the help menu in the main navigation bar.</p>
 													<h5 id="comments">Comments Tab</h5>
-													<img src="{{ STATIC_PREFIX }}images/help_images/gene-comments.png" align="right"> <p> Network Portal is designed to promote collaboration through social interactions. Therefore, interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their Facebook or Google accounts to connect to this page. Each regulon and gene page includes a comments tab that lists the history of interactions for that gene. You can browse the history, make updates, raise questions and share these activities within the social web. In future releases of the network portal, we are planning to create a personal space for each user that contains all the analysis steps performed by the user along with relevant information. It will be possible to share these personal spaces with other users.</p>
+													<img src="{% static "images/help_images/gene-comments.png" %}" align="right"> <p> Network Portal is designed to promote collaboration through social interactions. Therefore, interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their Facebook or Google accounts to connect to this page. Each regulon and gene page includes a comments tab that lists the history of interactions for that gene. You can browse the history, make updates, raise questions and share these activities within the social web. In future releases of the network portal, we are planning to create a personal space for each user that contains all the analysis steps performed by the user along with relevant information. It will be possible to share these personal spaces with other users.</p>
 														<h5 id="circvis">CircVis</h5>
 														Our circular regulon explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a>, which was originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use a simplified version of visquick to display distribution of regulon members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
-														<img src="{{ STATIC_PREFIX }}images/help_images/circvis-help.png" align="right"><br>
+														<img src="{% static "images/help_images/circvis-help.png" %}" align="right"><br>
 															<ul>
 																<li> 1. All genomic elements for the organism are represented as a circle and each element is separated by black tick marks. In this example "chromosome" and "pDV" represent the main chromosome and plasmid for D. vulgaris Hildenborough.</li>
 																<li> 2. Source gene</li>
@@ -269,12 +267,12 @@
 				<div id="accordion2" class="">
 					<h4> Workflow Concept</h4>
 					<div>
-						<p><img align="right" src="{{ STATIC_PREFIX }}images/workflow_concept.png">Researchers often come across repetitive analysis tasks where the same/different inputs are analyzed by using the same/different tools multiple times. In addition, a number of analyses tools may need to be used for analyzing the same set of inputs. The workflow allows automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools. </p>
+						<p><img align="right" src="{% static "images/workflow_concept.png" %}">Researchers often come across repetitive analysis tasks where the same/different inputs are analyzed by using the same/different tools multiple times. In addition, a number of analyses tools may need to be used for analyzing the same set of inputs. The workflow allows automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools. </p>
 						<p>The workflow is developed based on our extensive experience with Gaggle in exchanging data between independently developed software tools and databases to enable interactive exploration of systems biology data. Exporting the "boss" and "goose" concept into the workflow, each goose becomes a module in the workflow. These modules can be added into a workflow sequentially or in parallel and can accept output from other modules in the workflow. Once the workflow is built, it can be saved into a personal workspace and can be called out anytime to invoke the same analysis steps.</p> 
 						
 					</div>
 					<h4> Case 1 - Discovering Detailed Regulon Information</h4>
-					<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-1.png">
+					<div> <img align="right" src="{% static "images/workflow_case-1.png" %}">
 					<p> This exercise starts with a regulon in Network Portal. We will use a very simple workflow idea that includes broadcasting data via Firegoose to multiple web resources simultaneously. We will broadcast a Namelist of regulon members to DAVID for functional enrichment analysis and to Entrez to access NCBI tools. We will also broadcast motif PSSM information to STAMP in order to identify matches to known motifs.</p>
 						<b>STEPS:</b>
 						<ol>
@@ -294,7 +292,7 @@
 						</ol>
 					</div>
 					<h4> Case 2 - Analyzing gene expression data</h4>
-					<div> <img align="right" src="{{ STATIC_PREFIX }}images/workflow_case-2.png">
+					<div> <img align="right" src="{% static "images/workflow_case-2.png" %}">
 					<p> The second exercise includes both desktop applications and web resources. The aim of this workflow is to automate analysis of gene expression data and identify functional associations, functional enrichments and associated regulatory network modules. We will start by opening a gene expression file (tab delimited) in Mev. After performing statistical analyses, we will broadcast selected genes via Firegoose to KEGG (Metabolic pathway enrichment) and EMBL Strings (Functional associations). Inparallel, we will also open a Network model in Cytoscape and broadcast our gene list to the network in order to select network modules that include these genes.</p>   
 						<b>STEPS:</b>
 						<ol>
@@ -316,7 +314,7 @@
 						</ol>
 					</div>
 					<h4> Case 3 - Assigning functions to hypothetical proteins</h4>
-					<div><img src="{{ STATIC_PREFIX }}images/workflow_case-3.png"></div>
+					<div><img src="{% static "images/workflow_case-3.png" %}"></div>
 					</div></p>
 				</div>
 		
@@ -381,7 +379,7 @@
 <!--
       <h5>Navigation</h5>
       <span class="search-help"> Mouse over to see details of specific navigation items</span>
-      <img id="Image-Maps_9201202132102136" src="{{ STATIC_PREFIX }}images/gene-page-map.png" usemap="#Image-Maps_9201202132102136" border="0" width="724" height="620" alt="" />
+      <img id="Image-Maps_9201202132102136" src="{% static "images/gene-page-map.png" %}" usemap="#Image-Maps_9201202132102136" border="0" width="724" height="620" alt="" />
       <map id="_Image-Maps_9201202132102136" name="Image-Maps_9201202132102136">
 	<area shape="rect" coords="20,84,89,111" href="#" alt="<font color=red>HOME:</font><br> Takes you to the main Portal Page" title="home"    />
 

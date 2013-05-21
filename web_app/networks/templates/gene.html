@@ -1,4 +1,5 @@
 {% extends "base2.html" %}{% load static %}{% get_static_prefix as STATIC_PREFIX %}
+{% load staticfiles %}
 {% load filters %}
 {% block title %}Network Portal - Gene {{ gene.name }}{% endblock %}
 {% block cssreset %}
@@ -9,17 +10,17 @@
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
 {% endblock %}
 {% block cssspecial %}<link href="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.css" rel="stylesheet" type="text/css" />
-<link href="{{ STATIC_PREFIX }}/javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />{% endblock %}
-{% block jsspecial %}<script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/cytoscapeweb.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/wwu_logo/isblogo.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+<link href="{% static "javascripts/jquery.qtip.min.css" %}" rel="stylesheet" type="text/css" />{% endblock %}
+{% block jsspecial %}<script type="text/javascript" src="{% static "cytoscapeweb/js/AC_OETags.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "cytoscapeweb/js/cytoscapeweb.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/wwu_logo/isblogo.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/network_helpers.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/jquery.qtip.min.js" %}"></script>
     <script type="text/javascript" src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/protovis.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/visquick-min/vq.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/visquick-min/vq.circvis.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/visquick_helpers.js"></script>
+    <script type="text/javascript" src="{% static "javascripts/protovis.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/visquick-min/vq.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/visquick-min/vq.circvis.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "javascripts/visquick_helpers.js" %}"></script>
 <!--    <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/ext-all.js"></script>
     <script type="text/javascript">window.sv_base_url = "/sviewer/"</script>-->
@@ -56,8 +57,8 @@
                    switch (index) {
                      case 1:
                        var vis = nwhelpers.initNetworkTab({{ gene.bicluster_set.count }}, "{{ gene.name }}",
-                          "{{ STATIC_PREFIX }}cytoscapeweb/swf/CytoscapeWeb",
-                          "{{ STATIC_PREFIX }}cytoscapeweb/swf/playerProductInstall",
+                          "{% static "cytoscapeweb/swf/CytoscapeWeb" %}",
+                          "{% static "cytoscapeweb/swf/playerProductInstall" %}",
                           nwhelpers.load_popup);
                         break;
                       case 3:
