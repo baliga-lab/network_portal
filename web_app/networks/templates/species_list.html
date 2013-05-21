@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+{% load staticfiles %}
 {% load filters %}
 {% block title %}Network Portal - Available Species{% endblock %}
 {% block content %}
@@ -34,7 +35,7 @@ $(document).ready(function() {
 	      <td>
 	        {% for st in network %}
 	        {% if st.species_id == sp.id %}
-	        <a href="/{{sp.short_name}}/network/{{ st.id }}"><img src="{{ STATIC_PREFIX }}images/network.gif"/></a>
+	        <a href="{{st|network_url}}"><img src="{% static "images/network.gif" %}"/></a>
 		      {% endif %}
 		      {% endfor %}</td>
       </tr>
