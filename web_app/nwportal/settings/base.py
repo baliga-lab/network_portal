@@ -1,18 +1,12 @@
 # Django settings for network_portal project.
-import os.path
-import sys
+from os.path import join, abspath, dirname
+
+here = lambda *x: join(abspath(dirname(__file__)), *x)
+PROJECT_ROOT = here('..', '..')
+root = lambda *x: join(abspath(PROJECT_ROOT), *x)
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
-#from django.template.defaultfilters import slugify
-#SOCIAL_AUTH_ENABLED_BACKENDS = ('github')
-#SOCIAL_AUTH_COMPLETE_URL_NAME='socialauth_complete'
-#SOCIAL_AUTH_ASSOCIATE_URL_NAME='associate_complete'
-#SOCIAL_AUTH_DEFAULT_USERNAME=lambdau:slugify(u)
-#SOCIAL_AUTH_EXTRA_DATA=False
-#SOCIAL_AUTH_CHANGE_SIGNAL_ONLY=True
-#SOCIAL_AUTH_ASSOCIATE_BY_MAIL=True #associateuserviaemail
-
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -54,6 +48,8 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
+USE_TZ = True
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = ''
@@ -80,12 +76,10 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    "c:/GITHUB/baligalab/network_portal/web_app/static",
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), 'static').replace('\\','/'),
-    # os.path.join(os.path.dirname(__file__), '../public').replace('\\','/'),
+    root('static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -115,14 +109,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware'
 )
 
-ROOT_URLCONF = 'web_app.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
-    os.path.join(os.path.dirname(__file__), 'networks/templates').replace('\\','/'),
+    root('templates'),
+    root('networks/templates'),
 )
 
 # kmf: adding context processors
@@ -148,7 +142,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'web_app.networks',
+    'networks',
 )
 
 # A sample logging configuration. The only tangible logging
