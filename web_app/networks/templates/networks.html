@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+{% load filters %}
 {% block content %}
 <script>
 $(document).ready(function() { 
@@ -24,8 +25,8 @@ $(document).ready(function() {
     <tbody>
       {% for network in networks %}
       <tr>
-        <td><a href="/{{ network.species.short_name }}/network/{{ network.id }}"><img src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></td>
-        <td><i><a href="/{{ network.species.short_name }}">{{ network.species.name }}</a></i></td>
+        <td><a href="{{network|network_url}}"><img src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></td>
+        <td><i>{{network.species|species_link}}</i></td>
         <td>{{ network.created_at|date:"F j, Y" }}</td>
         <td>{{ network.bicluster_set.count }}</td>
       </tr>

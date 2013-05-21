@@ -46,11 +46,15 @@ def gene_ncbi_link(gene):
 
 
 @register.filter
+def network_url(network):
+    return "/%s/network/%d" % (network.species.short_name, network.id)
+
+
+@register.filter
 def network_link(network):
     """make link to network view"""
-    return mark_safe("<a href=\"/%s/network/%d\">%s</a>" % (
-            network.species.short_name, network.id, network.name))
-
+    return mark_safe("<a href=\"%s\">%s</a>" % (network_url(network),
+                                                network.name))
 
 @register.filter
 def pssm_json_url(motif_id):
@@ -76,7 +80,26 @@ def searchgene_regulates_link(gene):
 @register.filter
 def species_link(species):
     return mark_safe("<a href=\"/%s\">%s</a>" % (species.short_name,
-                                                         species.name))
+                                                 species.name))
+
+@register.filter
+def species_genes_link(species):
+    return mark_safe("<a href=\"/%s/genes\">%d</a>" % (species.short_name,
+                                                       species.gene_set.count()))
+
+@register.filter
+def species_ncbi_link(species):
+    """species list make link to NCBI for species"""
+    if species.ncbi_taxonomy_id:
+        return mark_safe("<a href=\"http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=%s\">%s (NCBI)</a>" % (species.ncbi_taxonomy_id, species.ncbi_taxonomy_id))
+    else:
+        return mark_safe("-")
+
+
+@register.filter
+def species_tfs_link(species):
+    return mark_safe("<a href=\"/%s/genes?filter=tf\">%d</a>" % (
+            species.short_name, species.transcription_factors().count()))
 
 @register.filter
 def tf_link(tf, network):
