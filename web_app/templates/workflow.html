@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 <link type="text/css" rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dropdown.css" />
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/portal-style.css">
 
 <script src="http://www.java.com/js/deployJava.js"></script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.16-all.js'></script>
@@ -13,414 +14,546 @@
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
+
 <div id="container" style="width: 100%">
 <img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png">
 <h5> Gaggle Workflow</h5>
-<table width="100%">
-	<tbody>
-		<tr>
-			<th>Start Here <img align="right" width="25px" src="{{ STATIC_PREFIX }}images/Redo.png"></th>
-			<th><span class="small blue fancybutton">1</span>&nbsp; <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a> </th>
-			<th><span class="small blue fancybutton">2</span>&nbsp; Add and connect workflow modules </th>
-			<th><span class="small blue fancybutton">3</span>&nbsp; 
-    		<select id="organismSelect" onchange="javascript:organismSelected(this);">
-        		<option value = "" selected>Select an organism</option>
-                <option value="Generic">Generic Data</option>
+
+<div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
+<ul>
+    <li><a class="name" href="#tab-data">Dataspace -></a></li>
+    <li><a class="network" href="#tab-workflow">Workflows -></a></li>
+    <li><a class="regulator" href="#tab-states">Saved States -></a></li>
+    <li><a class="regulator" href="#tab-reports">Reports -> </a></li>
+    <li><a class="motif" href="#tab-history">History</a></li>
+</ul>
+    <div id="tab-data">
+        <div class="main" style="width:70%">
+            <h5>Data Files </h5>
+            Select an organisms from the portal to see available data:
+            <select id="organismSelect" onchange="javascript:organismSelected(this);">
+                <option value = "" selected>Select an organism</option>
                 {% for organism in organisms %}
                 {% if organism.name != "Generic"  %}
-                    <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+                <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
                 {% endif %}
                 {% endfor %}
+            </select>
+            <table id="tblNetworkPortalFiles"><caption> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group Selected</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete Selected</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete UnSelected</a></caption>
+                <tbody>
+                <th>Name</th><th>Type</th><th> Desc</th><th>Operations</th>
+                </tbody>
+            </table>
+            <p>
+            <table id="tblUserFiles"><caption> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group Selected</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open Selected</a> | <a href="javascript:SaveCollectedData();">Save Selected</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete Selected</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete UnSelected</a></caption>
+                <tbody>
+                <th>Name</th><th>Type</th><th> Desc</th><th>Operations</th>
+                <tr>
+                    <td><a href=#> dvu_cmonkey.cys</a></td>
+                    <td>Cytoscape Network</td>
+                    <td>cMonkey produced cytoscape network file for DvH</td>
+                    <td>  <select id="operationSelect4" onchange="javascript:organismSelected(this);">
+                        <option value = "" selected>Select an operation</option>
+                        <option value="Generic">Open</option>
+                        <option value="Generic">Delete</option>
+                        <option value="Generic">Add to Workflow</option>
+                        <option value="Generic">QuickView</option>
+                        <option value="Generic">Download</option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href=#> dvu_string.cys</a></td>
+                    <td>Cytoscape Network</td>
+                    <td>EMBL String cytoscape network file for DvH</td>
+                    <td>  <select id="operationSelect5" onchange="javascript:organismSelected(this);">
+                        <option value = "" selected>Select an operation</option>
+                        <option value="Generic">Open</option>
+                        <option value="Generic">Delete</option>
+                        <option value="Generic">Add to Workflow</option>
+                        <option value="Generic">QuickView</option>
+                        <option value="Generic">Download</option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href=#> dvu_mev.anl</a></td>
+                    <td>MeV Analysis File</td>
+                    <td>MEV analysis file for gene expression data</td>
+                    <td>  <select id="operationSelect6" onchange="javascript:organismSelected(this);">
+                        <option value = "" selected>Select an operation</option>
+                        <option value="Generic">Open</option>
+                        <option value="Generic">Delete</option>
+                        <option value="Generic">Add to Workflow</option>
+                        <option value="Generic">QuickView</option>
+                        <option value="Generic">Download</option>
+                    </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-		    </select></th>
-			<th> <span class="small blue fancybutton">4</span>&nbsp; <input type="button" value="Run Workflow" onclick="SubmitWorkflow()" class="small green awesome" title="Run selected workflow"/></th>
-			<th><a class="componenthelp" href="#quickhelp"><img src="/static/images/question.gif" /></a></th>
-		</tr>
-	</tbody>
-</table>
-<table id="tblDataSpace" class="tblDataSpace">
-<tbody>
-<tr>
-    <th style="width:20%">
-        <div class="componentheader"><h3>Saved States</h3></div>
-    </th>
-    <th style="width: 60%">
-        <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
-        <input type="button" id="btnSaveState" value="Save State" onclick="javascript:SaveState();" class="button"/>
-        <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
-        <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
-        <input type="button" id="btnSaveData" value="Save Data" onclick="javascript:SaveCollectedData();" class="button"/>
-        <input type="button" id="btnDeleteSelectedData" value="Delete Selected" onclick="javascript:DeleteCollectedData(true);" class="button"/>
-        <input type="button" id="btnDeleteUnselectedData" value="Delete UnSelected" onclick="javascript:DeleteCollectedData(false);" class="button"/>
-        <input type="button" class="button" value="Upload Data" onclick="javascript:UploadDataFiles();">
-        <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
-        <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
-            <option value="-1">Select a data application record to apply to the workflow</option>
-            <option value="-2">---------------------------------------</option>
-        </select>
-        <br />
-    </th>
-    <th style="width: 20%">
-        <div class="componentheader"><h3>Groups</h3></div>
-    </th>
-</tr>
-<tr>
-    <td style="width:20%">
-        <div id="divstatedataaccordion">
-           {% for state in savedstates %}
-            <p id='astate_{{state.id|stringformat:"i"}}'>{{state.name}}</p>
-            <div id='divstate_{{state.id|stringformat:"i"}}'>
-                <div>{{state.description}}</div>
-                <input type="hidden" value='{{state.id|stringformat:"i"}}' />
-                <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
-                <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
-            </div>
-           {% endfor %}
         </div>
-    </td>
-    <td style="width: 60%">
-        <div id="wfdataspace" class="divdataspace">
-            {% for organismdatatype in organismdatatypes %}
-                <div id='div{{organismdatatype.type}}'>
-                    <div class="componentheader"><h3>{{organismdatatype.type}} Data</h3></div><br />
-                    <ul id='ul{{organismdatatype.type}}'>
+        <div id="sidebar" class="sidebar" style="width:25%"><h5> My Groups</h5>
+            <div id="wfgrpaccordion" class="datagroupaccordion">
+                {% for datagroup in datagroups %}
+                <p id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</p>
+                <div id='divgrp_{{datagroup.ID|stringformat:"i"}}' class="datagrpdivclass">
+                    <div>{{datagroupentry.Description}}</div>
+                    <ul>
+                        {% for content in datagroup.Contents %}
+                        <li>
+                            <input type="checkbox" />
+                            <a href="{{content.dataurl}}">{{content.urltext}}</a>
+                            <input type="hidden" value='{{content.id|stringformat:"i"}}' />
+                        </li>
+                        {% endfor %}
                     </ul>
+                    <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
+                    <input type="hidden" value="{{datagroup.Name}}" />
+                    <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
+                    <input type="button" value="Select All" class="button" onclick="javascript:SelectAllInGroup(this);" />
+                    <input type="button" value="Open" class="button" onclick="javascript:OpenOneGroup(this);" />
+                    <input type="button" value="Save" class="button" onclick="javascript:SaveOneGroup(this);" />
+                    <input type="button" value="Delete Group" class="button" onclick="javascript:DeleteOneGroup(this);" />
+                    <input type="button" value="Delete Selected" class="button" onclick="javascript:DeleteDataInGroup(this);" />
+                    <input type="button" value="Delete Unselected" class="button" onclick="javascript:DeleteDataInGroup(this);" />
                 </div>
-                <br />
-            {% endfor %}
-
-        </div>
-    </td>
-    <td style="width: 20%">
-        <div id="wfgrpaccordion" class="datagroupaccordion">
-            {% for datagroup in datagroups %}
-            <p id='agrp_{{datagroup.ID|stringformat:"i"}}'>{{datagroup.Name}}</p>
-            <div id='divgrp_{{datagroup.ID|stringformat:"i"}}' class="datagrpdivclass">
-                <div>{{datagroupentry.Description}}</div>
-                <ul>
-                    {% for content in datagroup.Contents %}
-                    <li>
-                        <input type="checkbox" />
-                        <a href="{{content.dataurl}}">{{content.urltext}}</a>
-                        <input type="hidden" value='{{content.id|stringformat:"i"}}' />
-                    </li>
-                    {% endfor %}
-                </ul>
-                <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
-                <input type="hidden" value="{{datagroup.Name}}" />
-                <input type="hidden" value='{{datagroup.ID|stringformat:"i"}}' />
-                <input type="button" value="Select All" class="button" onclick="javascript:SelectAllInGroup(this);" />
-                <input type="button" value="Open" class="button" onclick="javascript:OpenOneGroup(this);" />
-                <input type="button" value="Save" class="button" onclick="javascript:SaveOneGroup(this);" />
-                <input type="button" value="Delete Group" class="button" onclick="javascript:DeleteOneGroup(this);" />
-                <input type="button" value="Delete Selected" class="button" onclick="javascript:DeleteDataInGroup(this);" />
-                <input type="button" value="Delete Unselected" class="button" onclick="javascript:DeleteDataInGroup(this);" />
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
-    </td>
-</tr>
-</tbody>
-</table>
-<table id="tblWorkflow" class="tblWorkflow">
-<tbody>
-<tr>
-<th style="width: 15%">
-    <div>
-        <div class="componentheader"><h3>Modules</h3></div>
-        <a class="componenthelp" href="#inlinecomponenthelp">
-            <img src="/static/images/question.gif" />
-        </a>
     </div>
-</th>
-<th style="width: 65%">
-<!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
-<input type="button" value="Run" onclick="SubmitWorkflow(null)" class="button-run" title="Run selected workflow"/>
-<input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
-<input type="button" value="Delete" onclick="DeleteClicked()" class="button" title="Delete current workflow"/>
-<input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>
-<input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" class="button-record" title="Start recording new workflow"/>
-<input id="btnPause" type="button" value="Pause" onclick="TogglePause()" class="button-record" title="Pause workflow recording"/>
-    
-</th>
-<th style="width: 20%">
-	<div>
-        <div class="componentheader"><h3>Workflows</h3></div>
-        <a class="componenthelp" href="#workflowshelp">
-            <img src="/static/images/question.gif" />
-        </a>
-    </div>
-</th>
-</tr>
-<!--<tr>
-	<td></td>
-	<td>
-	    		<select id="organismSelect" onchange="javascript:organismSelected(this);">
-        		<option value = "" selected>Select an organism for the workflow</option>
-        		<option value="bce">Bacillus cereus ATCC14579 | bce</option>
-        		<option value="bsu">Bacillus subtilis | bsu</option>
-		        <option value="bth">Bacteroides thetaiotaomicron VPI-5482 | bth</option>
-		        <option value="cje">Campylobacter jejuni | cje</option>
-		        <option value="cac">Clostridium acetobutylicum | cac</option>
-		        <option value="eco">Escherichia coli K12 | eco</option>
-		        <option value="gsu">Geobacter sulfurreducens | gsu</option>
-		        <option value="hal">Halobacterium salinarum NRC-1 | hal</option>
-		        <option value="mmp">Methanococcus maripaludis S2 | mmp</option>
-		        <option value="pae">Pseudomonas aeruginosa | pae</option>
-		        <option value="rsp">Rhodobacter sphaeroides 2.4.1 | rsp</option>
-		        <option value="syf">Synechococcus elongatus PCC 7942 | syf</option>
-		    </select>
-	
 
-	</td>
-	<td></td>
-</tr>-->
-<tr>
-<td valign="top" style="width: 15%">
- <div id="components" class="divcomponents">
-    {% if wfentries.count > 0 %}
-        {% for wfentry in wfentries %}
-            <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
-            
-               {% for component in wfentry.WorkflowComponents %}
-                   
-                        <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
-                        <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a></div>
-                        <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
-                        <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
-                        <a class="componentquestion" href="#inlinewfpath">
+    <div id="tab-workflow">
+        <div class="sub-page">
+        <h5> Gaggle Workflow</h5>
+
+        <table width="100%">
+            <tbody>
+            <tr>
+                <th>Start Here <img align="right" width="25px" src="{{ STATIC_PREFIX }}images/Redo.png"></th>
+                <th><span class="small blue fancybutton">1</span>&nbsp; <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a> </th>
+                <th><span class="small blue fancybutton">2</span>&nbsp; Add and connect workflow modules </th>
+
+                <th> <span class="small blue fancybutton">4</span>&nbsp; <input type="button" value="Run Workflow" onclick="SubmitWorkflow()" class="small green awesome" title="Run selected workflow"/></th>
+                <th><a class="componenthelp" href="#quickhelp"><img src="/static/images/question.gif" /></a></th>
+            </tr>
+            </tbody>
+        </table>
+        <table id="tblDataSpace" class="tblDataSpace">
+            <tbody>
+            <tr>
+                <th style="width:20%">
+                    <div class="componentheader"><h3>Saved States</h3></div>
+                </th>
+                <th style="width: 60%">
+                    <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
+                    <input type="button" id="btnSaveState" value="Save State" onclick="javascript:SaveState();" class="button"/>
+                    <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
+                    <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
+                    <input type="button" id="btnSaveData" value="Save Data" onclick="javascript:SaveCollectedData();" class="button"/>
+                    <input type="button" id="btnDeleteSelectedData" value="Delete Selected" onclick="javascript:DeleteCollectedData(true);" class="button"/>
+                    <input type="button" id="btnDeleteUnselectedData" value="Delete UnSelected" onclick="javascript:DeleteCollectedData(false);" class="button"/>
+                    <input type="button" class="button" value="Upload Data" onclick="javascript:UploadDataFiles();">
+                    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+                    <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
+                        <option value="-1">Select a data application record to apply to the workflow</option>
+                        <option value="-2">---------------------------------------</option>
+                    </select>
+                    <br />
+                </th>
+                <th style="width: 20%">
+                    <div class="componentheader"><h3>Groups</h3></div>
+                </th>
+            </tr>
+            <tr>
+                <td style="width:20%">
+
+                </td>
+                <td style="width: 60%">
+                    <div id="wfdataspace" class="divdataspace">
+                        {% for organismdatatype in organismdatatypes %}
+                        <div id='div{{organismdatatype.type}}'>
+                            <div class="componentheader"><h3>{{organismdatatype.type}} Data</h3></div><br />
+                            <ul id='ul{{organismdatatype.type}}'>
+                            </ul>
+                        </div>
+                        <br />
+                        {% endfor %}
+
+                    </div>
+                </td>
+                <td style="width: 20%">
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <table id="tblWorkflow" class="tblWorkflow">
+            <tbody>
+            <tr>
+                <th style="width: 15%">
+                    <div>
+                        <div class="componentheader"><h3>Modules</h3></div>
+                        <a class="componenthelp" href="#inlinecomponenthelp">
                             <img src="/static/images/question.gif" />
                         </a>
-                        <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
-                                   title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
-                        <select class="componentsubactions">
-                            {% for subaction in component.Subactions %}
-                                <option value="{{subaction}}">{{subaction}}</option>
-                            {% endfor %}
+                    </div>
+                </th>
+                <th style="width: 65%">
+                    <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
+                    <input type="button" value="Run" onclick="SubmitWorkflow(null)" class="button-run" title="Run selected workflow"/>
+                    <input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
+                    <input type="button" value="Delete" onclick="DeleteClicked()" class="button" title="Delete current workflow"/>
+                    <input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>
+                    <input id="btnRecord" type="button" value="Record" onclick="ToggleRecording()" class="button-record" title="Start recording new workflow"/>
+                    <input id="btnPause" type="button" value="Pause" onclick="TogglePause()" class="button-record" title="Pause workflow recording"/>
+
+                </th>
+                <th style="width: 20%">
+                    <div>
+                        <div class="componentheader"><h3>Workflows</h3></div>
+                        <a class="componenthelp" href="#workflowshelp">
+                            <img src="/static/images/question.gif" />
+                        </a>
+                    </div>
+                </th>
+            </tr>
+            <!--<tr>
+                <td></td>
+                <td>
+                            <select id="organismSelect" onchange="javascript:organismSelected(this);">
+                            <option value = "" selected>Select an organism for the workflow</option>
+                            <option value="bce">Bacillus cereus ATCC14579 | bce</option>
+                            <option value="bsu">Bacillus subtilis | bsu</option>
+                            <option value="bth">Bacteroides thetaiotaomicron VPI-5482 | bth</option>
+                            <option value="cje">Campylobacter jejuni | cje</option>
+                            <option value="cac">Clostridium acetobutylicum | cac</option>
+                            <option value="eco">Escherichia coli K12 | eco</option>
+                            <option value="gsu">Geobacter sulfurreducens | gsu</option>
+                            <option value="hal">Halobacterium salinarum NRC-1 | hal</option>
+                            <option value="mmp">Methanococcus maripaludis S2 | mmp</option>
+                            <option value="pae">Pseudomonas aeruginosa | pae</option>
+                            <option value="rsp">Rhodobacter sphaeroides 2.4.1 | rsp</option>
+                            <option value="syf">Synechococcus elongatus PCC 7942 | syf</option>
                         </select>
-                        <input class="componentchildinput" type="text" placeholder="Enter data url"
+
+
+                </td>
+                <td></td>
+            </tr>-->
+            <tr>
+                <td valign="top" style="width: 15%">
+                    <div id="components" class="divcomponents">
+                        {% if wfentries.count > 0 %}
+                        {% for wfentry in wfentries %}
+                        <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
+
+                        {% for component in wfentry.WorkflowComponents %}
+
+                        <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
+                            <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a></div>
+                            <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
+                            <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
+                            <a class="componentquestion" href="#inlinewfpath">
+                                <img src="/static/images/question.gif" />
+                            </a>
+                            <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
+                  title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
+                            <select class="componentsubactions">
+                                {% for subaction in component.Subactions %}
+                                <option value="{{subaction}}">{{subaction}}</option>
+                                {% endfor %}
+                            </select>
+                            <input class="componentchildinput" type="text" placeholder="Enter data url"
                                    title="Enter the url of data to be opened by the component" value=""/>
-                        <input type="hidden" value="{{component.Component.name}}" />
-                        <input type="hidden" value="{{component.Component.short_name}}" />
-                        <input type="hidden" value="" />
-                        <input type="hidden" value="{{component.Component.arguments}}" />
-                        <input type="hidden" value="" />
+                            <input type="hidden" value="{{component.Component.name}}" />
+                            <input type="hidden" value="{{component.Component.short_name}}" />
+                            <input type="hidden" value="" />
+                            <input type="hidden" value="{{component.Component.arguments}}" />
+                            <input type="hidden" value="" />
 
                         </div>
-                   
-               {% endfor %}
-            
-        {% endfor %}
-    {% endif %}
-</div>
-</td>
-<td valign="top" style="width: 65%"><h3>Workflow Canvas</h3>
-<div id="workflowcanvas" class="workflowcanvas" >
-<div><span class="search_help">This is your workflow canvas. Start adding workflow components from the left, open a saved workflow or read our <a class="componenthelp" href="#quickhelp">quick start guide.</a></span></div>
-<div style="display:none">
- <div id="quickhelp" style="text-align:left"> 
-	<h2>Workflow Help</h2>
-	<h5>Quick Start Guide</h5>
-		<p><span class="small blue fancybutton">1</span>&nbsp; Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link and click on the "Gaggle" link in the firegoose toolbar to connect to Gaggle.</p>
-		<p><span class="small blue fancybutton">2</span>&nbsp; Add workflow modules from left sidebar and connect them.</p>
-		<p><span class="small blue fancybutton">3</span>&nbsp; Select an organism to analyze if you would like to use Network Portal organisms in your workflow. This will automatically create necessary attributes specific for the selected organism. Otherwise you can leave this field unselected and enter your custom specifications for each module.</p>
-		<p><span class="small blue fancybutton">4</span>&nbsp; Click <span class="small green awesome">"Run"</span> to start the workflow</li> </p>
-		
-	<h5> Running custom workflows</h5>
-		<p>If you would like to use your own cytoscape or mev files it is possible to create custom workflows. For the initial setup you will need to download and install custom workflow modules. 
-		<p><span class="small blue fancybutton">1</span>&nbsp; Install each goose by using the links on the left (if this is your first time). This will download the updated goose.</p>
-		<p><span class="small blue fancybutton">2</span>&nbsp; Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link</p>
-        <p><span class="small blue fancybutton">3</span>&nbsp; Click on the Gaggle toolbar in Firefox and <b>Connect to Gaggle</b></p>
-		<p><span class="small blue fancybutton">4</span>&nbsp; Drag and drop the goose you want into your workflow canvas</p>
-		<p><span class="small blue fancybutton">5</span>&nbsp; For each module (except firegoose),  workflow will automatically capture path to the executable file in your computer if you open the module (cytoscape or mev) after the gaggle boss has already started.Alternatively, "Enter the url of the executable in your computer" 
-			e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX. </p>
-		<p><span class="small blue fancybutton">6</span>&nbsp; Select any subactions for your modules from the dropdown menu.</p>
-		<p><span class="small blue fancybutton">7</span>&nbsp; If your workflow requires additional files, enter path to data files in your desktop or on the web. For example, this could be link to the expression file in your desktop or web.</p>
-		<p><span class="small blue fancybutton">8</span>&nbsp; In order to connect to components in the workflow drag the circle from the input goose to square of the next workflow component</p>
- 		<p><span class="small blue fancybutton">9</span>&nbsp; Save your workflow </p>
 
-	<h5> Running the Workflow</h5>
-		<p><span class="small blue fancybutton">1</span>&nbsp; Create a new workflow or open a saved one</p>
-		<p><span class="small blue fancybutton">2</span>&nbsp; Click <span class="small green awesome">"Run"</span> to start the workflow</p>
-		<p><span class="small blue fancybutton">3</span>&nbsp; For Firegoose, this will open a new tab and will take you to the page you specified in your workflow</p>
-		<p><span class="small blue fancybutton">4</span>&nbsp; Select the type of the data you want for the next component from the Firegoose toolbar and select "Next"</p>
-		<p><span class="small blue fancybutton">5</span>&nbsp; Your data will be broadcast to the next component in your workflow and your next application or webpage will be opened.</p>
-		<p><span class="small blue fancybutton">6</span>&nbsp; For each workflow component you need to select specific data and click "Next"</p>
+                        {% endfor %}
 
-	<h5> Recording the Workflow</h5>
-		<p><span class="small blue fancybutton">1</span>&nbsp; Gaggle can follow your actions and record them into your workflow for automated tasks</p>
-		<p><span class="small blue fancybutton">2</span>&nbsp; Before recording make sure that the Gaggle bos has started</p>
-		<p><span class="small blue fancybutton">3</span>&nbsp; Click on <span class="small awesome">"Record"</span> button to start recording</p>
-		<p><span class="small blue fancybutton">4</span>&nbsp; Create workflow and follow the steps to complete your analysis</p>
-		<p><span class="small blue fancybutton">5</span>&nbsp; Go back to your workspace and <span class="small awesome">"Stop"</span> your recording Once you are done</p>
-		<p><span class="small blue fancybutton">6</span>&nbsp; Workflow components and connections will be automatically created and placed into your workspace.</p>
-		<p><span class="small blue fancybutton">7</span>&nbsp; You can <span class="small awesome">"Pause"</span> workflow anytime</p>	
-    <h4><a href="/static/apidocuments/index.html">API documents</a> for developing Boss and Goose that supports workflow</h4>
- </div>
-</div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </td>
+                <td valign="top" style="width: 65%"><h3>Workflow Canvas</h3>
+                    <div id="workflowcanvas" class="workflowcanvas" >
+                        <div><span class="search_help">This is your workflow canvas. Start adding workflow components from the left, open a saved workflow or read our <a class="componenthelp" href="#quickhelp">quick start guide.</a></span></div>
+                        <div style="display:none">
+                            <div id="quickhelp" style="text-align:left">
+                                <h2>Workflow Help</h2>
+                                <h5>Quick Start Guide</h5>
+                                <p><span class="small blue fancybutton">1</span>&nbsp; Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link and click on the "Gaggle" link in the firegoose toolbar to connect to Gaggle.</p>
+                                <p><span class="small blue fancybutton">2</span>&nbsp; Add workflow modules from left sidebar and connect them.</p>
+                                <p><span class="small blue fancybutton">3</span>&nbsp; Select an organism to analyze if you would like to use Network Portal organisms in your workflow. This will automatically create necessary attributes specific for the selected organism. Otherwise you can leave this field unselected and enter your custom specifications for each module.</p>
+                                <p><span class="small blue fancybutton">4</span>&nbsp; Click <span class="small green awesome">"Run"</span> to start the workflow</li> </p>
 
-</td>
-<td class="tdlistworkflow" valign="top">
+                                <h5> Running custom workflows</h5>
+                                <p>If you would like to use your own cytoscape or mev files it is possible to create custom workflows. For the initial setup you will need to download and install custom workflow modules.
+                                <p><span class="small blue fancybutton">1</span>&nbsp; Install each goose by using the links on the left (if this is your first time). This will download the updated goose.</p>
+                                <p><span class="small blue fancybutton">2</span>&nbsp; Start the Gaggle Boss by clicking on the <span class="small red awesome">Start the Boss</span> link</p>
+                                <p><span class="small blue fancybutton">3</span>&nbsp; Click on the Gaggle toolbar in Firefox and <b>Connect to Gaggle</b></p>
+                                <p><span class="small blue fancybutton">4</span>&nbsp; Drag and drop the goose you want into your workflow canvas</p>
+                                <p><span class="small blue fancybutton">5</span>&nbsp; For each module (except firegoose),  workflow will automatically capture path to the executable file in your computer if you open the module (cytoscape or mev) after the gaggle boss has already started.Alternatively, "Enter the url of the executable in your computer"
+                                    e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX. </p>
+                                <p><span class="small blue fancybutton">6</span>&nbsp; Select any subactions for your modules from the dropdown menu.</p>
+                                <p><span class="small blue fancybutton">7</span>&nbsp; If your workflow requires additional files, enter path to data files in your desktop or on the web. For example, this could be link to the expression file in your desktop or web.</p>
+                                <p><span class="small blue fancybutton">8</span>&nbsp; In order to connect to components in the workflow drag the circle from the input goose to square of the next workflow component</p>
+                                <p><span class="small blue fancybutton">9</span>&nbsp; Save your workflow </p>
 
-    <div id="accordion" class="workflowaccordion">
-        {% for workflow in myworkflows %}
-        <p id='h3wf_{{workflow.id|stringformat:"i"}}'><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></p>
-        <div id='divwf_{{workflow.id|stringformat:"i"}}'>
-            <p>{{workflow.description}}</p>
+                                <h5> Running the Workflow</h5>
+                                <p><span class="small blue fancybutton">1</span>&nbsp; Create a new workflow or open a saved one</p>
+                                <p><span class="small blue fancybutton">2</span>&nbsp; Click <span class="small green awesome">"Run"</span> to start the workflow</p>
+                                <p><span class="small blue fancybutton">3</span>&nbsp; For Firegoose, this will open a new tab and will take you to the page you specified in your workflow</p>
+                                <p><span class="small blue fancybutton">4</span>&nbsp; Select the type of the data you want for the next component from the Firegoose toolbar and select "Next"</p>
+                                <p><span class="small blue fancybutton">5</span>&nbsp; Your data will be broadcast to the next component in your workflow and your next application or webpage will be opened.</p>
+                                <p><span class="small blue fancybutton">6</span>&nbsp; For each workflow component you need to select specific data and click "Next"</p>
+
+                                <h5> Recording the Workflow</h5>
+                                <p><span class="small blue fancybutton">1</span>&nbsp; Gaggle can follow your actions and record them into your workflow for automated tasks</p>
+                                <p><span class="small blue fancybutton">2</span>&nbsp; Before recording make sure that the Gaggle bos has started</p>
+                                <p><span class="small blue fancybutton">3</span>&nbsp; Click on <span class="small awesome">"Record"</span> button to start recording</p>
+                                <p><span class="small blue fancybutton">4</span>&nbsp; Create workflow and follow the steps to complete your analysis</p>
+                                <p><span class="small blue fancybutton">5</span>&nbsp; Go back to your workspace and <span class="small awesome">"Stop"</span> your recording Once you are done</p>
+                                <p><span class="small blue fancybutton">6</span>&nbsp; Workflow components and connections will be automatically created and placed into your workspace.</p>
+                                <p><span class="small blue fancybutton">7</span>&nbsp; You can <span class="small awesome">"Pause"</span> workflow anytime</p>
+                                <h4><a href="/static/apidocuments/index.html">API documents</a> for developing Boss and Goose that supports workflow</h4>
+                            </div>
+                        </div>
+
+                </td>
+                <td class="tdlistworkflow" valign="top">
+
+                    <div id="accordion" class="workflowaccordion">
+                        {% for workflow in myworkflows %}
+                        <p id='h3wf_{{workflow.id|stringformat:"i"}}'><a href='#' id='liwf_{{workflow.id|stringformat:"i"}}'>{{workflow.name}}</a></p>
+                        <div id='divwf_{{workflow.id|stringformat:"i"}}'>
+                            <p>{{workflow.description}}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+
+                    <!--<div id="divWorkflow" class="divWorkflow">
+                   <ul>
+                   {% if myworkflows.count > 0 %}
+                       {% for workflow in myworkflows %}
+                           <li class="unselectedworkflow" id='liwf_{{workflow.id|stringformat:"i"}}'><a title="{{workflow.description}}" href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
+                       {% endfor %}
+                   {% endif %}
+                   </ul>
+                   </div> -->
+
+
+                    <!--<div><H3> Reports</H3>
+                        <input type="button" value="Delete" onclick="DeleteSessionReport()" class="button"/>
+                    </div>
+                    <br />
+                    <div id="divReport" class="divWorkflow">
+                        <ul></ul>
+                    </div> -->
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
         </div>
-        {% endfor %}
+
+        <p id="result"></p>
+
+        <div id="dlgsaveworkflow" class="dlgsaveworkflow" title="Save Workflow">
+            <p>Name: <input type="text" /></p>
+            <p>Description: <input type="text" /></p>
+            <p><input type="checkbox"/>Save as a new workflow</p>
+        </div>
+
+        <div id="dlgauthenticationalert" class="dlgauthenticationalert" title="Warning">
+            <p>Do you want to login and save the workflow?</p>
+        </div>
+
+        <div id="dlgdeletealert" class="dlgauthenticationalert" title="Warning">
+            <p>Do you really want to delete the workflow?</p>
+        </div>
+
+        <div id="dlgnodataapplicationalert" class="dlgauthenticationalert" title="Warning">
+            <p>You haven't selected a data application method. Do you want to proceed?</p>
+        </div>
+
+        <div id="dlgworkflowfinished" class="dlgauthenticationalert" title="Continue Batch Run">
+            <p>Workflow finished. Do you want to execute the next one in the batch?</p>
+            <p><input type="checkbox"/>Do not ask for this batch</p>
+        </div>
+
+        <input id="authenticated" type="hidden" value="{{userid}}" />
+        <input id="componentstring" type="hidden" value="{{componentstring}}" />
+
+        <div style="display:none">
+            <div id='inlinewfpath' style='padding:10px; background:#fff'>
+                <h5>Configure the Path of Gaggle Geese Applications</h5>
+                <p align="left">There are two ways to configure the execution path of a goose:</p>
+                <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;If you already know the path of the goose (e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX),
+                    simply add the path to the input field.</p>
+                <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;Alternatively, Gaggle can automatically detect the path for you. Here is how it works: First, click the "Start Gaggle boss" button to start the boss. Next, start the goose application and connect to the boss.
+                    (most geese connect to boss automatically. MeV, however, needs to be connected manually) and that's it!
+                    The Gaggle boss will remember the paths for ALL the workflows.</p>
+            </div>
+        </div>
+
+        <div style="display:none">
+            <div id='inlinecomponenthelp' style='padding:10px; background:#fff'>
+                <h5>How to Build a Workflow</h5>
+                <p align="justify"><strong>Important:</strong> Go to the <a href="http://www.java.com/en/download/testjava.jsp">Java Test Page</a> and verify that the version of your Java is at least Java SE 6 (or 1.6).</p>
+                <p align="justify">
+                    1. Install each goose by using the links below. (If this is your first time).
+                    This will download the updated goose. You will need to install them for your application
+                </p>
+                <p align="justify">
+                    2. <strong>Drag the goose you want in your workflow and drop into the Workflow canvas.</strong>
+                </p>
+                <p align="justify">
+                    3. For each goose "Enter the url of the executable in your computer"
+                    e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX
+                </p>
+                <p align="justify">
+                    4. Select any subactions or data you want to open.
+                </p>
+                <p align="justify">
+                    5. Input the url (or path) to the data file to be opened by a the component.
+                </p>
+                <p align="justify">
+                    6. In order to connect to components in the workflow <strong>drag the circle from the input goose to square of next workflow component.</strong>
+                </p>
+                <p align="justify">
+                    7. Save your workflow.
+                </p>
+                </ul>
+                </p>
+            </div>
+        </div>
+
+        <div style="display:none">
+            <div id='workflowshelp' style='background:#fff'>
+                <H5>Saved Workflows</H5>
+                <p>You can save workflows into your personal workspace if you are logged in or you can save them into public workspace.
+                    Please remember that public workflows can be edited/deleted by others.</p>
+                <p> It is a good practise to provide a descriptive text for the workflow for future reference.</p>
+                <p> Clicking on the workflow title will bring workflow components into the canvas and will also list associated reports under the reports section.</p>
+            </div>
+        </div>
+
+        <div id="divDataspaceMenu" style="display: none">
+            <ul id="ulctxgoosenames">
+            </ul>
+
+        </div>
+
+        <div id="divDataspaceComponentMenu" style="display: none">
+            <ul id="ulctxcomponents">
+            </ul>
+            <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>Pass Gene Names
+            <input id="inputUrlValue" type="radio" name="PassData" />Pass Url</p>
+            <input id="inputContextSubaction" type="hidden" value="" />
+        </div>
+
+        <div id="divDataspaceGroup" style="display: none">
+            <p>Group Name: <input type="text" /></p>
+            <p>Description: <input type="text" /></p>
+        </div>
+
+        <div id="dlgUploadData" style="display:none">
+            <p><label id="labelOrganism"></label></p>
+            <p><form method="post" enctype="multipart/form-data">
+            <input name='uploads[]' id="filesToUpload" type="file" multiple>
+            Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
+        </form></p>
+            <p>
+                {% for datatype in organismdatatypes %}
+                <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
+                {% endfor %}
+            </p>
+        </div>
+
+        <div id="dlgSaveState" style="display: none">
+            <p>Name: <input type="text" /></p>
+            <p>Description: <input type="text" /></p>
+        </div>
+
+        <input id="inputDataSignal" type="hidden" value="0" />
+
+        <div>
+            <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
+            </applet>
+
+            <!-- <input type="text" id="htmlLoader" />
+          <input type="button" value="Load" onclick="LoadHTML()" />
+          <input type="button" value="Filter" onclick="FilterHTML()" />
+          <div id="divHTMLResult"></div> -->
+
+        </div>
+
+
+    </div>
+
+    <div id="tab-states">
+        <div class="sub-page">
+
+            <table id="tblSavedStates" class="tblDataSpace"><caption> Saved Analysis States</caption>
+                <tbody>
+                <tr>
+                    <th style="width:20%">
+                        <div class="componentheader">Name</div>
+                    </th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Operations</th>
+                </tr>
+
+                {% for state in savedstates %}
+                    <tr>
+                        <td style="width:20%">
+                            <p id='astate_{{state.id|stringformat:"i"}}'>{{state.name}}</p>
+                            <input type="hidden" value='{{state.id|stringformat:"i"}}' />
+                        </td>
+                        <td> {{state.description}} </td>
+                        <td></td>
+                        <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
+                            <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
+                            <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
+                            <br />
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div id="tab-reports">
+        <div class="sub-page">
+            <div><H3> Reports</H3>
+                <table id="tblReport"><caption> Workflow Reports - <a href="javascript:DeleteSessionReport();">Delete Selected</a></caption>
+                    <th>Name</th>
+                    <!--<th>Description</th> -->
+                    <th>Workflow</th>
+                    <th>Date</th>
+                    <th>Operations</th>
+                </table>
+            </div>
+            <br />
+        </div>
     </div>
 
 
-    <!--<div id="divWorkflow" class="divWorkflow">
-    <ul>
-    {% if myworkflows.count > 0 %}
-        {% for workflow in myworkflows %}
-            <li class="unselectedworkflow" id='liwf_{{workflow.id|stringformat:"i"}}'><a title="{{workflow.description}}" href='javascript:GetWorkflow("{{workflow.id|stringformat:"i"}}")'>{{workflow.name}}</a></li>
-        {% endfor %}
-    {% endif %}
-    </ul>
-    </div> -->
-    <div><H3> Reports</H3>
-        <input type="button" value="Delete" onclick="DeleteSessionReport()" class="button"/>
-    </div>
-    <br />
-    <div id="divReport" class="divWorkflow">
-       <ul></ul>
-    </div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 
-<p id="result"></p>
-
-<div id="dlgsaveworkflow" class="dlgsaveworkflow" title="Save Workflow">
-    <p>Name: <input type="text" /></p>
-    <p>Description: <input type="text" /></p>
-    <p><input type="checkbox"/>Save as a new workflow</p>
-</div>
-
-<div id="dlgauthenticationalert" class="dlgauthenticationalert" title="Warning">
-    <p>Do you want to login and save the workflow?</p>
-</div>
-
-<div id="dlgdeletealert" class="dlgauthenticationalert" title="Warning">
-    <p>Do you really want to delete the workflow?</p>
-</div>
-
-<div id="dlgnodataapplicationalert" class="dlgauthenticationalert" title="Warning">
-    <p>You haven't selected a data application method. Do you want to proceed?</p>
-</div>
-
-<div id="dlgworkflowfinished" class="dlgauthenticationalert" title="Continue Batch Run">
-    <p>Workflow finished. Do you want to execute the next one in the batch?</p>
-    <p><input type="checkbox"/>Do not ask for this batch</p>
-</div>
-
-<input id="authenticated" type="hidden" value="{{userid}}" />
-<input id="componentstring" type="hidden" value="{{componentstring}}" />
-
-<div style="display:none">
-<div id='inlinewfpath' style='padding:10px; background:#fff'>
-    <h5>Configure the Path of Gaggle Geese Applications</h5>
-    <p align="left">There are two ways to configure the execution path of a goose:</p>
-    <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;If you already know the path of the goose (e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX),
-    simply add the path to the input field.</p>
-    <p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;Alternatively, Gaggle can automatically detect the path for you. Here is how it works: First, click the "Start Gaggle boss" button to start the boss. Next, start the goose application and connect to the boss.
-       (most geese connect to boss automatically. MeV, however, needs to be connected manually) and that's it!
-        The Gaggle boss will remember the paths for ALL the workflows.</p>
 </div>
 </div>
 
-<div style="display:none">
-    <div id='inlinecomponenthelp' style='padding:10px; background:#fff'>
-        <h5>How to Build a Workflow</h5>
-        <p align="justify"><strong>Important:</strong> Go to the <a href="http://www.java.com/en/download/testjava.jsp">Java Test Page</a> and verify that the version of your Java is at least Java SE 6 (or 1.6).</p>
-        <p align="justify">
-            1. Install each goose by using the links below. (If this is your first time).
-                This will download the updated goose. You will need to install them for your application
-        </p>
-        <p align="justify">
-            2. <strong>Drag the goose you want in your workflow and drop into the Workflow canvas.</strong>
-        </p>
-        <p align="justify">
-            3. For each goose "Enter the url of the executable in your computer"
-                e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX
-        </p>
-        <p align="justify">
-            4. Select any subactions or data you want to open.
-        </p>
-        <p align="justify">
-            5. Input the url (or path) to the data file to be opened by a the component.
-        </p>
-        <p align="justify">
-            6. In order to connect to components in the workflow <strong>drag the circle from the input goose to square of next workflow component.</strong>
-        </p>
-        <p align="justify">
-            7. Save your workflow.
-        </p>
-        </ul>
-        </p>
-    </div>
-</div>
-
-<div style="display:none">
-    <div id='workflowshelp' style='background:#fff'>
-        <H5>Saved Workflows</H5>
-        <p>You can save workflows into your personal workspace if you are logged in or you can save them into public workspace.
-        Please remember that public workflows can be edited/deleted by others.</p>
-        <p> It is a good practise to provide a descriptive text for the workflow for future reference.</p>
-        <p> Clicking on the workflow title will bring workflow components into the canvas and will also list associated reports under the reports section.</p>
-      </div>
-</div>
-
-<div id="divDataspaceMenu" style="display: none">
-    <ul id="ulctxgoosenames">
-    </ul>
-
-</div>
-
-<div id="divDataspaceComponentMenu" style="display: none">
-    <ul id="ulctxcomponents">
-    </ul>
-    <p><input id="inputNameValue" type="checkbox" checked="true"/>Pass Names</p>
-    <input id="inputContextSubaction" type="hidden" value="" />
-</div>
-
-<div id="divDataspaceGroup" style="display: none">
-    <p>Group Name: <input type="text" /></p>
-    <p>Description: <input type="text" /></p>
-</div>
-
-<div id="dlgUploadData" style="display:none">
-    <p><label id="labelOrganism"></label></p>
-    <p><form method="post" enctype="multipart/form-data">
-        <input name='uploads[]' id="filesToUpload" type="file" multiple>
-    </form></p>
-    <p>
-        {% for datatype in organismdatatypes %}
-        <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
-        {% endfor %}
-    </p>
-</div>
-
-<div id="dlgSaveState" style="display: none">
-    <p>Name: <input type="text" /></p>
-    <p>Description: <input type="text" /></p>
-</div>
-
-<input id="inputDataSignal" type="hidden" value="0" />
-
-<div>
-<applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
-</applet>
-
-<!-- <input type="text" id="htmlLoader" />
-<input type="button" value="Load" onclick="LoadHTML()" />
-<input type="button" value="Filter" onclick="FilterHTML()" />
-<div id="divHTMLResult"></div> -->
 
 </div>
 

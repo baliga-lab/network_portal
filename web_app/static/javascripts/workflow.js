@@ -104,6 +104,8 @@ $(document).ready(function () {
 
     $(".componenthelp").colorbox({inline: true, width: "50%"});
 
+    $( "#tabs" ).tabs();
+
     setTimeout(function() { TimerFunc() }, 3000);
     GetEdgeDataTypes();
     LoadDataWorkspaceComponentMenu();
@@ -173,6 +175,7 @@ function SetDataPass(event)
     var source = event.target || event.srcElement;
     if (source == null)
         source = event;
+    //alert("Set data pass " + source);
     if (source != null) {
         var checked = $(source).prop("checked");
         if (checked) {
@@ -188,11 +191,18 @@ function SetDataPass(event)
                 {
                     var url = FG_currentDataToOpen[i].toString().toLowerCase();
                     //alert(url);
-                    if (url.indexOf(".txt") >= 0)
+                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0)
                     {
                         // If there is a txt file, we should NOT pass names
                         //alert("Set check to false");
                         $("#inputNameValue").prop("checked", false);
+                        $("#inputUrlValue").prop("checked", true);
+                        return;
+                    }
+                    else if (url.indexOf(".") <= 0)
+                    {
+                        $("#inputNameValue").prop("checked", true);
+                        $("#inputUrlValue").prop("checked", false);
                         return;
                     }
                 }
@@ -250,10 +260,14 @@ function LoadDataSpace()
             {
                 //alert("loading data space...");
                 var index = 0;
-                $("#wfdataspace").children().each(function() {
+                /*$("#wfdataspace").children().each(function() {
                     uldata = $(this).children()[2];
                     $(uldata).empty();
-                });
+                }); */
+
+                $("#tblNetworkPortalFiles").find("tr:gt(0)").remove();
+                $("#tblUserFiles").find("tr:gt(0)").remove();
+
                 var finished = false;
                 do
                 {
@@ -261,19 +275,20 @@ function LoadDataSpace()
                    if (pair != null)
                    {
                        //alert(index);
-                       var targetid = "#ul";
-                       var organism = pair['organism'];
-                       var datatype = pair['datatype'];
+                       //var targetid = "#ul";
+                       //var organism = pair['organism'];
+                       //var datatype = pair['datatype'];
                        //alert("organism: " + organism);
                        //alert("data type: " + datatype);
-                       if (organism == WF_currOrganism)
-                       {
-                            targetid += datatype;
-                       }
+                       //if (organism == WF_currOrganism)
+                       //{
+                       //     targetid += datatype;
+                       //}
 
                        //alert(targetid);
-                       if (targetid != "#ul")
-                           InsertDataToTarget(targetid, pair);
+                       //if (targetid != "#ul")
+
+                       InsertDataToTarget(pair);
                        index++;
                    }
                    else {
@@ -404,6 +419,13 @@ function InitializeWorkflow()
     currWorkflowDesc = "";
     WF_startNode = "";
     currSessionID = "";
+
+    // Tell the Boss to reset the top level workflow
+    var jsonObj = {};
+    jsonObj.reset = "true";
+    var jsonString = JSON.stringify(jsonObj);
+    //alert(jsonString);
+    SubmitWorkflowToBoss(jsonString);
 
     // clean up the context menu
     $("#ulctxgoosenames").empty();
@@ -1702,20 +1724,43 @@ function CheckSessions()
                             var session = result[key];
                             if (session != undefined)
                             {
-                                var link = "<li class='unselectedworkflow' id=\"lisession_" + session['id']
-                                 + "\"><label class='reportlabel'><input type='checkbox' /><a title=\" Retrieve the report of session run at " + session['date'] + "\" href='" + "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")'>" + session['date'] + "</a></label></li>";
-                                //alert(link);
-                                var liid = "lisession_" + session['id'];
-                                //alert("li ID: " + liid);
-                                var wflink = document.getElementById(liid);
-                                //var wflink = $(liid);
-                                //alert(wflink);
-                                if (wflink == undefined)
-                                    $(ul).append(link);
-                                //else
-                                //    $(wflink).html(link);
-                                //ToggleCurrentSessionLink(currWorkflowID, result['id']);
-                                //currWorkflowID = result['id'];
+                                var row = document.createElement("tr");
+                                row.setAttribute('id', ("lisession_" + session['id']));
+                                $("#tblReport").append($(row));
+
+                                var td0 = document.createElement("td");
+                                $(row).append($(td0));
+                                var label = document.createElement("label");
+                                label.className = "reportlabel";
+                                $(td0).append($(label));
+                                var checkbox = document.createElement("input");
+                                checkbox.setAttribute("type", "checkbox");
+                                $(label).append($(checkbox));
+                                var link = document.createElement("a");
+                                link.href = "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")";
+                                link.innerHTML = session['date'];
+                                $(label).append($(link));
+
+                                var inputid = document.createElement("input");
+                                inputid.setAttribute("type", "hidden");
+                                inputid.className = "reportinput";
+                                inputid.setAttribute("value", session['id']);
+                                $(label).append($(inputid));
+
+                                var td1 = document.createElement("td");
+                                $(row).append($(td1));
+
+                                var td2 = document.createElement("td");
+                                $(row).append($(td2));
+                                td2.innerHTML = session['date'];
+
+                                var td3 = document.createElement("td");
+                                $(row).append($(td3));
+                                var inputopen = document.createElement("input");
+                                inputopen.setAttribute("type", "button");
+                                inputopen.setAttribute("value", "open");
+                                inputopen.onclick = function() { GetWorkflowSessionReport(session['id']); };
+                                $(td3).append($(inputopen));
                             }
                         }
                         $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
@@ -1780,11 +1825,13 @@ function DeleteSessionReport()
         //alert(checkbox);
         if ($(checkbox).is(':checked'))
         {
-            var parentli = $(this).parent();
+            //var parentli = $(this).parent();
             //alert("Parent li id: " + parentli.attr('id'));
-            var parentid = parentli.attr('id');
-            var splitted = parentid.split("_");
-            var sessionid = splitted[1];
+            //var parentid = parentli.attr('id');
+            //var splitted = parentid.split("_");
+
+            var inputid = $(this).children()[2];
+            var sessionid = $(inputid).val();
             //alert("sessionid: " + sessionid);
             jsonobj[i] = sessionid;
             i++;
@@ -1923,7 +1970,164 @@ function SaveCollectedData()
         }
 }
 
-function DeleteCollectedData(selected)
+// Insert data to target element
+function InsertDataToTarget(linkpair)
+{
+    //alert("Insert data to target: " + targetid);
+    if (linkpair != null)
+    {
+        //alert(linkpair['userid'] + " " + $("#authenticated").val());
+        var targettable = (linkpair['userid'] == "0") ? "#tblNetworkPortalFiles" : "#tblUserFiles";
+        //alert(targettable);
+        var tbody = $(targettable).find('tbody');
+        var row = document.createElement("tr");
+        $(tbody).append($(row));
+        //var td0 = document.createElement("td");
+        //$(row).append($(td0));
+        //var checkbox = document.createElement("input");
+        //checkbox.setAttribute("type", "checkbox");
+        //$(td0).append($(checkbox));
+
+        var td1 = document.createElement("td");
+        $(row).append($(td1));
+        var label = document.createElement("label");
+        label.className = "dataspacelabel";
+        $(td1).append(label);
+
+        var checkbox = document.createElement("input");
+        checkbox.setAttribute("type", "checkbox");
+        $(label).append($(checkbox));
+
+        var link = document.createElement("a");
+        var url = linkpair["url"];
+        var text = linkpair["text"];
+        link.href = url;
+        link.innerHTML = text;
+        $(label).append($(link));
+
+        var idinput = document.createElement("input");
+        idinput.setAttribute("type", "hidden");
+        idinput.setAttribute("value", linkpair['id']);
+        $(label).append($(idinput));
+
+        //alert(linkpair['organism']);
+        var organisminput = document.createElement("input");
+        organisminput.setAttribute("type", "hidden");
+        organisminput.setAttribute("value", linkpair['organism']);
+        $(label).append($(organisminput));
+
+        var useridinput = document.createElement("input");
+        useridinput.setAttribute("type", "hidden");
+        useridinput.setAttribute("value", linkpair['userid']);
+        $(label).append($(useridinput));
+
+        var td2 = document.createElement("td");
+        $(row).append($(td2));
+        td2.innerHTML = linkpair["datatype"];
+
+        var td3 = document.createElement("td");
+        $(row).append($(td3));
+        $(td3).innerHTML = linkpair["desc"];
+
+        var td4 = document.createElement("td");
+        $(row).append($(td4));
+        var select = document.createElement("select");
+        select.onchange = DataOperationSelected;
+        $(td4).append($(select));
+        var option0 = document.createElement("option");
+        option0.value = "0";
+        option0.innerHTML = "Select an operation";
+        $(select).append($(option0));
+        var option1 = document.createElement("option");
+        option1.value = "1";
+        option1.innerHTML = "Open";
+        $(select).append($(option1));
+        var option2 = document.createElement("option");
+        option2.value = "2";
+        option2.innerHTML = "QuickView";
+        $(select).append($(option2));
+        var option3 = document.createElement("option");
+        option3.value = "3";
+        option3.innerHTML = "Download";
+        $(select).append($(option3));
+    }
+}
+
+function DataOperationSelected(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        //alert("data operation selected " + $(source).val());
+        var selectedvalue = $(source).val();
+        if (selectedvalue == "1")
+        {
+            // Open the data in a goose
+            GetSelectedRowData(source);
+            OpenDataGroup(WF_batchedData);
+        }
+        else if (selectedvalue == "2")
+        {
+            // QuickView
+        }
+        else if (selectedvalue == "3")
+        {
+            // Download
+        }
+    }
+}
+
+function GetSelectedRowData(source)
+{
+    WF_batchedData = [];
+    var row = $(source).parent().parent();
+    //alert(row);
+    var td0 = $(row).children()[0];
+    var label = $(td0).children()[0];
+    //alert(label);
+
+    WF_batchedData = [];
+
+       //alert($(this).children()[1]);
+    if (label != null) {
+        var link = $(label).children()[1];
+        //alert(link);
+        if (link != null) {
+            var linkvalue = $(link).prop("href");
+           //alert(linkvalue);
+
+            WF_batchedData.push(link);
+        }
+    }
+}
+
+function SelectAllData(tableid, ctrlid)
+{
+    if (tableid != null && ctrlid != null)
+    {
+        var ctrltext = $(ctrlid).text();
+        //alert(ctrltext);
+
+        var checked = (ctrltext == "Select All") ? true : false;
+        var newtext = (ctrltext == "Select All") ? "UnSelect All" : "Select All";
+        //alert(newtext);
+
+        $(ctrlid).text(newtext);
+        $(tableid).find("tr").each(function() {
+            var td0 = $(this).children()[0];
+            var label = $(td0).children()[0];
+            if (label != null)
+            {
+                var checkbox = $(label).children()[0];
+                $(checkbox).prop("checked", checked);
+            }
+        });
+    }
+}
+
+
+function DeleteCollectedData(tableid, selected)
 {
     //alert("Delete collected data " + selected);
     var datatodelete = {};
@@ -1931,12 +2135,12 @@ function DeleteCollectedData(selected)
     var index = 0;
     var hasdatatodelete = false;
 
-    $("#wfdataspace").children().each(function() {
-        var uldata = $(this).children()[2];
-        $(uldata).children().each(function() {
+    $(tableid).find('tr').each(function() {
+        var td0 = $(this).children()[0];
+        var label = $(td0).children()[0];
+        if (label != null) {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
-           var label = $(this).children()[0];
            //alert($(label).html());
            var input = $(label).children()[0];
            //alert($(input).is(':checked'));
@@ -1950,11 +2154,12 @@ function DeleteCollectedData(selected)
            //alert(userid + " " + $("#authenticated").val());
 
            // Note: userid == "*" means it is inserted by the firegoose
-           if ($(input).is(':checked') == selected && (userid == "*" || userid == $("#authenticated").val()))
+           if ($(input).is(':checked') == selected) // && (userid == "*" || userid == $("#authenticated").val()))
            {
                //elementstobedeleted.push($(this));
                if (dataid == null || dataid.length == 0 || parseInt(dataid) < 0)
                {
+                  // The data has not been saved to the server yet, we can simply remove it.
                   $(this).remove();
                }
                else {
@@ -1966,9 +2171,9 @@ function DeleteCollectedData(selected)
                   $(this).remove();
                }
            }
-        });
-        datatodelete['data'] = data;
+        }
     });
+    datatodelete['data'] = data;
 
     if (hasdatatodelete) {
         //alert(JSON.stringify(datatodelete));
@@ -1996,55 +2201,6 @@ function DeleteCollectedData(selected)
     }
 }
 
-// Insert data to target element
-function InsertDataToTarget(targetid, linkpair)
-{
-    //alert("Insert data to target: " + targetid);
-    if (targetid != null && linkpair != null)
-    {
-        var li = document.createElement("li");
-        $(targetid).append($(li));
-        var label = document.createElement("label");
-        label.className = "dataspacelabel";
-        $(li).append($(label));
-        var checkbox = document.createElement("input");
-        // If it is a predefined data, we cannot delete it, so there is no checkbox
-        //var checkboxtype = (linkpair['userid'] == "0") ? "hidden" : "checkbox";
-        checkbox.setAttribute("type", "checkbox");
-        $(label).append($(checkbox));
-        var url = linkpair['url'];
-        var text = linkpair['text'];
-        var link = document.createElement("a");
-        link.href = url;
-        link.innerHTML = text;
-        //var html = "<a href='" + url + "'>" + text + "</a>";
-        //alert(html);
-        //$(link).html(html);
-        $(label).append($(link));
-
-        var idinput = document.createElement("input");
-        idinput.setAttribute("type", "hidden");
-        idinput.setAttribute("value", linkpair['id']);
-        $(label).append($(idinput));
-
-        //alert(linkpair['organism']);
-        var organisminput = document.createElement("input");
-        organisminput.setAttribute("type", "hidden");
-        organisminput.setAttribute("value", linkpair['organism']);
-        $(label).append($(organisminput));
-
-        //alert(linkpair['datatype']);
-        var datatypeinput = document.createElement("input");
-        datatypeinput.setAttribute("type", "hidden");
-        datatypeinput.setAttribute("value", linkpair['datatype']);
-        $(label).append($(datatypeinput));
-
-        var useridinput = document.createElement("input");
-        useridinput.setAttribute("type", "hidden");
-        useridinput.setAttribute("value", linkpair['userid']);
-        $(label).append($(useridinput));
-    }
-}
 
 function UploadDataFiles()
 {
@@ -2067,6 +2223,8 @@ function UploadDataFiles()
                     var datatype = $('input[name="dataType"]:checked').val();
                     //alert(datatype);
                     formdata.append('datatype', datatype);
+                    formdata.append("description", $("#uploadFileDescription").val());
+
                     //alert(fileinput.files[0].name);
                     //formdata.append('file', fileinput.files);
                     for (var x = 0; x < fileinput.files.length; x++) {
@@ -2107,18 +2265,7 @@ function UploadDataFiles()
                                    var pair = result[index.toString()];
                                    if (pair != null)
                                    {
-                                       var targetid = "#ul";
-                                       var organism = pair['organism'];
-                                       var datatype = pair['datatype'];
-                                       //alert(organism);
-                                       if (organism == WF_currOrganism)
-                                       {
-                                            targetid += datatype;
-                                       }
-
-                                       //alert(targetid);
-                                       if (targetid != "#ul")
-                                           InsertDataToTarget(targetid, pair);
+                                       InsertDataToTarget(pair);
                                        index++;
                                    }
                                    else
@@ -2267,29 +2414,50 @@ function OnWorkflowFinished()
 }
 
 
-function GetSelectedData()
+function GetSelectedData(datatable)
 {
     WF_batchedData = [];
 
-    $(".dataspacelabel").each(function() {
-        var input = $(this).children()[0];
-        //alert($(input).prop("checked"));
-        if ($(input).prop("checked"))
-        {
-           //alert($(this).children()[1]);
-           var link = $(this).children()[1];
-           //alert(link);
-           var linkvalue = $(link).prop("href");
-           //alert(linkvalue);
+    if (datatable != null)
+    {
+        $(datatable).find("tr").each(function() {
+            var td0 = $(this).children()[0];
+            var label = $(td0).children()[0];
+            if (label != null) {
+                var checkbox = $(label).children()[0];
+                if ($(checkbox).prop("checked")) {
+                    var link = $(label).children()[1];
+                    //alert(link);
+                    var linkvalue = $(link).prop("href");
+                    //alert(linkvalue);
 
-           WF_batchedData.push(link);
-        }
-    });
+                    WF_batchedData.push(link);
+                }
+            }
+        });
+    }
+    else
+    {
+        $(".dataspacelabel").each(function() {
+            var input = $(this).children()[0];
+            //alert($(input).prop("checked"));
+            if ($(input).prop("checked"))
+            {
+               //alert($(this).children()[1]);
+               var link = $(this).children()[1];
+               //alert(link);
+               var linkvalue = $(link).prop("href");
+               //alert(linkvalue);
+
+               WF_batchedData.push(link);
+            }
+        });
+    }
 }
 
-function GroupData()
+function GroupData(datatable)
 {
-    GetSelectedData();
+    GetSelectedData(datatable);
     if (WF_batchedData.length > 0) {
         var firstpara = $('#divDataspaceGroup').children()[0];
         var groupnameinput = $(firstpara).children()[0];
@@ -2688,6 +2856,14 @@ function OpenDataGroup(group)
     {
           //ClearWorkflowCanvas();
           FG_currentDataToOpen = group;
+          $("#ulctxcomponents").children().each(function() {
+             var checkbox = $(this).children()[0];
+             if ($(checkbox).prop('checked'))
+             {
+                SetDataPass(checkbox);
+             }
+          });
+
           $('#divDataspaceComponentMenu').dialog( { height:400, width:500,
             buttons: {
                 "Open": function() {
@@ -2696,6 +2872,7 @@ function OpenDataGroup(group)
                            var checkbox = $(this).children()[0];
                            if ($(checkbox).prop('checked'))
                            {
+
                               var inputcomponentid = $(this).children()[1];
                               //alert($(inputcomponentid).val());
                               var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
@@ -2757,10 +2934,10 @@ function OpenDataGroup(group)
 
 // Open a group of data in a goose
 // User can specify whether to open the URL or the name list
-function GroupOpen()
+function GroupOpen(datatable)
 {
     //alert("Open data...");
-    GetSelectedData();
+    GetSelectedData(datatable);
     OpenDataGroup(WF_batchedData);
 }
 
@@ -2918,6 +3095,8 @@ function SaveState()
 
 }
 
+
+// Called by the Proxy Applet after a state is saved
 function OnSaveState(param)
 {
     //alert("state saved " + param);
@@ -2935,23 +3114,52 @@ function OnSaveState(param)
     var desc = splitted[2];
     var stateid = splitted[0];
     //alert(name + " " + desc + " " + stateid);
-    var newhtml = "<a href='#' id='astate_" + stateid + "'>" + name + "</a>";
-    var newdivhtml = "<div>" + desc + "</div><input type='hidden' value='" + stateid
-                        + "' /><input type='button' value='Load' class='button' onclick='javascript:LoadState(this);' />"
-                        + "<input type='button' class='button' value='Delete' onclick='javascript:DeleteState(this);' />";
-    //alert(newhtml);
-    //alert(newdivhtml);
-    //alert($(wfdivid));
 
-    var ahrefelement = document.createElement('p');
-    ahrefelement.setAttribute("id", 'astate_' + stateid);
-    $(ahrefelement).text(name);
-    var divelement = document.createElement("div");
-    divelement.setAttribute("id", ("divstate_" + stateid));
-    $(divelement).html(newdivhtml);
-    //alert("Append elements " + $(ahrefelement).html());
-    $("#divstatedataaccordion").append($(ahrefelement));
-    $("#divstatedataaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
+    var targettable = "#tblSavedStates";
+    //alert(targettable);
+    var tbody = $(targettable).find('tbody');
+    var row = document.createElement("tr");
+    $(tbody).append($(row));
+    //var td0 = document.createElement("td");
+    //$(row).append($(td0));
+    //var checkbox = document.createElement("input");
+    //checkbox.setAttribute("type", "checkbox");
+    //$(td0).append($(checkbox));
+
+    var td1 = document.createElement("td");
+    $(row).append($(td1));
+    var para = document.createElement("p");
+    para.setAttribute("id", "astate_" + stateid);
+    $(td1).append(para);
+
+    var idinput = document.createElement("input");
+    idinput.setAttribute("type", "hidden");
+    idinput.setAttribute("value", stateid);
+    $(td1).append($(idinput));
+
+    var td2 = document.createElement("td");
+    $(row).append($(td2));
+    td2.innerHTML = desc;
+
+    var td3 = document.createElement("td");
+    $(row).append($(td3));
+    $(td3).innerHTML = ""; // TODO add datetime of the state
+
+    var td4 = document.createElement("td");
+    $(row).append($(td4));
+    var loadbutton = document.createElement("input");
+    loadbutton.setAttribute("type", "button");
+    loadbutton.setAttribute("value", "Load");
+    loadbutton.className = "button";
+    loadbutton.onclick = LoadState;
+    $(td4).append($(loadbutton));
+
+    var deletebutton = document.createElement("input");
+    deletebutton.setAttribute("type", "button");
+    deletebutton.setAttribute("value", "Delete");
+    deletebutton.className = "button";
+    deletebutton.onclick = DeleteState;
+    $(td4).append($(deletebutton));
 }
 
 
@@ -2961,10 +3169,13 @@ function LoadState(event)
     if (source == null)
         source = event;
     if (source != null) {
-        var divelement = $(source).parent();
-        var stateidinput = $(divelement).children()[1];
+        var row = $(source).parent().parent();
+        var td0 = $(row).children()[0];
+        var stateidinput = $(td0).children()[1];
+        //var divelement = $(source).parent();
+        //var stateidinput = $(divelement).children()[1];
         var stateid = $(stateidinput).val();
-        //alert(stateid);
+        alert(stateid);
         var proxy = get_proxyapplet();
         if (proxy != undefined) {
             //alert("Submit workflow to boss");
