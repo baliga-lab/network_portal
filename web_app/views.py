@@ -218,18 +218,19 @@ def getdataspace(request):
         for data in predefinedorganismdata:
             datatypeobj = OrganismDataTypes.objects.filter(id = data.type_id)[0]
             print 'data type: ' + datatypeobj.type
-            linkobj = {'id': data.id, 'userid': '0', 'organism': organismobj.name, 'datatype': datatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
+            linkobj = {'id': data.id, 'userid': '0', 'organism': organismobj.name, 'datatype': datatypeobj.type, 'text': data.urltext, 'url': data.dataurl, 'desc': data.description}
             returndata[str(index)] = linkobj
             index = index + 1
 
-        print 'Get user data'
-        ownerdata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = organismobj.id)
-        for data in ownerdata:
-            datatypeobj = OrganismDataTypes.objects.filter(id = data.type_id)[0]
-            print 'data type: ' + datatypeobj.type
-            linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': datatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
-            returndata[str(index)] = linkobj
-            index = index + 1
+        if (query['userid'] != '0'):
+            print 'Get user data'
+            ownerdata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = organismobj.id)
+            for data in ownerdata:
+                datatypeobj = OrganismDataTypes.objects.filter(id = data.type_id)[0]
+                print 'data type: ' + datatypeobj.type
+                linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': datatypeobj.type, 'text': data.urltext, 'url': data.dataurl, 'desc': data.description}
+                returndata[str(index)] = linkobj
+                index = index + 1
 
         # get captured data (i.e., captured)
         if query['organism'] != 'Genric':
@@ -239,7 +240,7 @@ def getdataspace(request):
             ownercaptureddata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = genericorganismobj.id, type_id = genericdatatypeobj.id)
             for data in ownercaptureddata:
                 print 'data type: ' + datatypeobj.type
-                linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': genericdatatypeobj.type, 'text': data.urltext, 'url': data.dataurl}
+                linkobj = {'id': data.id, 'userid': query['userid'], 'organism': organismobj.name, 'datatype': genericdatatypeobj.type, 'text': data.urltext, 'url': data.dataurl, 'desc': data.description}
                 returndata[str(index)] = linkobj
                 index = index + 1
 
@@ -859,15 +860,19 @@ def uploaddata(request):
         print request.REQUEST['organismtype']
         print request.REQUEST['datatype']
         print request.REQUEST['userid']
+        print request.REQUEST['description']
 
         userid = request.REQUEST['userid']
         organismtype = request.REQUEST['organismtype']
+        desc = request.REQUEST['description']
         if organismtype is None:
             organismtype = 'Generic'
         organism = Organisms.objects.filter(name = organismtype)[0]
         print 'organism id: ' + str(organism.id)
 
         dtype =  request.REQUEST['datatype']
+        if (dtype == 'undefined'):
+            dtype = 'Generic'
         datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
@@ -900,10 +905,10 @@ def uploaddata(request):
             dataurl = savepath + '/' + filename
             print 'File url: ' + dataurl
             # save to DB
-            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id)
+            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id, description = desc)
             data.save()
 
-            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : filename, 'url': dataurl }
+            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : filename, 'url': dataurl, 'desc': desc }
             responsedata[str(idx)] = pair
             idx = idx + 1
     except Exception as e:
