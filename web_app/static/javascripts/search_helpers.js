@@ -31,7 +31,7 @@ if (!searchhelpers) {
         }
         if (biclusters.length > 0) {
             var ids = biclusters.join(',');
-            $('<div id="display-network_' + speciesId + '"><a href="/network?biclusters=' + ids + '">view network for selected regulons (' + biclusters.length + ')</a></div>').replaceAll('#display-network_' + speciesId);
+            $('<div id="display-network_' + speciesId + '"><a href="/' + speciesId + '/network?biclusters=' + ids + '">view network for selected regulons (' + biclusters.length + ')</a></div>').replaceAll('#display-network_' + speciesId);
         } else {
             $('<div id="display-network_' + speciesId + '"></div>').replaceAll('#display-network_' + speciesId);
         }

@@ -70,6 +70,17 @@ def network(request, species=None, network_id=None):
     return render_to_response('network.html', locals())
 
 
+def networkbicl(request, species=None):
+    """This is a query that is executed with a list of biclusters
+    We currently only have only 1 network per species, so we simply
+    select the first network for the species
+    """
+    species = Species.objects.get(Q(short_name=species))
+    networks = Network.objects.all()
+    network = networks[0]
+    return render_to_response('network.html', locals())
+
+
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):
         bicluster_ids = re.split( r'[\s,;]+', request.GET['biclusters'] )
