@@ -131,7 +131,7 @@ def lookup(dict, key):
 def search_result_map(species_genes, species_names):
     result = '<ul>'
     for species_id, genes in species_genes.items():
-        result += ("<li><a href=\"#species_%d\">%d results</a> for '%s'</li>" % (species_id, len(genes), species_names[species_id]))
+        result += ("<li><a href=\"#species_%s\">%d results</a> for '%s'</li>" % (species_id, len(genes), species_names[species_id]))
     return mark_safe(result + '</ul>')
 
 
