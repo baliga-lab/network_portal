@@ -234,8 +234,9 @@ function LoadDataSpace()
 {
     var queryobj = {};
     WF_currOrganism = $("#organismSelect").val();
+
     if (WF_currOrganism == null || WF_currOrganism.length ==0)
-        return;
+        WF_currOrganism = "Generic";
 
     //alert(WF_currOrganism);
     queryobj['organism'] = WF_currOrganism;
@@ -2208,7 +2209,7 @@ function UploadDataFiles()
     $("#labelOrganism").html("Upload file for " + WF_currOrganism);
     $( "#dlgUploadData" ).dialog({
         resizable: false,
-        height:400,
+        height:500,
         width:450,
         modal: true,
         buttons: {
@@ -3175,7 +3176,7 @@ function LoadState(event)
         //var divelement = $(source).parent();
         //var stateidinput = $(divelement).children()[1];
         var stateid = $(stateidinput).val();
-        alert(stateid);
+        //alert(stateid);
         var proxy = get_proxyapplet();
         if (proxy != undefined) {
             //alert("Submit workflow to boss");

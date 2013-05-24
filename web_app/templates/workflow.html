@@ -19,6 +19,10 @@
 <img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png">
 <h5> Gaggle Workflow</h5>
 
+<p>
+    <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a>
+    <a id="btnSaveState" class="small red awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
+</p>
 <div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
 <ul>
     <li><a class="name" href="#tab-data">Dataspace -></a></li>
@@ -48,51 +52,13 @@
             <table id="tblUserFiles"><caption> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group Selected</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open Selected</a> | <a href="javascript:SaveCollectedData();">Save Selected</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete Selected</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete UnSelected</a></caption>
                 <tbody>
                 <th>Name</th><th>Type</th><th> Desc</th><th>Operations</th>
-                <tr>
-                    <td><a href=#> dvu_cmonkey.cys</a></td>
-                    <td>Cytoscape Network</td>
-                    <td>cMonkey produced cytoscape network file for DvH</td>
-                    <td>  <select id="operationSelect4" onchange="javascript:organismSelected(this);">
-                        <option value = "" selected>Select an operation</option>
-                        <option value="Generic">Open</option>
-                        <option value="Generic">Delete</option>
-                        <option value="Generic">Add to Workflow</option>
-                        <option value="Generic">QuickView</option>
-                        <option value="Generic">Download</option>
-                    </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><a href=#> dvu_string.cys</a></td>
-                    <td>Cytoscape Network</td>
-                    <td>EMBL String cytoscape network file for DvH</td>
-                    <td>  <select id="operationSelect5" onchange="javascript:organismSelected(this);">
-                        <option value = "" selected>Select an operation</option>
-                        <option value="Generic">Open</option>
-                        <option value="Generic">Delete</option>
-                        <option value="Generic">Add to Workflow</option>
-                        <option value="Generic">QuickView</option>
-                        <option value="Generic">Download</option>
-                    </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><a href=#> dvu_mev.anl</a></td>
-                    <td>MeV Analysis File</td>
-                    <td>MEV analysis file for gene expression data</td>
-                    <td>  <select id="operationSelect6" onchange="javascript:organismSelected(this);">
-                        <option value = "" selected>Select an operation</option>
-                        <option value="Generic">Open</option>
-                        <option value="Generic">Delete</option>
-                        <option value="Generic">Add to Workflow</option>
-                        <option value="Generic">QuickView</option>
-                        <option value="Generic">Download</option>
-                    </select>
-                    </td>
-                </tr>
                 </tbody>
             </table>
-
+            <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+            <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
+                <option value="-1">Select a data application record to apply to the workflow</option>
+                <option value="-2">---------------------------------------</option>
+            </select>
         </div>
         <div id="sidebar" class="sidebar" style="width:25%"><h5> My Groups</h5>
             <div id="wfgrpaccordion" class="datagroupaccordion">
@@ -137,55 +103,6 @@
 
                 <th> <span class="small blue fancybutton">4</span>&nbsp; <input type="button" value="Run Workflow" onclick="SubmitWorkflow()" class="small green awesome" title="Run selected workflow"/></th>
                 <th><a class="componenthelp" href="#quickhelp"><img src="/static/images/question.gif" /></a></th>
-            </tr>
-            </tbody>
-        </table>
-        <table id="tblDataSpace" class="tblDataSpace">
-            <tbody>
-            <tr>
-                <th style="width:20%">
-                    <div class="componentheader"><h3>Saved States</h3></div>
-                </th>
-                <th style="width: 60%">
-                    <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
-                    <input type="button" id="btnSaveState" value="Save State" onclick="javascript:SaveState();" class="button"/>
-                    <input type="button" id="btnOpen" value="Open" onclick="javascript:GroupOpen();" class="button"/>
-                    <input type="button" id="btnGroup" value="Group" onclick="javascript:GroupData();" class="button"/>
-                    <input type="button" id="btnSaveData" value="Save Data" onclick="javascript:SaveCollectedData();" class="button"/>
-                    <input type="button" id="btnDeleteSelectedData" value="Delete Selected" onclick="javascript:DeleteCollectedData(true);" class="button"/>
-                    <input type="button" id="btnDeleteUnselectedData" value="Delete UnSelected" onclick="javascript:DeleteCollectedData(false);" class="button"/>
-                    <input type="button" class="button" value="Upload Data" onclick="javascript:UploadDataFiles();">
-                    <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
-                    <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
-                        <option value="-1">Select a data application record to apply to the workflow</option>
-                        <option value="-2">---------------------------------------</option>
-                    </select>
-                    <br />
-                </th>
-                <th style="width: 20%">
-                    <div class="componentheader"><h3>Groups</h3></div>
-                </th>
-            </tr>
-            <tr>
-                <td style="width:20%">
-
-                </td>
-                <td style="width: 60%">
-                    <div id="wfdataspace" class="divdataspace">
-                        {% for organismdatatype in organismdatatypes %}
-                        <div id='div{{organismdatatype.type}}'>
-                            <div class="componentheader"><h3>{{organismdatatype.type}} Data</h3></div><br />
-                            <ul id='ul{{organismdatatype.type}}'>
-                            </ul>
-                        </div>
-                        <br />
-                        {% endfor %}
-
-                    </div>
-                </td>
-                <td style="width: 20%">
-
-                </td>
             </tr>
             </tbody>
         </table>
