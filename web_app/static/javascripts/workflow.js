@@ -117,7 +117,7 @@ $(document).ready(function () {
 function TimerFunc()
 {
     CheckDataInjection();
-    UpdateGeeseInfo();
+    //UpdateGeeseInfo();
 }
 
 function UpdateGeeseInfo()
@@ -2065,6 +2065,7 @@ function DataOperationSelected(event)
         if (selectedvalue == "1")
         {
             // Open the data in a goose
+            //alert("Open data...");
             GetSelectedRowData(source);
             OpenDataGroup(WF_batchedData);
         }
