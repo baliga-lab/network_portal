@@ -65,8 +65,8 @@ def networks(request):
     networks = Network.objects.all()
     return render_to_response('networks.html', locals())
 
-def network(request, species=None, network_id=None):
-    network = Network.objects.get(id=network_id)
+def network(request, species=None, network_num=None):
+    network = Network.objects.filter(species__short_name=species)[0]
     return render_to_response('network.html', locals())
 
 
@@ -75,9 +75,7 @@ def networkbicl(request, species=None):
     We currently only have only 1 network per species, so we simply
     select the first network for the species
     """
-    species = Species.objects.get(Q(short_name=species))
-    networks = Network.objects.all()
-    network = networks[0]
+    network = Network.objects.filter(species__short_name=species)[0]
     return render_to_response('network.html', locals())
 
 
@@ -249,13 +247,14 @@ SVG_MAP = {
     'hal': "http://baliga.systemsbiology.net/cmonkey/enigma/hal/cmonkey_4.5.4_hal_2072x268_10_Jul_13_11:04:39_EGRIN1_ORIGINAL_CLUSTERS/svgs/"
 }
 
-def bicluster(request, species=None, network_id=None, bicluster_id=None):
+def bicluster(request, species=None, network_num=None, bicluster_num=None):
     def is_functiontype(f, ftype):
         """filtering on type, bonferroni p value cutoff of 0.05"""
         return (f.function.type == ftype and f.p_bh < 0.05 and
                 f.gene_count > 2)
 
-    bicluster = Bicluster.objects.get(id=bicluster_id)
+    bicluster = Bicluster.objects.filter(network__species__short_name=species,
+                                         k=bicluster_num)[0]
     expressions = bicluster.expressions()
     expmap = {}
     genes = bicluster.genes.all()
