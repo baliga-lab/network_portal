@@ -77,7 +77,7 @@ $(document).ready(function() {
 	<th>Description</th>
 	<th>Regulated&nbsp;by</th>
 	<th>Regulates</th>
-	<th>In Regulons</th>
+	<th>In Modules</th>
       </tr>
       {% for gene in genes %}
       <tr>
@@ -99,7 +99,17 @@ $(document).ready(function() {
   <p><div id="display-network_{{ species_id }}"></div></p>
   {% endfor %}
   {% else %}
-  <p><b>No results found !</b></p>
+    <p><div class="error_message">
+        <div class="main">
+            <div class="ui-widget">
+                <div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
+                    <p><span class="ui-icon ui-icon-info" style="float:left;margin-right:.1em;"></span>
+                    <strong> Warning:</strong> Your search returned no results!</p>
+                </div>
+            </div>
+         </div>
+       </div>
+   </p>
   {% endif %} <!-- for results -->
   {% endif %} <!-- if q -->
 </div><!-- End #main -->

@@ -1,4 +1,4 @@
-{% extends "base2.html" %}
+ {% extends "base2.html" %}
 {% block title %}Network Portal - Welcome{% endblock %}
 {% block cssspecial %}
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery-overlay.css" media="screen" />
@@ -117,7 +117,7 @@
       <td>{{ version }}</td>	  
     </tr>
     <tr>
-      <th>Regulons</th>
+      <th>Modules</th>
       <th>Regulators</th>
       <th>Motifs</th>
     </tr>
@@ -130,35 +130,13 @@
 
    <h3>Updates </h3>
 <br>
-<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
-<script>
-new TWTR.Widget({
-  version: 2,
-  type: 'profile',
-  rpp: 4,
-  interval: 30000,
-  width: 260,
-  height: 300,
-  theme: {
-    shell: {
-      background: '#faf7f5',
-      color: '#977C57',
-     
-    },
-    tweets: {
-      background: '#ffffff',
-      color: '#421610',
-      links: '#073aa7'
-    }
-  },
-  features: {
-    scrollbar: false,
-    loop: false,
-    live: false,
-    behavior: 'all'
-  }
-}).render().setUser('Network_Portal').start();
-</script>
+<!-- Start Twitter Widget -->
+<a class="twitter-timeline" href="https://twitter.com/Network_Portal" data-widget-id="299943334582042624">Tweets by @Network_Portal</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+<!-- End Twitter Widget -->
+<!-- Start Google+ Widget -->
+<a href="https://plus.google.com/114454847552693798586" rel="publisher">Google+</a>
+<!-- End Google+ Widget -->
 
 <!--  <h3>What's New</h3>
   <ul class="sidemenu">

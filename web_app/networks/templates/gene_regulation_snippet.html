@@ -15,16 +15,16 @@
     });
   </script>
 
-<div class="main">
+<div class="sub-page">
 {% if influence_biclusters|length > 0 %}
-<b>{{ gene }}</b> is regulated by <b>{{ influence_biclusters|length }}</b> influences and regulates <b>{{ regulated_biclusters|length }}</b> regulons.
+<b>{{ gene }}</b> is regulated by <b>{{ influence_biclusters|length }}</b> influences and regulates <b>{{ regulated_biclusters|length }}</b> modules.</br>
 
 <!--<b> {{ gene }}</b> is possibly regulated by <b>{{ influence_biclusters|length }}</b> influences.-->
   <table id="gene-regulators-table" class="gene-regulation" style="float: left;">
    <caption> Regulators for {{ gene.display_name }} ({{ influence_biclusters|length }})</caption>
     <tr>
       <th class="help">Regulator</th>
-      <th>Regulon</th>
+      <th>Module</th>
       <th>Operator</th>
     </tr>
     {% for bicluster, influence in influence_biclusters %}
@@ -36,7 +36,15 @@
     {% endfor %}
   </table>
 {% else %}
-<div class="error_message">No regulators were found for {{ gene }}.</div>
+<div class="error_message" style="float: left;"><div class="main">
+	<div class="ui-widget">
+    	<div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
+    		<p><span class="ui-icon ui-icon-info" style="float:left;margin-right:.3em;"></span>
+				<strong> Warning:</strong> No Regulators were found for {{ gene }}!</p>
+			</div>
+		</div>
+	</div>
+</div>
 {% endif %}
 {% if regulated_biclusters|length > 0 %}
 <a name="regulates"></a>
@@ -44,7 +52,7 @@
   <table class="gene-regulation" style="float: right;">
    <caption> Regulated by {{ gene }} ({{ count_regulated_biclusters }})</caption>
     <tr>
-      <th>Regulon</th>
+      <th>Module</th>
       <th>Residual</th>
       <th>Genes</th>
     </tr>
@@ -57,18 +65,18 @@
     {% endfor %}
    </table>
 {% else %}
-<table class="gene-regulation" style="float: right;">
-   <caption> Regulated by {{ gene }} ({{ count_regulated_biclusters }})</caption>
-    <tr>
-      <th>Regulon</th>
-      <th>Residual</th>
-      <th>Genes</th>
-    </tr>
-<tr>
-    </tr>
-   </table>
+<div class="error_message" style="float: right;">
+<div class="error_message"><div class="main">
+	<div class="ui-widget">
+    	<div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
+    		<p><span class="ui-icon ui-icon-info" style="float:left;margin-right:.3em;"></span>
+				<strong> Warning:</strong> {{ gene }} Does not regulate any modules!</p>
+			</div>
+		</div>
+	</div>
+</div>
 
-<div class="error_message" style="float: right;">{{ gene }} does not regulate any gene.</div>
+</div>
 {% endif %}
 
 </div>

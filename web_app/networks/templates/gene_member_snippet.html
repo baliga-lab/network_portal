@@ -5,12 +5,12 @@ $(document).ready(function() {
     {#.tablesorterPager({container: $("#tablepager")})#}; 
 });
 </script>
-<h3> Regulon neighborhood information for {{ gene }} </h3>
+<h3> Module neighborhood information for {{ gene }} </h3>
 <p>
 <div class="main">
 {% if neighbor_genes|length > 0 %}
 {% load filters %}
-<b>{{ gene }}</b> has total of <b>{{ neighbor_genes|length }}</b> gene neighbors in regulons
+<b>{{ gene }}</b> has total of <b>{{ neighbor_genes|length }}</b> gene neighbors in modules
 <b>{{ gene.bicluster_set.all|bicluster_links }}</b>
 
 <div class="gaggle-data hidden">
@@ -27,7 +27,7 @@ $(document).ready(function() {
       <th>Gene</th>
       <th>Common Name</th>
       <th>Description</th>
-      <th>Regulon membership</th>
+      <th>Module membership</th>
     </tr>
   </thead>
   <tbody>
@@ -46,7 +46,7 @@ $(document).ready(function() {
 				<div class="ui-widget">
     				<div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
     				<p><span class="ui-icon ui-icon-info" style="float:left; margin-right:.7em;"></span>
-					<strong> Warning:</strong> No regulon neighbors were found for {{ gene }}!</p>
+					<strong> Warning:</strong> No module neighbors were found for {{ gene }}!</p>
 					</div>
 				</div>
 			</div>

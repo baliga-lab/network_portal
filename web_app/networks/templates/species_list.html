@@ -16,9 +16,9 @@ $(document).ready(function() {
     <caption>Complete list of species in the Network Portal database</caption>
     <thead>
       <tr>
-		    <th>Org code</th>
-        <th>Species</th>
-        <th>Taxonomy id</th>
+		    <th style="width:30%">Org code</th>
+            <th>Species</th>
+            <th style="width:60%">Taxonomy id</th>
 		    <th>Genes </th>
 		    <th>Regulators </th>
 		    <th>Network</th>
@@ -28,8 +28,8 @@ $(document).ready(function() {
       {% for sp in species %}
       <tr>
 	      <td>{{ sp.short_name }}</td>
-        <td><i>{{sp|species_link}}</i></td>
-        <td>{{sp|species_ncbi_link}}</td>
+          <td><i>{{sp|species_link}}</i></td>
+          <td>{{sp|species_ncbi_link}}</td>
 	      <td>{{sp|species_genes_link}}</td>
 	      <td>{{sp|species_tfs_link}}</td>
 	      <td>

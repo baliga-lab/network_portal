@@ -1,4 +1,4 @@
-<h5> Motif information <span class="search_help">(de novo identified motifs for regulons)</span>
+<h5> Motif information <span class="search_help">(de novo identified motifs for modules)</span>
 </h5>
 <div class="tabs">
 <div class="main">
@@ -33,7 +33,15 @@ There are {{ motifs|length }} motifs predicted. {% if species.short_name == 'dvu
 </table>
 {% else %}
 <div class="error_message">
-  No motifs were found.
+  <div class="main">
+	<div class="ui-widget">
+    	<div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
+    		<p><span class="ui-icon ui-icon-info" style="float:left;margin-right:.3em;"></span>
+			<strong> Warning:</strong> No Motifs were found!</p>
+		</div>
+	</div>
+</div>
+
 </div>
 {% endif %}
 </div>

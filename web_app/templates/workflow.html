@@ -1,9 +1,10 @@
 {% extends "base2.html" %}
-{% block title %}Workflow Framework - Welcome{% endblock %}
+{% block title %}Gaggle Workspace - Welcome{% endblock %}
 {% block content %}
+{% load static %}
 <div class="sub-page">
 <div class="main" style="width: 97%">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 <link type="text/css" rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dropdown.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/portal-style.css">
@@ -17,11 +18,11 @@
 
 <div id="container" style="width: 100%">
 <img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png">
-<h5> Gaggle Workflow</h5>
+<h5> Gaggle Workspace</h5>
 
 <p>
     <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a>
-    <a id="btnSaveState" class="small red awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
+    <a id="btnSaveState" class="small green awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
 </p>
 <div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
 <ul>
@@ -43,15 +44,15 @@
                 {% endif %}
                 {% endfor %}
             </select>
-            <table id="tblNetworkPortalFiles"><caption> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group Selected</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete Selected</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete UnSelected</a></caption>
+            <table id="tblNetworkPortalFiles"><caption style="font-size: 10pt;"> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete UnSelected</a></caption>
                 <tbody>
-                <th>Name</th><th>Type</th><th> Desc</th><th>Operations</th>
+                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <p>
-            <table id="tblUserFiles"><caption> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group Selected</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open Selected</a> | <a href="javascript:SaveCollectedData();">Save Selected</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete Selected</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete UnSelected</a></caption>
+            <table id="tblUserFiles"><caption style="font-size: 10pt;"> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open</a> | <a href="javascript:SaveCollectedData();">Save</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete UnSelected</a></caption>
                 <tbody>
-                <th>Name</th><th>Type</th><th> Desc</th><th>Operations</th>
+                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
@@ -94,7 +95,7 @@
         <div class="sub-page">
         <h5> Gaggle Workflow</h5>
 
-        <table width="100%">
+        <!-- <table width="100%">
             <tbody>
             <tr>
                 <th>Start Here <img align="right" width="25px" src="{{ STATIC_PREFIX }}images/Redo.png"></th>
@@ -105,7 +106,7 @@
                 <th><a class="componenthelp" href="#quickhelp"><img src="/static/images/question.gif" /></a></th>
             </tr>
             </tbody>
-        </table>
+        </table> -->
         <table id="tblWorkflow" class="tblWorkflow">
             <tbody>
             <tr>
@@ -466,6 +467,16 @@
         </div>
     </div>
 
+    <div id="tab-history">
+        <div class="sub-page">
+            <div><H3> History</H3>
+            <p>History information will be implemented soon.</p>
+            </div>
+            <br />
+        </div>
+    </div>
+
+    
 
 
 </div>
@@ -475,7 +486,7 @@
 </div>
 
 
-</div>
+
 </div>
 
 {% endblock %}
