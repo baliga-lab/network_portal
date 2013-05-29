@@ -12,8 +12,5 @@ DATABASES = {
     }
 }
 
-#STATIC_ROOT = ''
-#STATICFILES_DIRS = (
-#)
-#TEMPLATE_DIRS = (
-#)
+STATIC_ROOT = '/local/htdocs/nwportal'
+
