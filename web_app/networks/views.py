@@ -75,14 +75,19 @@ def networkbicl(request, species=None):
     We currently only have only 1 network per species, so we simply
     select the first network for the species
     """
-    biclusters = request.GET['biclusters']
+    bicluster_list = map(lambda x: int(x),
+                         request.GET['biclusters'].split(','))
+    biclusters = Bicluster.objects.filter(network__species__short_name=species,
+                                          k__in=bicluster_list)
+    bicluster_ids = ",".join(map(lambda x: str(x),
+                                 [b.id for b in biclusters]))
     return render_to_response('bicluster_network.html', locals())
 
 
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):
-        bicluster_ids = re.split( r'[\s,;]+', request.GET['biclusters'] )
-        biclusters = Bicluster.objects.filter(id__in=bicluster_ids)
+        bicluster_nums = re.split( r'[\s,;]+', request.GET['biclusters'] )
+        biclusters = Bicluster.objects.filter(id__in=bicluster_nums)
     elif request.GET.has_key('gene'):
         biclusters = Bicluster.objects.filter(genes__name=request.GET['gene'])
     

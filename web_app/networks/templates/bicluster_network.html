@@ -7,7 +7,7 @@
 <script src="{% static "javascripts/network_helpers.js" %}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    nwhelpers.initAndLoadCytoscapeWeb('/network/graphml?biclusters={{biclusters}}',
+    nwhelpers.initAndLoadCytoscapeWeb('/network/graphml?biclusters={{bicluster_ids}}',
       '{% static "cytoscapeweb/swf/CytoscapeWeb" %}',
       '{% static "cytoscapeweb/swf/playerProductInstall" %}',
       nwhelpers.load_popup);
