@@ -75,8 +75,8 @@ def networkbicl(request, species=None):
     We currently only have only 1 network per species, so we simply
     select the first network for the species
     """
-    network = Network.objects.filter(species__short_name=species)[0]
-    return render_to_response('network.html', locals())
+    biclusters = request.GET['biclusters']
+    return render_to_response('bicluster_network.html', locals())
 
 
 def network_as_graphml(request):
