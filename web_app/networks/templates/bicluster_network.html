@@ -1,0 +1,21 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% block title %}Network Portal - Bicluster Network View{% endblock %}
+{% block jsspecial %}
+<script src="{% static "cytoscapeweb/js/AC_OETags.min.js" %}"></script>
+<script src="{% static "cytoscapeweb/js/cytoscapeweb.min.js" %}"></script>
+<script src="{% static "javascripts/network_helpers.js" %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    nwhelpers.initAndLoadCytoscapeWeb('/network/graphml?biclusters={{bicluster_ids}}',
+      '{% static "cytoscapeweb/swf/CytoscapeWeb" %}',
+      '{% static "cytoscapeweb/swf/playerProductInstall" %}',
+      nwhelpers.load_popup);
+
+  });
+</script>
+{% endblock %}
+{% block content %}
+<div id="cytoscapeweb"></div>
+<div id="pop_up"></div>
+{% endblock %}}

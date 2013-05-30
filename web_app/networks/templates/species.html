@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+{% load filters %}
 {% block title %}Network Portal - Species {{ species.name }}{% endblock %}
 {% block content %}
 {% load static %}
@@ -27,7 +28,7 @@
   			<td><a href="/{{ species.short_name }}/genes?filter=tf">{{ transcription_factors|length }}</a></td>
   			<td>{% if species.network_set.count > 0 %}
   				    {% for network in species.network_set.all %}
-    				<a href="/{{ species.short_name }}/network/{{ network.id }}"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></a>
+    				<a href="{{network|network_url}}"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/>Explore network</a></a>
   					{% endfor %}
   				{% else %}
   				No networks for this species, yet.

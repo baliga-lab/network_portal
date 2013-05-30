@@ -90,12 +90,12 @@ urlpatterns = patterns('',
     url(r'^species$', 'networks.views.species', name='species'),
     url(r'^species/$', 'networks.views.species', name='species'),
     url(r'^(?P<species>.*)/genes/$', 'networks.views.genes', name='genes'),
-    url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)$', 'networks.views.network', name='network'),
+    url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)$', 'networks.views.network', name='network'),
     url(r'^(?P<species>[^/]*)/network$', 'networks.views.networkbicl',
         name='networkbicl'),
 
     url(r'^(?P<species>[^/]*)/gene/(?P<gene>.*)$', 'networks.views.gene', name='gene'),
-    url(r'^(?P<species>[^/]*)/network/(?P<network_id>\d+)/module/(?P<bicluster_id>\d+)$', 'networks.views.bicluster', name='biclusters'),
+    url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)/module/(?P<bicluster_num>\d+)$', 'networks.views.bicluster', name='biclusters'),
 
     url(r'^(?P<species>[^/]*)/?$', 'networks.views.species', name='species'),
  

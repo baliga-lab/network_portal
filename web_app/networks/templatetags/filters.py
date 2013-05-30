@@ -13,7 +13,7 @@ def make_bicluster_link(bicl):
     network = bicl.network
     species = network.species.short_name
     return "<a href=\"/%s/network/%d/module/%d\">%d</a>" % (
-        species, network.id, bicl.id, bicl.k)
+        species, 1, bicl.k, bicl.k)  # TODO: currently network num always 1
 
 
 @register.filter
@@ -48,7 +48,7 @@ def gene_ncbi_link(gene):
 
 @register.filter
 def network_url(network):
-    return "/%s/network/%d" % (network.species.short_name, network.id)
+    return "/%s/network/%d" % (network.species.short_name, 1)  # currently 1
 
 
 @register.filter
