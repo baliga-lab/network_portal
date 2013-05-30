@@ -117,6 +117,18 @@ $(document).ready(function () {
 function TimerFunc()
 {
     CheckDataInjection();
+
+    // Set the onchange event handler for operation drop downs of data
+    // This is to handle the situation where some data are captured by the Firegoose
+    // and we want to hook the onchange event
+
+    //alert("setting select event handler");
+    $(".firegooseInsertedSelect").change(DataOperationSelected);
+    $(".firegooseInsertedSelect").focus(SelectGotFocus);
+
+    $(".firegooseInsertedSelect").removeClass("firegooseInsertedSelect")
+
+    setTimeout(function() { TimerFunc() }, 3000);
     //UpdateGeeseInfo();
 }
 
@@ -2033,7 +2045,9 @@ function InsertDataToTarget(linkpair)
         var td4 = document.createElement("td");
         $(row).append($(td4));
         var select = document.createElement("select");
+        select.className = "dataOperationSelect";
         select.onchange = DataOperationSelected;
+        select.onfocus = SelectGotFocus;
         $(td4).append($(select));
         var option0 = document.createElement("option");
         option0.value = "0";
@@ -2052,6 +2066,21 @@ function InsertDataToTarget(linkpair)
         option3.innerHTML = "Download";
         $(select).append($(option3));
     }
+}
+
+function SelectGotFocus(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    //alert(source);
+    if (source != null) {
+        if (source.selectedIndex != 0) {
+            source.selectedIndex = 0;
+            source.blur();
+        }
+    }
+
 }
 
 function DataOperationSelected(event)
@@ -2854,6 +2883,7 @@ function OpenOneGroup(event)
 
 function OpenDataGroup(group)
 {
+    //alert("Opening data..." + group.length);
     if (group.length > 0)
     {
           //ClearWorkflowCanvas();
@@ -3132,6 +3162,7 @@ function OnSaveState(param)
     $(row).append($(td1));
     var para = document.createElement("p");
     para.setAttribute("id", "astate_" + stateid);
+    para.innerHTML = name;
     $(td1).append(para);
 
     var idinput = document.createElement("input");
