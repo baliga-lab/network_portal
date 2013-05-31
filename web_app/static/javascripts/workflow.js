@@ -2040,7 +2040,7 @@ function InsertDataToTarget(linkpair)
 
         var td3 = document.createElement("td");
         $(row).append($(td3));
-        $(td3).innerHTML = linkpair["desc"];
+        td3.innerHTML = linkpair["desc"];
 
         var td4 = document.createElement("td");
         $(row).append($(td4));
@@ -2896,7 +2896,7 @@ function OpenDataGroup(group)
              }
           });
 
-          $('#divDataspaceComponentMenu').dialog( { height:400, width:500,
+          $('#divDataspaceComponentMenu').dialog( { height:450, width:500,
             buttons: {
                 "Open": function() {
                     // Get all the selected data

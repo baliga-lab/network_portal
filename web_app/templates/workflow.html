@@ -371,10 +371,12 @@
         </div>
 
         <div id="divDataspaceComponentMenu" style="display: none">
+            <strong>Select an Application</strong><br/>
             <ul id="ulctxcomponents">
             </ul>
-            <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>Pass Gene Names
-            <input id="inputUrlValue" type="radio" name="PassData" />Pass Url</p>
+            <strong>Select a broadcast type</strong>
+            <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>NameList
+            <input id="inputUrlValue" type="radio" name="PassData" />File</p>
             <input id="inputContextSubaction" type="hidden" value="" />
         </div>
 
@@ -386,7 +388,7 @@
         <div id="dlgUploadData" style="display:none">
             <p><label id="labelOrganism"></label></p>
             <p><form method="post" enctype="multipart/form-data">
-            <input name='uploads[]' id="filesToUpload" type="file" multiple>
+            <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
             Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
         </form></p>
             <p>
@@ -438,7 +440,7 @@
                             <input type="hidden" value='{{state.id|stringformat:"i"}}' />
                         </td>
                         <td> {{state.description}} </td>
-                        <td></td>
+                        <td> {{state.created_at}} </td>
                         <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
                             <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
                             <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
