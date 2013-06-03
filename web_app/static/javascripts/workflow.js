@@ -203,7 +203,7 @@ function SetDataPass(event)
                 {
                     var url = FG_currentDataToOpen[i].toString().toLowerCase();
                     //alert(url);
-                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0)
+                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat"))
                     {
                         // If there is a txt file, we should NOT pass names
                         //alert("Set check to false");
