@@ -72,7 +72,7 @@ urlpatterns = patterns('',
 
     # Login / Logout
     #url(r'^login/$', 'django.contrib.auth.views.login'),
-    url(r'^logout/$', 'views.logout_page'),
+    url(r'^logout$', 'views.logout_page'),
     url(r'^login/$', 'views.login_page'),
 
     #(r'^analysis/$', 'networks.views.analysis', name='analysis'),
