@@ -168,7 +168,7 @@
             {% if member_biclusters %}
             {% for bicluster in member_biclusters %}
             <tr>
-              <td><a href="/{{ gene.species.short_name }}/network/1/module/{{ bicluster.id }}">{{ bicluster.id }}</a></td>
+              <td>{{bicluster|bicluster_link}}</td>
               <td><a href="?view=regulation">{{ bicluster.influences.count }}</a></td>
               <td>{{ bicluster.conditions.count }}</td>
             </tr>
