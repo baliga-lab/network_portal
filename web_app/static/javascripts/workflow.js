@@ -124,8 +124,11 @@ function TimerFunc()
 
     //alert("setting select event handler");
     $(".firegooseInsertedSelect").change(DataOperationSelected);
+
+    // Call SelectGotFocus to reset the selected item
     $(".firegooseInsertedSelect").focus(SelectGotFocus);
 
+    // remove the class so the event handler won't get hooked again
     $(".firegooseInsertedSelect").removeClass("firegooseInsertedSelect")
 
     setTimeout(function() { TimerFunc() }, 3000);
@@ -174,8 +177,8 @@ function LoadDataWorkspaceComponentMenu()
             subactionhtml = "<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
         }
         var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
-        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />" + goosename
-           + "<input type='hidden' value='" + $(this).attr("id") + "' />" + subactionhtml);
+        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' /><label>" + goosename
+           + "</label><input type='hidden' value='" + $(this).attr("id") + "' />" + subactionhtml);
         $("#ulctxcomponents").append(li);
     });
 }
@@ -438,7 +441,7 @@ function InitializeWorkflow()
     jsonObj.reset = "true";
     var jsonString = JSON.stringify(jsonObj);
     //alert(jsonString);
-    SubmitWorkflowToBoss(jsonString);
+    SubmitWorkflowToBoss(jsonString, null);
 
     // clean up the context menu
     $("#ulctxgoosenames").empty();
@@ -1081,7 +1084,7 @@ function ShowSaveWorkflowDlg()
         });
 }
 
-function SubmitWorkflow(nodelist) {
+function SubmitWorkflow(nodelist, info) {
     //Start boss
     //SubmitWorkflowToBoss("Test");
 
@@ -1095,7 +1098,8 @@ function SubmitWorkflow(nodelist) {
             var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
             var jsonString = JSON.stringify(jsonObj);
             //alert(jsonString);
-            SubmitWorkflowToBoss(jsonString);
+            //alert(info);
+            SubmitWorkflowToBoss(jsonString, info);
             WF_timercnt = 0;
             setTimeout(function() { CheckSessions() }, 15000);
         //}
@@ -2068,6 +2072,8 @@ function InsertDataToTarget(linkpair)
     }
 }
 
+// Reset the selectedIndex of the operation dropdown list
+// So that the logic
 function SelectGotFocus(event)
 {
     var source = event.target || event.srcElement;
@@ -2095,8 +2101,9 @@ function DataOperationSelected(event)
         {
             // Open the data in a goose
             //alert("Open data...");
-            GetSelectedRowData(source);
-            OpenDataGroup(WF_batchedData);
+            var dataname = GetSelectedRowData(source);
+            //alert(dataname);
+            OpenDataGroup(WF_batchedData, dataname);
         }
         else if (selectedvalue == "2")
         {
@@ -2117,7 +2124,9 @@ function GetSelectedRowData(source)
     var td0 = $(row).children()[0];
     var label = $(td0).children()[0];
     //alert(label);
-
+    var url = $(label).children()[1];
+    var dataname = url.innerHTML;
+    //alert(dataname);
     WF_batchedData = [];
 
        //alert($(this).children()[1]);
@@ -2131,6 +2140,7 @@ function GetSelectedRowData(source)
             WF_batchedData.push(link);
         }
     }
+    return dataname;
 }
 
 function SelectAllData(tableid, ctrlid)
@@ -2870,6 +2880,10 @@ function OpenOneGroup(event)
       source = event;
   if (source != null) {
       var grpul = $(source).parent().children()[1];
+      var groupinput = $(grpul).parent().children()[3];
+      //alert(groupinput);
+      var groupname = $(groupinput).val();
+      //alert(groupname);
       var datatoopen = [];
       $(grpul).children().each(function() {
           var checkbox = $(this).children()[0];
@@ -2877,11 +2891,11 @@ function OpenOneGroup(event)
           if ($(checkbox).is(':checked'))
             datatoopen.push(link);
       });
-      OpenDataGroup(datatoopen);
+      OpenDataGroup(datatoopen, groupname);
   }
 }
 
-function OpenDataGroup(group)
+function OpenDataGroup(group, groupname)
 {
     //alert("Opening data..." + group.length);
     if (group.length > 0)
@@ -2902,10 +2916,15 @@ function OpenDataGroup(group)
                     // Get all the selected data
                     $("#ulctxcomponents").children().each(function() {
                            var checkbox = $(this).children()[0];
+
                            if ($(checkbox).prop('checked'))
                            {
-
-                              var inputcomponentid = $(this).children()[1];
+                              var goosenameli = $(checkbox).parent();
+                              var goosenamelabel = $(goosenameli).children()[1];
+                              //alert(goosenamelabel);
+                              var goosename = $(goosenamelabel).text();
+                              //alert(goosename);
+                              var inputcomponentid = $(this).children()[2];
                               //alert($(inputcomponentid).val());
                               var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
                               // Append the selected goose to the canvas
@@ -2946,7 +2965,10 @@ function OpenDataGroup(group)
                               // Now we form the workflow of this new component and submit the workflow to Boss
                               var nodelist = [];
                               nodelist.push(nodeobj.Element);
-                              SubmitWorkflow(nodelist);
+
+                              var info = "Submitting " + groupname + " to " + goosename;
+                              //alert(info);
+                              SubmitWorkflow(nodelist, info);
                            }
                     });
                     //SubmitWorkflow();
@@ -2970,7 +2992,7 @@ function GroupOpen(datatable)
 {
     //alert("Open data...");
     GetSelectedData(datatable);
-    OpenDataGroup(WF_batchedData);
+    OpenDataGroup(WF_batchedData, "selected data");
 }
 
 function FindComponent(gname)
@@ -3253,6 +3275,19 @@ function DeleteState(event)
     }
 }
 
+function DisplayInfo(targetdiv, info, style)
+{
+    if (targetdiv != null && info != null)
+    {
+        //alert("display info " + info);
+        var para = document.createElement("p");
+        $(para).text(info);
+        $(para).css(style);
+        $(targetdiv).prepend($(para));
+    }
+}
+
+
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");
 
@@ -3293,11 +3328,12 @@ function ProcessAction(sourcename, sourcecommand, targetname, targetcommand, typ
     }
 }
 
-function SubmitWorkflowToBoss(jsonworkflow) {
+function SubmitWorkflowToBoss(jsonworkflow, info) {
     var proxy = get_proxyapplet();
     if (proxy != undefined) {
         //alert("Submit workflow to boss");
         proxy.SubmitWorkflow(jsonworkflow);
+        DisplayInfo("#divHistoryInfo", info, "historyinfo");
         //alert("workflow action done");
     }
 }
