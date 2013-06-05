@@ -2075,3 +2075,29 @@ background-color: #ffb515;
 {
 
 }
+
+.autoscrolldiv
+{
+    max-height: 900px;
+    scroll: auto;
+}
+
+.historyinfo
+{
+    color: blue;
+}
+
+.warning
+{
+    color: blue;
+}
+
+.error
+{
+    color: red;
+}
+
+.info
+{
+    color: black;
+}
