@@ -1,10 +1,10 @@
 {% load filters %}
-<h5> Members for Module {{ bicluster.id }} </h5>
+<h5> Members for Module {{ bicluster.k }} </h5>
 <p>
   {% if filter == 'tf' %}
-  There are <b>{{ gene_count }}</b> transcription factors in <b>Module {{ bicluster.id }}</b>
+  There are <b>{{ gene_count }}</b> transcription factors in <b>Module {{ bicluster.k }}</b>
   {% else %}
-  There are <b>{{ gene_count }}</b> genes in <b> Module {{ bicluster.id }}</b>
+  There are <b>{{ gene_count }}</b> genes in <b> Module {{ bicluster.k }}</b>
   {% endif %}
 </p>
 <div class="main">
