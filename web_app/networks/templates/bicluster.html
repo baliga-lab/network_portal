@@ -1,5 +1,5 @@
 {% extends "base2.html" %}
-{% block title %}Network Portal - Module {{ bicluster.id }}{% endblock %}
+{% block title %}Network Portal - Module {{ bicluster.k }}{% endblock %}
 {% load filters %}
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
@@ -58,7 +58,7 @@
   <div class="sub-page">
     <div id="tabs" class="sub-page">
       <ul>
-		<li><a class="name" href="#tab-main">Module {{ bicluster.id }}</a></li>
+		<li><a class="name" href="#tab-main">Module {{ bicluster.k }}</a></li>
 		<li><a class="network" href="#tab-network">Network</a></li>
 		<li><a class="regulator" href="#tab-regulator">Regulators</a></li>
 		<li><a class="motif" href="#tab-motif">Motifs</a></li>
@@ -72,7 +72,7 @@
       <div id="tab-main">
 	  <div class="main">
 	      
-			<h5>Module {{ bicluster.id }} Profile </h5><br>
+			<h5>Module {{ bicluster.k }} Profile </h5><br>
 	
 			{% if img_url %}
 			<object data="{{ img_url }}" type="image/svg+xml"></object>
@@ -161,7 +161,7 @@
       </div>
       -->
       <div id="tab-social" class="sub-page">
-	  <h5> Comments for Module {{ bicluster.id }}</h5><br>
+	  <h5> Comments for Module {{ bicluster.k }}</h5><br>
 		<div id="disqus_thread" class="main"></div> <!-- Commenting from Disqus-->
 			<script type="text/javascript">
 			/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
