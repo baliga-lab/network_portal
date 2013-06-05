@@ -11,11 +11,13 @@ Created by
 Nitin Baliga
 Christopher Bare
 Karen Foley
+Ning Jiang
 Serdar Turkarslan
 Wei-Ju Wu
+Elisabeth Wurtmann
 
 License
 -------
-Copyright (C) 2011 Institute for Systems Biology
+Copyright (C) 2011-2013 Institute for Systems Biology
 LGPL, see license.txt
 
