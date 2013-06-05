@@ -107,6 +107,11 @@ def tf_link(tf, network):
     return mark_safe("<a href=\"/network/%d/regulated_by/%s\">%s</a>" % (
             network.id, tf.name, tf.display_name()))
 
+@register.filter
+def meme_pssm_link(network):
+    return mark_safe("<a href=\"/%s/network/1/meme_motifs\">Motifs 1</a>" % (
+            network.species.short_name))
+
 
 ######################################################################
 #### Utility filters
