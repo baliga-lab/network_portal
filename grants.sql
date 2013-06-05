@@ -95,3 +95,26 @@ grant all privileges on auth_user_groups_id_seq to apache;
 grant all privileges on auth_user_id_seq to apache;
 grant all privileges on auth_user_user_permissions to apache;
 grant all privileges on auth_user_user_permissions_id_seq to apache;
+
+alter table  django_openid_auth_association owner to dj_ango;
+alter table  django_openid_auth_nonce owner to dj_ango;
+alter table networks_organismdatatypes owner to dj_ango;
+alter table networks_organisms owner to dj_ango;
+alter table networks_workflows owner to dj_ango;
+alter table networks_workflowcaptureddata owner to dj_ango;
+alter table networks_workflowcategories owner to dj_ango;
+alter table networks_users owner to dj_ango;
+alter table networks_workflowcomponents owner to dj_ango;
+alter table networks_workflowdatagroupcontent owner to dj_ango;
+alter table networks_workflowdatagroups owner to dj_ango;
+alter table networks_workflowedgedatatypes owner to dj_ango;
+alter table networks_workflowedges owner to dj_ango;
+alter table networks_workflownodes owner to dj_ango;
+
+
+
+
+
+
+
+

@@ -31,6 +31,7 @@
     <li><a class="regulator" href="#tab-states">Saved States -></a></li>
     <li><a class="regulator" href="#tab-reports">Reports -> </a></li>
     <li><a class="motif" href="#tab-history">History</a></li>
+    <li><a class="motif" href="#tab-log">Log</a></li>
 </ul>
     <div id="tab-data">
         <div class="main" style="width:70%">
@@ -371,10 +372,12 @@
         </div>
 
         <div id="divDataspaceComponentMenu" style="display: none">
+            <strong>Select an Application</strong><br/>
             <ul id="ulctxcomponents">
             </ul>
-            <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>Pass Gene Names
-            <input id="inputUrlValue" type="radio" name="PassData" />Pass Url</p>
+            <strong>Select a broadcast type</strong>
+            <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>NameList
+            <input id="inputUrlValue" type="radio" name="PassData" />File</p>
             <input id="inputContextSubaction" type="hidden" value="" />
         </div>
 
@@ -386,7 +389,7 @@
         <div id="dlgUploadData" style="display:none">
             <p><label id="labelOrganism"></label></p>
             <p><form method="post" enctype="multipart/form-data">
-            <input name='uploads[]' id="filesToUpload" type="file" multiple>
+            <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
             Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
         </form></p>
             <p>
@@ -438,7 +441,7 @@
                             <input type="hidden" value='{{state.id|stringformat:"i"}}' />
                         </td>
                         <td> {{state.description}} </td>
-                        <td></td>
+                        <td> {{state.created_at}} </td>
                         <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
                             <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
                             <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
@@ -470,12 +473,20 @@
     <div id="tab-history">
         <div class="sub-page">
             <div><H3> History</H3>
-            <p>History information will be implemented soon.</p>
+                <div id="divHistoryInfo" class="autoscrolldiv">
+                </div>
             </div>
-            <br />
         </div>
     </div>
 
+    <div id="tab-log">
+        <div class="sub-page">
+            <div><H3>Log</H3>
+                <div id="divLogInfo" class="autoscrolldiv">
+                </div>
+            </div>
+        </div>
+    </div>
     
 
 

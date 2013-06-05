@@ -72,7 +72,7 @@ urlpatterns = patterns('',
 
     # Login / Logout
     #url(r'^login/$', 'django.contrib.auth.views.login'),
-    url(r'^logout/$', 'views.logout_page'),
+    url(r'^logout$', 'views.logout_page'),
     url(r'^login/$', 'views.login_page'),
 
     #(r'^analysis/$', 'networks.views.analysis', name='analysis'),
@@ -90,6 +90,8 @@ urlpatterns = patterns('',
     url(r'^species$', 'networks.views.species', name='species'),
     url(r'^species/$', 'networks.views.species', name='species'),
     url(r'^(?P<species>.*)/genes/$', 'networks.views.genes', name='genes'),
+    url(r'^(?P<species>.*)/network/(?P<network_num>\d+)/meme_motifs/$',
+        'networks.views.meme_pssms', name='meme_pssms'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)$', 'networks.views.network', name='network'),
     url(r'^(?P<species>[^/]*)/network$', 'networks.views.networkbicl',
         name='networkbicl'),

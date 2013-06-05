@@ -864,6 +864,9 @@ def uploaddata(request):
 
         userid = request.REQUEST['userid']
         organismtype = request.REQUEST['organismtype']
+        if (organismtype is None or len(organismtype) == 0):
+           organismtype = 'Generic'
+
         desc = request.REQUEST['description']
         if organismtype is None:
             organismtype = 'Generic'
