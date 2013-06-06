@@ -19,6 +19,7 @@
         <th>Genes</th>
         <th>Transcription Factors</th>
         <th>Network</th>
+        <th>Download (MEME)</th>
         <th>Data Sources</th>
        </tr>
      </thead>
@@ -34,6 +35,11 @@
   				No networks for this species, yet.
   				{% endif %}
   				</td>
+        <td>{% if species.network_set.count > 0 %}
+  				    {% for network in species.network_set.all %}
+    				    {{network|meme_pssm_link}}
+  					  {% endfor %}
+  				  {% else %}No networks for this species, yet.{% endif %}
   			<td>{{ network.data_source }}</td>
   			</tr>
   		</tbody>

@@ -4,6 +4,7 @@ import math
 from itertools import chain
 from pprint import pprint
 import json
+import collections
 
 from django.template import RequestContext
 from django.http import HttpResponse
@@ -466,3 +467,55 @@ def make_circvis_data(gene):
               'start': g.start,
               'end': g.end} for g in used_genes]
     return {'chromosomes': chromosomes, 'genes': genes, 'network': network}
+
+
+MotifData = collections.namedtuple('MotifData',
+                                   ['name', 'pssm', 'nsites', 'evalue'])
+
+def meme_pssms(request, species, network_num):
+    network = Network.objects.filter(species__short_name=species)[0]
+    biclusters = network.bicluster_set.all()
+    out_motifs = []
+    freq_a = 0
+    freq_c = 0
+    freq_g = 0
+    freq_t = 0
+
+    for bicl in biclusters:
+        motifs = [motif for motif in bicl.motif_set.all()]
+        for m in motifs:
+            name = "%d_%d" % (m.bicluster.k, m.position)
+            pssm = m.pssm()
+            out_motifs.append(MotifData(name, pssm, m.sites, m.e_value))
+            for rows in pssm:
+                freq_a += rows['a']
+                freq_c += rows['c']
+                freq_g += rows['g']
+                freq_t += rows['t']
+    freq_total = freq_a + freq_c + freq_g + freq_t
+    freq_a /= freq_total
+    freq_c /= freq_total
+    freq_g /= freq_total
+    freq_t /= freq_total
+
+    meme_result = """MEME version 3.0
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from dataset with add-one prior applied)
+A %.3f C %.3f G %.3f T %.3f
+""" % (freq_a, freq_c, freq_g, freq_t)
+
+    for m in out_motifs:
+        meme_result += """\nMOTIF %s
+BL   MOTIF %s width=0 seqs=0
+letter-probability matrix: alength= 4 w= %d nsites= %d E= %.3e
+""" % (m.name, m.name, len(m.pssm), m.nsites, m.evalue)
+        for row in m.pssm:
+            meme_result += """%.3f %.3f %.3f %.3f\n""" % (row['a'], row['c'],
+                                                          row['g'], row['t'])
+    resp = HttpResponse(meme_result, mimetype='application/meme')
+    resp['Content-Disposition'] = 'attachment; filename="%s_motifs.meme"' % species
+    return resp
