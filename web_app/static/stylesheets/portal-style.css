@@ -2080,6 +2080,7 @@ background-color: #ffb515;
 {
     max-height: 900px;
     scroll: auto;
+    word-break: normal;
 }
 
 .historyinfo

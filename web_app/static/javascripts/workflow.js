@@ -2970,6 +2970,7 @@ function OpenDataGroup(group, groupname)
                               //alert(info);
                               SubmitWorkflow(nodelist, info);
                            }
+                           $('#divDataspaceComponentMenu').dialog('close');
                     });
                     //SubmitWorkflow();
                     //$('#divDataspaceComponentMenu').dialog('close');
@@ -3233,7 +3234,7 @@ function LoadState(event)
         //alert(stateid);
         var proxy = get_proxyapplet();
         if (proxy != undefined) {
-            //alert("Submit workflow to boss");
+            alert("Load state...");
             proxy.LoadStateDelegate(stateid);
             //alert("workflow action done");
         }
