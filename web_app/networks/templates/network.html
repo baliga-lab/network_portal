@@ -53,10 +53,19 @@ $(document).ready(function() {
   loadList();
 });
 </script>
-<div class="main">
-  <span><span id="dispresid">Residual: 0-0.3</span><div id="residslider" style="width: 30%"></div></span>
-  <span><span id="dispmot">Motif e-value 0-10</span><div id="motslider" style="width: 30%"></div></span>
-  <span><input id="resetfilters" type="button" value="Reset Filters"></input>
+<div class="sub-page">
+<h5> Explore network modules for {{ network.species.name }}</h5>
+<p>Use residual and motif e-value sliders to filter modules
+	<table style= "border:none">
+		<th><span id="dispresid">Residual: 0-0.3</span></th>
+		<th><span id="dispmot">Motif e-value 0-10</span></th>
+		<th></th>
+		<tr>
+			<td style="width: 40%"><div id="residslider" style="width: 100%"></div></td>
+			<td style="width: 40%"><div id="motslider" style="width: 100%"></div></td>
+			<td style="width: 15%"><input id="resetfilters" type="button" value="Reset Filters"></input></td>
+		</tr>
+	</table>
 
   <div id="modulelist">
     This is the section to display the module list
@@ -67,5 +76,5 @@ $(document).ready(function() {
     {{tf|tf_link:network}} 
     {% endfor %}
   </div>
-</div><!-- End #main -->
+</div><!-- End #sub-page -->
 {% endblock %}
