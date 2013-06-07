@@ -29,6 +29,12 @@
     {% endblock %}
 
 {% block content %}
+<h5><span class="search_help"> Organism : <a href="/{{ gene.species.short_name }}">{{ gene.species.name }}</a>
+                             | Network : {% for network in species.network_set.all %}
+    				                        <a href="{{network|network_url}}" title="Explore Network"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/></a></a>
+  					{% endfor %}
+   </span>
+</h5>
 <div id="bicluster-top">
  <div class="sub-page">
    <div id="tabs" class="sub-page">
@@ -154,7 +160,7 @@
           
             <strong> Organism:</strong><br> <a href="/{{ gene.species.short_name }}">{{ gene.species.name }}</a><br/>
             <strong> Locus tag:</strong><br> {{ gene.name }} <br/>
-            <strong> Aliases:</strong> <br><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=gene&term={{ gene.geneid }}">{{ gene.geneid }} (NCBI) </a>, <a href="http://microbesonline.org/cgi-bin/fetchLocus.cgi?locus=206275&disp=0">206275 (MicrobesOnline) </a><br/>
+            <strong> Aliases:</strong> <br><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=gene&term={{ gene.geneid }}">{{ gene.geneid }} (NCBI) </a>, <a href="http://microbesonline.org/cgi-bin/keywordSearch.cgi?searchType=customQuery&customQuery={{ gene.name }}">{{ gene.name }} (MicrobesOnline) </a><br/>
             <strong> Gene Name:</strong><br> <i> {% if gene.common_name %} {{ gene.common_name }} {% else %} N/A {% endif %}</i><br/>
 
 
