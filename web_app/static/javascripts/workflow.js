@@ -3136,6 +3136,9 @@ function SaveState()
                 if (proxy != undefined) {
 
                     //alert(name + " " + desc);
+                    var datetime = GetCurrentDateTimeString();
+                    DisplayInfo("#divHistoryInfo", (datetime + " Save state " + name), "historyinfo");
+
                     proxy.SaveStateDelegate(userid, name, desc);
                     //alert("workflow action done");
                 }
@@ -3234,7 +3237,9 @@ function LoadState(event)
         //alert(stateid);
         var proxy = get_proxyapplet();
         if (proxy != undefined) {
-            alert("Load state...");
+            //alert("Load state...");
+            var datetime = GetCurrentDateTimeString();
+            DisplayInfo("#divHistoryInfo", (datetime + " Load state "), "historyinfo");
             proxy.LoadStateDelegate(stateid);
             //alert("workflow action done");
         }
@@ -3329,14 +3334,34 @@ function ProcessAction(sourcename, sourcecommand, targetname, targetcommand, typ
     }
 }
 
+
 function SubmitWorkflowToBoss(jsonworkflow, info) {
     var proxy = get_proxyapplet();
     if (proxy != undefined) {
         //alert("Submit workflow to boss");
         proxy.SubmitWorkflow(jsonworkflow);
-        DisplayInfo("#divHistoryInfo", info, "historyinfo");
+        var datetime = GetCurrentDateTimeString();
+        DisplayInfo("#divHistoryInfo", (datetime + " " + info), "historyinfo");
         //alert("workflow action done");
     }
+}
+
+
+function GetCurrentDateTimeString()
+{
+    var currentdate = new Date();
+    var datetime = currentdate.getFullYear() + "/"
+                    + (currentdate.getMonth()+1)  + "/"
+                    + currentdate.getDate() + " @ "
+                    + currentdate.getHours() + ":"
+                    + currentdate.getMinutes() + ":"
+                    + currentdate.getSeconds();
+    return datetime;
+}
+
+function ClearHistory(controlid)
+{
+    $(controlid).empty();
 }
 
 // change the style of the workflow component according to the status
