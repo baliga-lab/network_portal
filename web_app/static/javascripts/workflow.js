@@ -194,10 +194,15 @@ function SetDataPass(event)
     if (source != null) {
         var checked = $(source).prop("checked");
         if (checked) {
-            $("#inputContextSubaction").val("");
+            var subactionselect = $(source).parent().children("select");
+            if (subactionselect == null)
+                $("#inputContextSubaction").val("");
+            else
+                $("#inputContextSubaction").val($(subactionselect).val());
 
             var li = $(source).parent();
-            var goosename = $(li).text();
+            var goosenamelabel = $(li).children()[1];
+            var goosename = $(goosenamelabel).html();
             //alert(goosename);
 
             if (FG_currentDataToOpen != null) {
