@@ -3359,6 +3359,11 @@ function GetCurrentDateTimeString()
     return datetime;
 }
 
+function ClearHistory(controlid)
+{
+    $(controlid).empty();
+}
+
 // change the style of the workflow component according to the status
 function SetWorkflowStatus(componentid, status)
 {
