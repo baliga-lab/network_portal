@@ -54,7 +54,9 @@
   </script>
 {% endblock %}
 {% block content %}
-<h5>{{ bicluster.network.species }}</h5>
+<h5><span class="search_help"> Organism : {{ bicluster.network.species|species_link }} | Network : {% for network in species.network_set.all %}
+    				{{ network.id }} <a href="{{network|network_url}}" title="Explore Network"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/></a></a>
+  					{% endfor %} </span></h5>
 <div id="bicluster-top">
   <div class="sub-page">
     <div id="tabs" class="sub-page">
