@@ -12,7 +12,7 @@ $(document).ready(function() {
     $("#query").autocomplete({
       source: function(request, response) {
         $.ajax({
-          url: "http://networks.systemsbiology.net:8983/solr/suggest/?wt=json&json.wrf=?",
+          url: "{{solr_suggest}}",
           crossDomain: true,
           dataType: "jsonp",
           async: false,

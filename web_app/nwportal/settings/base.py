@@ -13,6 +13,8 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+SOLR_SELECT = 'http://localhost:8983/solr/nwportal/select/'
+SOLR_SUGGEST = "http://localhost:8983/solr/nwportal/suggest/?wt=json&json.wrf=?"
 
 DATABASES = {
     'default': {

@@ -13,6 +13,8 @@ from django.utils import simplejson as json
 from django.utils import formats
 from django.utils.formats import get_format
 from django.db import transaction
+from django.conf import settings
+
 
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
@@ -1058,6 +1060,7 @@ def savestate(request):
 
 
 def search(request):
+    solr_suggest = settings.SOLR_SUGGEST
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
