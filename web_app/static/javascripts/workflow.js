@@ -35,6 +35,7 @@ var componenttitledivindex = 0;
 var componenttitlelinkindex = 0;
 var componentsubactioninputindex = 4;
 var componentdatauriindex = 5;
+var jsplumbInstance = null;
 
 var WF_dataAppliedHistory = [];
 
@@ -105,6 +106,9 @@ $(document).ready(function () {
     $(".componenthelp").colorbox({inline: true, width: "50%"});
 
     $( "#tabs" ).tabs();
+
+    jsplumbInstance = jsPlumb.getInstance();
+
 
     setTimeout(function() { TimerFunc() }, 3000);
     GetEdgeDataTypes();
@@ -619,8 +623,10 @@ function componentDropEvent(ev, component) {
             //alert("Adding endpoints...");
 
             // Add the source and target endpoints to the component
-            jsPlumb.addEndpoint(cid, sourceWFEndpointOptions);
-            jsPlumb.addEndpoint(cid, targetWFEndpointOptions);
+            if (jsplumbInstance == null)
+                jsplumbInstance = jsPlumb.getInstance();
+            jsplumbInstance.addEndpoint(cid, sourceWFEndpointOptions);
+            jsplumbInstance.addEndpoint(cid, targetWFEndpointOptions);
 
             //jsPlumb.makeTarget(cid, {
             //    anchor: "Continuous",
@@ -631,7 +637,7 @@ function componentDropEvent(ev, component) {
             //});
 
             //  set the component to be draggable
-            jsPlumb.draggable(cid, {
+            jsplumbInstance.draggable(cid, {
                 containment: "parent",
                 helper: "original"
             });
@@ -642,6 +648,42 @@ function componentDropEvent(ev, component) {
         }
     }
 }
+
+function ComponentClicked(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        var sourceid = $(source).attr("id");
+        //alert(sourceid);
+        var srcWFEndpointOptions = {
+            anchor: "RightMiddle",
+            endpoint: "Dot",
+            isSource: true,
+            maxConnections: -1,
+            connector: "StateMachine",
+            connectorStyle: { strokeStyle: "#666" },
+            connectorOverlays: [
+                        ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}]
+                        //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
+                    ]
+        };
+
+        try {
+            if (jsplumbInstance != null) {
+                //alert("Adding endpoints");
+                srcEP = jsplumbInstance.addEndpoint(sourceid, sourceWFEndpointOptions);
+                targetEP = jsplumbInstance.addEndpoint(sourceid, targetWFEndpointOptions);
+            }
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+}
+
+
 
 // Start download a url based on OS
 function startDownload(url)
@@ -695,7 +737,7 @@ function ExtractWorkflow(nodelist) {
 
     if (nodelist == null)
     {
-        var connectionList = jsPlumb.getConnections();
+        var connectionList = jsplumbInstance.getConnections();
         //alert(connectionList.length);
         for (i = 0; i < connectionList.length; i++) {
             var conn = connectionList[i];
@@ -1381,9 +1423,15 @@ function FindComponentId(componentname, componentarray)
     return null;
 }
 
+// Add the component div to the workflow canvas
+// Due to the jquery tabs, calling jsPlumb.addEndpoint() from a tab other than the tab that contains the
+// workflow canvas doesn't add end points correctly. We need to instantiate a new jsplumb instance and
+// add the end points when the component divs are clicked
 function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
 {
     //alert(componentid);
+    //alert(sourceid);
+    //alert(nodecnt);
     var nodeobj = {};
     var sourcelement = null;
     var source = document.getElementById(componentid); // this is the component in the component list
@@ -1455,12 +1503,19 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         //var tableposition = $("#tblWorkflow").offset();
         //alert("Canvas top: " + canvasposition.top + "Canvas left: " + canvasposition.left);
         //alert("Table top: " + tableposition.top + "Table left: " + tableposition.left);
-        var leftv = canvasposition.left + 10 + ((nodecnt % 2 == 0) ? 0 : 1) * 400;
+        var leftv = 250 + ((nodecnt % 2 == 0) ? 0 : 1) * 400;
         var topv = canvasposition.top + 10 + Math.floor(nodecnt / 2) * 250;
         var stylestr = "position: absolute; top: " + topv.toString() + "px; left: " + leftv.toString() + "px";
         //alert(stylestr);
         $(sourcelement).attr('style', stylestr);
         $(sourcelement).appendTo("#workflowcanvas");
+
+        nodeobj.Element = sourcelement;
+        nodeobj.IsNew = true;
+        WF_endpoints[sourceid] = {};
+
+        if (jsplumbInstance == null)
+            jsplumbInstance = jsPlumb.getInstance();
 
         var srcWFEndpointOptions = {
                             anchor: "RightMiddle",
@@ -1474,27 +1529,27 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
                                         //,["Label", {label:"Data", location:0.5, id: "connlabel", overlayClass: "dataLabel"}]
                                     ]
         };
-        srcEP = jsPlumb.addEndpoint(sourceid, sourceWFEndpointOptions);
-        targetEP = jsPlumb.addEndpoint(sourceid, targetWFEndpointOptions);
-        nodeobj.Element = sourcelement;
+
+        srcEP = jsplumbInstance.addEndpoint(sourceid, sourceWFEndpointOptions);
+        targetEP = jsplumbInstance.addEndpoint(sourceid, targetWFEndpointOptions);
         nodeobj.SourceEP = srcEP;
         nodeobj.TargetEP = targetEP;
-        nodeobj.IsNew = true;
 
         // store the endpoints for retrieve later
-        WF_endpoints[sourceid] = {};
         WF_endpoints[sourceid].SourceEP = srcEP;
         WF_endpoints[sourceid].TargetEP = targetEP;
+
         // Save the nodeobj
         //alert("Node id: " + nodeid);
         if (nodeid.length > 0)
             WF_processednodes[nodeid] = sourcelement;
 
         //  set the component to be draggable
-        jsPlumb.draggable(sourceid, {
+        jsplumbInstance.draggable(sourceid, {
             containment: "parent",
             helper: "original"
         });
+
     }
     //alert("component appended");
     $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
@@ -1622,7 +1677,7 @@ function DisplayWorkflow(flowdata, workflowid) {
         for (var key in nodes_obj)
         {
             //alert(key);
-            SearchAndCreateNode(nodes_obj, key, WF_nodecnt++, componentarray, startnodeid);
+            SearchAndCreateNode(nodes_obj, key, WF_nodecnt, componentarray, startnodeid);
         }
 
         var j = 0;
@@ -1649,7 +1704,8 @@ function DisplayWorkflow(flowdata, workflowid) {
                 // remove the default Label overlay.
                 // if we do not do this, there will be two labels
                 //sourcenode.SourceEP.connectorOverlays.pop();
-                var c = jsPlumb.connect({
+                //alert(sourcenode.SourceEP);
+                var c = jsplumbInstance.connect({
                     source: sourcenode.SourceEP,
                     target: targetnode.TargetEP,
                     //overlays: connoverlays
@@ -1684,7 +1740,7 @@ function DisplayWorkflow(flowdata, workflowid) {
 function ClearWorkflowCanvas() {
     $("#workflowcanvas").empty();  // clean up the canvas
     //jsPlumb.deleteEveryEndpoint();
-    jsPlumb.reset();
+    jsplumbInstance.reset();
     WF_endpoints = {};
     wfcnt = 0;
     wflabelcnt = 0;
@@ -1718,14 +1774,14 @@ function RemoveComponent(clicktarget)
      // relative position, removing a component will cause others to shift locations
      // and JSPlumb will display the endpoints incorrectly.
      // See the SearchAndCreateNode function for details.
-     jsPlumb.selectEndpoints({ source: component }).each(
+     jsplumbInstance.selectEndpoints({ source: component }).each(
                                           function (ep) {
-                                              jsPlumb.deleteEndpoint(ep);
+                                              jsplumbInstance.deleteEndpoint(ep);
                                           });
 
-     jsPlumb.selectEndpoints({ target: component }).each(
+     jsplumbInstance.selectEndpoints({ target: component }).each(
                                                function (ep) {
-                                                   jsPlumb.deleteEndpoint(ep);
+                                                   jsplumbInstance.deleteEndpoint(ep);
                                                });
 
      $(component).remove();
@@ -3061,7 +3117,7 @@ function HandleGooseRecording(gooseid)
 function ConnectNodes(source, target)
 {
     //alert("connect nodes...");
-    var connectionList = jsPlumb.getConnections();
+    var connectionList = jsplumbInstance.getConnections();
     var found = false;
     //alert(connectionList.length);
     for (i = 0; i < connectionList.length; i++) {
@@ -3083,7 +3139,7 @@ function ConnectNodes(source, target)
         var srcEP = WF_endpoints[sourceid].SourceEP;
         //alert(srcEP);
         var targetEP = WF_endpoints[targetid].TargetEP;
-        var c = jsPlumb.connect({
+        var c = jsplumbInstance.connect({
             source: srcEP,
             target: targetEP,
             //overlays: connoverlays
