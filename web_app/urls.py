@@ -75,6 +75,8 @@ urlpatterns = patterns('',
     url(r'^logout$', 'views.logout_page'),
     url(r'^login/$', 'views.login_page'),
 
+    url(r'^advsearch', 'networks.views.advsearch', name='advsearch'),
+
     #(r'^analysis/$', 'networks.views.analysis', name='analysis'),
     #(r'^analysis/$', include('analysis.urls')),
     (r'^analysis/gene/$', 'networks.views.analysis_gene'),

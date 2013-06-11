@@ -1,0 +1,67 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% load filters %}
+{% block title %}Network Portal - Advanced Search{% endblock %}
+{% block jsspecial %}
+<script type="text/javascript">
+$(document).ready(function() {
+  $('.logicop').change(function() {
+    console.debug('operator changed');
+  });
+  $('.searchattr').change(function() {
+    console.debug('operator changed: ', $(this).val());
+    if ($(this).val() == 'residual') {
+      $('#params').replaceWith('<span id="params"><input style="width: 60px" type="text"> - <input style="width: 60px" type="text"></span>');
+    } else {
+      $('#params').replaceWith('<span id="params"><input type="text"></span>');
+    }
+  });
+  $('#search').click(function() {
+    $('#results').replaceWith('Search results will come here....');
+  });
+});
+</script>
+{% endblock %}
+{% block content %}
+<form>
+<h2>Organism</h2>
+<div>Select organism (default: All)</div>
+<div>
+  <select>
+    <option value="all">All</option>
+    {% for sp in species %}<option value="{{sp.short_name}}">{{sp.name}}</option>
+    {% endfor %}
+  </select>
+</div>
+<h2>Gene Search</h2>
+<div>Select a field to search (default: Locus tag)</div>
+<div>
+  <select>
+    <option>Locus tag</option>
+    <option>Aliases</option>
+    <option>Name</option>
+    <option>Function</option>
+    <option>Regulator</option>
+  </select>
+  Search Term <input type="text"></input>
+</div>
+<h2>Module Search</h2>
+<div>Filter by residual (default: no-filter)</div>
+<div>
+  <select class="searchattr">
+    <option value="residual">Residual</option>
+    <option value="gene">Contains gene</option>
+    <option value="regulator">Regulated by</option>
+    <option value="function">Enriched for function</option>
+  </select>
+  <span id="params"><input style="width: 60px" type="text"> - <input style="width: 60px" type="text"></span>
+  <select class="logicop">
+    <option></option>
+    <option value="and">AND</option>
+    <option value="or">OR</option>
+  </select>
+</div>
+<input id="search" type="button" value="Search">
+</form>
+<div id="results"></div>
+{% endblock %}

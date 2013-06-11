@@ -26,6 +26,10 @@ def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
 
+def advsearch(request):
+    species = Species.objects.all()
+    return render_to_response('adv_search.html', locals())
+
 def biclusterstats_list(request, network_id=None):
     network = Network.objects.get(id=network_id)
 

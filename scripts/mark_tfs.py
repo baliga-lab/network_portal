@@ -1,11 +1,15 @@
 import sys
 import psycopg2
+import synonyms
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print 'Usage: mark_tfs.py <orgcode> <tfs-file>'
     else:
         print "Marking genes for %s..." % sys.argv[1]
+        if sys.argv[1] == 'eco':
+            synonyms = synonyms.read_synonyms(sys.argv[3])
+
         with open(sys.argv[2], 'r') as infile:
             tfs = sorted([line.strip() for line in infile])
             if sys.argv[1] == 'syf':
@@ -22,6 +26,10 @@ where short_name = %s""", (sys.argv[1], ))
         print "species id: ", species_id
         
         for gene in tfs:
+            if sys.argv[1] == 'eco':
+                if gene in synonyms:
+                    print "%s -> %s" % (gene, synonyms[gene])
+                    gene = synonyms[gene]
             cur.execute("""select id, name, common_name
 from networks_gene where (name = %s or common_name = %s) and species_id = %s""",
                         (gene, gene, species_id))

@@ -49,5 +49,6 @@
   -->
   <cores adminPath="/admin/cores" defaultCoreName="collection1" host="${host:}" hostPort="${jetty.port:}" hostContext="${hostContext:}" zkClientTimeout="${zkClientTimeout:15000}">
     <core name="nwportal" instanceDir="nwportal" />
+    <core name="nwportal_adv" instanceDir="nwportal_adv" />
   </cores>
 </solr>
