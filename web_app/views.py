@@ -1059,12 +1059,13 @@ def savestate(request):
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
 
-def search(request):
+def search_genes(request):
     solr_suggest = settings.SOLR_SUGGEST
+    solr_select  = settings.SOLR_SELECT_GENES
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
-            results = s.search(q)
+            results = s.search(solr_select, q)
             gene_ids= []
             for result in results:
                 if result['doc_type'] == 'GENE':

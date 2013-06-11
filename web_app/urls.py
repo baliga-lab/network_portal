@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'views.deleteworkflow', name='deleteworkflow'),
     url(r'^workflow/(?P<workflow_id>\d+)/$', 'views.getworkflow', name='getworkflow'),
     url(r'^workflow$', 'views.workflow', name='workflow'),
-    url(r'^search', 'views.search', name='search'),
+    url(r'^search', 'views.search_genes', name='search'),
     url(r'^help', 'views.help', name='help'),
     url(r'^seqviewer', 'views.seqviewer', name='seqviewer'),
 

@@ -1,20 +1,17 @@
 import urllib2
 import urllib
 from django.utils import simplejson
-from django.conf import settings
 
 
 def make_query_string(q):
     return '+'.join([urllib.quote(comp.encode('utf-8')) for comp in q.split(' ')])
 
-def search(q):
+def search(baseurl, q, max_results=10000):
     """We send our query directly to Solr without going through the sunburnt library.
     Sunburnt creates funny query strings which can lead to less than optimal results.
     """
-    solr_url = settings.SOLR_SELECT
-    req = urllib2.Request(solr_url)
     query_string = make_query_string(q)
-    response = urllib2.urlopen(solr_url, 'wt=json&rows=10000&q=' + query_string)
+    response = urllib2.urlopen(baseurl, 'wt=json&rows=%d&q=%s' % (max_results, query_string))
     resp = simplejson.loads(response.read())['response']
     start = resp['start']
     num_found = resp['numFound']
