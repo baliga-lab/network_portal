@@ -13,18 +13,52 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.db.models import Q
 from django.utils import simplejson
+from django.conf import settings
 
 import networkx as nx
+import search as s
 
 from .models import *
 from .functions import functional_systems
 from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
 
+class SearchModule:
+    def __init__(self, k, residual):
+        self.k = k
+        self.residual = residual
+        self.genes = []
+        self.motif1_evalue = "-"
+        self.motif2_evalue = "-"
 
 # I renamed this to make a gene page
 def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
+def search_modules(request):
+    solr_select = settings.SOLR_SELECT_MODULES
+    data = ["elem"]
+    q = "*:*"
+    docs = s.search(solr_select, q, 10000)
+    results = {}
+    for doc in docs:
+        species_name = doc['species_name']
+        k = doc['module_num']
+
+        if species_name not in results:
+            results[species_name] = {}
+        if k not in results[species_name]:
+            results[species_name][k] = SearchModule(k, float(doc['module_residual']))
+        if 'motif_position' in doc:
+            if int(doc['motif_position']) == 1:
+                results[species_name][k].motif1_evalue = float(doc['motif_evalue'])
+            else:
+                results[species_name][k].motif2_evalue = float(doc['motif_evalue'])
+
+    return render_to_response("module_results.html", locals())
+
+def advsearch(request):
+    species = Species.objects.all()
+    return render_to_response('adv_search.html', locals())
 
 def biclusterstats_list(request, network_id=None):
     network = Network.objects.get(id=network_id)

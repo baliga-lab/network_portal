@@ -13,6 +13,9 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+SOLR_SELECT_GENES = 'http://localhost:8983/solr/nwportal/select/'
+SOLR_SELECT_MODULES = 'http://localhost:8983/solr/nwportal_adv/select/'
+SOLR_SUGGEST = "http://localhost:8983/solr/nwportal/suggest/?wt=json&json.wrf=?"
 
 DATABASES = {
     'default': {

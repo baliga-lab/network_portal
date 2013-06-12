@@ -38,7 +38,8 @@ urlpatterns = patterns('',
     url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'views.deleteworkflow', name='deleteworkflow'),
     url(r'^workflow/(?P<workflow_id>\d+)/$', 'views.getworkflow', name='getworkflow'),
     url(r'^workflow$', 'views.workflow', name='workflow'),
-    url(r'^search', 'views.search', name='search'),
+    url(r'^search$', 'views.search_genes', name='search'),
+    url(r'^searchmodules/', 'networks.views.search_modules', name='searchmodules'),
     url(r'^help', 'views.help', name='help'),
     url(r'^seqviewer', 'views.seqviewer', name='seqviewer'),
 
@@ -74,6 +75,8 @@ urlpatterns = patterns('',
     #url(r'^login/$', 'django.contrib.auth.views.login'),
     url(r'^logout$', 'views.logout_page'),
     url(r'^login/$', 'views.login_page'),
+
+    url(r'^advsearch', 'networks.views.advsearch', name='advsearch'),
 
     #(r'^analysis/$', 'networks.views.analysis', name='analysis'),
     #(r'^analysis/$', include('analysis.urls')),

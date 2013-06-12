@@ -13,6 +13,8 @@ from django.utils import simplejson as json
 from django.utils import formats
 from django.utils.formats import get_format
 from django.db import transaction
+from django.conf import settings
+
 
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
@@ -1057,11 +1059,13 @@ def savestate(request):
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
 
-def search(request):
+def search_genes(request):
+    solr_suggest = settings.SOLR_SUGGEST
+    solr_select  = settings.SOLR_SELECT_GENES
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
-            results = s.search(q)
+            results = s.search(solr_select, q)
             gene_ids= []
             for result in results:
                 if result['doc_type'] == 'GENE':
