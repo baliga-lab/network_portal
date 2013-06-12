@@ -1,30 +1,26 @@
-=============================================
- Network Portal installation on ISB machines
-=============================================
+# Network Portal installation on ISB machines
 
-How to install Network Portal on ISB's standard CentOS Unix machines.
+## How to install Network Portal on ISB's standard CentOS Unix machines.
 
 Network Portal is a Django web application. I built and installed Python 2.7.3 in /local/python and got several Python modules using PIP. We use the Apache web server and WSGI, Postgres, and Solr which depends on Java and Jetty.
 
 Installation and configuration of each component is described below.
 
-Tools and Dependencies
-======================
-emacs
-git
-apache2
-python 2.7.3 or latest
-python-pip
-libraries: python-dev build-essential libpq-dev libapache2-mod-wsgi
-Python modules: django, psycopg2, networkx, numpy, python-openid
-Postgres
-Java 1.6+
-Jetty
-Solr
+## Tools and Dependencies
+
+  * emacs
+  * git
+  * apache2
+  * python 2.7.3 or latest
+  * python-pip
+  * libraries: python-dev build-essential libpq-dev libapache2-mod-wsgi
+  * Python modules: django, psycopg2, networkx, numpy, python-openid
+  * Postgres
+  * Java 1.6+
+  * Solr 4
 
 
-Python
-======
+## Python
 
 Get Python 2.7.3 or latest 2.7.x from python.org.
 
@@ -63,8 +59,7 @@ We need several python modules, which can be installed by PIP: django, networkx,
 /local/python/bin/pip install numpy
 
 
-Apache
-======
+## Apache
 
 =Editing apache configuration
 export EDITOR=/usr/bin/emacs
@@ -75,7 +70,7 @@ sudo /etc/init.d/httpd start
 sudo /etc/init.d/httpd restart
 sudo /etc/init.d/httpd stop
 
-=Configure
+## Configure
 Andrew installed WSGI as root (see Andrew's notes at bottom). Add the necessary junk to link Apache to Django in /etc/httpd/conf/httpd.conf:
 
 WSGIScriptAlias / /local/network_portal/web_app/wsgi.py
@@ -123,8 +118,7 @@ Allow from all
 </IfModule>
 
 
-Postgres
-========
+## Postgres
 
 =Authentication
 Postgres authentication is tricky. There are several methods, of which we'll use two - ident and md5. Ident authentication uses your unix login to login to postgres. For example, one way to administer the database is through the psql client, which you can start like this:
@@ -167,15 +161,14 @@ sudo /etc/init.d/postgresql restart
 pg_ctl -D /var/lib/pgsql/data reload
 
 
-Java
+## Java
 ====
 Russ installed OpenJDK 1.6.x.
 java -version
 java version "1.6.0_22"
 
 
-Solr
-====
+## Solr
 
 The Solr search engine runs in the Jetty app server. I copied the war file into Jetty's webapps directory, 'cause weird things seemed to happen when I sym-linked it.
 
@@ -190,95 +183,7 @@ See the above Postgres section for setting up authentication.
 Tell Solr to rebuild the index:
 curl http://localhost:8983/solr/dataimport?command=full-import
 
-Jetty
-=====
-
-In /local/jetty/jetty-hightide-8.1.4.v20120524/etc/jetty.xml, change the port on which Jetty will be listening to Solr's default, 8983.
-
-...
-<Set name="port"><Property name="jetty.port" default="8983"/></Set>
-...
-
-Also add system properties to set solr.solr.home and solr.install.dir:
-
-<Call class="java.lang.System" name="setProperty">
-  <Arg>solr.solr.home</Arg>
-  <Arg>/local/network_portal/solr</Arg>
-</Call>
-<Call class="java.lang.System" name="setProperty">
-  <Arg>solr.install.dir</Arg>
-  <Arg>/local/lib/apache-solr-3.5.0</Arg>
-</Call>
-<Call class="java.lang.System" name="setProperty">
-  <Arg>run.mode</Arg>
-  <Arg>production</Arg>
-</Call>
-
-Temporarily, we're starting Jetty like this:
-/local/jetty/jetty-hightide-8.1.4.v20120524/bin/jetty.sh start
-
-We need to run it as a service.
-
-
-
-postgres permissions
-====================
-create user solr with password 'secret';
-grant all privileges on django_admin_log to solr;
-grant all privileges on django_content_type to solr;
-grant all privileges on django_session to solr;
-grant all privileges on django_site to solr;
-grant all privileges on expression to solr;
-grant all privileges on networks_annotation to solr;
-grant all privileges on networks_bicluster to solr;
-grant all privileges on networks_bicluster_conditions to solr;
-grant all privileges on networks_bicluster_function to solr;
-grant all privileges on networks_bicluster_genes to solr;
-grant all privileges on networks_bicluster_influences to solr;
-grant all privileges on networks_chromosome to solr;
-grant all privileges on networks_condition to solr;
-grant all privileges on networks_function to solr;
-grant all privileges on networks_function_relationships to solr;
-grant all privileges on networks_gene to solr;
-grant all privileges on networks_gene_function to solr;
-grant all privileges on networks_influence to solr;
-grant all privileges on networks_influence_parts to solr;
-grant all privileges on networks_motif to solr;
-grant all privileges on networks_network to solr;
-grant all privileges on networks_species to solr;
-grant all privileges on networks_synonym to solr;
-grant all privileges on pssms to solr;
-
-create user apache;
-grant all privileges on django_admin_log to apache;
-grant all privileges on django_content_type to apache;
-grant all privileges on django_session to apache;
-grant all privileges on django_site to apache;
-grant all privileges on expression to apache;
-grant all privileges on networks_annotation to apache;
-grant all privileges on networks_bicluster to apache;
-grant all privileges on networks_bicluster_conditions to apache;
-grant all privileges on networks_bicluster_function to apache;
-grant all privileges on networks_bicluster_genes to apache;
-grant all privileges on networks_bicluster_influences to apache;
-grant all privileges on networks_chromosome to apache;
-grant all privileges on networks_condition to apache;
-grant all privileges on networks_function to apache;
-grant all privileges on networks_function_relationships to apache;
-grant all privileges on networks_gene to apache;
-grant all privileges on networks_gene_function to apache;
-grant all privileges on networks_influence to apache;
-grant all privileges on networks_influence_parts to apache;
-grant all privileges on networks_motif to apache;
-grant all privileges on networks_network to apache;
-grant all privileges on networks_species to apache;
-grant all privileges on networks_synonym to apache;
-grant all privileges on pssms to apache;
-
-
-
-Andrew's notes:
-==============
+## Andrew's notes:
 
 Noted missing apxs which is required for mod_wsgi, apxs is part of httpd-devel (This also installed several dependency rpms)
 yum install httpd-devel 
