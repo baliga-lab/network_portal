@@ -48,11 +48,10 @@ def search_modules(request):
             results[species_name] = {}
         if k not in results[species_name]:
             results[species_name][k] = SearchModule(k, float(doc['module_residual']))
-        if 'motif_position' in doc:
-            if int(doc['motif_position']) == 1:
-                results[species_name][k].motif1_evalue = float(doc['motif_evalue'])
-            else:
-                results[species_name][k].motif2_evalue = float(doc['motif_evalue'])
+        if 'motif1_evalue' in doc:
+            results[species_name][k].motif1_evalue = float(doc['motif1_evalue'])
+        if 'motif1_evalue' in doc:
+            results[species_name][k].motif2_evalue = float(doc['motif2_evalue'])
 
     return render_to_response("module_results.html", locals())
 

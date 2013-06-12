@@ -22,6 +22,7 @@
           query="select * from networks_gene">
     <field column="doc_id" template="GENE_${gene.id}" />
     <field column="doc_type" template="GENE" /> 
+    <field column="species_id" name="species_id" />
     <field column="name" name="gene_name" />
     <field column="common_name" name="gene_common_name" />
     <field column="type" name="gene_type" />
@@ -29,9 +30,7 @@
     <field column="transcription_factor" name="gene_tf" />
     <entity name="gene_species"
             query="SELECT networks_species.name
-                   FROM networks_species, networks_gene
-                   WHERE networks_gene.species_id=networks_species.id
-                   AND networks_gene.id='${gene.id}'">
+                   FROM networks_species WHERE id=${gene.species_id}">
       <field column="name" name="species_name" />
     </entity>
     <entity name="gene_function"

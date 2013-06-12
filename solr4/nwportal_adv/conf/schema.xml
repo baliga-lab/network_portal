@@ -121,8 +121,8 @@
    <!-- <field name="condition" type="text_general" indexed="true" stored="true" multiValued="true" /> -->
    <field name="module_num" type="int" indexed="true" stored="true" />
    <field name="module_residual" type="double" indexed="true" stored="true" />
-   <field name="motif_position" type="int" indexed="true" stored="true" />
-   <field name="motif_evalue" type="double" indexed="true" stored="true" />
+   <field name="motif1_evalue" type="double" indexed="true" stored="true" />
+   <field name="motif2_evalue" type="double" indexed="true" stored="true" />
 
    <!-- START fields copied from original network portal START -->
    <field name="doc_id" type="string" />
