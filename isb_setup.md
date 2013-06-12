@@ -51,8 +51,8 @@ Apache 2 is installed, these modules are most relevant to us:
 ### Editing apache configuration
 
 ```shell
-  export EDITOR=&lt;whatever is your favorite editor&gt;
-  sudoedit /etc/httpd/conf/httpd.conf
+export EDITOR=&lt;whatever is your favorite editor&gt;
+sudoedit /etc/httpd/conf/httpd.conf
 ```
 
 Note: keep the configuration clean, guys !
@@ -60,16 +60,16 @@ Note: keep the configuration clean, guys !
 ### Starting, stopping and restarting
 
 ```shell
-  sudo /etc/init.d/httpd start
-  sudo /etc/init.d/httpd restart
-  sudo /etc/init.d/httpd stop
+sudo /etc/init.d/httpd start
+sudo /etc/init.d/httpd restart
+sudo /etc/init.d/httpd stop
 ```
 
 ### Reverse proxy Solr
 
 ...so we can access it from javascript in web pages.
 
-<code>
+```xml
   &lt;IfModule mod_proxy.c&gt;
     ProxyRequests Off
 
@@ -84,7 +84,7 @@ Note: keep the configuration clean, guys !
     ProxyPass /solr/suggest http://localhost:8983/solr/suggest
     ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest
   &lt;/IfModule&gt;
-</code>
+```
 
 ## Postgres
 
