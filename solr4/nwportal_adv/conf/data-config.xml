@@ -10,18 +10,24 @@
   <document name="modules">
     <entity name="module"
             transformer="TemplateTransformer"
-            query="select b.id, b.network_id, k, residual, name, common_name, type, description, transcription_factor from networks_bicluster b join networks_bicluster_genes bg on b.id = bg.bicluster_id join networks_gene g on g.id = bg.gene_id">
+            query="select b.id, b.network_id, k, residual, name, common_name, type,
+                   description, transcription_factor, m.position, m.e_value
+                   from networks_bicluster b
+                   join networks_bicluster_genes bg on b.id = bg.bicluster_id
+                   join networks_gene g on g.id = bg.gene_id
+                   left outer join networks_motif m on b.id = m.bicluster_id">
       <field column="doc_id"      template="MODULE_${module.id}" />
       <field column="doc_type"    template="MODULE" /> 
       <field column="network_id"  name="network_id" />
       <field column="k"           name="module_num" />
       <field column="residual"    name="module_residual" />
-      <field column="gene_id"     name="gene_id" />
       <field column="name"        name="gene_name" />
       <field column="common_name" name="gene_common_name" />
       <field column="type"        name="gene_type" />
       <field column="description" name="gene_description" />
       <field column="transcription_factor" name="gene_tf" />
+      <field column="position" name="motif_position" />
+      <field column="e_value" name="motif_evalue" />
       <entity name="gene_species"
               query="SELECT s.name
                      FROM networks_species s join networks_network n on
