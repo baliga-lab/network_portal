@@ -51,8 +51,8 @@ Apache 2 is installed, these modules are most relevant to us:
 ### Editing apache configuration
 
 <code>
-export EDITOR=&lt;whatever is your favorite editor&gt;  
-sudoedit /etc/httpd/conf/httpd.conf  
+  export EDITOR=&lt;whatever is your favorite editor&gt;
+  sudoedit /etc/httpd/conf/httpd.conf
 </code>
 
 Note: keep the configuration clean, guys !
@@ -60,9 +60,9 @@ Note: keep the configuration clean, guys !
 ### Starting, stopping and restarting
 
 <code>
-sudo /etc/init.d/httpd start  
-sudo /etc/init.d/httpd restart  
-sudo /etc/init.d/httpd stop
+  sudo /etc/init.d/httpd start
+  sudo /etc/init.d/httpd restart
+  sudo /etc/init.d/httpd stop
 </code>
 
 ### Reverse proxy Solr
@@ -70,25 +70,25 @@ sudo /etc/init.d/httpd stop
 ...so we can access it from javascript in web pages.
 
 <code>
-&lt;IfModule mod_proxy.c&gt;  
-  ProxyRequests Off  
-  
-  &lt;Proxy *&gt;  
-  Order deny,allow  
-  Allow from all  
-  &lt;/Proxy&gt;
-  
-  ProxyPass /solr/select http://localhost:8983/solr/select  
-  ProxyPassReverse /solr/select http://localhost:8983/solr/select  
-  
-  ProxyPass /solr/suggest http://localhost:8983/solr/suggest  
-  ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest  
-&lt;/IfModule&gt;  
+  &lt;IfModule mod_proxy.c&gt;
+    ProxyRequests Off
+
+    &lt;Proxy *&gt;
+      Order deny,allow
+      Allow from all
+    &lt;/Proxy&gt;
+
+    ProxyPass /solr/select http://localhost:8983/solr/select
+    ProxyPassReverse /solr/select http://localhost:8983/solr/select
+
+    ProxyPass /solr/suggest http://localhost:8983/solr/suggest
+    ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest
+  &lt;/IfModule&gt;
 </code>
 
 ## Postgres
 
-=Authentication
+### Authentication
 Postgres authentication is tricky. There are several methods, of which we'll use two - ident and md5. Ident authentication uses your unix login to login to postgres. For example, one way to administer the database is through the psql client, which you can start like this:
 
 sudo -u postgres psql
@@ -120,21 +120,23 @@ I work w/ this scripts and a separate instance of Postgres on my own machine, th
 scp bragi:/local/apache2/docs/gaggle/cbare/network_portal.dump.2012.03.19.gz .
 gunzip < network_portal.dump.2012.03.19.gz | sudo -u postgres psql --dbname network_portal
 
-=Starting, stopping, restarting
-sudo /etc/init.d/postgresql start
-sudo /etc/init.d/postgresql stop
-sudo /etc/init.d/postgresql restart
+### Starting, stopping, restarting
 
-=Reloading configuration
-pg_ctl -D /var/lib/pgsql/data reload
+<code>
+  sudo /etc/init.d/postgresql start
+  sudo /etc/init.d/postgresql stop
+  sudo /etc/init.d/postgresql restart
+</code>
 
+### Reloading configuration
+
+<code>
+  pg_ctl -D /var/lib/pgsql/data reload
+</code>
 
 ## Java
-====
-Russ installed OpenJDK 1.6.x.
-java -version
-java version "1.6.0_22"
 
+Java 6 is installed, which is sufficient to run Solr 4
 
 ## Solr
 
