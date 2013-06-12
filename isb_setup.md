@@ -50,20 +50,20 @@ Apache 2 is installed, these modules are most relevant to us:
 
 ### Editing apache configuration
 
-<code>
+```shell
   export EDITOR=&lt;whatever is your favorite editor&gt;
   sudoedit /etc/httpd/conf/httpd.conf
-</code>
+```
 
 Note: keep the configuration clean, guys !
 
 ### Starting, stopping and restarting
 
-<code>
+```shell
   sudo /etc/init.d/httpd start
   sudo /etc/init.d/httpd restart
   sudo /etc/init.d/httpd stop
-</code>
+```
 
 ### Reverse proxy Solr
 
