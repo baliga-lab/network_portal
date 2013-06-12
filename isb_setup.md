@@ -1,5 +1,11 @@
 # Network Portal installation on ISB machines
 
+## General remarks
+
+Our goal should be to delegate software management to IT rather than trying to
+manage then compiling our own packages - they know the server environments much
+better than the developers !
+
 ## How to install Network Portal on ISB's standard CentOS Unix machines.
 
 Network Portal is a Django web application. I built and installed Python 2.7.3 in /local/python and got several Python modules using PIP. We use the Apache web server and WSGI, Postgres, and Solr which depends on Java and Jetty.
@@ -8,98 +14,59 @@ Installation and configuration of each component is described below.
 
 ## Tools and Dependencies
 
-  * emacs
   * git
   * apache2
-  * python 2.7.3 or latest
+  * python 2.7.x (>= 2.7.3), see section "Python"
   * python-pip
-  * libraries: python-dev build-essential libpq-dev libapache2-mod-wsgi
-  * Python modules: django, psycopg2, networkx, numpy, python-openid
-  * Postgres
+  * Postgres >= 8.x
   * Java 1.6+
   * Solr 4
 
-
 ## Python
 
-Get Python 2.7.3 or latest 2.7.x from python.org.
+ISB IT manages all Python-related modules. This includes mod_wsgi on Apache2.
+Note that the current compiled Apache 2 is not compiled with mod_php or mod_ssl.
+IT currently recommends to serve SSL related content through an additional
+web server. Our Python 2.7.x installation on como is found under /tools/python-2.7.3
 
-./configure --prefix /local/python --enable-shared
+The following Python dependencies are installed:
 
-Python build finished, but the necessary bits to build these modules were not found:
-_bsddb             _sqlite3           _ssl            
-bsddb185           dbm                dl              
-gdbm               imageop            sunaudiodev     
-
-Installed sqlite, just in case we need it and rebuilt. I had to hack an entry in Python's setup.py script to add '/local/sqlite/include' to sqlite_inc_paths. I hope we can do without the rest?
-
-make
-make install
-
-After installing the new Python, I add /local/python/bin to the beginning of my path, so all python commands use that version of python.
-export PATH=/local/python/bin:$PATH
-which python
-python --version
-
-If you see: error while loading shared libraries: libpython2.7.so.1.0: cannot open shared object file,
-export LD_LIBRARY_PATH=/local/python/lib
-
-=Install PIP
-curl -O http://pypi.python.org/packages/2.7/s/setuptools/setuptools-0.6c11-py2.7.egg
-sh setuptools-0.6c11-py2.7.egg --prefix=/local/python
-
-curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
-python get-pip.py
-
-We need several python modules, which can be installed by PIP: django, networkx, numpy, psycopg2. Not that psycopg2 requires the installation of libpq-dev.
-
-/local/python/bin/pip install django
-/local/python/bin/pip install psycopg2
-/local/python/bin/pip install networkx
-/local/python/bin/pip install numpy
+  * pip
+  * easy_install
+  * django 1.5.x
+  * django_openid_auth
+  * networkx
+  * numpy/scipy
+  * psycopg2
+  * python-openid
 
 
 ## Apache
 
-=Editing apache configuration
-export EDITOR=/usr/bin/emacs
-sudoedit /etc/httpd/conf/httpd.conf
+Apache 2 is installed, these modules are most relevant to us:
 
-=Starting, stopping and restarting
+  * mod_fcgid
+  * mod_wsgi
+
+### Editing apache configuration
+
+<code>
+export EDITOR=<whatever is your favorite editor>
+sudoedit /etc/httpd/conf/httpd.conf
+</code>
+
+Note: keep the configuration clean, guys !
+
+### Starting, stopping and restarting
+
+<code>
 sudo /etc/init.d/httpd start
 sudo /etc/init.d/httpd restart
 sudo /etc/init.d/httpd stop
+</code>
 
-## Configure
-Andrew installed WSGI as root (see Andrew's notes at bottom). Add the necessary junk to link Apache to Django in /etc/httpd/conf/httpd.conf:
+### Reverse proxy Solr
 
-WSGIScriptAlias / /local/network_portal/web_app/wsgi.py
-# WSGIPythonHome /tools/bin                                                                                                            
-WSGIPythonPath /local/network_portal/web_app
-
-<Directory /local/network_portal/web_app>
- <Files wsgi.py>
- Order deny,allow
- Allow from all
- </Files>
-</Directory>
-
-Alias /robots.txt /local/network_portal/web_app/static/robots.txt
-Alias /favicon.ico /local/network_portal/web_app/static/favicon.ico
-Alias /media/ /local/network_portal/media/
-Alias /static/ /local/network_portal/web_app/static/
-
-<Directory /local/network_portal/web_app/static>
-Order deny,allow
-Allow from all
-</Directory>
-
-<Directory /local/network_portal/media>
-Order deny,allow
-Allow from all
-</Directory>
-
-=Reverse proxy Solr
 ...so we can access it from javascript in web pages.
 
 <IfModule mod_proxy.c>
