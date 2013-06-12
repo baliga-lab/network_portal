@@ -1,0 +1,15 @@
+<div id="module-results">
+{% for species, modules in results.items %}
+<b>Organism:</b> {{species}}
+<table>
+  <tr><th>k</th><th>residual</th><th>Motif 1 e-value</th><th>Motif 2 e-value</th></tr>
+  {% for k, module in modules.items %}
+  <tr>
+    <td>{{k}}</td><td>{{module.residual}}</td>
+    <td>{{ module.motif1_evalue }}</td>
+    <td>{{ module.motif2_evalue }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endfor %}
+</div>
