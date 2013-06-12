@@ -109,7 +109,8 @@ Logging into postgres from Python is configured in /local/network_portal/web_app
 Authentication methods are configured in the pg_hba.conf file. Google 'pg_hba.conf postgres 8.4 for more information:
 /local/data/postgres/data/pg_hba.conf
 
-=Data
+### Data
+
 Up to this point, the way we've populated the DB is by scripts that read cMonkey output from RData files and insert data into Postgres. These scripts are in the network portal project in the r-scripts folder: (extract-biclusters.R and functional.enrichment.R).
 
 I work w/ this scripts and a separate instance of Postgres on my own machine, then dump the DB and reimport it into the production DB, like this:
@@ -119,17 +120,17 @@ gunzip < network_portal.dump.2012.03.19.gz | sudo -u postgres psql --dbname netw
 
 ### Starting, stopping, restarting
 
-<code>
+```shell
   sudo /etc/init.d/postgresql start
   sudo /etc/init.d/postgresql stop
   sudo /etc/init.d/postgresql restart
-</code>
+```
 
 ### Reloading configuration
 
-<code>
+```shell
   pg_ctl -D /var/lib/pgsql/data reload
-</code>
+```
 
 ## Java
 
@@ -139,7 +140,9 @@ Java 6 is installed, which is sufficient to run Solr 4
 
 The Solr search engine runs in the Jetty app server. I copied the war file into Jetty's webapps directory, 'cause weird things seemed to happen when I sym-linked it.
 
+```shell
 cp /local/lib/apache-solr-3.5.0/dist/apache-solr-3.5.0.war /local/jetty/jetty-hightide-8.1.4.v20120524/webapps/solr.war
+```
 
 To make use of Solr's DataImportHandler to build the index from database queries, Solr needs to be configured to talk to Postgres. I think putting the JDBC driver for postgres in /local/network_portal/solr/lib should be sufficient, but I also put it in /local/jetty/jetty-hightide-8.1.4.v20120524/lib/jdbc. Get the latest driver from: jdbc.postgresql.org.
 
@@ -148,17 +151,26 @@ DataImportHandler is configured in: /local/network_portal/solr/conf/data-config.
 See the above Postgres section for setting up authentication.
 
 Tell Solr to rebuild the index:
+
+```shell
 curl http://localhost:8983/solr/dataimport?command=full-import
+```
 
 ## Andrew's notes:
 
 Noted missing apxs which is required for mod_wsgi, apxs is part of httpd-devel (This also installed several dependency rpms)
+
+```shell
 yum install httpd-devel 
+```
 
 Noted /local/python was built without -enabled-shared which is required for mod_wsgi, coonfigured, rebuilt, and installed with them enabled
+
+```shell
 ./configure --prefix /local/python --enable-shared
 make
 make install
+```
 
 Configured and built mod_wsgi
 ./configure --with-python=/local/python/bin/python2.7
