@@ -70,20 +70,17 @@ sudo /etc/init.d/httpd stop
 ...so we can access it from javascript in web pages.
 
 ```xml
-  &lt;IfModule mod_proxy.c&gt;
-    ProxyRequests Off
-
-    &lt;Proxy *&gt;
-      Order deny,allow
-      Allow from all
-    &lt;/Proxy&gt;
-
-    ProxyPass /solr/select http://localhost:8983/solr/select
-    ProxyPassReverse /solr/select http://localhost:8983/solr/select
-
-    ProxyPass /solr/suggest http://localhost:8983/solr/suggest
-    ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest
-  &lt;/IfModule&gt;
+<IfModule mod_proxy.c>
+  ProxyRequests Off
+  <Proxy *>
+   Order deny,allow
+   Allow from all
+  </Proxy>
+  ProxyPass /solr/select http://localhost:8983/solr/select
+  ProxyPassReverse /solr/select http://localhost:8983/solr/select
+  ProxyPass /solr/suggest http://localhost:8983/solr/suggest
+  ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest
+</IfModule>
 ```
 
 ## Postgres
