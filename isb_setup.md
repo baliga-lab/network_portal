@@ -51,8 +51,8 @@ Apache 2 is installed, these modules are most relevant to us:
 ### Editing apache configuration
 
 <code>
-export EDITOR=<whatever is your favorite editor>
-sudoedit /etc/httpd/conf/httpd.conf
+export EDITOR=&lt;whatever is your favorite editor&gt;  
+sudoedit /etc/httpd/conf/httpd.conf  
 </code>
 
 Note: keep the configuration clean, guys !
@@ -60,8 +60,8 @@ Note: keep the configuration clean, guys !
 ### Starting, stopping and restarting
 
 <code>
-sudo /etc/init.d/httpd start
-sudo /etc/init.d/httpd restart
+sudo /etc/init.d/httpd start  
+sudo /etc/init.d/httpd restart  
 sudo /etc/init.d/httpd stop
 </code>
 
@@ -69,21 +69,22 @@ sudo /etc/init.d/httpd stop
 
 ...so we can access it from javascript in web pages.
 
-<IfModule mod_proxy.c>
-  ProxyRequests Off
-
-  <Proxy *>
-  Order deny,allow
-  Allow from all
-  </Proxy>
-
-  ProxyPass /solr/select http://localhost:8983/solr/select
-  ProxyPassReverse /solr/select http://localhost:8983/solr/select
-
-  ProxyPass /solr/suggest http://localhost:8983/solr/suggest
-  ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest
-</IfModule>
-
+<code>
+&lt;IfModule mod_proxy.c&gt;  
+  ProxyRequests Off  
+  
+  &lt;Proxy *&gt;  
+  Order deny,allow  
+  Allow from all  
+  &lt;/Proxy&gt;
+  
+  ProxyPass /solr/select http://localhost:8983/solr/select  
+  ProxyPassReverse /solr/select http://localhost:8983/solr/select  
+  
+  ProxyPass /solr/suggest http://localhost:8983/solr/suggest  
+  ProxyPassReverse /solr/suggest http://localhost:8983/solr/suggest  
+&lt;/IfModule&gt;  
+</code>
 
 ## Postgres
 
