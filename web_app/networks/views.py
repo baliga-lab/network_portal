@@ -13,8 +13,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.db.models import Q
 from django.utils import simplejson
+from django.conf import settings
 
 import networkx as nx
+import search as s
 
 from .models import *
 from .functions import functional_systems
@@ -25,6 +27,20 @@ from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_bic
 def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
+def search_modules(request):
+    print "SEARCHMODS"
+    solr_select = settings.SOLR_SELECT_MODULES
+    data = ["elem"]
+    q = "*:*"
+    docs = s.search(solr_select, q)
+    results = {}
+    for doc in docs:
+        species_name = doc['species_name']
+        if species_name not in results:
+            results[species_name] = []
+        results[species_name].append((doc['module_num'], doc['module_residual']))
+
+    return render_to_response("module_results.html", locals())
 
 def advsearch(request):
     species = Species.objects.all()

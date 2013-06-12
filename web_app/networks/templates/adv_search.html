@@ -17,7 +17,16 @@ $(document).ready(function() {
     }
   });
   $('#search').click(function() {
-    $('#results').replaceWith('Search results will come here....');
+    $.ajax({
+      url: "/searchmodules/",
+      crossDomain: true,
+      error: function(xhr, status, errorThrown) {
+        console.debug("error here: " + errorThrown);
+      },
+      success: function(data) {
+        $('#module-results').replaceWith(data);
+      }
+    });
   });
 });
 </script>
@@ -63,5 +72,5 @@ $(document).ready(function() {
 </div>
 <input id="search" type="button" value="Search">
 </form>
-<div id="results"></div>
+<div id="module-results"></div>
 {% endblock %}

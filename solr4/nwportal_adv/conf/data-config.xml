@@ -10,7 +10,7 @@
   <document name="modules">
     <entity name="module"
             transformer="TemplateTransformer"
-            query="select b.id, b.network_id, k, name, common_name, type, description, transcription_factor from networks_bicluster b join networks_bicluster_genes bg on b.id = bg.bicluster_id join networks_gene g on g.id = bg.gene_id">
+            query="select b.id, b.network_id, k, residual, name, common_name, type, description, transcription_factor from networks_bicluster b join networks_bicluster_genes bg on b.id = bg.bicluster_id join networks_gene g on g.id = bg.gene_id">
       <field column="doc_id"      template="MODULE_${module.id}" />
       <field column="doc_type"    template="MODULE" /> 
       <field column="network_id"  name="network_id" />
@@ -29,20 +29,6 @@
                      WHERE n.id =${module.network_id}">
         <field column="name" name="species_name" />
       </entity>
-      <!--
-      <entity name="gene_function"
-              query="SELECT networks_function.native_id, networks_function.name, networks_function.namespace, networks_function.type, networks_function.description
-                     FROM networks_function, networks_gene, networks_gene_function
-                     WHERE networks_function.id=networks_gene_function.function_id
-                     AND networks_gene_function.gene_id=networks_gene.id
-                     AND networks_gene.id='${gene.id}'">
-        <field column="native_id" name="gene_function_native_id" />
-        <field column="name" name="gene_function_name" />
-        <field column="namespace" name="gene_function_namespace" />
-        <field column="type" name="gene_function_type" />
-        <field column="description" name="gene_function_desc" />
-      </entity>
-      -->
     </entity>
   </document>
 </dataConfig>
