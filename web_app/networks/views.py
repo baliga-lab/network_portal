@@ -16,8 +16,7 @@ from django.utils import simplejson
 from django.conf import settings
 
 import networkx as nx
-import search as s
-
+from .search import solr_search
 from .models import *
 from .functions import functional_systems
 from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
@@ -58,7 +57,7 @@ def search_genes(request):
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
-            results = s.search(solr_select, q)
+            results = solr_search(solr_select, q)
             gene_ids= []
             for result in results:
                 if result['doc_type'] == 'GENE':
@@ -96,7 +95,7 @@ def search_modules(request):
     else:
         q = "*:*"
         
-    docs = s.search(solr_select, q, 10000)
+    docs = solr_search(solr_select, q, 10000)
     results = {}
     for doc in docs:
         species_name = doc['species_name']

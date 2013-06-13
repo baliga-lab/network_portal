@@ -6,7 +6,7 @@ from django.utils import simplejson
 def make_query_string(q):
     return '+'.join([urllib.quote(comp.encode('utf-8')) for comp in q.split(' ')])
 
-def search(baseurl, q, max_results=10000):
+def solr_search(baseurl, q, max_results=10000):
     """We send our query directly to Solr without going through the sunburnt library.
     Sunburnt creates funny query strings which can lead to less than optimal results.
     """
