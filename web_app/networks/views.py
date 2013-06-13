@@ -51,9 +51,10 @@ def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
 
-def search_genes(request):
+def search(request):
     solr_suggest = settings.SOLR_SUGGEST
     solr_select  = settings.SOLR_SELECT_GENES
+
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
@@ -86,29 +87,46 @@ def search_genes(request):
 
 
 def search_modules(request):
-    species_code = request.GET.get('organism', 'all')
-    print "SPECIES: ", species_code
+    """builds a query string
+    species_short_name:<code>
+    module_residual:[<from> TO <to>]
+    """
+    def make_resid_cond():
+        min_resid = request.GET.get('minresid', "*")
+        max_resid = request.GET.get('maxresid', "*")
+        min_resid = "*" if not min_resid else min_resid
+        max_resid = "*" if not max_resid else max_resid
+        if not (min_resid == '*' and max_resid == '*'):
+            return "module_residual:[%s TO %s]" % (min_resid, max_resid)
+        else:
+            return ""
+    def make_species_cond():
+        species_code = request.GET.get('organism', 'all')
+        if species_code != 'all':
+            return "species_short_name:" + species_code
+        else:
+            return ""
+
     solr_select = settings.SOLR_SELECT_MODULES
-    data = ["elem"]
-    if species_code != 'all':
-        q = "species_short_name:" + species_code
-    else:
-        q = "*:*"
-        
-    docs = solr_search(solr_select, q, 10000)
-    results = {}
-    for doc in docs:
+    resid_cond = make_resid_cond()
+    species_cond = make_species_cond()
+    conds = " ".join([resid_cond, species_cond]).strip()
+    q = "*:*" if not conds else conds
+
+    module_docs = solr_search(solr_select, q, 10000)
+    mresults = {}
+    for doc in module_docs:
         species_name = doc['species_name']
         k = doc['module_num']
 
-        if species_name not in results:
-            results[species_name] = {}
-        if k not in results[species_name]:
-            results[species_name][k] = SearchModule(k, float(doc['module_residual']))
+        if species_name not in mresults:
+            mresults[species_name] = {}
+        if k not in mresults[species_name]:
+            mresults[species_name][k] = SearchModule(k, float(doc['module_residual']))
         if 'motif1_evalue' in doc:
-            results[species_name][k].motif1_evalue = float(doc['motif1_evalue'])
+            mresults[species_name][k].motif1_evalue = float(doc['motif1_evalue'])
         if 'motif1_evalue' in doc:
-            results[species_name][k].motif2_evalue = float(doc['motif2_evalue'])
+            mresults[species_name][k].motif2_evalue = float(doc['motif2_evalue'])
 
     return render_to_response("module_results.html", locals())
 

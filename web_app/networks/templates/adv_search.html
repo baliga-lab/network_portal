@@ -11,6 +11,7 @@ $(document).ready(function() {
     console.debug('operator changed');
   });
   $('#orgcode').change(function() { orgcode = $(this).val(); });
+
   $('.searchattr').change(function() {
     console.debug('operator changed: ', $(this).val());
     if ($(this).val() == 'residual') {
@@ -20,10 +21,22 @@ $(document).ready(function() {
     }
   });
   $('#search').click(function() {
+    var minresid = $.trim($('#minresid').val());
+    var maxresid = $.trim($('#maxresid').val());
+    if (minresid && isNaN(minresid)) {
+      alert("please enter a valid number as min residual");
+    }
+    if (maxresid && isNaN(maxresid)) {
+      alert("please enter a valid number as max residual");
+    }
+
+    // search in modules
     $.ajax({
       url: "/searchmodules",
       data: {
-        organism: orgcode
+        organism: orgcode,
+        minresid: minresid,
+        maxresid: maxresid
       },
       crossDomain: true,
       error: function(xhr, status, errorThrown) {
@@ -69,7 +82,7 @@ $(document).ready(function() {
     <option value="regulator">Regulated by</option>
     <option value="function">Enriched for function</option>
   </select>
-  <span id="params"><input style="width: 60px" type="text"> - <input style="width: 60px" type="text"></span>
+  <span id="params"><input id="minresid" style="width: 60px" type="text"> - <input style="width: 60px" type="text" id="maxresid"></span>
   <select class="logicop">
     <option></option>
     <option value="and">AND</option>
