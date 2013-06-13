@@ -30,14 +30,72 @@ class SearchModule:
         self.motif1_evalue = "-"
         self.motif2_evalue = "-"
 
+
+class GeneResultEntry:
+    def __init__(self, gene,
+                 influence_biclusters,
+                 regulated_biclusters):
+        self.id = gene.id
+        self.name = gene.name
+        self.description = gene.description
+        self.species = gene.species
+        self.biclusters = gene.bicluster_set.all()
+        self.gene = gene
+        self.influence_biclusters = influence_biclusters
+        self.regulated_biclusters = regulated_biclusters
+
+    def bicluster_ids(self):
+        return [b.id for b in self.biclusters]
+
 # I renamed this to make a gene page
 def analysis_gene(request):
     return render_to_response('analysis/gene.html', {}, context_instance=RequestContext(request))
 
+
+def search_genes(request):
+    solr_suggest = settings.SOLR_SUGGEST
+    solr_select  = settings.SOLR_SELECT_GENES
+    if request.GET.has_key('q'):
+        try:
+            q = request.GET['q']
+            results = s.search(solr_select, q)
+            gene_ids= []
+            for result in results:
+                if result['doc_type'] == 'GENE':
+                    gene_ids.append(result['id'])
+
+            gene_objs = Gene.objects.filter(pk__in=gene_ids)
+            species_genes = {}
+            species_names = {}
+            genes = []
+            for gene_obj in gene_objs:
+                species_names[gene_obj.species.short_name] = gene_obj.species.name
+                biclusters = gene_obj.bicluster_set.all()
+                regulates = Bicluster.objects.filter(influences__name__contains=gene_obj.name)
+                _, influence_biclusters = get_influence_biclusters(gene_obj)
+
+                if not species_genes.has_key(gene_obj.species.short_name):
+                    species_genes[gene_obj.species.short_name] = []
+                genes = species_genes[gene_obj.species.short_name]
+
+                genes.append(GeneResultEntry(gene_obj,
+                                             influence_biclusters,
+                                             regulates))
+        except Exception as e:
+            error_message = str(e)
+    return render_to_response('search.html', locals())
+
+
 def search_modules(request):
+    species_code = request.GET.get('organism', 'all')
+    print "SPECIES: ", species_code
     solr_select = settings.SOLR_SELECT_MODULES
     data = ["elem"]
-    q = "*:*"
+    if species_code != 'all':
+        q = "species_short_name:" + species_code
+    else:
+        q = "*:*"
+        
     docs = s.search(solr_select, q, 10000)
     results = {}
     for doc in docs:

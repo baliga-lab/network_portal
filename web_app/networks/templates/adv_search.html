@@ -5,9 +5,12 @@
 {% block jsspecial %}
 <script type="text/javascript">
 $(document).ready(function() {
+  var orgcode = 'all';
+
   $('.logicop').change(function() {
     console.debug('operator changed');
   });
+  $('#orgcode').change(function() { orgcode = $(this).val(); });
   $('.searchattr').change(function() {
     console.debug('operator changed: ', $(this).val());
     if ($(this).val() == 'residual') {
@@ -18,7 +21,10 @@ $(document).ready(function() {
   });
   $('#search').click(function() {
     $.ajax({
-      url: "/searchmodules/",
+      url: "/searchmodules",
+      data: {
+        organism: orgcode
+      },
       crossDomain: true,
       error: function(xhr, status, errorThrown) {
         console.debug("error here: " + errorThrown);
@@ -36,7 +42,7 @@ $(document).ready(function() {
 <h2>Organism</h2>
 <div>Select organism (default: All)</div>
 <div>
-  <select>
+  <select id="orgcode">
     <option value="all">All</option>
     {% for sp in species %}<option value="{{sp.short_name}}">{{sp.name}}</option>
     {% endfor %}
