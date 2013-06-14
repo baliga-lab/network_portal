@@ -235,7 +235,7 @@ def getdataspace(request):
                 index = index + 1
 
         # get captured data (i.e., captured)
-        if query['organism'] != 'Genric':
+        if query['organism'] != 'Generic':
             print 'Get captured data'
             genericorganismobj = Organisms.objects.filter(name = 'Generic')[0]
             genericdatatypeobj = OrganismDataTypes.objects.filter(type = 'Generic')[0]
@@ -807,10 +807,15 @@ def savecaptureddata(request):
         for key in nodelist.keys():
             link = nodelist[key]
             if int(link['nodeindex']) < 0:
-                organism = Organisms.objects.filter(name = link['organism'])[0]
+                organismtype = link['organism']
+                if (organismtype is None or len(organismtype) == 0):
+                    organismtype = 'Generic'
+
+                organism = Organisms.objects.filter(name = organismtype)[0]
                 print 'organism id: ' + str(organism.id)
 
                 dtype =  link['datatype']
+                print 'data type: ' + dtype
                 datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
 
                 content = WorkflowCapturedData(owner_id = captureddata['userid'], type_id = datatypeobj.id, dataurl = link['url'], urltext = link['text'], organism_id = organism.id)

@@ -27,6 +27,8 @@ var WF_groupcnt = -1;
 var WF_captureddataid = -1;
 var WF_currOrganism = "Generic";
 var FG_currentDataToOpen = null;
+var WF_capturedDataType = "Generic";
+var WF_filesToUpload = null;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -986,6 +988,8 @@ function organismSelected(sel)
         //alert(organismvalue);
         if (organismvalue != null && organismvalue.length > 0)
         {
+            WF_currOrganism = $("#organismSelect").val();
+
             var cytowebstarturl = "http://networks.systemsbiology.net/static/jnlp/cytoscape-" + organismvalue + ".jnlp";
             var mevwebstarturl = "http://networks.systemsbiology.net/static/jnlp/mev-" + organismvalue + ".jnlp";
 
@@ -1968,43 +1972,54 @@ function SaveCollectedData()
 {
     var collecteddata = {};
     var userid = $("#authenticated").val();
+    WF_currOrganism = $("#organismSelect").val();
     collecteddata['userid'] = userid;
     var data = {};
     var index = 0;
     var hasdatatosave = false;
-    $("#ulGeneric").children().each(function() {
+    $(".dataspacelabel").each(function() {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
-           var label = $(this).children()[0];
-           //alert($(label).html());
-           var link = $(label).children()[1];
-           var linkobj = {};
-           linkobj.text = $(link).text();
-           linkobj.url = $(link).prop("href");
-           var organisminput = $(label).children()[3];
-           linkobj.organism = $(organisminput).val();
-           var datatypeinput = $(label).children()[4];
-           linkobj.datatype = $(datatypeinput).val();
-           var dataidinput = $(label).children()[2];
-           var dataid = $(dataidinput).val();
-           if (dataid == null || dataid.length == 0)
+           var checkbox = $(this).children()[0];
+           if ($(checkbox).is(':checked'))
            {
-              //alert(dataid);
-              hasdatatosave = true;
-              dataid = WF_captureddataid.toString();
-              WF_captureddataid--;
-              dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
-              dataidinput.setAttribute("value", dataid.toString());
-           }
-           linkobj.nodeindex = dataid;
-           data[index.toString()] = linkobj;
-           index++;
-           //alert($(input).is(':checked'));
-        });
-        collecteddata['data'] = data;
+               //var label = $(this).children()[0];
+               //alert($(this).html());
+               var link = $(this).children()[1];
+               var linkobj = {};
 
-        if (hasdatatosave) {
-            //alert(JSON.stringify(collecteddata));
+               linkobj.text = $(link).text();
+               linkobj.url = $(link).prop("href");
+               linkobj.organism = WF_currOrganism;
+               //alert(linkobj.url);
+               var datatypeinput = $(this).children()[3];
+               linkobj.datatype = $(datatypeinput).val();
+               //var datatypeinput = $(this).children()[4];
+               //linkobj.datatype = $(datatypeinput).val();
+               var dataidinput = $(this).children()[2];
+               var dataid = $(dataidinput).val();
+               //alert(dataid);
+               if (dataid == null || dataid.length == 0)
+               {
+                  hasdatatosave = true;
+                  dataid = WF_captureddataid.toString();
+                  WF_captureddataid--;
+                  dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                  dataidinput.setAttribute("value", dataid.toString());
+
+                  linkobj.nodeindex = dataid;
+                  data[index.toString()] = linkobj;
+                  index++;
+               }
+
+               //alert($(input).is(':checked'));
+           }
+           collecteddata['data'] = data;
+    });
+
+    if (hasdatatosave) {
+        //alert(JSON.stringify(collecteddata));
+        if (index > 0) {
             jQuery.ajax({
                url: "/workflow/savecaptureddata",
                type: "POST",
@@ -2021,8 +2036,7 @@ function SaveCollectedData()
                    //alert(result['id']);
                    //alert(($("#divWorkflow").children().length));
                    //alert(result);
-                   if (result != null)
-                   {
+                   if (result != null) {
                        // Need to update the id of each saved data
                        var index = 0;
                        var finished = false;
@@ -2046,6 +2060,7 @@ function SaveCollectedData()
                }
             });
         }
+    }
 }
 
 // Insert data to target element
@@ -2188,7 +2203,6 @@ function GetSelectedRowData(source)
     var url = $(label).children()[1];
     var dataname = url.innerHTML;
     //alert(dataname);
-    WF_batchedData = [];
 
        //alert($(this).children()[1]);
     if (label != null) {
@@ -2249,7 +2263,7 @@ function DeleteCollectedData(tableid, selected)
            var dataidinput = $(label).children()[2];
            var dataid = $(dataidinput).val();
 
-           var useridinput = $(label).children()[5];
+           var useridinput = $(label).children()[4];
            var userid = $(useridinput).val();
 
            //alert(dataid);
@@ -2303,6 +2317,70 @@ function DeleteCollectedData(tableid, selected)
     }
 }
 
+function DoUploadFiles(files, userid, organismtype, datatype, description, showResult)
+{
+    if (files.length > 0) {
+        var formdata = new FormData();
+        formdata.append('userid', userid);
+        //alert(organismtype);
+        formdata.append('organismtype', organismtype);
+        //alert(datatype);
+        formdata.append('datatype', datatype);
+        formdata.append("description", description);
+
+        //alert(fileinput.files[0].name);
+        //formdata.append('file', fileinput.files);
+        for (var x = 0; x < files.length; x++) {
+            formdata.append(files[x].name, files[x]);
+        }
+        //alert("Uploading...");
+        jQuery.ajax({
+            url: "/workflow/uploaddata",
+            type: "POST",
+            xhr: function () {  // custom xhr
+                myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) { // check if upload property exists
+                    //myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                }
+                return myXhr;
+            },
+            data: formdata,
+            cache: false,
+            contentType: false,
+            processData: false,
+            //            beforeSend: function (x) {
+            //                if (x && x.overrideMimeType) {
+            //                    x.overrideMimeType("application/json;charset=UTF-8");
+            //                }
+            //            },
+            success: function (result) {
+                //alert("Successfully uploaded files " + result);
+                //var organism = result['organism'];
+                //var datatype = result['datatype'];
+                //alert(organism);
+                if (showResult && result != null)
+                {
+                    //alert(targetid);
+                    var finished = false;
+                    var index = 0;
+                    do
+                    {
+                       var pair = result[index.toString()];
+                       if (pair != null)
+                       {
+                           InsertDataToTarget(pair);
+                           index++;
+                       }
+                       else
+                          finished = true;
+                    }
+                    while (!finished);
+                }
+            }
+        });
+    }
+}
+
 
 function UploadDataFiles()
 {
@@ -2319,64 +2397,10 @@ function UploadDataFiles()
                 if (fileinput.files.length > 0) {
                     var formdata = new FormData();
                     var userid = $("#authenticated").val();
-                    formdata.append('userid', userid);
-                    //alert(organismtype);
-                    formdata.append('organismtype', WF_currOrganism);
                     var datatype = $('input[name="dataType"]:checked').val();
-                    //alert(datatype);
-                    formdata.append('datatype', datatype);
-                    formdata.append("description", $("#uploadFileDescription").val());
-
-                    //alert(fileinput.files[0].name);
-                    //formdata.append('file', fileinput.files);
-                    for (var x = 0; x < fileinput.files.length; x++) {
-                        formdata.append(fileinput.files[x].name, fileinput.files[x]);
-                    }
-                    //alert("Uploading...");
-                    jQuery.ajax({
-                        url: "/workflow/uploaddata",
-                        type: "POST",
-                        xhr: function () {  // custom xhr
-                            myXhr = $.ajaxSettings.xhr();
-                            if (myXhr.upload) { // check if upload property exists
-                                //myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
-                            }
-                            return myXhr;
-                        },
-                        data: formdata,
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        //            beforeSend: function (x) {
-                        //                if (x && x.overrideMimeType) {
-                        //                    x.overrideMimeType("application/json;charset=UTF-8");
-                        //                }
-                        //            },
-                        success: function (result) {
-                            //alert("Successfully uploaded files " + result);
-                            //var organism = result['organism'];
-                            //var datatype = result['datatype'];
-                            //alert(organism);
-                            if (result != null)
-                            {
-                                //alert(targetid);
-                                var finished = false;
-                                var index = 0;
-                                do
-                                {
-                                   var pair = result[index.toString()];
-                                   if (pair != null)
-                                   {
-                                       InsertDataToTarget(pair);
-                                       index++;
-                                   }
-                                   else
-                                      finished = true;
-                                }
-                                while (!finished);
-                            }
-                        }
-                    });
+                    var description = $("#uploadFileDescription").val();
+                    //alert(WF_currOrganism);
+                    DoUploadFiles(fileinput.files, userid, WF_currOrganism, datatype, description, true);
                 }
                 $( this ).dialog( "close" );
             },
