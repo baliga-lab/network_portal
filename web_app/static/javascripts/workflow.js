@@ -3316,8 +3316,6 @@ function LoadState(event)
         var row = $(source).parent().parent();
         var td0 = $(row).children()[0];
         var stateidinput = $(td0).children()[1];
-        //var divelement = $(source).parent();
-        //var stateidinput = $(divelement).children()[1];
         var stateid = $(stateidinput).val();
         //alert(stateid);
         var proxy = get_proxyapplet();
@@ -3337,8 +3335,9 @@ function DeleteState(event)
     if (source == null)
         source = event;
     if (source != null) {
-       var divelement = $(source).parent();
-       var stateidinput = $(divelement).children()[1];
+       var row = $(source).parent().parent();
+       var td0 = $(row).children()[0];
+       var stateidinput = $(td0).children()[1];
        var stateid = $(stateidinput).val();
        //alert(stateid);
 
