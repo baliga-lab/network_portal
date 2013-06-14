@@ -3355,9 +3355,7 @@ function DeleteState(event)
                    //alert("Remove workflow: " + data);
                    if (data == "1")
                    {
-                       $(divelement).remove();
-                       var stateahrefid = "#astate_" + stateid;
-                       $(stateahrefid).remove();
+                       $(row).remove();
                    }
                }
            );
