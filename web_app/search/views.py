@@ -27,20 +27,20 @@ class SearchGene:
 
 
 class GeneResultEntry:
-    def __init__(self, gene,
-                 influence_biclusters,
-                 regulated_biclusters):
-        self.id = gene.id
-        self.name = gene.name
-        self.description = gene.description
-        self.species = gene.species
-        self.biclusters = gene.bicluster_set.all()
-        self.gene = gene
-        self.influence_biclusters = influence_biclusters
+    def __init__(self,
+                 species,
+                 gene_name,
+                 gene_description,
+                 biclusters,
+                 regulated_biclusters,
+                 num_influences):
+        self.species = species
+        self.name = gene_name
+        self.description = gene_description
+        self.biclusters = biclusters
         self.regulated_biclusters = regulated_biclusters
+        self.num_influences = num_influences
 
-    def bicluster_ids(self):
-        return [b.id for b in self.biclusters]
 
 def _make_species_cond(request):
     species_code = request.GET.get('organism', 'all')
@@ -123,33 +123,34 @@ def search_genes(request):
 
 
 def search(request):
+    """
+    species_genes: species_short_name -> [GeneResultEntry]
+    species_names: species_short_name -> [species_name]
+    """
     #solr_suggest = settings.SOLR_SUGGEST
 
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
-            results = solr_search(settings.SOLR_SELECT_GENES, q)
-            gene_ids= []
-            for result in results:
-                if result['doc_type'] == 'GENE':
-                    gene_ids.append(result['id'])
-
-            gene_objs = Gene.objects.filter(pk__in=gene_ids)
+            docs = solr_search(settings.SOLR_SELECT_GENES, q)
             species_genes = {}
             species_names = {}
-            genes = []
-            for gene_obj in gene_objs:
-                species_names[gene_obj.species.short_name] = gene_obj.species.name
-                regulates = Bicluster.objects.filter(influences__name__contains=gene_obj.name)
-                _, influence_biclusters = get_influence_biclusters(gene_obj)
+            for doc in docs:
+                species_short_name = doc['species_short_name']
+                species_names[species_short_name] = doc['species_name']
+                if not species_genes.has_key(species_short_name):
+                    species_genes[species_short_name] = []
 
-                if not species_genes.has_key(gene_obj.species.short_name):
-                    species_genes[gene_obj.species.short_name] = []
-                genes = species_genes[gene_obj.species.short_name]
-
-                genes.append(GeneResultEntry(gene_obj,
-                                             influence_biclusters,
-                                             regulates))
+                genes = species_genes[species_short_name]
+                genes.append(GeneResultEntry(
+                        species_short_name,
+                        doc['gene_name'],
+                        doc.get('gene_description'),
+                        doc.get('gene_bicluster', []),
+                        doc.get('gene_regulated_bicluster', []),
+                        doc.get('gene_influence_count', 0)))
+                
+                
         except Exception as e:
             error_message = str(e)
     return render_to_response('search.html', locals())

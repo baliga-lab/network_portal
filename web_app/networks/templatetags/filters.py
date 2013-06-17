@@ -61,23 +61,6 @@ def network_link(network):
 def pssm_json_url(motif_id):
     return mark_safe("/json/pssm?motif_id=%s" % motif_id)
 
-
-@register.filter
-def searchgene_link(gene):
-    """search result list: make link to gene view"""
-    return mark_safe("<a href=\"/%s/gene/%s\">%s</a>" % (gene.species.short_name, gene.name, gene.name))
-
-
-@register.filter
-def searchgene_regulation_link(gene):
-    """search result list: make link to regulation view of a gene"""
-    return mark_safe("<a href=\"/%s/gene/%s?view=regulation\">%d influences</a>" % (gene.species.short_name, gene.name, len(gene.influence_biclusters)))
-
-@register.filter
-def searchgene_regulates_link(gene):
-    return mark_safe("<a href=\"/%s/gene/%s?view=regulation#regulates\">regulates %d</a>" % (gene.species.short_name, gene.name, len(gene.regulated_biclusters)))
-
-
 @register.filter
 def species_link(species):
     return mark_safe("<a href=\"/%s\">%s</a>" % (species.short_name,
@@ -130,14 +113,6 @@ def lookup(dict, key):
     if key in dict:
         return dict[key]
     return ''
-
-
-@register.filter
-def search_result_map(species_genes, species_names):
-    result = '<ul>'
-    for species_id, genes in species_genes.items():
-        result += ("<li><a href=\"#species_%s\">%d results</a> for '%s'</li>" % (species_id, len(genes), species_names[species_id]))
-    return mark_safe(result + '</ul>')
 
 
 @register.filter

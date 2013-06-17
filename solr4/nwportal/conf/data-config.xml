@@ -34,6 +34,25 @@
         <field column="k" name="gene_regulated_bicluster" />
       </entity>
 
+      <!-- all biclusters a gene is in -->
+      <entity name="gene_biclusters"
+              query="select distinct(b.k) as k from networks_bicluster b
+                     join networks_bicluster_genes bg
+                     on bg.bicluster_id = b.id
+                     where bg.gene_id = ${gene.id}">
+        <field column="k" name="gene_bicluster" />
+      </entity>
+
+      <!-- number of bicluster influences for the gene -->
+      <entity name="gene_influences"
+              query="select count(*) as n
+                     from networks_bicluster_influences
+                     where bicluster_id in
+                     (select bicluster_id from networks_bicluster_genes
+                     where gene_id = ${gene.id})">
+        <field column="n" name="gene_influence_count" />
+      </entity>
+
       <!--
           These are the function attributes of the gene.
           We defined all these as multi-valued in schema.xml
