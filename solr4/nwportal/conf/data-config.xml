@@ -17,9 +17,10 @@
 
       <!-- parent species -->
       <entity name="gene_species"
-              query="SELECT networks_species.name
+              query="SELECT name, short_name
                      FROM networks_species WHERE id=${gene.species_id}">
         <field column="name" name="species_name" />
+        <field column="short_name" name="species_short_name" />
       </entity>
 
       <!--

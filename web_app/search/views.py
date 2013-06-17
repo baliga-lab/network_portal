@@ -15,6 +15,17 @@ class SearchModule:
         self.motif2_evalue = "-"
 
 
+class SearchGene:
+    def __init__(self, species, name, common_name, description):
+        self.species = species
+        self.name = name
+        self.common_name = common_name
+        self.description = description
+
+    def label(self):
+        return self.common_name if self.common_name else self.name
+
+
 class GeneResultEntry:
     def __init__(self, gene,
                  influence_biclusters,
@@ -31,6 +42,13 @@ class GeneResultEntry:
     def bicluster_ids(self):
         return [b.id for b in self.biclusters]
 
+def _make_species_cond(request):
+    species_code = request.GET.get('organism', 'all')
+    if species_code != 'all':
+        return "+species_short_name:" + species_code
+    else:
+        return ""
+
 
 def search_modules(request):
     """builds a query string
@@ -46,20 +64,13 @@ def search_modules(request):
             return "module_residual:[%s TO %s]" % (min_resid, max_resid)
         else:
             return ""
-    def make_species_cond():
-        species_code = request.GET.get('organism', 'all')
-        if species_code != 'all':
-            return "species_short_name:" + species_code
-        else:
-            return ""
 
-    solr_select = settings.SOLR_SELECT_MODULES
     resid_cond = make_resid_cond()
-    species_cond = make_species_cond()
+    species_cond = _make_species_cond(request)
     conds = " ".join([resid_cond, species_cond]).strip()
     q = "*:*" if not conds else conds
 
-    module_docs = solr_search(solr_select, q, 10000)
+    module_docs = solr_search(settings.SOLR_SELECT_MODULES, q, 10000)
     mresults = {}
     for doc in module_docs:
         species_name = doc['species_name']
@@ -82,15 +93,42 @@ def advsearch(request):
     return render_to_response('adv_search.html', locals())
 
 
+def search_genes(request):
+    species_cond = _make_species_cond(request)
+    attr = request.GET['attribute']
+    term = request.GET.get('term')
+    print "ATTRIBUTE: %s, TERM = %s" % (attr, term)
+    conds = [species_cond]
+    if term:
+        if attr == 'locustag':
+            conds.append("+gene_common_name:%s" % term)
+        elif attr == 'name':
+            conds.append("+gene_name:%s" % term)
+        elif attr == 'function':
+            conds.append("+gene_function_name:%s" % term)
+
+    cond_string = " ".join(conds)
+
+    q = "*:*" if not cond_string else cond_string
+    gresults = []
+    gene_docs = solr_search(settings.SOLR_SELECT_GENES, q)
+    for doc in gene_docs:
+        gene_id = doc['id']
+        gresults.append(SearchGene(doc['species_name'],
+                                   doc.get('gene_name'),
+                                   doc.get('gene_common_name'),
+                                   doc.get('gene_description', '-')))
+        
+    return render_to_response("gene_results.html", locals())
+
 
 def search(request):
-    solr_suggest = settings.SOLR_SUGGEST
-    solr_select  = settings.SOLR_SELECT_GENES
+    #solr_suggest = settings.SOLR_SUGGEST
 
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
-            results = solr_search(solr_select, q)
+            results = solr_search(settings.SOLR_SELECT_GENES, q)
             gene_ids= []
             for result in results:
                 if result['doc_type'] == 'GENE':
@@ -102,7 +140,6 @@ def search(request):
             genes = []
             for gene_obj in gene_objs:
                 species_names[gene_obj.species.short_name] = gene_obj.species.name
-                biclusters = gene_obj.bicluster_set.all()
                 regulates = Bicluster.objects.filter(influences__name__contains=gene_obj.name)
                 _, influence_biclusters = get_influence_biclusters(gene_obj)
 

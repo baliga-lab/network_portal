@@ -43,7 +43,7 @@ urlpatterns = patterns('',
     url(r'^advsearch$', 'search.views.advsearch', name='advsearch'),
     url(r'^search$',    'search.views.search', name='search'),
     url(r'^searchmodules$', 'search.views.search_modules', name='searchmodules'),
-    #url(r'^searchgenes$', 'networks.views.search_genes', name='searchgenes'),
+    url(r'^searchgenes$', 'search.views.search_genes', name='searchgenes'),
 
     url(r'^help', 'views.help', name='help'),
     url(r'^seqviewer', 'views.seqviewer', name='seqviewer'),
