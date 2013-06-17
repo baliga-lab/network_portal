@@ -23,6 +23,17 @@
         <field column="short_name" name="species_short_name" />
       </entity>
 
+      <!-- note that we refer to the field through their column
+      value rather than the transformed name -->
+      <entity name="gene_regulates"
+              query="select distinct(b.k) as k from networks_influence i
+                     join networks_bicluster_influences bi
+                     on bi.influence_id = i.id
+                     join networks_bicluster b on b.id = bi.bicluster_id
+                     where i.name like '%${gene.name}%'">
+        <field column="k" name="gene_regulated_bicluster" />
+      </entity>
+
       <!--
           These are the function attributes of the gene.
           We defined all these as multi-valued in schema.xml

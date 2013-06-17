@@ -119,6 +119,9 @@
    <field name="network" type="text_general" indexed="true" stored="true" multiValued="true" />
    <field name="species" type="text_general" indexed="true" stored="true" />
    <!-- <field name="condition" type="text_general" indexed="true" stored="true" multiValued="true" /> -->
+
+   <field name="gene_regulated_bicluster" type="int" indexed="true" stored="true" multiValued="true"/>
+
    <!-- START fields copied from original network portal START -->
    <field name="doc_id" type="string" />
    <field name="doc_type" type="string" />
