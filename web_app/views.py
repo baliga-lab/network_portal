@@ -70,15 +70,49 @@ def about(request):
 def contact(request):
     return render_to_response('contact.html', locals())
 
+
+class WorkflowComponentSubactionInfo:
+    def __init__(self, n, v):
+        self.name = n
+        self.url = v
+
 class WorkflowComponentInfo:
     def __init__(self, component):
+        print 'Paring workflow component ' + component.name
+
         self.Component = component
-        self.Subactions = ['Select a subaction', '------------']
+
+        self.Subactions = []
+        selectsubaction = WorkflowComponentSubactionInfo('Select a subaction', 'Select a subaction')
+        self.Subactions.append(selectsubaction)
+        seperator = WorkflowComponentSubactionInfo('------------', '------------')
+        self.Subactions.append(seperator)
+
         print component.subactions
-        print component.serviceurl
-        if component.subactions:
+        #print component.serviceurl
+        if component.subactions is not None:
             #split subactions into an array
-            self.Subactions.extend(component.subactions.split(';'))
+            subactions = component.subactions.split(';')
+            #self.Subactions.extend(component.subactions.split(';'))
+
+            for subaction in subactions:
+                print 'subaction ' + subaction
+                if subaction is not None:
+                    url = subaction
+                    #try to extract url of the subaction (could be null)
+                    try:
+                        goose = WorkflowComponents.objects.filter(short_name = subaction)[0]
+                        print 'goose result ' + goose.short_name
+                        if goose is not None:
+                          print 'Found goose for subaction ' + subaction + ' url ' + goose.serviceurl
+                          url = goose.serviceurl
+                          if url is None:
+                            url = subaction
+                    except Exception as e:
+                            print str(e)
+                print 'subaction ' + subaction + ' url ' + url
+                subactioninfo = WorkflowComponentSubactionInfo(subaction, url)
+                self.Subactions.append(subactioninfo)
         print self.Subactions
 
 
