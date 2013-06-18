@@ -916,7 +916,7 @@ def uploaddata(request):
         #physicalpath = os.path.join('static/data', organismtype)
 
         #Comment this for test machine
-        physicalpath = organismtype
+        physicalpath = os.path.join('data', organismtype)
         physicalpath = os.path.join(physicalpath, dtype)
         physicalpath = os.path.join(physicalpath, userid)
         physicalpath = makedir(physicalpath)
