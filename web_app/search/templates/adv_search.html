@@ -6,44 +6,68 @@
 <script type="text/javascript">
 $(document).ready(function() {
   var orgcode = 'all';
-
-  $('.logicop').change(function() {
-    console.debug('operator changed');
-  });
   $('#orgcode').change(function() { orgcode = $(this).val(); });
 
-  $('.searchattr').change(function() {
-    console.debug('operator changed: ', $(this).val());
+  $('#module-search-attr').change(function() {
     if ($(this).val() == 'residual') {
-      $('#params').replaceWith('<span id="params"><input style="width: 60px" type="text"> - <input style="width: 60px" type="text"></span>');
+      $('#params').replaceWith('<span id="params"><input id="minresid" style="width: 60px" type="text"> - <input id="maxresid" style="width: 60px" type="text"></span>');
     } else {
-      $('#params').replaceWith('<span id="params"><input type="text"></span>');
+      $('#params').replaceWith('<span id="params"><input id="param" type="text"></span>');
     }
   });
-  $('#search').click(function() {
-    var minresid = $.trim($('#minresid').val());
-    var maxresid = $.trim($('#maxresid').val());
-    if (minresid && isNaN(minresid)) {
-      alert("please enter a valid number as min residual");
-    }
-    if (maxresid && isNaN(maxresid)) {
-      alert("please enter a valid number as max residual");
+
+  $('#search-modules').click(function() {
+    var attr = $('#module-search-attr').val();
+    var reqData;
+    if (attr == 'residual') {
+      var minresid = $.trim($('#minresid').val());
+      var maxresid = $.trim($('#maxresid').val());
+      if (minresid && isNaN(minresid)) {
+        alert("please enter a valid number as min residual");
+      }
+      if (maxresid && isNaN(maxresid)) {
+        alert("please enter a valid number as max residual");
+      }
+      reqData = {
+        organism: orgcode,
+        minresid: minresid,
+        maxresid: maxresid
+      };
+    } else {
+      reqData = {
+        organism: orgcode
+      };
+      reqData[attr] = $('#param').val();
     }
 
     // search in modules
     $.ajax({
       url: "/searchmodules",
+      data: reqData,
+      crossDomain: true,
+      error: function(xhr, status, errorThrown) {
+        console.debug("error here: " + errorThrown);
+      },
+      success: function(data) {
+        $('#results').replaceWith(data);
+      }
+    });
+  });
+
+  $('#search-genes').click(function() {
+    $.ajax({
+      url: "/searchgenes",
       data: {
         organism: orgcode,
-        minresid: minresid,
-        maxresid: maxresid
+        attribute: $('#gene-search-attr').val(),
+        term: $('#gene-search-term').val()
       },
       crossDomain: true,
       error: function(xhr, status, errorThrown) {
         console.debug("error here: " + errorThrown);
       },
       success: function(data) {
-        $('#module-results').replaceWith(data);
+        $('#results').replaceWith(data);
       }
     });
   });
@@ -62,34 +86,36 @@ $(document).ready(function() {
   </select>
 </div>
 <h2>Gene Search</h2>
-<div>Select a field to search (default: Locus tag)</div>
+<div>Select a field to search (default: Name)</div>
 <div>
-  <select>
-    <option>Locus tag</option>
-    <option>Aliases</option>
-    <option>Name</option>
-    <option>Function</option>
-    <option>Regulator</option>
+  <select id="gene-search-attr">
+    <option value="name">Name</option>
+    <option value="locustag">Locus tag</option>
+    <!-- <option value="aliases">Aliases</option> -->
+    <option value="function">Function</option>
+    <!-- <option value="regulator">Regulator</option> -->
   </select>
-  Search Term <input type="text"></input>
+  Search Term <input type="text" id="gene-search-term"></input>
+  <input id="search-genes" type="button" value="Search Genes">
 </div>
 <h2>Module Search</h2>
+<input id="search-modules" type="button" value="Search Modules">
 <div>Filter by residual (default: no-filter)</div>
 <div>
-  <select class="searchattr">
+  <select id="module-search-attr">
     <option value="residual">Residual</option>
     <option value="gene">Contains gene</option>
     <option value="regulator">Regulated by</option>
     <option value="function">Enriched for function</option>
   </select>
   <span id="params"><input id="minresid" style="width: 60px" type="text"> - <input style="width: 60px" type="text" id="maxresid"></span>
+  <!--
   <select class="logicop">
     <option></option>
     <option value="and">AND</option>
     <option value="or">OR</option>
-  </select>
+  </select> -->
 </div>
-<input id="search" type="button" value="Search">
 </form>
-<div id="module-results"></div>
+<div id="results"></div>
 {% endblock %}

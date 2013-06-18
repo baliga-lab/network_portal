@@ -15,21 +15,39 @@ class SearchModule:
         self.motif2_evalue = "-"
 
 
-class GeneResultEntry:
-    def __init__(self, gene,
-                 influence_biclusters,
-                 regulated_biclusters):
-        self.id = gene.id
-        self.name = gene.name
-        self.description = gene.description
-        self.species = gene.species
-        self.biclusters = gene.bicluster_set.all()
-        self.gene = gene
-        self.influence_biclusters = influence_biclusters
-        self.regulated_biclusters = regulated_biclusters
+class SearchGene:
+    def __init__(self, species, name, common_name, description):
+        self.species = species
+        self.name = name
+        self.common_name = common_name
+        self.description = description
 
-    def bicluster_ids(self):
-        return [b.id for b in self.biclusters]
+    def label(self):
+        return self.common_name if self.common_name else self.name
+
+
+class GeneResultEntry:
+    def __init__(self,
+                 species,
+                 gene_name,
+                 gene_description,
+                 biclusters,
+                 regulated_biclusters,
+                 num_influences):
+        self.species = species
+        self.name = gene_name
+        self.description = gene_description
+        self.biclusters = biclusters
+        self.regulated_biclusters = regulated_biclusters
+        self.num_influences = num_influences
+
+
+def _make_species_cond(request):
+    species_code = request.GET.get('organism', 'all')
+    if species_code != 'all':
+        return "+species_short_name:" + species_code
+    else:
+        return ""
 
 
 def search_modules(request):
@@ -43,23 +61,33 @@ def search_modules(request):
         min_resid = "*" if not min_resid else min_resid
         max_resid = "*" if not max_resid else max_resid
         if not (min_resid == '*' and max_resid == '*'):
-            return "module_residual:[%s TO %s]" % (min_resid, max_resid)
-        else:
-            return ""
-    def make_species_cond():
-        species_code = request.GET.get('organism', 'all')
-        if species_code != 'all':
-            return "species_short_name:" + species_code
+            return "+module_residual:[%s TO %s]" % (min_resid, max_resid)
         else:
             return ""
 
-    solr_select = settings.SOLR_SELECT_MODULES
+    def make_attr_cond(attr):
+        value = request.GET.get(attr, '').strip()
+        if value:
+            if attr == 'gene':
+                return "+module_gene_name:%s" % value
+            if attr == 'regulator':
+                return "+module_influence_name:%s" % value
+            if attr == 'function':
+                return "+module_function_name:%s" % value
+        return ""
+
     resid_cond = make_resid_cond()
-    species_cond = make_species_cond()
-    conds = " ".join([resid_cond, species_cond]).strip()
-    q = "*:*" if not conds else conds
+    species_cond = _make_species_cond(request)
+    gene_cond = make_attr_cond('gene')
+    regulator_cond = make_attr_cond('regulator')
+    function_cond = make_attr_cond('function')
 
-    module_docs = solr_search(solr_select, q, 10000)
+    conds = " ".join([resid_cond, species_cond, gene_cond,
+                      regulator_cond, function_cond]).strip()
+    q = "*:*" if not conds else conds
+    print "q: ", q
+
+    module_docs = solr_search(settings.SOLR_SELECT_MODULES, q, 10000)
     mresults = {}
     for doc in module_docs:
         species_name = doc['species_name']
@@ -82,37 +110,64 @@ def advsearch(request):
     return render_to_response('adv_search.html', locals())
 
 
+def search_genes(request):
+    species_cond = _make_species_cond(request)
+    attr = request.GET['attribute']
+    term = request.GET.get('term')
+    print "ATTRIBUTE: %s, TERM = %s" % (attr, term)
+    conds = [species_cond]
+    if term:
+        if attr == 'locustag':
+            conds.append("+gene_common_name:%s" % term)
+        elif attr == 'name':
+            conds.append("+gene_name:%s" % term)
+        elif attr == 'function':
+            conds.append("+gene_function_name:%s" % term)
+
+    cond_string = " ".join(conds)
+
+    q = "*:*" if not cond_string else cond_string
+    gresults = []
+    gene_docs = solr_search(settings.SOLR_SELECT_GENES, q)
+    for doc in gene_docs:
+        gene_id = doc['id']
+        gresults.append(SearchGene(doc['species_name'],
+                                   doc.get('gene_name'),
+                                   doc.get('gene_common_name'),
+                                   doc.get('gene_description', '-')))
+        
+    return render_to_response("gene_results.html", locals())
+
 
 def search(request):
-    solr_suggest = settings.SOLR_SUGGEST
-    solr_select  = settings.SOLR_SELECT_GENES
+    """
+    species_genes: species_short_name -> [GeneResultEntry]
+    species_names: species_short_name -> [species_name]
+    """
+    #solr_suggest = settings.SOLR_SUGGEST
 
     if request.GET.has_key('q'):
         try:
             q = request.GET['q']
-            results = solr_search(solr_select, q)
-            gene_ids= []
-            for result in results:
-                if result['doc_type'] == 'GENE':
-                    gene_ids.append(result['id'])
-
-            gene_objs = Gene.objects.filter(pk__in=gene_ids)
+            docs = solr_search(settings.SOLR_SELECT_GENES, q)
             species_genes = {}
             species_names = {}
-            genes = []
-            for gene_obj in gene_objs:
-                species_names[gene_obj.species.short_name] = gene_obj.species.name
-                biclusters = gene_obj.bicluster_set.all()
-                regulates = Bicluster.objects.filter(influences__name__contains=gene_obj.name)
-                _, influence_biclusters = get_influence_biclusters(gene_obj)
+            for doc in docs:
+                species_short_name = doc['species_short_name']
+                species_names[species_short_name] = doc['species_name']
+                if not species_genes.has_key(species_short_name):
+                    species_genes[species_short_name] = []
 
-                if not species_genes.has_key(gene_obj.species.short_name):
-                    species_genes[gene_obj.species.short_name] = []
-                genes = species_genes[gene_obj.species.short_name]
-
-                genes.append(GeneResultEntry(gene_obj,
-                                             influence_biclusters,
-                                             regulates))
+                genes = species_genes[species_short_name]
+                genes.append(GeneResultEntry(
+                        species_short_name,
+                        doc['gene_name'],
+                        doc.get('gene_description'),
+                        doc.get('gene_bicluster', []),
+                        doc.get('gene_regulated_bicluster', []),
+                        doc.get('gene_influence_count', 0)))
+                
+                
         except Exception as e:
             error_message = str(e)
     return render_to_response('search.html', locals())

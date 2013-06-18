@@ -1,0 +1,17 @@
+<div id="results">
+  <table>
+      <tr>
+	      <th>Species</th>
+	      <th>Gene</th>
+	      <th>Description</th>
+      </tr>
+      {% for g in gresults %}
+      <tr>
+        <td>{{g.species}}</td>
+        <td>{{g.common_name}}</td>
+        <td>{{g.description}}</td>
+      </tr>
+      {% endfor %}      
+  </table>
+  These should be the gene results
+</div>

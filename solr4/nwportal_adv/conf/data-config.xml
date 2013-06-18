@@ -10,8 +10,7 @@
   <document name="modules">
     <entity name="module"
             transformer="TemplateTransformer"
-            query="select b.id, b.network_id, k, residual, name, common_name, type,
-                   description, transcription_factor,
+            query="select b.id, b.network_id, k, residual,
                    m1.e_value as m1_eval,
                    m2.e_value as m2_eval
                    from networks_bicluster b
@@ -26,14 +25,37 @@
       <field column="network_id"  name="network_id" />
       <field column="k"           name="module_num" />
       <field column="residual"    name="module_residual" />
-      <field column="name"        name="gene_name" />
-      <field column="common_name" name="gene_common_name" />
-      <field column="type"        name="gene_type" />
-      <field column="description" name="gene_description" />
-      <field column="transcription_factor" name="gene_tf" />
       <field column="m1_eval"     name="motif1_evalue" />
       <field column="m2_eval"     name="motif2_evalue" />
-      <entity name="gene_species"
+      <!-- related genes: we embed them as multi-valued fields -->
+      <entity name="module_genes"
+              query="select g.name, g.common_name from networks_bicluster_genes bg
+                     join networks_gene g on bg.gene_id = g.id
+                     where bg.bicluster_id = ${module.id}">
+        <field column="name"        name="module_gene_name" />
+        <field column="common_name" name="module_gene_common_name" />
+      </entity>
+
+      <!-- regulators: these are the influences which regulate a bicluster -->
+      <entity name="module_regulators"
+              query="select i.name from networks_influence i
+                     join networks_bicluster_influences bi
+                     on bi.influence_id = i.id
+                     where bi.bicluster_id = ${module.id}">
+        <field column="name" name="module_influence_name" />
+      </entity>
+
+      <!-- functions: these are the functions related to a bicluster-->
+      <entity name="module_functions"
+              query="select f.name from networks_function f
+                     join networks_bicluster_function bf
+                     on bf.function_id = f.id
+                     where bf.bicluster_id = ${module.id}">
+        <field column="name" name="module_function_name" />
+      </entity>
+
+      <!-- parent species -->
+      <entity name="module_species"
               query="SELECT s.name, s.short_name
                      FROM networks_species s join networks_network n on
                      s.id = n.species_id
