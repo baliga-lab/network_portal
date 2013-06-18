@@ -299,8 +299,9 @@ class WorkflowEdge:
 def deletefile(filepath):
     try:
         print 'delete file: ' + filepath
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+        basepath = '/local/htdocs/nwportal/data'
 
         fullpath = basepath + filepath
         print 'delete full path: ' + fullpath
@@ -311,8 +312,9 @@ def deletefile(filepath):
 def savefile(filepath, srcfile):
     try:
         print 'save file: ' + filepath
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+        basepath = '/local/htdocs/nwportal/data'
 
         #Use / as seperator to make sure everything works in the boss code
         fullpath = basepath + "/" + filepath
@@ -329,8 +331,10 @@ def makedir(path):
     try:
         print 'Make directory ' + path
 
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+        basepath = '/local/htdocs/nwportal/data'
+
         fullpath = os.path.join(basepath, path)
         print 'full path: ' + fullpath
         if not os.path.exists(fullpath):
@@ -667,9 +671,13 @@ def savereportdata(request):
             #sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
             #sessionpath = '/github/baligalab/network_portal/web_app/static/reportdata/' + wfid
 
-            sessionpath = makedir('static/reportdata/' + wfid)
-            savepath = '/static/reportdata/' + wfid
+            #Uncomment on test machine
+            #sessionpath = makedir('static/reportdata/' + wfid)
 
+            #Comment on test machine
+            sessionpath = makedir('reportdata/' + wfid)
+
+            savepath = '/static/reportdata/' + wfid
             sessionpath = sessionpath + '/' + sessionId
             savepath = savepath + '/' + sessionId
             print 'wfnode path: ' + sessionpath
@@ -903,12 +911,17 @@ def uploaddata(request):
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
         #sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
-        sessionpath = os.path.join('static/data', organismtype)
-        sessionpath = os.path.join(sessionpath, dtype)
-        sessionpath = os.path.join(sessionpath, userid)
-        sessionpath = makedir(sessionpath)
-        print 'save path: ' + sessionpath
-        savepath = '/static/data/' + organismtype + '/' + dtype + '/' + userid
+
+        #Uncomment this for test machine
+        #physicalpath = os.path.join('static/data', organismtype)
+
+        #Comment this for test machine
+        physicalpath = organismtype
+        physicalpath = os.path.join(physicalpath, dtype)
+        physicalpath = os.path.join(physicalpath, userid)
+        physicalpath = makedir(physicalpath)
+        print 'save path: ' + physicalpath
+        savepathurl = '/static/data/' + organismtype + '/' + dtype + '/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -922,13 +935,13 @@ def uploaddata(request):
             print fullfilename
             prefix, filename = os.path.split(fullfilename)
             print 'File name: ' + filename
-            with open(os.path.join(sessionpath, filename), 'wb') as f:
+            with open(os.path.join(physicalpath, filename), 'wb') as f:
                 destination = File(f)
                 for chunk in srcfile.chunks():
                     destination.write(chunk)
                 destination.close()
 
-            dataurl = savepath + '/' + filename
+            dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
             # save to DB
             data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id, description = desc)
@@ -1032,12 +1045,17 @@ def savestate(request):
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
         #statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
 
-        statepath = os.path.join('static', 'data')
-        statepath = os.path.join(statepath, 'states')
+        #Uncomment the following for test machines
+        #statepath = os.path.join('static', 'data')
+        #statepath = os.path.join(statepath, 'states')
+
+        #Comment the following for test machines
+        statepath = 'states'
+
         statepath = os.path.join(statepath, userid)
-        statepath = makedir(statepath)
+        makedir(statepath)
         print 'save path: ' + statepath
-        savepath = 'static/data/states/' + userid
+        savepathurl = 'static/data/states/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -1057,7 +1075,7 @@ def savestate(request):
             print fullfilename
             prefix, filename = os.path.split(fullfilename)
             print 'File name: ' + filename
-            filesavepath = os.path.join(savepath, filename)
+            filesavepath = os.path.join(statepath, filename)
             savefile(filesavepath, srcfile)
 
             #with open(os.path.join(statepath, filename), 'wb') as f:
@@ -1066,7 +1084,7 @@ def savestate(request):
             #        destination.write(chunk)
             #    destination.close()
 
-            dataurl = filesavepath
+            dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
             sf = StateFiles(state_id = data.id, name = filename, url = dataurl)
             sf.save()
