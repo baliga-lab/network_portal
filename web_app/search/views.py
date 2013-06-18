@@ -61,14 +61,31 @@ def search_modules(request):
         min_resid = "*" if not min_resid else min_resid
         max_resid = "*" if not max_resid else max_resid
         if not (min_resid == '*' and max_resid == '*'):
-            return "module_residual:[%s TO %s]" % (min_resid, max_resid)
+            return "+module_residual:[%s TO %s]" % (min_resid, max_resid)
         else:
             return ""
 
+    def make_attr_cond(attr):
+        value = request.GET.get(attr, '').strip()
+        if value:
+            if attr == 'gene':
+                return "+module_gene_name:%s" % value
+            if attr == 'regulator':
+                return "+module_influence_name:%s" % value
+            if attr == 'function':
+                return "+module_function_name:%s" % value
+        return ""
+
     resid_cond = make_resid_cond()
     species_cond = _make_species_cond(request)
-    conds = " ".join([resid_cond, species_cond]).strip()
+    gene_cond = make_attr_cond('gene')
+    regulator_cond = make_attr_cond('regulator')
+    function_cond = make_attr_cond('function')
+
+    conds = " ".join([resid_cond, species_cond, gene_cond,
+                      regulator_cond, function_cond]).strip()
     q = "*:*" if not conds else conds
+    print "q: ", q
 
     module_docs = solr_search(settings.SOLR_SELECT_MODULES, q, 10000)
     mresults = {}
