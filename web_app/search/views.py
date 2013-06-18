@@ -1,5 +1,6 @@
 from django.shortcuts import render_to_response
 from django.conf import settings
+from django.utils.html import escape
 
 from networks.models import *
 from networks.helpers import get_influence_biclusters
@@ -67,13 +68,14 @@ def search_modules(request):
 
     def make_attr_cond(attr):
         value = request.GET.get(attr, '').strip()
+        print "attr: %s, value: %s" % (attr, value)
         if value:
             if attr == 'gene':
                 return "+module_gene_name:%s" % value
             if attr == 'regulator':
                 return "+module_influence_name:%s" % value
             if attr == 'function':
-                return "+module_function_name:%s" % value
+                return '+module_function_name:"*%s*"' % value
         return ""
 
     resid_cond = make_resid_cond()
@@ -122,7 +124,7 @@ def search_genes(request):
         elif attr == 'name':
             conds.append("+gene_name:%s" % term)
         elif attr == 'function':
-            conds.append("+gene_function_name:%s" % term)
+            conds.append("+gene_function_name:*%s*" % term)
 
     cond_string = " ".join(conds)
 

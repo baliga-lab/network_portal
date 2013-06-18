@@ -99,7 +99,6 @@ $(document).ready(function() {
   <input id="search-genes" type="button" value="Search Genes">
 </div>
 <h2>Module Search</h2>
-<input id="search-modules" type="button" value="Search Modules">
 <div>Filter by residual (default: no-filter)</div>
 <div>
   <select id="module-search-attr">
@@ -115,7 +114,9 @@ $(document).ready(function() {
     <option value="and">AND</option>
     <option value="or">OR</option>
   </select> -->
+  <input type="button" value="+">
 </div>
+<input id="search-modules" type="button" value="Search Modules">
 </form>
 <div id="results"></div>
 {% endblock %}

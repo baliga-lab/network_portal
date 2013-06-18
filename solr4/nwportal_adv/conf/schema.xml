@@ -129,7 +129,7 @@
           multiValued="true"/>
    <field name="module_influence_name" type="string" indexed="true" stored="true"
           multiValued="true"/>
-   <field name="module_function_name" type="string" indexed="true" stored="true"
+   <field name="module_function_name" type="text_general" indexed="true" stored="true"
           multiValued="true"/>
 
    <!-- START fields copied from original network portal START -->
