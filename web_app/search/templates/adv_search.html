@@ -6,54 +6,13 @@
 <script src="{% static "javascripts/advsearch.js" %}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-  // Initialize filters
-  advsearch.initFilters('#module-filters');
-  var orgcode = 'all';
-  $('#orgcode').change(function() { orgcode = $(this).val(); });
-
-  $('#search-modules').click(function() {
-    var attr = $('.module-search-attr').val();
-    var reqData;
-    if (attr == 'residual') {
-      var minresid = $.trim($('.minresid').val());
-      var maxresid = $.trim($('.maxresid').val());
-      if (minresid && isNaN(minresid)) {
-        alert("please enter a valid number as min residual");
-      }
-      if (maxresid && isNaN(maxresid)) {
-        alert("please enter a valid number as max residual");
-      }
-      reqData = {
-        organism: orgcode,
-        minresid: minresid,
-        maxresid: maxresid
-      };
-    } else {
-      reqData = {
-        organism: orgcode
-      };
-      reqData[attr] = $('#param').val();
-    }
-
-    // search in modules
-    $.ajax({
-      url: "/searchmodules",
-      data: reqData,
-      crossDomain: true,
-      error: function(xhr, status, errorThrown) {
-        console.debug("error here: " + errorThrown);
-      },
-      success: function(data) {
-        $('#results').replaceWith(data);
-      }
-    });
-  });
+  advsearch.initFilters('#module-filters', '#orgcode', '#results');
 
   $('#search-genes').click(function() {
     $.ajax({
       url: "/searchgenes",
       data: {
-        organism: orgcode,
+        organism: $('#orgcode').val(),
         attribute: $('#gene-search-attr').val(),
         term: $('#gene-search-term').val()
       },
@@ -65,10 +24,6 @@ $(document).ready(function() {
         $('#results').replaceWith(data);
       }
     });
-  });
-
-  $('#addfilterrow').click(function() {
-    console.debug('hallo');
   });
 });
 </script>
