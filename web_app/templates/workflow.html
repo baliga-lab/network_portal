@@ -181,7 +181,7 @@
                   title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
                             <select class="componentsubactions">
                                 {% for subaction in component.Subactions %}
-                                <option value="{{subaction}}">{{subaction}}</option>
+                                <option value="{{subaction.url}}">{{subaction.name}}</option>
                                 {% endfor %}
                             </select>
                             <input class="componentchildinput" type="text" placeholder="Enter data url"
