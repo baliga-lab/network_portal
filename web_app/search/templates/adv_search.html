@@ -3,25 +3,20 @@
 {% load filters %}
 {% block title %}Network Portal - Advanced Search{% endblock %}
 {% block jsspecial %}
+<script src="{% static "javascripts/advsearch.js" %}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+  // Initialize filters
+  advsearch.initFilters('#module-filters');
   var orgcode = 'all';
   $('#orgcode').change(function() { orgcode = $(this).val(); });
 
-  $('#module-search-attr').change(function() {
-    if ($(this).val() == 'residual') {
-      $('#params').replaceWith('<span id="params"><input id="minresid" style="width: 60px" type="text"> - <input id="maxresid" style="width: 60px" type="text"></span>');
-    } else {
-      $('#params').replaceWith('<span id="params"><input id="param" type="text"></span>');
-    }
-  });
-
   $('#search-modules').click(function() {
-    var attr = $('#module-search-attr').val();
+    var attr = $('.module-search-attr').val();
     var reqData;
     if (attr == 'residual') {
-      var minresid = $.trim($('#minresid').val());
-      var maxresid = $.trim($('#maxresid').val());
+      var minresid = $.trim($('.minresid').val());
+      var maxresid = $.trim($('.maxresid').val());
       if (minresid && isNaN(minresid)) {
         alert("please enter a valid number as min residual");
       }
@@ -71,6 +66,10 @@ $(document).ready(function() {
       }
     });
   });
+
+  $('#addfilterrow').click(function() {
+    console.debug('hallo');
+  });
 });
 </script>
 {% endblock %}
@@ -100,23 +99,8 @@ $(document).ready(function() {
 </div>
 <h2>Module Search</h2>
 <div>Filter by residual (default: no-filter)</div>
-<div>
-  <select id="module-search-attr">
-    <option value="residual">Residual</option>
-    <option value="gene">Contains gene</option>
-    <option value="regulator">Regulated by</option>
-    <option value="function">Enriched for function</option>
-  </select>
-  <span id="params"><input id="minresid" style="width: 60px" type="text"> - <input style="width: 60px" type="text" id="maxresid"></span>
-  <!--
-  <select class="logicop">
-    <option></option>
-    <option value="and">AND</option>
-    <option value="or">OR</option>
-  </select> -->
-  <input type="button" value="+">
-</div>
 <input id="search-modules" type="button" value="Search Modules">
+<div id="module-filters">Filter placeholder</div>
 </form>
 <div id="results"></div>
 {% endblock %}
