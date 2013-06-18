@@ -13,4 +13,5 @@ DATABASES = {
 }
 
 STATIC_ROOT = '/local/htdocs/nwportal'
+USERDATA_ROOT = '/local/nwportaluserdata'
 

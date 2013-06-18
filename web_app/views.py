@@ -301,7 +301,7 @@ def deletefile(filepath):
         print 'delete file: ' + filepath
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
-        basepath = settings.STATIC_ROOT
+        basepath = settings.USERDATA_ROOT
 
         fullpath = basepath + filepath
         print 'delete full path: ' + fullpath
@@ -314,7 +314,7 @@ def savefile(filepath, srcfile):
         print 'save file: ' + filepath
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
-        basepath = settings.STATIC_ROOT
+        basepath = settings.USERDATA_ROOT
 
         #Use / as seperator to make sure everything works in the boss code
         fullpath = basepath + "/" + filepath
