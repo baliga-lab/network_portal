@@ -301,7 +301,7 @@ def deletefile(filepath):
         print 'delete file: ' + filepath
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
-        basepath = '/local/htdocs/nwportal/data'
+        basepath = settings.STATIC_ROOT
 
         fullpath = basepath + filepath
         print 'delete full path: ' + fullpath
@@ -314,7 +314,7 @@ def savefile(filepath, srcfile):
         print 'save file: ' + filepath
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
-        basepath = '/local/htdocs/nwportal/data'
+        basepath = settings.STATIC_ROOT
 
         #Use / as seperator to make sure everything works in the boss code
         fullpath = basepath + "/" + filepath
@@ -333,7 +333,7 @@ def makedir(path):
 
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
-        basepath = '/local/htdocs/nwportal/data'
+        basepath = settings.STATIC_ROOT
 
         fullpath = os.path.join(basepath, path)
         print 'full path: ' + fullpath
@@ -1055,7 +1055,7 @@ def savestate(request):
         statepath = os.path.join(statepath, userid)
         makedir(statepath)
         print 'save path: ' + statepath
-        savepathurl = 'static/data/states/' + userid
+        savepathurl = 'static/states/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
