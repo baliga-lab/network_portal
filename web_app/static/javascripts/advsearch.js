@@ -23,7 +23,7 @@ if (!advsearch) {
              '<option value="regulator">Regulated by</option>' +
              '<option value="function">Enriched for function</option>' +
              '</select>' + makeResidualParams(id) + '&nbsp;' +
-             '<input type="button" id="addfilterrow" value="+">' +
+             '<input type="button" id="addfilterrow" class="addfilterrow" value="+">' +
              '</div><div id="append-filter-row"></div>';
      }
 
@@ -34,20 +34,25 @@ if (!advsearch) {
              $('#module-search-params_' + id).replaceWith(makeStdParams(id));
          }
      }
-     advsearch.initFilters = function(formSelector, orgcodeSelector,
-                                      resultsSelector) {
-         $(formSelector).replaceWith(makeFilterRow(currentId++));
-         $('.module-search-attr').change(function() {
+
+     function updateEventHandlers() {
+         // for simplicity, we just replace all the existing event handlers
+         // if we don't, the elements will fire more and more events
+         $('.module-search-attr').off('change').on('change', function() {
            var comps = $(this).attr('id').split('_');
            var id = comps[comps.length - 1];
            replaceRow(id, $(this).val());
          });
-
-         $('#addfilterrow').click(function() {
-           console.debug('hallo');
+         $('.addfilterrow').off('click').on('click', function() {
            $('#append-filter-row').replaceWith(makeFilterRow(currentId++));
+           updateEventHandlers();
          });
+     }
 
+     advsearch.initFilters = function(formSelector, orgcodeSelector,
+                                      resultsSelector) {
+         $(formSelector).replaceWith(makeFilterRow(currentId++));
+         updateEventHandlers();
 
          // Setup the search button event handler
          $('#search-modules').click(function() {
