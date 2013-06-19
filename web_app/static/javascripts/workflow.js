@@ -799,14 +799,21 @@ function ExtractWorkflow(nodelist) {
                         //var namevalueelement = $((nameelement).children())[0];
                         //alert(srcidstr);
                         wfnode.name = $(nameelement).val();
+                        //alert(wfnode.name);
                         wfnode.goosename = $(goosenameelement).val();
                         wfnode.serviceuri = $(serviceurlelement).val();
                         wfnode.arguments = $(argumentselement).val();
                         //alert("Service uri arguments: " + wfnode.arguments);
                         var subaction = $(subactionelement).val();
+                        //alert(subaction);
+                        //var subactiontext = $(subactionelement).text();
+                        //alert(subaction + " " + subactiontext);
                         if (subaction == "Select a subaction" || subaction == "------------")
                             subaction = "";
-                        wfnode.subaction = subaction;
+                        var subactiontext = $(subactionelement).find(":selected").text();
+                        //alert(subactiontext);
+                        wfnode.subaction = (wfnode.goosename == "Generic") ? (subaction + ";;" + subactiontext) : subaction;
+                        //alert(wfnode.subaction);
 
                         wfnode.datauri = $(dataurielement).val();
                         wfnode.componentid = srcid;
@@ -910,7 +917,11 @@ function ExtractWorkflow(nodelist) {
                 var subaction = $(subactionelement).val();
                 if (subaction == "Select a subaction" || subaction == "------------")
                     subaction = "";
-                wfnode.subaction = subaction; //.attr("value");
+
+                var subactiontext = $(subactionelement).find(":selected").text();
+                //alert(subactiontext);
+
+                wfnode.subaction = (wfnode.goosename == "Generic") ? (subaction + ";;" + subactiontext) : subaction; //.attr("value");
                 wfnode.datauri = $(dataurielement).val(); //.attr("value");
                 wfnode.wfnodeid = $(componentworkflownodeidelement).val(); //attr("value");
                 wfnode.componentid = srcid;
@@ -1473,7 +1484,7 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
 
 
         // configure the parameters of the component
-        var serviceuriinput = $(sourcelement).children()[2];
+        var serviceuriinput = $(sourcelement).children()[serviceuriindex];
         if (node != null)
             $(serviceuriinput).val(node.serviceuri);
         var serviceuri = $(serviceuriinput).val();
@@ -1485,7 +1496,7 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
                 var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
                 //alert(uri);
                 if (uri != null)
-                    $(serviceuriinput).attr("value", uri);
+                    $(serviceuriinput).val(uri);
             }
         }
 
@@ -3019,7 +3030,6 @@ function OpenDataGroup(group, groupname)
                               // Set the subaction of the appended goose if necessary
                               //alert("getting subaction value");
                               var subaction = $("#inputContextSubaction").val();
-                              //alert(subaction);
                               if (subaction != null && subaction.length > 0)
                               {
                                   var subactionselect = $(sourceelement).children()[componentsubactioninputindex];
