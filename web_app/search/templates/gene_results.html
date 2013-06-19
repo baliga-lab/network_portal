@@ -7,8 +7,8 @@
       </tr>
       {% for g in gresults %}
       <tr>
-        <td>{{g.species}}</td>
-        <td>{{g.common_name}}</td>
+        <td><a href="/{{g.species}}">{{g.species_name}}</a></td>
+        <td><a href="/{{g.species}}/gene/{{g.name}}">{{g.name}}</a></td>
         <td>{{g.description}}</td>
       </tr>
       {% endfor %}      

@@ -17,8 +17,9 @@ class SearchModule:
 
 
 class SearchGene:
-    def __init__(self, species, name, common_name, description):
+    def __init__(self, species, species_name, name, common_name, description):
         self.species = species
+        self.species_name = species_name
         self.name = name
         self.common_name = common_name
         self.description = description
@@ -66,8 +67,9 @@ def search_modules(request):
         else:
             return ""
 
-    def make_attr_cond(attr):
-        value = request.GET.get(attr, '').strip()
+    def make_attr_cond(key):
+        attr = key.split('_')[0]
+        value = request.GET.get(key, '').strip()
         print "attr: %s, value: %s" % (attr, value)
         if value:
             if attr == 'gene':
@@ -77,35 +79,35 @@ def search_modules(request):
             if attr == 'function':
                 return '+module_function_name:"*%s*"' % value
         return ""
-
-    resid_cond = make_resid_cond()
+    # there is only one species condition and one residual condition
     species_cond = _make_species_cond(request)
-    gene_cond = make_attr_cond('gene')
-    regulator_cond = make_attr_cond('regulator')
-    function_cond = make_attr_cond('function')
+    resid_cond = make_resid_cond()
+    attr_keys = [key for key in request.GET.keys()
+                 if key not in ['minresid', 'maxresid', 'organism']]
+    args = [make_attr_cond(key) for key in attr_keys]
+    args.extend([species_cond, resid_cond])
 
-    conds = " ".join([resid_cond, species_cond, gene_cond,
-                      regulator_cond, function_cond]).strip()
+    conds = " ".join(args).strip()
     q = "*:*" if not conds else conds
     print "q: ", q
-
     module_docs = solr_search(settings.SOLR_SELECT_MODULES, q, 10000)
     mresults = {}
+    species_names = {}
     for doc in module_docs:
-        species_name = doc['species_name']
+        species = doc['species_short_name']
+        species_names[species] = doc['species_name']
         k = doc['module_num']
 
-        if species_name not in mresults:
-            mresults[species_name] = {}
-        if k not in mresults[species_name]:
-            mresults[species_name][k] = SearchModule(k, float(doc['module_residual']))
+        if species not in mresults:
+            mresults[species] = {}
+        if k not in mresults[species]:
+            mresults[species][k] = SearchModule(k, float(doc['module_residual']))
         if 'motif1_evalue' in doc:
-            mresults[species_name][k].motif1_evalue = float(doc['motif1_evalue'])
+            mresults[species][k].motif1_evalue = float(doc['motif1_evalue'])
         if 'motif1_evalue' in doc:
-            mresults[species_name][k].motif2_evalue = float(doc['motif2_evalue'])
+            mresults[species][k].motif2_evalue = float(doc['motif2_evalue'])
 
     return render_to_response("module_results.html", locals())
-
 
 def advsearch(request):
     species = Species.objects.all()
@@ -133,7 +135,8 @@ def search_genes(request):
     gene_docs = solr_search(settings.SOLR_SELECT_GENES, q)
     for doc in gene_docs:
         gene_id = doc['id']
-        gresults.append(SearchGene(doc['species_name'],
+        gresults.append(SearchGene(doc['species_short_name'],
+                                   doc['species_name'],
                                    doc.get('gene_name'),
                                    doc.get('gene_common_name'),
                                    doc.get('gene_description', '-')))

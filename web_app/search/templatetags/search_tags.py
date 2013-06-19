@@ -39,3 +39,7 @@ def make_bicluster_link(species, k):
 def searchgene_bicluster_links(gene):
     return mark_safe(", ".join([make_bicluster_link(gene.species, k)
                                 for k in gene.biclusters]))
+
+@register.filter
+def searchmodule_link(species, k):
+    return mark_safe(make_bicluster_link(species, k))
