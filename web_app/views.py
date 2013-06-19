@@ -15,7 +15,6 @@ from django.utils.formats import get_format
 from django.db import transaction
 from django.conf import settings
 
-
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -33,6 +32,7 @@ import urllib2
 
 from django.core.files import File
 import os
+import mimetypes
 import shutil
 from collections import namedtuple
 
@@ -314,6 +314,7 @@ def savefile(filepath, srcfile):
         print 'save file: ' + filepath
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+        print 'base path: ' + settings.USERDATA_ROOT
         basepath = settings.USERDATA_ROOT
 
         #Use / as seperator to make sure everything works in the boss code
@@ -333,7 +334,9 @@ def makedir(path):
 
         #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
-        basepath = settings.STATIC_ROOT
+
+        basepath = settings.USERDATA_ROOT
+        print 'base path: ' + basepath
 
         fullpath = os.path.join(basepath, path)
         print 'full path: ' + fullpath
@@ -913,15 +916,16 @@ def uploaddata(request):
         #sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
 
         #Uncomment this for test machine
-        #physicalpath = os.path.join('static/data', organismtype)
+        physicalpath = organismtype #os.path.join('static/data', organismtype)
 
         #Comment this for test machine
-        physicalpath = os.path.join('data', organismtype)
+        #physicalpath = os.path.join('data', organismtype)
+
         physicalpath = os.path.join(physicalpath, dtype)
         physicalpath = os.path.join(physicalpath, userid)
         physicalpath = makedir(physicalpath)
         print 'save path: ' + physicalpath
-        savepathurl = '/static/data/' + organismtype + '/' + dtype + '/' + userid
+        savepathurl = '/workflow/getuserdata/' + organismtype + '/' + dtype + '/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -987,7 +991,9 @@ def getstateinfo(request, stateid):
                 gooseobjs[goosename] = pair
 
             print 'goose obj has ' + str(pair['files']) + ' files'
-            fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
+            #fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
+            fileurl = 'http://' + request.get_host() + '/workflow/getuserdata/states/states/' + str(state.owner_id) + '/' + file.name
+
             print fileurl
             filecnt = pair['files']
             fileobj = pair['fileobj']
@@ -1050,12 +1056,12 @@ def savestate(request):
         #statepath = os.path.join(statepath, 'states')
 
         #Comment the following for test machines
-        statepath = 'states'
+        statepath = 'states/states'
 
         statepath = os.path.join(statepath, userid)
         makedir(statepath)
         print 'save path: ' + statepath
-        savepathurl = 'static/states/' + userid
+        savepathurl = '/workflow/getuserdata/states/states/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -1096,6 +1102,36 @@ def savestate(request):
 
     print json.dumps(responsedata)
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+@csrf_exempt
+def getuserdata(request, organismtype, datatype, userid, filename):
+    print organismtype
+    print datatype
+    print userid
+    print filename
+
+    try:
+        mimetypes.init()
+
+        file_path = settings.USERDATA_ROOT + '/' + organismtype + '/' + datatype + '/' + userid + '/' + filename
+        print 'file path: ' + file_path
+        fsock = open(file_path,"rb")
+        #file = fsock.read()
+        #fsock = open(file_path,"rb").read()
+        file_name = os.path.basename(file_path)
+        print file_name
+        file_size = os.path.getsize(file_path)
+        print "file size is: " + str(file_size)
+        mime_type_guess = mimetypes.guess_type(file_name)
+        if mime_type_guess is not None:
+            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+    except Exception as e:
+        print str(e)
+        response = HttpResponseNotFound()
+
+    return response
+
 
 
 # This function is not used now.

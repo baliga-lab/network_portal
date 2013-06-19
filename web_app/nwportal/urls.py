@@ -32,6 +32,7 @@ urlpatterns = patterns('',
     url(r'^workflow/savestate', 'views.savestate', name='savestate'),
     url(r'^workflow/deletesavedstate/(?P<stateid>\d+)/', 'views.deletesavedstate', name='deletesavedstate'),
     url(r'^workflow/getstateinfo/(?P<stateid>\d+)/$', 'views.getstateinfo', name='getstateinfo'),
+    url(r'^workflow/getuserdata/(?P<organismtype>[\w|\W]+)/(?P<datatype>[\w|\W]+)/(?P<userid>\d+)/(?P<filename>[\w|\W]+)/$', 'views.getuserdata', name='getuserdata'),
 
 
     url(r'^workflow/save', 'views.saveworkflow', name='saveworkflow'),
