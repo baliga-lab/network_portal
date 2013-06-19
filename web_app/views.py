@@ -15,7 +15,6 @@ from django.utils.formats import get_format
 from django.db import transaction
 from django.conf import settings
 
-
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -33,6 +32,7 @@ import urllib2
 
 from django.core.files import File
 import os
+import mimetypes
 import shutil
 from collections import namedtuple
 
@@ -299,8 +299,9 @@ class WorkflowEdge:
 def deletefile(filepath):
     try:
         print 'delete file: ' + filepath
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+        basepath = settings.USERDATA_ROOT
 
         fullpath = basepath + filepath
         print 'delete full path: ' + fullpath
@@ -311,8 +312,10 @@ def deletefile(filepath):
 def savefile(filepath, srcfile):
     try:
         print 'save file: ' + filepath
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+        print 'base path: ' + settings.USERDATA_ROOT
+        basepath = settings.USERDATA_ROOT
 
         #Use / as seperator to make sure everything works in the boss code
         fullpath = basepath + "/" + filepath
@@ -329,8 +332,12 @@ def makedir(path):
     try:
         print 'Make directory ' + path
 
-        basepath = '/github/baligalab/network_portal/web_app'
+        #basepath = '/github/baligalab/network_portal/web_app'
         #basepath = '/local/network_portal/web_app'
+
+        basepath = settings.USERDATA_ROOT
+        print 'base path: ' + basepath
+
         fullpath = os.path.join(basepath, path)
         print 'full path: ' + fullpath
         if not os.path.exists(fullpath):
@@ -667,9 +674,13 @@ def savereportdata(request):
             #sessionpath = os.path.join('/local/network_portal/web_app/static/reportdata', wfid)
             #sessionpath = '/github/baligalab/network_portal/web_app/static/reportdata/' + wfid
 
-            sessionpath = makedir('static/reportdata/' + wfid)
-            savepath = '/static/reportdata/' + wfid
+            #Uncomment on test machine
+            #sessionpath = makedir('static/reportdata/' + wfid)
 
+            #Comment on test machine
+            sessionpath = makedir('reportdata/' + wfid)
+
+            savepath = '/static/reportdata/' + wfid
             sessionpath = sessionpath + '/' + sessionId
             savepath = savepath + '/' + sessionId
             print 'wfnode path: ' + sessionpath
@@ -903,12 +914,18 @@ def uploaddata(request):
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
         #sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
-        sessionpath = os.path.join('static/data', organismtype)
-        sessionpath = os.path.join(sessionpath, dtype)
-        sessionpath = os.path.join(sessionpath, userid)
-        sessionpath = makedir(sessionpath)
-        print 'save path: ' + sessionpath
-        savepath = '/static/data/' + organismtype + '/' + dtype + '/' + userid
+
+        #Uncomment this for test machine
+        physicalpath = organismtype #os.path.join('static/data', organismtype)
+
+        #Comment this for test machine
+        #physicalpath = os.path.join('data', organismtype)
+
+        physicalpath = os.path.join(physicalpath, dtype)
+        physicalpath = os.path.join(physicalpath, userid)
+        physicalpath = makedir(physicalpath)
+        print 'save path: ' + physicalpath
+        savepathurl = '/workflow/getuserdata/' + organismtype + '/' + dtype + '/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -922,13 +939,13 @@ def uploaddata(request):
             print fullfilename
             prefix, filename = os.path.split(fullfilename)
             print 'File name: ' + filename
-            with open(os.path.join(sessionpath, filename), 'wb') as f:
+            with open(os.path.join(physicalpath, filename), 'wb') as f:
                 destination = File(f)
                 for chunk in srcfile.chunks():
                     destination.write(chunk)
                 destination.close()
 
-            dataurl = savepath + '/' + filename
+            dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
             # save to DB
             data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id, description = desc)
@@ -974,7 +991,9 @@ def getstateinfo(request, stateid):
                 gooseobjs[goosename] = pair
 
             print 'goose obj has ' + str(pair['files']) + ' files'
-            fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
+            #fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
+            fileurl = 'http://' + request.get_host() + '/workflow/getuserdata/states/states/' + str(state.owner_id) + '/' + file.name
+
             print fileurl
             filecnt = pair['files']
             fileobj = pair['fileobj']
@@ -1032,12 +1051,17 @@ def savestate(request):
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
         #statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
 
-        statepath = os.path.join('static', 'data')
-        statepath = os.path.join(statepath, 'states')
+        #Uncomment the following for test machines
+        #statepath = os.path.join('static', 'data')
+        #statepath = os.path.join(statepath, 'states')
+
+        #Comment the following for test machines
+        statepath = 'states/states'
+
         statepath = os.path.join(statepath, userid)
-        statepath = makedir(statepath)
+        makedir(statepath)
         print 'save path: ' + statepath
-        savepath = 'static/data/states/' + userid
+        savepathurl = '/workflow/getuserdata/states/states/' + userid
 
         responsedata = {}
         #responsedata['organismtype'] = organismtype
@@ -1057,7 +1081,7 @@ def savestate(request):
             print fullfilename
             prefix, filename = os.path.split(fullfilename)
             print 'File name: ' + filename
-            filesavepath = os.path.join(savepath, filename)
+            filesavepath = os.path.join(statepath, filename)
             savefile(filesavepath, srcfile)
 
             #with open(os.path.join(statepath, filename), 'wb') as f:
@@ -1066,7 +1090,7 @@ def savestate(request):
             #        destination.write(chunk)
             #    destination.close()
 
-            dataurl = filesavepath
+            dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
             sf = StateFiles(state_id = data.id, name = filename, url = dataurl)
             sf.save()
@@ -1078,6 +1102,36 @@ def savestate(request):
 
     print json.dumps(responsedata)
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+@csrf_exempt
+def getuserdata(request, organismtype, datatype, userid, filename):
+    print organismtype
+    print datatype
+    print userid
+    print filename
+
+    try:
+        mimetypes.init()
+
+        file_path = settings.USERDATA_ROOT + '/' + organismtype + '/' + datatype + '/' + userid + '/' + filename
+        print 'file path: ' + file_path
+        fsock = open(file_path,"rb")
+        #file = fsock.read()
+        #fsock = open(file_path,"rb").read()
+        file_name = os.path.basename(file_path)
+        print file_name
+        file_size = os.path.getsize(file_path)
+        print "file size is: " + str(file_size)
+        mime_type_guess = mimetypes.guess_type(file_name)
+        if mime_type_guess is not None:
+            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+    except Exception as e:
+        print str(e)
+        response = HttpResponseNotFound()
+
+    return response
+
 
 
 # This function is not used now.

@@ -68,6 +68,11 @@ MEDIA_URL = ''
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = ''
 
+# Absolute path to the directory user data such as uploaded files and state files
+# are stored. The directory has the format of [organism name]/[data type]/[userid]/[filename]
+# Example: "/home/userdata/gsu/Cytoscape Network/1/gsu_network.cys"
+USERDATA_ROOT = ''
+
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
