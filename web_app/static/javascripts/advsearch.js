@@ -67,31 +67,29 @@ if (!advsearch) {
 
          // Setup the search button event handler
          $('#search-modules').click(function() {
-           var orgcode = $(orgcodeSelector).val();
-           var attr = $('.module-search-attr').val();
-           var reqData;
-           console.debug('attr: ' + attr);
-           if (attr == 'residual') {
-               var minresid = $.trim($('.minresid').val());
-               var maxresid = $.trim($('.maxresid').val());
-               if (minresid && isNaN(minresid)) {
-                   alert("please enter a valid number as min residual");
+           var reqData = {
+               organism: $(orgcodeSelector).val()
+           };
+
+           $('.module-search-attr').each(function (i, elem) {
+               var attr = elem.value;
+               var id   = elem.id;
+               var num  = numPart(elem.id); 
+               if (attr == 'residual') {
+                   var minresid = $.trim($('#minresid_' + num).val());
+                   var maxresid = $.trim($('#maxresid_' + num).val());
+                   if (minresid && isNaN(minresid)) {
+                       alert("please enter a valid number as min residual");
+                   }
+                   if (maxresid && isNaN(maxresid)) {
+                       alert("please enter a valid number as max residual");
+                   }
+                   reqData['minresid'] = minresid;
+                   reqData['maxresid'] = maxresid;
+               } else {
+                   reqData[attr + '_' + num] = $('#param_' + num).val();
                }
-               if (maxresid && isNaN(maxresid)) {
-                   alert("please enter a valid number as max residual");
-               }
-               reqData = {
-                   organism: orgcode,
-                   minresid: minresid,
-                   maxresid: maxresid
-               };
-           } else {
-               reqData = {
-                   organism: orgcode
-               };
-               reqData[attr] = $('#param').val();
-           }
-           console.debug(reqData);
+           });
 
            // search in modules
            $.ajax({

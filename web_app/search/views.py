@@ -66,8 +66,9 @@ def search_modules(request):
         else:
             return ""
 
-    def make_attr_cond(attr):
-        value = request.GET.get(attr, '').strip()
+    def make_attr_cond(key):
+        attr = key.split('_')[0]
+        value = request.GET.get(key, '').strip()
         print "attr: %s, value: %s" % (attr, value)
         if value:
             if attr == 'gene':
@@ -77,18 +78,17 @@ def search_modules(request):
             if attr == 'function':
                 return '+module_function_name:"*%s*"' % value
         return ""
-
-    resid_cond = make_resid_cond()
+    # there is only one species condition and one residual condition
     species_cond = _make_species_cond(request)
-    gene_cond = make_attr_cond('gene')
-    regulator_cond = make_attr_cond('regulator')
-    function_cond = make_attr_cond('function')
+    resid_cond = make_resid_cond()
+    attr_keys = [key for key in request.GET.keys()
+                 if key not in ['minresid', 'maxresid', 'organism']]
+    args = [make_attr_cond(key) for key in attr_keys]
+    args.extend([species_cond, resid_cond])
 
-    conds = " ".join([resid_cond, species_cond, gene_cond,
-                      regulator_cond, function_cond]).strip()
+    conds = " ".join(args).strip()
     q = "*:*" if not conds else conds
     print "q: ", q
-
     module_docs = solr_search(settings.SOLR_SELECT_MODULES, q, 10000)
     mresults = {}
     for doc in module_docs:
@@ -105,7 +105,6 @@ def search_modules(request):
             mresults[species_name][k].motif2_evalue = float(doc['motif2_evalue'])
 
     return render_to_response("module_results.html", locals())
-
 
 def advsearch(request):
     species = Species.objects.all()
