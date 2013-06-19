@@ -23,8 +23,13 @@ if (!advsearch) {
              '<option value="regulator">Regulated by</option>' +
              '<option value="function">Enriched for function</option>' +
              '</select>' + makeResidualParams(id) + '&nbsp;' +
-             '<input type="button" id="addfilterrow" class="addfilterrow" value="+">' +
+             '<input type="button" id="addfilterrow_' + id + '" class="addfilterrow" value="+">' +
              '</div><div id="append-filter-row"></div>';
+     }
+
+     function numPart(id) {
+         var comps = id.split('_');
+         return comps[comps.length - 1];
      }
 
      function replaceRow(id, attrType) {
@@ -39,13 +44,19 @@ if (!advsearch) {
          // for simplicity, we just replace all the existing event handlers
          // if we don't, the elements will fire more and more events
          $('.module-search-attr').off('change').on('change', function() {
-           var comps = $(this).attr('id').split('_');
-           var id = comps[comps.length - 1];
-           replaceRow(id, $(this).val());
+           replaceRow(numPart($(this).attr('id')), $(this).val());
          });
          $('.addfilterrow').off('click').on('click', function() {
+           var id = $(this).attr('id');
+           var num = numPart(id);
+           // turn the add button in to a remove button
+           $('#' + id).replaceWith('<input type="button" id="remfilterrow_' + num + '" class="remfilterrow" value="-">');
            $('#append-filter-row').replaceWith(makeFilterRow(currentId++));
            updateEventHandlers();
+         });
+         $('.remfilterrow').off('click').on('click', function() {
+           var id = $(this).attr('id');
+           $('#filterrow_' + numPart(id)).remove();
          });
      }
 

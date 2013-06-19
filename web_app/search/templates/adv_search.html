@@ -2,6 +2,13 @@
 {% load staticfiles %}
 {% load filters %}
 {% block title %}Network Portal - Advanced Search{% endblock %}
+{% block cssspecial %}
+<style>
+.addfilterrow, .remfilterrow {
+  width: 30px;
+}
+</style>
+{% endblock %}
 {% block jsspecial %}
 <script src="{% static "javascripts/advsearch.js" %}"></script>
 <script type="text/javascript">
