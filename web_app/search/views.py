@@ -17,8 +17,9 @@ class SearchModule:
 
 
 class SearchGene:
-    def __init__(self, species, name, common_name, description):
+    def __init__(self, species, species_name, name, common_name, description):
         self.species = species
+        self.species_name = species_name
         self.name = name
         self.common_name = common_name
         self.description = description
@@ -91,18 +92,20 @@ def search_modules(request):
     print "q: ", q
     module_docs = solr_search(settings.SOLR_SELECT_MODULES, q, 10000)
     mresults = {}
+    species_names = {}
     for doc in module_docs:
-        species_name = doc['species_name']
+        species = doc['species_short_name']
+        species_names[species] = doc['species_name']
         k = doc['module_num']
 
-        if species_name not in mresults:
-            mresults[species_name] = {}
-        if k not in mresults[species_name]:
-            mresults[species_name][k] = SearchModule(k, float(doc['module_residual']))
+        if species not in mresults:
+            mresults[species] = {}
+        if k not in mresults[species]:
+            mresults[species][k] = SearchModule(k, float(doc['module_residual']))
         if 'motif1_evalue' in doc:
-            mresults[species_name][k].motif1_evalue = float(doc['motif1_evalue'])
+            mresults[species][k].motif1_evalue = float(doc['motif1_evalue'])
         if 'motif1_evalue' in doc:
-            mresults[species_name][k].motif2_evalue = float(doc['motif2_evalue'])
+            mresults[species][k].motif2_evalue = float(doc['motif2_evalue'])
 
     return render_to_response("module_results.html", locals())
 
@@ -132,7 +135,8 @@ def search_genes(request):
     gene_docs = solr_search(settings.SOLR_SELECT_GENES, q)
     for doc in gene_docs:
         gene_id = doc['id']
-        gresults.append(SearchGene(doc['species_name'],
+        gresults.append(SearchGene(doc['species_short_name'],
+                                   doc['species_name'],
                                    doc.get('gene_name'),
                                    doc.get('gene_common_name'),
                                    doc.get('gene_description', '-')))
