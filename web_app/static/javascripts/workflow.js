@@ -209,6 +209,12 @@ function SetDataPass(event)
             var li = $(source).parent();
             var goosenamelabel = $(li).children()[1];
             var goosename = $(goosenamelabel).html();
+            if (goosename == "Generic") {
+                $("#inputNameValue").prop("checked", false);
+                $("#inputUrlValue").prop("checked", true);
+                return;
+            }
+
             //alert(goosename);
 
             if (FG_currentDataToOpen != null) {
