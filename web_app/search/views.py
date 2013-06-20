@@ -87,6 +87,11 @@ def search_modules(request):
     args = [make_attr_cond(key) for key in attr_keys]
     args.extend([species_cond, resid_cond])
 
+    filter_pairs = [(key.split('_')[0], value)
+                    for key, value in request.GET.items()
+                    if value]
+    print "pairs: ", filter_pairs
+
     conds = " ".join(args).strip()
     q = "*:*" if not conds else conds
     print "q: ", q

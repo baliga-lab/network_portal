@@ -1,7 +1,16 @@
 {% load filters %}
 {% load search_tags %}
 <div id="results">
+<div class="filter-display">
+  <h3>Filters</h3>
+  {% for key, value in filter_pairs %}
+    <div style="margin-left: 1em; color: red">{{key}} = {{value}}</div>
+  {% endfor %}
+<div></div>
+  <h3>Found modules</h3>
+<div></div>
 {% for species, modules in mresults.items %}
+</div>
 <b>Organism:</b> {{species_names|lookup:species}}
 <table>
   <tr><th>k</th><th>residual</th><th>Motif 1 e-value</th><th>Motif 2 e-value</th></tr>
