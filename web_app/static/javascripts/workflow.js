@@ -608,6 +608,13 @@ function componentDropEvent(ev, component) {
 
             $(($(cloned).children())[componentsubactioninputindex]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
 
+            var argumentsinput = $(cloned).children()[9];
+            if (goosename == "Generic") {
+               $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+            }
+            else
+               $(argumentsinput).removeClass("workflowcomponentchildinput").addClass("componentchildinput");
+
             var serviceuriinput = ($(cloned).children())[2];
             if (window.localStorage != null)
             {
@@ -1509,6 +1516,9 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         if (node != null) {
             var argumentsinput = $(sourcelement).children()[9];
             $(argumentsinput).val(node.arguments);
+            if (goosename == "Generic") {
+                $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+            }
             var subactioninput = $(sourcelement).children()[componentsubactioninputindex];
             $(subactioninput).val(node.subaction);
             var datauriinput = $(sourcelement).children()[componentdatauriindex];
@@ -2154,10 +2164,13 @@ function InsertDataToTarget(linkpair)
         option1.value = "1";
         option1.innerHTML = "Open";
         $(select).append($(option1));
-        var option2 = document.createElement("option");
-        option2.value = "2";
-        option2.innerHTML = "QuickView";
-        $(select).append($(option2));
+
+        // TODO: add quick view back later
+        //var option2 = document.createElement("option");
+        //option2.value = "2";
+        //option2.innerHTML = "QuickView";
+        //$(select).append($(option2));
+
         var option3 = document.createElement("option");
         option3.value = "3";
         option3.innerHTML = "Download";
@@ -2194,7 +2207,8 @@ function DataOperationSelected(event)
         {
             // Open the data in a goose
             //alert("Open data...");
-            var dataname = GetSelectedRowData(source);
+            var url = GetSelectedRowData(source);
+            var dataname = url.innerHTML;
             //alert(dataname);
             OpenDataGroup(WF_batchedData, dataname);
         }
@@ -2205,6 +2219,8 @@ function DataOperationSelected(event)
         else if (selectedvalue == "3")
         {
             // Download
+            var url = GetSelectedRowData(source);
+            window.open($(url).prop("href"),'Download');
         }
     }
 }
@@ -2232,7 +2248,7 @@ function GetSelectedRowData(source)
             WF_batchedData.push(link);
         }
     }
-    return dataname;
+    return url;
 }
 
 function SelectAllData(tableid, ctrlid)
