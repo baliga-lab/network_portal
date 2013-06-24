@@ -45,15 +45,15 @@
                 {% endif %}
                 {% endfor %}
             </select>
-            <table id="tblNetworkPortalFiles"><caption style="font-size: 10pt;"> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete UnSelected</a></caption>
+            <table id="tblNetworkPortalFiles"><caption style="font-size: 10pt;"> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete Unselected</a></caption>
                 <tbody>
                 <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <p>
-            <table id="tblUserFiles"><caption style="font-size: 10pt;"> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open</a> | <a href="javascript:SaveCollectedData();">Save</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete UnSelected</a></caption>
+            <table id="tblUserFiles"><caption style="font-size: 10pt;"> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open</a> | <a href="javascript:SaveCollectedData();">Save</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete Unselected</a></caption>
                 <tbody>
-                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
+                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desciption</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
