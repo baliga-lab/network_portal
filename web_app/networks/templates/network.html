@@ -1,11 +1,14 @@
 {% extends "base2.html" %}
 {% load filters %}
+{% load staticfiles %}
 {% block title %}Network Portal - Module stats for {{ network.species.name }}{% endblock %}
 {% block cssspecial %}
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css">
+    <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 {% endblock %}
 {% block jsspecial %}
   <script src="{{ STATIC_PREFIX }}javascripts/highcharts-3.0.1.js"></script>
+  <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 {% endblock %}
 {% block content %}
 <script>
@@ -51,9 +54,11 @@ $(document).ready(function() {
     $("#motslider").slider("values", [0, 100]);
   });
   loadList();
+  $('.help').colorbox({inline: true, width: "50%"});
 });
 </script>
 <div class="sub-page">
+<a class="help" href="#help"><img align="right" src="/static/images/help.png" /></a>
 <h5><span class="search_help"> Explore network modules for <a href="/{{ network.species.short_name }}">{{ network.species.name }}</a> </span></h5>
 <p>Use residual and motif e-value sliders to filter modules
 	<table style= "border:none">
@@ -75,6 +80,30 @@ $(document).ready(function() {
     {% for tf in network.species.transcription_factors %}
     {{tf|tf_link:network}} 
     {% endfor %}
+  </div>
+  <div style="display:none">
+	<div id='help' style='padding:10px; background:#fff; text-align:left;'>
+    	<h5>Network Exploration Help</h5>
+    	<p> This page gives you overview of the network modules for a particular organism. You can explore these modules by using various filters.</p>
+    	<p>Currently we support two filters, <b> Residual</b> and <b> Motif e-values</b>.
+    	Network modules are loaded with default residual and motif e-value filters. In order to change filters, simply move the slider to select 
+    	the desired range. Results table will automatically update to reflect your filter selections. If you would like to remove filters, click on "Reset Filters" button.
+    	</p>
+    	<h2> Network Table</h2>
+    	<p> Network table will show the following columns for each module.</p>
+    	<p><b>Module:</b> Number of the module for the given version of the network.</p> 
+    	<p id="residual"><b>Residual:</b> is a measure of bicluster quality. Mean bicluster residual is smaller when the expression profile of the genes in the module
+    	is "tighter". So smaller residuals are usually indicative of better bicluster quality.</p>
+    	<p><b>Expression Profile:</b> is a preview of the expression profiles of all the genes under subset of conditions included in the module.
+    	Tighter expression profiles are usually indicative of better bicluster quality.</p>
+    	<p><b> Motif e-value:</b> cMonkey tries to identify two motifs per modules in the upstream sequences of the module member genes.
+    	Motif e-value is an indicative of the motif co-occurences between the members of the module.Smaller e-values are indicative of significant sequence motifs. Our experience showed that e-values smaller than 10 are generally indicative of significant motifs.</p>
+    	<p><b> Genes:</b> Number of genes included in the module.</p>
+    	<p><b> Functions:</b> We identify functional enrichment of each module by camparing to different functional categories such as KEGG, COG, GO etc. by using hypergeometric function. If the module is significantly enriched for any of the functions, this column will list few of the these functions as an overview. 
+    	Full list of functions is available upon visiting the module page under the Functions tab.</p>
+    	<h2>Influences</h2>
+    	<p>Inferelator algorithm identifies most probable regulatory influences for each module. These influences can be transcription factors or environmental factors. Influences section lists all the regulators that have influences on modules. Click on the regulator name If you would like to access which modules are regulated by these regulators.</p>
+	</div>
   </div>
 </div><!-- End #sub-page -->
 {% endblock %}

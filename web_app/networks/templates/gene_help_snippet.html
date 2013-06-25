@@ -1,48 +1,55 @@
 {% load staticfiles %}
 <div id="content">
-  <div class="main">
-    <h3> Gene Page Help</h3>
+  <div class="sub-page">
+    <h5> Gene Page Help</h5>
 <br>
-<h5 id="network">Network Tab</h5>
-<img src="{% static "images/help_images/gene-network.png" %}" align="right"><p> If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as network by using CytoscapeWeb. In this view, each green colored circular nodes represent regulon member genes, purple colored diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon (Bicluster) via edges. This representation provides quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among diferent regulons. <br><br>
-Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details. For genes, Locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor or not and any associated functional information will be shown. For regulators, number of regulons are shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown.<br>
+<div id="network" class="help" style='padding:10px; background:#fff; text-align:left;'>
+<h2 id="network">Network Tab</h2>
+<p> If the gene is associated with a module(s), its connection to given modules along with other members of that module are shown as network by using CytoscapeWeb. In this view, each green colored circular nodes represent module member genes, purple colored diamonds represent module motifs and red triangles represent regulators. Each node is connected to module (Bicluster) via edges. This representation provides quick overview of all genes, regulators and motifs for modules. It also allows one to see shared genes/motifs/regulators among diferent modules. <br><br>
+Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details. For genes, Locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor or not and any associated functional information will be shown. For regulators, number of modules are shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For modules, expression profile plot, motif information, functional associations and motif locations for each member of the module will be shown.<br>
 You can pin information boxes by using button in the box title and open up additional ones on the same screen for comparative analysis.<br>
-<h5 id="regulation">Regulation Tab</h5>   
- <img src="{% static "images/help_images/gene-regulation.png" %}" align="right"> <p> Regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. Regulators table list total number of regulatory influences, regulators, regulons and type of the influence. You can see description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as combiner in the column labeled "Operator". Fo rtranscription factors, an additional table next to regulator table will be show. This table show regulons that are influenced by the transcription factor. </br>
-  <h5 id="motifs">Motifs Tab</h5>   
-<img src="{% static "images/help_images/gene-motifs.png" %}" align="right"><p> Network inference algorithm uses de novo motif prediction for assigning genes to regulons. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
-  <h5 id="functions">Functions Tab</h5>  
- <img src="{% static "images/help_images/gene-functions.png" %}" align="right"> <p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. Function name is linked to its explanation and more details<br>
-  <h5 id="regulon-members">Regulon Members Tab</h5> 
- <img src="{% static "images/help_images/gene-regulon-members.png" %}" align="right"><p> Identity of gene members in a regulon may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same regulon(s) with gene under consideration are shown here. For each memebr, gene name, description and regulons that contain it are listed. <br>
-    <h5 id="help">Help Tab</h5> 
-<img src="{% static "images/help_images/gene-help.png" %}" align="right"> <p> This help page. More general help can be accessed by clicking help menu in the main navigation bar.</p>
-     <h5 id="comments">Comments Tab</h5>
-<img src="{% static "images/help_images/gene-comments.png" %}" align="right"> <p> Network Portal is designed to promote collaboration through social interactions. Therefore interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their facebook (or Google) accounts to connect to this page. Each regulon and gene page includes comments tab that lists history of the interactions for that gene. You can browse the history, make updates, raise questions and share these activities with social web. In the next releases of the network portal, we are planning to create personal space for each user where you can share you space that contains all the analysis steps you did along with relevant information. 
+</div>
+<div id="regulation" class="help" style='padding:10px; background:#fff; text-align:left;'>
+<h2 id="regulation">Regulation Tab</h2>   
+<p> Regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms.</p>
+<p> If the gene is a member of a module, regulators influencing that module are also considered to regulate the gene. Regulators table list total number of regulatory influences, regulators, modules and type of the influence.</p>
+<p> You can see description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as combiner in the column labeled "Operator".</p>
+<p> For transcription factors, an additional table next to regulator table will be show. This table show modules that are influenced by the transcription factor. </br>
+</div>
+<div id="motif" class="help" style='padding:10px; background:#fff; text-align:left;'>
+  <h2 id="motifs">Motifs Tab</h2>   
+<p> Network inference algorithm uses de novo motif prediction for assigning genes to modules. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
+ </div>
+<div id="functions" class="help" style='padding:10px; background:#fff; text-align:left;'>
+  <h2 id="functions">Functions Tab</h2>  
+<p> Identification of functional enrichment for the module members is important in associating predicted motifs and regulatory influences with pathways. As described above, the network inference pipeline includes a functional enrichment module by which hypergeometric p-values are used to identify over representation of functional ontology terms among module members.</p>
+<p> Network Portal presents functional ontologies from KEGG, GO, TIGRFAM, and COG as separate tables that include function name, type, corrected and uncorrected hypergeometric p-values, and the number of genes assigned to this category out of total number of genes in the module.<br>
+</div>
+<div id="regulon-members" class="help" style='padding:10px; background:#fff; text-align:left;'>
+  <h2 id="regulon-members">Module Members Tab</h2> 
+ <p> Identity of gene members in a module may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same module(s) with gene under consideration are shown here. For each memebr, gene name, description and modules that contain it are listed. <br>
+</div>
+<div id="help" class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h2 id="help">Help Tab</h2> 
+<p> This help page. More general help can be accessed by clicking help menu in the main navigation bar.</p>
+</div>
+<div id="social" class="help" style='padding:10px; background:#fff; text-align:left;'>
+     <h2 id="comments">Social Tab</h2>
+<p> Network Portal is designed to promote collaboration through social interactions. Therefore interested researchers can share information, questions and updates for a particular gene.</p>
+<p> Users can use their Disqus, Facebook, Twitter or Google accounts to connect to this page (We recommend Google). Each module and gene page includes comments tab that lists history of the interactions for that gene. You can browse the history, make updates, raise questions and share these activities with social web.</p>
+<p> In the next releases of the network portal, we are planning to create personal space for each user where you can share you space that contains all the analysis steps you did along with relevant information. 
 </p>
-<h5 id="circvis">CircVis</h5>
-Our circular regulon explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a> originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use simplified version of visquick to display distribution of regulon members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
+</div>
+<h2 id="circvis">CircVis</h2>
+Our circular module explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a> originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use simplified version of visquick to display distribution of module members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
 <img src="{% static "images/help_images/circvis-help.png" %}" align="right"><br>
   <ul>
     <li> 1. All genomic elements for the organism are represented as a circle and each element is separated by black tick marks. In this example chromosome and pDV represent main chromosome and plasmid for D. vulgaris Hildenborough, respectively.</li>
     <li> 2. Source gene</li>
-    <li> 3. Target genes (other regulon members)</li>
-    <li> 4. Interactions between source and target genes for a particular regulon</li>
-    <li> 5. Regulon(s) that source gene and target genes belong to</li>
+    <li> 3. Target genes (other module members)</li>
+    <li> 4. Interactions between source and target genes for a particular module</li>
+    <li> 5. Module(s) that source gene and target genes belong to</li>
     <li> 6. Visualisation legend</li>
   </ul>
-</div>
-<div id="sidebar">
-	<h4>Navigation</h4>
-			<ul class="sidemenu">
-				<li><a href="#network">Network Tab</a></li>
-				<li><a href="#regulation">Regulation Tab</a></li>
-				<li><a href="#motifs">Motifs Tab</a></li>
-				<li><a href="#functions">Functions Tab</a></li>
-				<li><a href="#regulon-members">Regulon Members Tab</a></li>
-				<li><a href="#help">Help Tab</a></li>
-				<li><a href="#comments">Comments Tab</a></li>
-				<li><a href="#circvis">CircVis Visualization</a></li>
-			</ul>
 </div>
 </div>

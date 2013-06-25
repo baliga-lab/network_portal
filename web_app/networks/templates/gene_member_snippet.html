@@ -5,7 +5,8 @@ $(document).ready(function() {
     {#.tablesorterPager({container: $("#tablepager")})#}; 
 });
 </script>
-<h3> Module neighborhood information for {{ gene }} </h3>
+<a class="help" href="#regulon-members"><img align="right" src="/static/images/help.png" /></a>
+<h5> Module neighborhood information for {{ gene }} </h5>
 <p>
 <div class="main">
 {% if neighbor_genes|length > 0 %}

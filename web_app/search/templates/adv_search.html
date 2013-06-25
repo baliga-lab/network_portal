@@ -3,6 +3,8 @@
 {% load filters %}
 {% block title %}Network Portal - Advanced Search{% endblock %}
 {% block cssspecial %}
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/portal-style.css">
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 <style>
 .addfilterrow, .remfilterrow {
   width: 30px;
@@ -14,11 +16,12 @@
 </style>
 {% endblock %}
 {% block jsspecial %}
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script src="{% static "javascripts/advsearch.js" %}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
   advsearch.initFilters('#module-filters', '#orgcode', '#results');
-
+  $('.help').colorbox({inline: true, width: "50%"});
   $('#search-genes').click(function() {
     $.ajax({
       url: "/searchgenes",
@@ -38,35 +41,80 @@ $(document).ready(function() {
   });
 });
 </script>
+
 {% endblock %}
 {% block content %}
+<div class="sub-page">
+<div class="main" style="width: 97%">
+
+<a class="help" href="#help"><img align="right" src="/static/images/help.png" /></a>
+<h5> Advanced Search </h5>
+
 <form>
-<h2>Organism</h2>
+<h5>Organism</h5>
 <div>Select organism (default: All)</div>
-<div>
-  <select id="orgcode">
-    <option value="all">All</option>
-    {% for sp in species %}<option value="{{sp.short_name}}">{{sp.name}}</option>
-    {% endfor %}
-  </select>
-</div>
-<h2>Gene Search</h2>
-<div>Select a field to search (default: Name)</div>
-<div>
-  <select id="gene-search-attr">
-    <option value="name">Name</option>
-    <option value="locustag">Locus tag</option>
-    <!-- <option value="aliases">Aliases</option> -->
-    <option value="function">Function</option>
-    <!-- <option value="regulator">Regulator</option> -->
-  </select>
-  Search Term <input type="text" id="gene-search-term"></input>
-  <input id="search-genes" type="button" value="Search Genes">
-</div>
-<h2>Module Search</h2>
-<div>Filter by residual (default: no-filter)</div>
-<div id="module-filters">Filter placeholder</div>
-<input id="search-modules" type="button" value="Search Modules">
+			<div>
+  				<select id="orgcode">
+    			<option value="all">All</option>
+    			{% for sp in species %}<option value="{{sp.short_name}}">{{sp.name}}</option>
+    			{% endfor %}
+  				</select>
+			</div>
+
+<table>
+	<th><h5>Gene Search</h5></th><th><h5>Module Search</h5></th>
+	<tr>
+		<td>
+			<div>Select a field to search (default: Name)</div>
+			<div>
+  				<select id="gene-search-attr">
+    			<option value="name">Name</option>
+    			<option value="locustag">Locus tag</option>
+    			<!-- <option value="aliases">Aliases</option> -->
+    			<option value="function">Function</option>
+    			<!-- <option value="regulator">Regulator</option> -->
+  				</select>
+  				Search Term <input type="text" id="gene-search-term"></input></br>
+  				<input id="search-genes" type="button" value="Search Genes" class="medium blue awesome">
+			</div>
+		</td>
+		<td>
+			<div>Filter by residual (default: no-filter)</div>
+			<div id="module-filters">Filter placeholder</div>
+			<input id="search-modules" type="button" value="Search Modules" class="medium blue awesome">
+			</form>
+			<div id="results"></div>
+		</td>
+	</tr>
+</table>
 </form>
 <div id="results"></div>
+<div style="display:none">
+	<div id='help' style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Advanced Search Help</h5>
+    Search is available in two categories. You can search for genes or you can search for regulatory modules.
+    It is also possible to restrict the search to specific organisms. 
+    <p>Select organism of interest from the "Organism" pull-down menu or select "All" to include all organisms available.</p>
+    <h2> Gene Search</h2>
+    <p>In order to search for genes, select a field from the pull down menu. Currently, we support "Name" (Default), "Locus Tag" and "Function".
+    e.g Name: DVU3023, Locus tag: BC0478 and Function: electron transport</p>
+    Search results will be presented as table that includes columns "Species", "Gene" and "Description".
+    <h2> Module Search</h2>
+    <p>Module search currently supports 4 fields. The default is "no-filters" and will bring all the modules.
+    Other available searchable fields are "Residual", "Contains gene", "Regulated by", and "Enriched for function"</br>
+    <b>Residual:</b> Indicative of how tight is the co-expression between the member genes of the module. Smaller residual values indicate
+    better co-expression.</br>
+    <b>Contains gene:</b> This will list modules that includes query gene(s)</br>
+    <b>Regulated by:</b> Modules that are regulated by the qery gene(s) will be shown</br>
+    <b>Enriched for function:</b> Modules that are calculated to be enriched for the query function will be shown.
+     </p>
+     <p>
+     Results table lists "Module", "residual", "Motif 1 e-value" and "Motif 2 e-value"
+     </p>
+    	    
+   </div>
+</div>
+
+	</div><!-- Main-->
+</div>  <!-- Sub-page-->          
 {% endblock %}

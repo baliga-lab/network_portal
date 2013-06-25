@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
 {% endblock %}
 {% block cssspecial %}<link href="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 <link href="{% static "javascripts/jquery.qtip.min.css" %}" rel="stylesheet" type="text/css" />{% endblock %}
 {% block jsspecial %}<script type="text/javascript" src="{% static "cytoscapeweb/js/AC_OETags.min.js" %}"></script>
     <script type="text/javascript" src="{% static "cytoscapeweb/js/cytoscapeweb.min.js" %}"></script>
@@ -21,6 +22,7 @@
     <script type="text/javascript" src="{% static "javascripts/visquick-min/vq.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascripts/visquick-min/vq.circvis.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascripts/visquick_helpers.js" %}"></script>
+    <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <!--    <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/ext-all.js"></script>
     <script type="text/javascript">window.sv_base_url = "/sviewer/"</script>-->
@@ -30,7 +32,7 @@
 
 {% block content %}
 <h5><span class="search_help"> Organism : <a href="/{{ gene.species.short_name }}">{{ gene.species.name }}</a>
-                             | Network : {% for network in species.network_set.all %}
+                             | Module List : {% for network in species.network_set.all %}
     				                        <a href="{{network|network_url}}" title="Explore Network"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/></a></a>
   					{% endfor %}
    </span>
@@ -46,7 +48,7 @@
 	     <li><a class="function" href="#tab-function">Functions</a></li>
 	     <li><a class="genes" href="#tab-gene">Module Members</a></li>
 	     {# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
-	     <li><a class="help" href="#tab-help">Help</a></li>
+	     <li><a class="gene-help" href="#tab-help">Help</a></li>
 	     <li><a class="social" href="#tab-social">Social</a></li>
      </ul>
      <div id="tab-main">
@@ -99,9 +101,11 @@
                 $('[id^=previewcanvas]').click(function() {
                   $('#tabs').tabs("option", "active", 3);
                 });
+                $('.help').colorbox({inline: true, width: "50%"});
               });
         </script>
 	       <div class="sub-page">
+	       <a class="help" href="#gene-info"><img align="right" src="/static/images/help.png" /></a> 
 	         <h5>{{ gene.display_name }}</h5>
 	         <p><span id="gene_description">{{ gene.description }}</span></p>
            <div id="circvis">CircVis</div>
@@ -241,6 +245,9 @@
 	{% include 'gene_help_snippet.html' %}
       </div>
       <div id="tab-social" class="sub-page">
+      <a class="help" href="#social"><img align="right" src="/static/images/help.png" /></a>
+      <h5>Comments for {{ gene.name }} </h5>
+      Please add your comments for this gene by using the form below. Your comments will be publicly available.</br>
       <p>
       <div id="disqus_thread" class="main"></div> <!-- Commenting from Disqus-->
     <script type="text/javascript">
@@ -261,5 +268,27 @@
       </div>
     </div>{# top-tabs #}
    </div>{# sub-page #}
+   <div style="display:none">
+	<div id='gene-info' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Gene Help</h5>
+    <h2>Overview</h2>
+    <p>Gene landing pages present genomic, functional, and regulatory information for individual genes. A circular visualization displays connections between the selected gene and genes in the same modules, with as edges drawn between the respective coordinates of the whole genome.</p>
+    <p> The gene page also lists functional ontology assignments, module membership, and motifs associated with these modules. Genes in the network inherit regulatory influences from the modules to which they belong. Therefore, the regulatory information for each gene is a collection of all regulatory influences on these modules. These are listed as a table that includes influence name, type, and target module. If the gene is a transcription factor, its target modules are also displayed in a table that provides residual values and number of genes.</p>	
+    <h2 id="circvis">CircVis</h2>
+Our circular module explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a> originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use simplified version of visquick to display distribution of module members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
+<img src="{% static "images/help_images/circvis-help.png" %}" align="right"><br>
+  <ul>
+    <li> 1. All genomic elements for the organism are represented as a circle and each element is separated by black tick marks. In this example chromosome and pDV represent main chromosome and plasmid for D. vulgaris Hildenborough, respectively.</li>
+    <li> 2. Source gene</li>
+    <li> 3. Target genes (other module members)</li>
+    <li> 4. Interactions between source and target genes for a particular module</li>
+    <li> 5. Module(s) that source gene and target genes belong to</li>
+    <li> 6. Visualisation legend</li>
+  </ul>
+
+        </div>
+   </div> 
+
+   
 </div>{# bicluster-top #}
 {% endblock %}

@@ -3,14 +3,18 @@
 {% load filters %}
 {% block title %}Network Portal - Available Species{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script>
 $(document).ready(function() { 
     $("#species-list") 
     .tablesorter({widthFixed: true, widgets: ['zebra']}) 
-    {#.tablesorterPager({container: $("#tablepager")})#}; 
+    {#.tablesorterPager({container: $("#tablepager")})#};
+    $('.help').colorbox({inline: true, width: "50%"}); 
 });
 </script>
 <div class="main">
+  <a class="help" href="#help-species-list"><img align="right" src="/static/images/help.png" /></a>
   <h5>Species</h5>
   <table id="species-list" class="tablesorter">
     <caption>Complete list of species in the Network Portal database</caption>
@@ -45,5 +49,16 @@ $(document).ready(function() {
    
   <h5>Submit your data</h5>
 <p>Do you have data that you would like to analyze? Send us an <a href= "mailto:sturkarslan@ssytemsbiology.org">email</a></p>
+<div style="display:none">
+	<div id='help-species-list' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Species List Help</h5>
+    <p>We can build a regulatory network for any organism whose genome is sequenced if sufficient gene expression data are available. In order to show the flexibility of network portal, we built regulatory networks for organisms from different phylogenies and with varying genome complexity and available amounts of gene expression data.</p>
+    <p> The first release of Network Portal includes 2 Archaea and 11 Bacteria, including 3 Firmicutes, 6 Proteobacteria, a Cyanobacterium, and a Bacteroidetes species. These organisms include a number of well-studied model organisms as well as species that are of interest due to human pathogenicity, human symbiosis, biofuel production, or bioremediation activity. Comparative network analysis will benefit from the selection of species from distantly related clades, including representation from multiple phyla within Bacteria and multiple classes within Archaea, and from the selection of some closely related species, such as the two Bacillus sp.</p>
+    <p> The smallest genome in the Network Portal is that of C. jejuni with 1711 genes and the largest is P. aeruginosa with 5646 genes. The largest and smallest expression datasets are 1661 and 58 for H. salinarum and M. maripaludis, respectively. The Network Portal can rapidly be expanded to include the >100 organisms for which there is already sufficient gene expression data available in public databases for robust regulatory network inference.</p>
+    <p> Species List table shows organism for which we currently have network models available. Clicking on the Species name will take you the species specific page to acces all related resources. Taxonomy id shows link to taxonomy page at NCBI. Total number of genes in the genome as well as Number of regulators are also listed in the table and linked to table listing all the genes and regulators.</p>
+    <p> In order to access the available network model, click on the network icon (<img src="/static/images/network.gif"/>).
+    </div>
+</div>
+
 </div><!-- End #main -->
 {% endblock %}
