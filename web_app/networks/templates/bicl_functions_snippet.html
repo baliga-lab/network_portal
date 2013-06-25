@@ -38,6 +38,7 @@
     });
   </script>
   <div class="subpage">
+  <a class="help" href="#help-functions"><img align="right" src="/static/images/help.png" /></a>
 	<h5> Functional Enrichment</h5><p>
 	    <b>Regulon {{ bicluster.k }}</b> is enriched for following functions.
   		</p>
@@ -164,4 +165,13 @@
   </table>
   </div> {# cog-accordion #}
 </div>{% endif %}{# cog #}
+<div style="display:none">
+	<div id='help-functions' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Functions Help</h5>
+    	<p>Biological networks contain sets of regulatory units called functional modules that together play a role in regulation of specific functional processes. Connections between different modules in the network can help identify regulatory relationships such as hierarchy and epistasis. In addition, associating functions with modules enables putative assignment of functions to hypothetical genes.  It is therefore essential to identify functional enrichment of modules within the regulatory network.</p>
+    	<p> Functional annotations from single sources are often either not available or not complete. Therefore, we integrated KEGG pathway, Gene Ontology, TIGRFam and COG information as references for functional enrichment analysis.</p>
+    	<p> We use hypergeometric p-values to identify significant overlaps between co-regulated module members and genes assigned to a particular functional annotation category. P-values are corrected for multiple comparisons by using Benjamini-Hochberg correction and filtered for p-values ≤ 0.05.</p>
+    	<p>Network Portal presents functional ontologies from KEGG, GO, TIGRFAM, and COG as separate tables that include function name, type, corrected and uncorrected hypergeometric p-values, and the number of genes assigned to this category out of total number of genes in the module.</p> 
+	</div>
+ </div>
 </div>
