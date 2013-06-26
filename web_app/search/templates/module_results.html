@@ -1,16 +1,5 @@
-{% extends "base2.html" %}
 {% load filters %}
 {% load search_tags %}
-<script type="text/javascript" src="/static/javascripts/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="/static/javascripts/jquery.tablesorter.pager.js"></script>
-<script>
-    $(document).ready(function() {
-                      $("#module-search-results")
-                      .tablesorter({widthFixed: true, widgets: ['zebra']})
-                      {#.tablesorterPager({container: $("#tablepager")})#};
-                      });
-    </script>
-
 <div id="results">
 <div class="filter-display">
   <h3>Filters</h3>
@@ -22,7 +11,7 @@
 <div></div>
 {% for species, modules in mresults.items %}
 </div>
-<h2><b>Organism:</b> {{species_names|lookup:species}}</h2>
+<h5><b>Organism:</b> {{species_names|lookup:species}}</h5>
 <table id="module-search-results">
   <tr><th>k</th><th>residual</th><th>Motif 1 e-value</th><th>Motif 2 e-value</th></tr>
   {% for k, module in modules.items %}
