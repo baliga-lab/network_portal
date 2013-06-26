@@ -1,3 +1,12 @@
+<script type="text/javascript" src="/static/javascripts/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="/static/javascripts/jquery.tablesorter.pager.js"></script>
+<script>
+    $(document).ready(function() {
+                      $("#results")
+                      .tablesorter({widthFixed: true, widgets: ['zebra']})
+                      {#.tablesorterPager({container: $("#tablepager")})#};
+                      });
+    </script>
 <div id="results">
   <table>
       <tr>
