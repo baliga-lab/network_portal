@@ -4,19 +4,21 @@
     <title>{% block title %}Network Portal{% endblock %}</title>
     {% block cssreset %}{% endblock %}
     {% block csscommon %}<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/portal-style.css">{% endblock %}
+    <link href="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
     {% block cssspecial %}{% endblock %}
-    {% block jscommon %}<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    {% block jscommon %}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/json2.min.js"></script>{% endblock %}
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}cytoscapeweb/js/json2.min.js"></script>
+    {% endblock %}
     {% block jsspecial %}{% endblock %}
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/main.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/collapsing_divs.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.tablesorter.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.tablesorter.pager.js"></script>
 	<script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.jcarousel.min.js"></script>
-
-
-    
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+ 
     <!-- google analytics -->
     <script type="text/javascript">
 
@@ -31,6 +33,22 @@
       })();
 
     </script>
+        <script type="text/javascript">
+            // Create the tooltips only on document load
+            $(document).ready(function()
+                              {
+                              // By suppling no content attribute, the library uses each elements title attribute by default
+                              $('underlinemenu a[href][title]').qtip({
+                                                                content: {
+                                                                text: false // Use each elements title attribute
+                                                                },
+                                                                      style: 'cream' // Give it some style
+                                                                });
+                              
+                              // NOTE: You can even omit all options and simply replace the regular title tooltips like so:
+                              // $('#content a[href]').qtip();
+                              });
+            </script>
   </head>
   <body>
     {% block basewrap %}<div id="wrap-no-line">{% endblock %}
@@ -41,9 +59,10 @@
      <div id="underlinemenu" class="underlinemenu">
 	<ul>
 	  {% if request.user.is_authenticated %}
-	  <li><a href="logout">{{ request.user.email }}</a></li>
+	  <li><a href="logout" title="Click to logout">{{ request.user.email }}</a></li>
+      <li><a href="workflow" title="Go to My workspace">My Workspace</a></li>
 	  {% else %}
-	  <li><a href="openid/login">Login</a></li>
+	  <li><a href="openid/login" title="Use your Google ID to login">Login</a></li>
 	  {% endif %}
 	  <li><a href="/about">About</a></li>
 	  <li><a href="/contact">Contact</a></li>
