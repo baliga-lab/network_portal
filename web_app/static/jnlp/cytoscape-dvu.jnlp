@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://networks.systemsbiology.net/static/">
+  <information>
+    <title>Cytoscape WebStart</title>
+    <vendor>Baliga Lab | Institute for Systems Biology</vendor>
+    <homepage href="http://networks.systemsbiology.net"/>
+    <icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/>
+    <icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+
+    <offline-allowed/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/Cytoscape/cytoscape.jar"/>
+    <jar href="lib/Cytoscape/scripting-manager-1_0.jar" />
+    <jar href="lib/Cytoscape/CytoscapeRPC.jar" />
+    <jar href="lib/Cytoscape/advanced-network-merge-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/attribute-browser-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/automatic-layout-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/core-commands-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/editor-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/equation-functions-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/manual-layout-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/ncbi-client-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/network-analyzer-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/rfilters-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/sbml-reader-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/table-import-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/y-layouts-1.0.1.jar" />
+    <jar href="lib/Cytoscape/editor-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/biomart-client-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/biopax-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/cpath-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/cpath2-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/linkout-2.8.3-jar-with-dependencies.jar" />
+    <jar href="applications/cygoose-2.10.0-jar-with-dependencies.jar"/>
+  </recources>
+  <application-desc main-class="cytoscape.CyMain">
+    <argument>-p</argument>
+    <argument>org.systemsbiology.cytoscape.GagglePlugin</argument>
+    <argument>-p</argument>
+    <argument>org.cytoscape.scripting.ScriptEngineManagerPlugin</argument>
+    <argument>-p</argument>
+    <argument>tudelft.CytoscapeRPC.CytoscapeRPCPlugin</argument>
+    <argument>-p</argument>
+    <argument>csplugins.network.merge.NetworkMergePlugin</argument>
+    <argument>-p</argument>
+    <argument>browser.AttributeBrowserPlugin</argument>
+    <argument>-p</argument>
+    <argument>csplugins.layout.LayoutPlugin</argument>
+    <argument>-p</argument>
+    <argument>coreCommands.CoreCommands</argument>
+    <argument>-p</argument>
+    <argument>cytoscape.editor.CytoscapeEditorPlugin</argument>
+    <argument>-p</argument>
+    <argument>org.cytoscape.EquationFunctions.EquationFunctionsPlugin</argument>
+    <argument>-p</argument>
+    <argument>ManualLayout.ManualLayoutPlugin</argument>
+    <argument>-p</argument>
+    <argument>edu.ucsd.bioeng.idekerlab.ncbiclient.NCBIClientPlugin</argument>
+    <argument>-p</argument>
+    <argument>de.mpg.mpi_inf.bioinf.netanalyzer.Plugin</argument>
+    <argument>-p</argument>
+    <argument>filter.cytoscape.FilterPlugin</argument>
+    <argument>-p</argument>
+    <argument>sbmlreader.SBMLReaderPlugin</argument>
+    <argument>-p</argument>
+    <argument>edu.ucsd.bioeng.coreplugin.tableImport.TableImportPlugin</argument>
+    <argument>-p</argument>
+    <argument>yfiles.YFilesLayoutPlugin</argument>
+    <argument>-p</argument>
+    <argument>edu.ucsd.bioeng.idekerlab.biomartclient.BiomartClientPlugin</argument>
+    <argument>-p</argument>
+    <argument>cytoscape.coreplugins.biopax.BiopaxPlugin</argument>
+    <argument>-p</argument>
+    <argument>org.cytoscape.coreplugin.cpath2.plugin.CPathPlugIn2</argument>
+    <argument>-p</argument>
+    <argument>org.cytoscape.coreplugin.cpath.plugin.CPathPlugIn</argument>
+    <argument>-p</argument>
+    <argument>linkout.LinkOutPlugin</argument>
+    <argument>http://networks.systemsbiology.net/static/data-files/cytoscape/dvu-network.cys</argument>
+  </application-desc>
+</jnlp>

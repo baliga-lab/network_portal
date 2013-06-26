@@ -2,8 +2,9 @@
 {% load staticfiles %}
 {% block title %}Network Portal - Help {% endblock %}
 {% block cssspecial %}<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/cupertino/jquery-ui.css" />
-
-<link href="{% static "javascripts/jquery.qtip.min.css" %}" rel="stylesheet" type="text/css" />{% endblock %}
+<link href="{% static "javascripts/jquery.qtip.min.css" %}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+{% endblock %}
 {% block jsspecial %}<script type="text/javascript" src="{% static "cytoscapeweb/js/AC_OETags.min.js" %}"></script>
     <script type="text/javascript" src="{% static "cytoscapeweb/js/cytoscapeweb.min.js" %}"></script>
     <script type="text/javascript" src="{% static "javascripts/wwu_logo/isblogo.js" %}"></script>
@@ -16,6 +17,7 @@
     <script type="text/javascript" src="{% static "javascripts/visquick_helpers.js" %}"></script>
     <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="http://www.ncbi.nlm.nih.gov/core/extjs/ext-3.4.0/ext-all.js"></script>
+    <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
     <script type="text/javascript">window.sv_base_url = "/sviewer/"</script>
     <script type="text/javascript">
       $(document).ready(function()
@@ -27,6 +29,7 @@
       attr: 'alt' // Use the ALT attribute of the area map for the content
       },
       });
+      $(".figure1").colorbox({rel:'figure1'});
       });
     </script>
     <title>ScreenFlow video</title>
@@ -108,24 +111,24 @@
 					<p>Network Portal provides analysis and visualization tools for selected gene regulatory networks to aid researchers in biological discovery and hypothesis development. It provides a user-friendly interface, extensive search capabilities and a number of visualization tools. We are also constantly adding regulatory networks for new species. Increasing the number of network models will also enable comparative network biology. We are also developing tools for comparing network models and these will be integrated into the portal as soon as they are available.</p>
 					<p> The Network Portal also acts as a gateway for the Gaggle Workflow. Gaggle Workflow makes the life of researchers easier by taking over the burden of repetitive analysis tasks. Integration with Network Portal provides full access to automated analysis of network models and associated biological information.</p>
 					</div>
-					<h4>Navigating Network Portal</h4>
+					<h4>Navigating Gene Pages</h4>
 					<div>
 						<div id="tab-help">
-							<h5 id="network">Network Tab</h5>
-							<img src="{% static "images/help_images/gene-network.png" %}" align="right"><p>If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as a network using CytoscapeWeb. In this view, green circular nodes represent regulon member genes, purple diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon(s) (Biclusters) via edges. This representation provides a quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among different regulons. Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details.</br> The information shown for genes includes the locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor and any associated functional information. For regulators, the number of regulons is shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown. You can pin information boxes by using the button in the box title and open up additional ones on the same screen for comparative analysis.</p>								
-							<h5 id="regulation">Regulation Tab</h5>   
-								<img src="{% static "images/help_images/gene-regulation.png" %}" align="right"> <p> The regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. The regulators table lists the total number of regulatory influences, regulators, regulons and type of the influence. You can see a description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as a combiner in the column labeled "Operator". For transcription factors, an additional table next to regulator table will be shown. This table shows regulons that are influenced by the transcription factor. </br>
-									<h5 id="motifs">Motifs Tab</h5>   
-									<img src="{% static "images/help_images/gene-motifs.png" %}" align="right"><p> Network inference algorithm uses de novo motif prediction for assigning genes to regulons. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
-										<h5 id="functions">Functions Tab</h5>  
-										<img src="{% static "images/help_images/gene-functions.png" %}" align="right"> <p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. The function name is linked to its explanation and more details.<br>
-											<h5 id="regulon-members">Regulon Members Tab</h5> 
-											<img src="{% static "images/help_images/gene-regulon-members.png" %}" align="right"><p> Identity of gene members in a regulon may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same regulon(s) with gene under consideration are shown here. For each member, gene name, description and regulons that contain it are listed. <br>
-												<h5 id="help">Help Tab</h5> 
-												<img src="{% static "images/help_images/gene-help.png" %}" align="right"> <p> More general help can be accessed by clicking the help menu in the main navigation bar.</p>
-													<h5 id="comments">Comments Tab</h5>
-													<img src="{% static "images/help_images/gene-comments.png" %}" align="right"> <p> Network Portal is designed to promote collaboration through social interactions. Therefore, interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their Facebook or Google accounts to connect to this page. Each regulon and gene page includes a comments tab that lists the history of interactions for that gene. You can browse the history, make updates, raise questions and share these activities within the social web. In future releases of the network portal, we are planning to create a personal space for each user that contains all the analysis steps performed by the user along with relevant information. It will be possible to share these personal spaces with other users.</p>
-														<h5 id="circvis">CircVis</h5>
+							<h2 id="network">Network Tab</h2>
+							<p>If the gene is associated with a regulon(s), its connection to given regulons along with other members of that regulon are shown as a network using CytoscapeWeb. In this view, green circular nodes represent regulon member genes, purple diamonds represent regulon motifs and red triangles represent regulators. Each node is connected to regulon(s) (Biclusters) via edges. This representation provides a quick overview of all genes, regulators and motifs for regulons. It also allows one to see shared genes/motifs/regulators among different regulons. Network representation is interactive. You can zoom in/out and move nodes/edges around. Clicking on a node will open up a window to give more details.</br> The information shown for genes includes the locus tag, organism, genomic coordinates, NCBI gene ID, whether it is transcription factor and any associated functional information. For regulators, the number of regulons is shown in addition to gene details. For motifs, e-value, consensus sequence and sequence logo will be shown. For regulons, expression profile plot, motif information, functional associations and motif locations for each member of the regulon will be shown. You can pin information boxes by using the button in the box title and open up additional ones on the same screen for comparative analysis.</p>								
+							<h2 id="regulation">Regulation Tab</h2>   
+								<p> The regulation tab for each gene includes regulatory influences such as environmental factors or transcription factors or their combinations identified by regulatory network inference algorithms. If the gene is a member of a regulon, regulators influencing that regulon are also considered to regulate the gene. The regulators table lists the total number of regulatory influences, regulators, regulons and type of the influence. You can see a description of the regulator inside the tooltip when you mouseover. In certain cases the regulatory influence is predicted to be the result of the combination of two influences. These are indicated as a combiner in the column labeled "Operator". For transcription factors, an additional table next to regulator table will be shown. This table shows regulons that are influenced by the transcription factor. </br>
+									<h2 id="motifs">Motifs Tab</h2>   
+									<p> Network inference algorithm uses de novo motif prediction for assigning genes to regulons. If there are any motifs identified in the upstream region of a gene, the motif will be shown here. For each motif sequence logo, consensus and e-value will be shown.<br>
+									<h2 id="functions">Functions Tab</h2>  
+									<p> Functional annotations for a given gene might be important to connect regulatory information with physiology of the cell. Therefore, functional annotations for each gene collected from KEGG, Gene Ontology (GO), Cluster of Orthologous Groups (COG) and TIGR Roles will be shown here. The function name is linked to its explanation and more details.<br>
+									<h2 id="regulon-members">Regulon Members Tab</h2> 
+									<p> Identity of gene members in a regulon may help to identify potential interactions between different functional modules. Therefore, neighbor genes that share the same regulon(s) with gene under consideration are shown here. For each member, gene name, description and regulons that contain it are listed. <br>
+									<h2 id="help">Help Tab</h2> 
+									<p> More general help can be accessed by clicking the help menu in the main navigation bar.</p>
+									<h2 id="comments">Social Tab</h2>
+									<p> Network Portal is designed to promote collaboration through social interactions. Therefore, interested researchers can share information, questions and updates for a particular gene. Users can obtain login information by registering for our website. Alternatively, they can use their Facebook or Google accounts to connect to this page. Each regulon and gene page includes a comments tab that lists the history of interactions for that gene. You can browse the history, make updates, raise questions and share these activities within the social web. In future releases of the network portal, we are planning to create a personal space for each user that contains all the analysis steps performed by the user along with relevant information. It will be possible to share these personal spaces with other users.</p>
+									<h2 id="circvis">CircVis</h2>
 														Our circular regulon explorer is adapted from <a href="http://code.google.com/p/visquick/">visquick</a>, which was originally developed by Dick Kreisberg of <a href="http://shmulevich.systemsbiology.net/">Ilya Shmulevich lab</a> at ISB for <a href="http://cancergenome.nih.gov/">The Cancer Genome Atlas</a>. We use a simplified version of visquick to display distribution of regulon members and their interactions across the genome. This view provides summary of regulation information for a gene. The main components are;
 														<img src="{% static "images/help_images/circvis-help.png" %}" align="right"><br>
 															<ul>
@@ -139,6 +142,79 @@
 
 						</div>
 					</div>
+					<h4>Navigating Module Pages</h4>
+					<div>
+						<div id="tab-help">
+					<h2> What is a module?</h2>
+			<p>Regulatory units (modules) in the Network Portal are based on the network inference algorithm used. For the current version, modules are based on <a target="blank" href="http://baliga.systemsbiology.net/drupal/content/new-cmonkey-r-package-and-code">cMonkey</a> modules and <a target = "blank" href="http://baliga.systemsbiology.net/drupal/content/inferelator">Inferelator</a> regulatory influences on these modules. More specifically, module refers to set of genes that are conditionally co-regulated under subset of the conditions. Identification of modules integrates co-expression, de-novo motif identification, and other functional associations such as operon information and protein-protein interactions.</p>
+			<h2>Module Overview</h2>
+			<a class="figure1" href="/static/images/module-figure.png" title="An Example summary view of the module"><img height=20% width=20% align="left" src="/static/images/module-figure.png"></a>
+			<p> The landing module page shows quick summary info including co-expression profiles, de-novo identified motifs, and transcription factors and/or environmental factors as regulatory influences. It also includes module residual, motif e-values, conditions and links to other resources such as NCBI and Microbesonline. 
+		  . If a transcription factor is included in the manually curated <a target="blank" href="http://regprecise.lbl.gov/RegPrecise/">RegPrecise</a> database, further information from RegPrecise is shown, allowing users to perform comparative analysis.</p>
+		  	<h2> Expression Profiles</h2>
+		  	<p>Expression profiles is a plot of the expression ratios (log10) of the module's genes, over all subset of the conditions included in the module.
+		  	The X-axis represent conditions and the Y-axis represents log10 expression ratios. Each gene is plotted as line plot with different colors. 
+		  	Colored legend for the lines are presented under the plot. This plot is dynamic. Clicking on the gene names in the legend will show/hide the plot for that particular gene. A tooltip will show expression ratio information if you mouseover the lines in the plot.</p>
+		  	<h2> Motif Locations</h2>
+		  	<p>Location of the Identified motifs for the module in the upstream regions of the member genes are shown under the expression profiles plot. This plot shows the diagram of the upstream positions of the motifs, colored red and green for motifs #1, and 2, respectively. Intensity of the color is proportional to the significance of the occurence of that motif at a given location.	Motifs on the forward and reverse strand are represented over and under the line respectively.</p>	
+		  	</div>
+		<div id="network-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2>Network</h2>
+		 	<p>A network view of the module is created using cytoscapeWeb and enables dynamic, interactive exploration of the module properties. In this view, module member genes, motifs, and regulatory influences are represented as peripheral nodes connected to core module node via edges. Module members are green circles, regulators are red triangles and motifs are blue diamonds. Selection of a node gives access to detailed information in a pop-up window, which allows dragging and pinning to compare multiple selections. Selecting module members will show information about the selected gene such as name, species and fucntions. Motif selection will show motif logo image and e-values. Bicluster selction will show expression profile and summary statistics for the module.</p>
+		 	<img alt="Gene" src="{{ STATIC_PREFIX }}images/network_gene.png" style="background:none;border:0px;position:relative; bottom:-10px;">Module member <img alt="Regulator" src="{{ STATIC_PREFIX }}images/network_regulator.png" style="background:none;border:0px;position:relative; bottom:-10px;">Regulator  <img alt="Motif" src="{{ STATIC_PREFIX }}images/network_motif.png" style="background:none;border:0px;position:relative; bottom:-10px;">Motif
+		</div>
+		<div id="regulator-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2 id="regulators"> Regulators</h2>
+		 	<p>For each module, single or AND logic connected regulatory influences are listed under the regulators tab. These regulatory influences are identified by Inferelator. Table shows name of the regulator and its type. <b>tf:</b> Transcription factor, <b>ef:</b> Environmental factor and <b> combiner:</b>Combinatorial influence of a tf or an ef through logic gate. Tabel is sortable by clicking on the arrows next to column headers.</p>
+		</div>
+		<div id="motif-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2>Motifs</h2>
+    		<p>Transcription factor binding motifs help to elucidate regulatory mechanism. cMonkey integrates powerful de novo motif detection to identify conditionally co-regulated sets of genes. De novo predicted motifs for each module are listed in the module page as motif logo images along with associated prediction statistics (e-values). The main module page also shows the location of these motifs within the upstream sequences of the module member genes.</p>
+    		<p> Motifs of interest can be broadcasted to <a target="blank" href="http://regpredict.lbl.gov/regpredict/">RegPredict</a> (currently only available for Desulfovibrio vulgaris Hildenborough) in order to compare conservation in similar species. This integrated motif prediction and comparative analysis provides an additional checkpoint for regulatory motif prediction confidence.</p>
+    	</div>
+    	<div id="functions-info" style='padding:10px; background:#fff; text-align:left;'>
+    		<h2>Functions</h2>
+    		<p>Biological networks contain sets of regulatory units called functional modules that together play a role in regulation of specific functional processes. Connections between different modules in the network can help identify regulatory relationships such as hierarchy and epistasis. In addition, associating functions with modules enables putative assignment of functions to hypothetical genes.  It is therefore essential to identify functional enrichment of modules within the regulatory network.</p>
+    		<p> Functional annotations from single sources are often either not available or not complete. Therefore, we integrated KEGG pathway, Gene Ontology, TIGRFam and COG information as references for functional enrichment analysis.</p>
+    		<p> We use hypergeometric p-values to identify significant overlaps between co-regulated module members and genes assigned to a particular functional annotation category. P-values are corrected for multiple comparisons by using Benjamini-Hochberg correction and filtered for p-values ≤ 0.05.</p>
+    		<p>Network Portal presents functional ontologies from KEGG, GO, TIGRFAM, and COG as separate tables that include function name, type, corrected and uncorrected hypergeometric p-values, and the number of genes assigned to this category out of total number of genes in the module.</p>
+    	</div>
+    	<div id="gene-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2>Genes</h2>
+    		<p> Gene member table shows all the genes included in the module. Listed attributes are;
+    		<ol>
+    			<li> Name: Gene name or Locus tag</li>
+    			<li> Common Name: Gene short name</li>
+    			<li> Type: Type of the feature, usually CDS.</li>
+    			<li> Gene ID: Link to NCBI Gene ID</li>
+    			<li> Chromosome: Chromosome name from annotation file</li>
+    			<li> Start/End:Feature start and end coordinates</li>
+    			<li> Strand: strand of the gene</li>
+    			<li> Description: Description of the gene from annotation file</li>
+    			<li> TF: If the gene is a Transcription Factor or not.</li>
+    		</ol>
+    		<p>If you are browsing the Network Portal by using Gaggle/Firegoose, firegoose plugin will capture the NameList of the gene members. Captured names can be saved into your Workspace by clicking on <b> "Capture"</b> in the firegoose toolbar or can be directly sent other desktop and web resources by using <b>"Broadcast"</b> option.
+        	</div>
+
+    	<div id="social-info" style='padding:10px; background:#fff; text-align:left;'>
+    		<h2>Social</h2>
+			<p>You can start a conversation about this module or join the existing discussion by adding your comments. In order to be able to add your comments you need to sign in by using any of the following services;Disqus, Google, Facebook or Twitter. For full compatibility with other network portal features, we recommend using your Google ID.</p>  
+		 </div>
+		 <div id="definitions-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2> Definitions</h2>
+		 	<p><b>Residual:</b> is a measure of bicluster quality. Mean bicluster residual is smaller when the expression profile of the genes in the module
+    	is "tighter". So smaller residuals are usually indicative of better bicluster quality.</p>
+    		<p><b>Expression Profile:</b> is a preview of the expression profiles of all the genes under subset of conditions included in the module.
+    	Tighter expression profiles are usually indicative of better bicluster quality.</p>
+    		<p><b> Motif e-value:</b> cMonkey tries to identify two motifs per modules in the upstream sequences of the module member genes.
+    	Motif e-value is an indicative of the motif co-occurences between the members of the module.Smaller e-values are indicative of significant sequence motifs. Our experience showed that e-values smaller than 10 are generally indicative of significant motifs.</p>
+    		<p><b> Genes:</b> Number of genes included in the module.</p>
+    		<p><b> Functions:</b> We identify functional enrichment of each module by camparing to different functional categories such as KEGG, COG, GO etc. by using hypergeometric function. If the module is significantly enriched for any of the functions, this column will list few of the these functions as an overview. 
+    	Full list of functions is available upon visiting the module page under the Functions tab.</p>
+
+					</div>
+					</div><!-- div for navigating module pages -->		
+					
 				</div>
 			</div>
 			<div id="tabs-2"> <h5> What is Gaggle?</h5>
@@ -326,10 +402,10 @@
 			</div>
 			
 			<div id="tabs-5"><h5> Get Involved</h5><br>
-				<h4 class="medium orange awesome"> Development </h4>
+				<h2> Development </h2>
 				<p>One of the key benefits of the Gaggle and Gaggle Workflow is that anyone can implement their own Geese. We hope to promote interoperability among bioinformatics applications by making this as easy as possible. Have an application you'd like to see included on this page? Please contact us by email (sturkars at systemsbiology.org) or through the discussion groups.</p>
 				<p> We strongly encourage developers to take advantage of easy implementation features in Gaggle and Network Portal. If you are a developer who would like to integrate his/her desktop/web applications with Gaggle/Network Portal we provide all the support you need.</p>
-				<h4 class="medium orange awesome">Gaggle Subversion Repository</h4>
+				<h2>Gaggle Subversion Repository</h2>
 				<p>
 				The Gaggle's source code is all open source, licensed under the LGPL,
 				and served using the
@@ -359,17 +435,17 @@
 				
 				<p>
 				
-				<h4 class="medium orange awesome">Firegoose Source code</h4>
+				<h2>Firegoose Source code</h2>
 				<ul>
 					<li>Firegoose source is here:
 						<a href="http://gaggle.systemsbiology.net/svn/gaggle/FireGoose/trunk/">http://gaggle.systemsbiology.net/svn/gaggle/FireGoose/trunk/</a></li>
 				</ul>
-				<h4 class="medium orange awesome">Network Portal Source code</h4>
+				<h2>Network Portal Source code</h2>
 				<ul>
 					<li>Network Portal source is here:
 						<a href="http://baliga-lab/github.com/network_portal">http://baliga-lab/github.com/network_portal</a></li>
 				</ul>
-				<h4 class="medium orange awesome">Gaggle Workflow API</h4>
+				<h2>Gaggle Workflow API</h2>
 				<ul>
 					<li>Workflow API documentation is here:
 						<a href="http://baliga-lab/github.com/network_portal">http://baliga-lab/github.com/network_portal</a></li>

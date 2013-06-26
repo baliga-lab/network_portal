@@ -1,5 +1,6 @@
 {% load filters %}
-<h5> Regulators for Module {{ bicluster.k }}</h5>
+{% load staticfiles %}
+<a class="help" href="#help-regulator"><img align="right" src="/static/images/help.png" /></a><h5> Regulators for Module {{ bicluster.k }}</h5>
 <p>
  There are <b>{{ inf_count }}</b> regulatory influences for <b>Module {{ bicluster.k }}</b> 
 </p>
@@ -10,6 +11,7 @@ $(document).ready(function() {
     $("#bicluster-regulators-table")
     .tablesorter({widthFixed: true, widgets: ['zebra']})
     {#.tablesorterPager({container: $("#tablepager")})#};
+    $('.help').colorbox({inline: true, width: "50%"});
 });
 </script>
 
@@ -41,5 +43,13 @@ $(document).ready(function() {
 	</div>
 </div>
 {% endif %}
-
+<div style="display:none">
+	<div id='help-regulator' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Regulator Help</h5>
+		 <p>For each module, single or AND logic connected regulatory influences are listed under the regulators tab. These regulatory influences are identified by Inferelator. Table shows name of the regulator and its type.</p>
+		  <p><b>tf:</b> Transcription factor</p>
+		  <p><b>ef:</b> Environmental factor</p>
+		   <p><b> combiner:</b> Combinatorial influence of a tf or an ef through logic gate. Table is sortable by clicking on the arrows next to column headers.</p> 
+    </div>
+ </div>
 </div>
