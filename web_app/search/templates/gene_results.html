@@ -2,13 +2,14 @@
 <script type="text/javascript" src="/static/javascripts/jquery.tablesorter.pager.js"></script>
 <script>
     $(document).ready(function() {
-                      $("#results")
+                      $("#gene-search-results")
                       .tablesorter({widthFixed: true, widgets: ['zebra']})
                       {#.tablesorterPager({container: $("#tablepager")})#};
                       });
     </script>
 <div id="results">
-  <table>
+    <h3> Genes matching to your query</h3>
+  <table id="gene-search-results">
       <tr>
 	      <th>Species</th>
 	      <th>Gene</th>
