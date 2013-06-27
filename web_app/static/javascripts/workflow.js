@@ -221,7 +221,8 @@ function SetDataPass(event)
                 //alert(FG_currentDataToOpen.length);
                 for (var i = 0; i < FG_currentDataToOpen.length; i++)
                 {
-                    var url = FG_currentDataToOpen[i].toString().toLowerCase();
+                    var datalink = FG_currentDataToOpen[i];
+                    var url = $(datalink).prop("href").toString().toLowerCase();
                     //alert(url);
                     if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0)
                     {
@@ -607,6 +608,13 @@ function componentDropEvent(ev, component) {
             $(($(cloned).children())[3]).removeClass("workflowcomponentchildinput componentquestion").addClass("workflowcomponentquestion");
 
             $(($(cloned).children())[componentsubactioninputindex]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
+
+            var argumentsinput = $(cloned).children()[9];
+            if (goosename == "Generic") {
+               $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+            }
+            else
+               $(argumentsinput).removeClass("workflowcomponentchildinput").addClass("componentchildinput");
 
             var serviceuriinput = ($(cloned).children())[2];
             if (window.localStorage != null)
@@ -1509,6 +1517,9 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         if (node != null) {
             var argumentsinput = $(sourcelement).children()[9];
             $(argumentsinput).val(node.arguments);
+            if (goosename == "Generic") {
+                $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
+            }
             var subactioninput = $(sourcelement).children()[componentsubactioninputindex];
             $(subactioninput).val(node.subaction);
             var datauriinput = $(sourcelement).children()[componentdatauriindex];
@@ -2154,10 +2165,13 @@ function InsertDataToTarget(linkpair)
         option1.value = "1";
         option1.innerHTML = "Open";
         $(select).append($(option1));
-        var option2 = document.createElement("option");
-        option2.value = "2";
-        option2.innerHTML = "QuickView";
-        $(select).append($(option2));
+
+        // TODO: add quick view back later
+        //var option2 = document.createElement("option");
+        //option2.value = "2";
+        //option2.innerHTML = "QuickView";
+        //$(select).append($(option2));
+
         var option3 = document.createElement("option");
         option3.value = "3";
         option3.innerHTML = "Download";
@@ -2194,7 +2208,8 @@ function DataOperationSelected(event)
         {
             // Open the data in a goose
             //alert("Open data...");
-            var dataname = GetSelectedRowData(source);
+            var url = GetSelectedRowData(source);
+            var dataname = url.innerHTML;
             //alert(dataname);
             OpenDataGroup(WF_batchedData, dataname);
         }
@@ -2205,6 +2220,8 @@ function DataOperationSelected(event)
         else if (selectedvalue == "3")
         {
             // Download
+            var url = GetSelectedRowData(source);
+            window.open($(url).prop("href"),'Download');
         }
     }
 }
@@ -2232,7 +2249,7 @@ function GetSelectedRowData(source)
             WF_batchedData.push(link);
         }
     }
-    return dataname;
+    return url;
 }
 
 function SelectAllData(tableid, ctrlid)
@@ -2997,6 +3014,102 @@ function OpenOneGroup(event)
   }
 }
 
+function OpenGoose(goosenameli, group, groupname)
+{
+      //alert(goosenameli);
+      if (goosenameli != null) {
+          var goosenamelabel = $(goosenameli).children()[1];
+          //alert(goosenamelabel);
+          var goosename = $(goosenamelabel).text();
+          //alert(goosename);
+          var inputcomponentid = $(goosenameli).children()[2];
+          //alert($(inputcomponentid).val());
+          var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
+          // Append the selected goose to the canvas
+          var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
+          var sourceelement = nodeobj.Element;
+          //alert(sourceelement);
+
+          // Set the subaction of the appended goose if necessary
+          //alert("getting subaction value");
+          var subaction = $("#inputContextSubaction").val();
+          if (subaction != null && subaction.length > 0)
+          {
+              var subactionselect = $(sourceelement).children()[componentsubactioninputindex];
+              //alert(subactionselect);
+              $(subactionselect).val(subaction);
+          }
+
+          //alert($(sourceelement).attr("id"));
+          // Process the batched data
+          // Add data to the data uri field according to namelist or URL options
+          var datauri = "";
+          var prefix = ($("#inputNameValue").prop('checked')) ? "Namelist:" : "URL:";
+          datauri = prefix;
+          for (var i = 0; i < group.length; i++)
+          {
+              var datalink = group[i];
+              var data = $(datalink).prop("href");
+              if ($("#inputNameValue").prop('checked'))
+                  data = $(datalink).text();
+              datauri += (data + ";");
+          }
+
+          //alert(datauri);
+          var datauriinput = $(sourceelement).children()[componentdatauriindex];
+          //alert(datauriinput)
+          $(datauriinput).val(datauri);
+
+          // Now we form the workflow of this new component and submit the workflow to Boss
+          var nodelist = [];
+          nodelist.push(nodeobj.Element);
+
+          var info = "Submitting " + groupname + " to " + goosename;
+          //alert(info);
+          SubmitWorkflow(nodelist, info);
+      }
+}
+
+
+function FindGooseControlByName(goosename)
+{
+    //alert("Find " + goosename);
+    var index = 0;
+    var gooseindex = -1;
+    var found = false;
+    $("#ulctxcomponents").children().each(function() {
+       var goosenamelabel = $(this).children()[1];
+       //alert(goosenamelabel);
+       var gname = $(goosenamelabel).text();
+       if (gname == goosename) {
+         //alert(index);
+         var checkbox = $(this).children()[0];
+         $(checkbox).prop("checked", true);
+         gooseindex = index;
+         return;
+       }
+       index++;
+    });
+    return gooseindex
+}
+
+function ProcessGooseOpen(goosename, group, groupname)
+{
+    var gooseliindex = FindGooseControlByName(goosename);
+    //alert(goosename + " " + gooseliindex);
+    if (gooseliindex >= 0)
+    {
+        var gooseli = $("#ulctxcomponents").children()[gooseliindex];
+        var checkbox = $(gooseli).children()[0];
+        SetDataPass(checkbox);
+        //alert(gooseli);
+        OpenGoose(gooseli, group);
+        $('#divDataspaceComponentMenu').dialog('close');
+        return true;
+    }
+    return false;
+}
+
 function OpenDataGroup(group, groupname)
 {
     //alert("Opening data..." + group.length);
@@ -3004,72 +3117,44 @@ function OpenDataGroup(group, groupname)
     {
           //ClearWorkflowCanvas();
           FG_currentDataToOpen = group;
-          $("#ulctxcomponents").children().each(function() {
-             var checkbox = $(this).children()[0];
-             if ($(checkbox).prop('checked'))
+
+          if (group.length == 1)
+          {
+             var url = group[0];
+             var data = $(url).prop("href");
+             //alert(data);
+             if (data.indexOf(".cys") >= 0 || data.indexOf(".sif") >= 0)
              {
-                SetDataPass(checkbox);
+                //alert("Searching for Cytoscape...");
+                if (ProcessGooseOpen("Cytoscape", group, groupname))
+                   return;
              }
+             else if (data.indexOf(".tsv") >= 0 || data.indexOf("anl") >= 0) {
+                if (ProcessGooseOpen("MeV", group, groupname))
+                   return;
+             }
+          }
+
+          //alert("Checking checkbox");
+          $("#ulctxcomponents").children().each(function() {
+               var checkbox = $(this).children()[0];
+               if ($(checkbox).prop('checked'))
+               {
+                  SetDataPass(checkbox);
+               }
           });
 
+          //alert("open dialog");
           $('#divDataspaceComponentMenu').dialog( { height:450, width:500,
             buttons: {
                 "Open": function() {
                     // Get all the selected data
                     $("#ulctxcomponents").children().each(function() {
                            var checkbox = $(this).children()[0];
-
                            if ($(checkbox).prop('checked'))
                            {
-                              var goosenameli = $(checkbox).parent();
-                              var goosenamelabel = $(goosenameli).children()[1];
-                              //alert(goosenamelabel);
-                              var goosename = $(goosenamelabel).text();
-                              //alert(goosename);
-                              var inputcomponentid = $(this).children()[2];
-                              //alert($(inputcomponentid).val());
-                              var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
-                              // Append the selected goose to the canvas
-                              var nodeobj = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
-                              var sourceelement = nodeobj.Element;
-
-                              // Set the subaction of the appended goose if necessary
-                              //alert("getting subaction value");
-                              var subaction = $("#inputContextSubaction").val();
-                              if (subaction != null && subaction.length > 0)
-                              {
-                                  var subactionselect = $(sourceelement).children()[componentsubactioninputindex];
-                                  //alert(subactionselect);
-                                  $(subactionselect).val(subaction);
-                              }
-
-                              //alert($(sourceelement).attr("id"));
-                              // Process the batched data
-                              // Add data to the data uri field according to namelist or URL options
-                              var datauri = "";
-                              var prefix = ($("#inputNameValue").prop('checked')) ? "Namelist:" : "URL:";
-                              datauri = prefix;
-                              for (var i = 0; i < group.length; i++)
-                              {
-                                  var datalink = group[i];
-                                  var data = $(datalink).prop("href");
-                                  if ($("#inputNameValue").prop('checked'))
-                                      data = $(datalink).text();
-                                  datauri += (data + ";");
-                              }
-
-                              //alert(datauri);
-                              var datauriinput = $(sourceelement).children()[componentdatauriindex];
-                              //alert(datauriinput)
-                              $(datauriinput).val(datauri);
-
-                              // Now we form the workflow of this new component and submit the workflow to Boss
-                              var nodelist = [];
-                              nodelist.push(nodeobj.Element);
-
-                              var info = "Submitting " + groupname + " to " + goosename;
-                              //alert(info);
-                              SubmitWorkflow(nodelist, info);
+                               var goosenameli = $(checkbox).parent();
+                               OpenGoose(goosenameli, group);
                            }
                            $('#divDataspaceComponentMenu').dialog('close');
                     });

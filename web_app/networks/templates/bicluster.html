@@ -8,6 +8,7 @@
 	<link href="{{ STATIC_PREFIX }}/javascripts/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
 	<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/portal-style.css">
+	<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 {% endblock %}
 {% block jsspecial %}
   <script src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
@@ -16,6 +17,7 @@
   <script src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
   <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
   <script src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+  <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 
   {% if img_url %}
   {% else %}
@@ -44,6 +46,8 @@
         annot.draw('annotation-graph1', {
           width: 500, height: 550, annotations: annotations1
         });
+        $('.help').colorbox({inline: true, width: "50%"});
+        $(".figure1").colorbox({rel:'figure1'});
     });
   </script>
   {% endif %}
@@ -54,7 +58,7 @@
   </script>
 {% endblock %}
 {% block content %}
-<h5><span class="search_help"> Organism : {{ bicluster.network.species|species_link }} | Network : {% for network in species.network_set.all %}
+<h5><span class="search_help"> Organism : {{ bicluster.network.species|species_link }} | Module List: {% for network in species.network_set.all %}
     				<a href="{{network|network_url}}" title="Explore Network"><img align="center" src="{{ STATIC_PREFIX }}images/network.gif"/></a></a>
   					{% endfor %} </span></h5>
 <div id="bicluster-top">
@@ -68,13 +72,13 @@
 		<li><a class="function" href="#tab-function">Functions</a></li>
 		<li><a class="genes" href="#tab-gene">Genes</a></li>
 		{# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
-		<li><a class="help" href="#tab-help">Help</a></li>
+		<li><a class="module-help" href="#tab-help">Help</a></li>
 		<li><a class="social" href="#tab-social">Social</a></li>
       </ul>
 	  
       <div id="tab-main">
 	  <div class="main">
-	      
+	  <a class="help" href="#module-info"><img align="right" src="/static/images/help.png" /></a>  
 			<h5>Module {{ bicluster.k }} Profile </h5><br>
 	
 			{% if img_url %}
@@ -164,7 +168,9 @@
       </div>
       -->
       <div id="tab-social" class="sub-page">
+      <a class="help" href="#help-social"><img align="right" src="/static/images/help.png" /></a>
 	  <h5> Comments for Module {{ bicluster.k }}</h5><br>
+	  Please add your comments for this module by using the form below. Your comments will be publicly available.</p>
 		<div id="disqus_thread" class="main"></div> <!-- Commenting from Disqus-->
 			<script type="text/javascript">
 			/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -180,10 +186,86 @@
 		<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 		<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
     <!-- Commenting from Disqus-->
+    <div style="display:none">
+		<div id='help-social' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Social Help</h5>
+		<p>You can start a conversation about this module or join the existing discussion by adding your comments. In order to be able to add your comments you need to sign in by using any of the following services;Disqus, Google, Facebook or Twitter. For full compatibility with other network portal features, we recommend using your Google ID.</p>   
+    	</div>
+ 	</div>
+
+    
       </div>
 	  
       <div id="tab-help" class="sub-page">
-		<h5> Help </h5>
+		<h5 id="tab-help"> Help </h5>
+		<div id="module-info" style='padding:10px; background:#fff; text-align:left;'>
+			<h2> What is a module?</h2>
+			<p>Regulatory units (modules) in the Network Portal are based on the network inference algorithm used. For the current version, modules are based on <a target="blank" href="http://baliga.systemsbiology.net/drupal/content/new-cmonkey-r-package-and-code">cMonkey</a> modules and <a target = "blank" href="http://baliga.systemsbiology.net/drupal/content/inferelator">Inferelator</a> regulatory influences on these modules. More specifically, module refers to set of genes that are conditionally co-regulated under subset of the conditions. Identification of modules integrates co-expression, de-novo motif identification, and other functional associations such as operon information and protein-protein interactions.</p>
+			<h2>Module Overview</h2>
+			<a class="figure1" href="/static/images/module-figure.png" title="An Example summary view of the module"><img height=20% width=20% align="left" src="/static/images/module-figure.png"></a>
+			<p> The landing module page shows quick summary info including co-expression profiles, de-novo identified motifs, and transcription factors and/or environmental factors as regulatory influences. It also includes module residual, motif e-values, conditions and links to other resources such as NCBI and Microbesonline. 
+		  . If a transcription factor is included in the manually curated <a target="blank" href="http://regprecise.lbl.gov/RegPrecise/">RegPrecise</a> database, further information from RegPrecise is shown, allowing users to perform comparative analysis.</p>
+		  	<h2> Expression Profiles</h2>
+		  	<p>Expression profiles is a plot of the expression ratios (log10) of the module's genes, over all subset of the conditions included in the module.
+		  	The X-axis represent conditions and the Y-axis represents log10 expression ratios. Each gene is plotted as line plot with different colors. 
+		  	Colored legend for the lines are presented under the plot. This plot is dynamic. Clicking on the gene names in the legend will show/hide the plot for that particular gene. A tooltip will show expression ratio information if you mouseover the lines in the plot.</p>
+		  	<h2> Motif Locations</h2>
+		  	<p>Location of the Identified motifs for the module in the upstream regions of the member genes are shown under the expression profiles plot. This plot shows the diagram of the upstream positions of the motifs, colored red and green for motifs #1, and 2, respectively. Intensity of the color is proportional to the significance of the occurence of that motif at a given location.	Motifs on the forward and reverse strand are represented over and under the line respectively.</p>	
+		  	</div>
+		<div id="network-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2>Network</h2>
+		 	<p>A network view of the module is created using cytoscapeWeb and enables dynamic, interactive exploration of the module properties. In this view, module member genes, motifs, and regulatory influences are represented as peripheral nodes connected to core module node via edges. Module members are green circles, regulators are red triangles and motifs are blue diamonds. Selection of a node gives access to detailed information in a pop-up window, which allows dragging and pinning to compare multiple selections. Selecting module members will show information about the selected gene such as name, species and fucntions. Motif selection will show motif logo image and e-values. Bicluster selction will show expression profile and summary statistics for the module.</p>
+		 	<img alt="Gene" src="{{ STATIC_PREFIX }}images/network_gene.png" style="background:none;border:0px;position:relative; bottom:-10px;">Module member <img alt="Regulator" src="{{ STATIC_PREFIX }}images/network_regulator.png" style="background:none;border:0px;position:relative; bottom:-10px;">Regulator  <img alt="Motif" src="{{ STATIC_PREFIX }}images/network_motif.png" style="background:none;border:0px;position:relative; bottom:-10px;">Motif
+		</div>
+		<div id="regulator-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2 id="regulators"> Regulators</h2>
+		 	<p>For each module, single or AND logic connected regulatory influences are listed under the regulators tab. These regulatory influences are identified by Inferelator. Table shows name of the regulator and its type. <b>tf:</b> Transcription factor, <b>ef:</b> Environmental factor and <b> combiner:</b>Combinatorial influence of a tf or an ef through logic gate. Tabel is sortable by clicking on the arrows next to column headers.</p>
+		</div>
+		<div id="motif-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2>Motifs</h2>
+    		<p>Transcription factor binding motifs help to elucidate regulatory mechanism. cMonkey integrates powerful de novo motif detection to identify conditionally co-regulated sets of genes. De novo predicted motifs for each module are listed in the module page as motif logo images along with associated prediction statistics (e-values). The main module page also shows the location of these motifs within the upstream sequences of the module member genes.</p>
+    		<p> Motifs of interest can be broadcasted to <a target="blank" href="http://regpredict.lbl.gov/regpredict/">RegPredict</a> (currently only available for Desulfovibrio vulgaris Hildenborough) in order to compare conservation in similar species. This integrated motif prediction and comparative analysis provides an additional checkpoint for regulatory motif prediction confidence.</p>
+    	</div>
+    	<div id="functions-info" style='padding:10px; background:#fff; text-align:left;'>
+    		<h2>Functions</h2>
+    		<p>Biological networks contain sets of regulatory units called functional modules that together play a role in regulation of specific functional processes. Connections between different modules in the network can help identify regulatory relationships such as hierarchy and epistasis. In addition, associating functions with modules enables putative assignment of functions to hypothetical genes.  It is therefore essential to identify functional enrichment of modules within the regulatory network.</p>
+    		<p> Functional annotations from single sources are often either not available or not complete. Therefore, we integrated KEGG pathway, Gene Ontology, TIGRFam and COG information as references for functional enrichment analysis.</p>
+    		<p> We use hypergeometric p-values to identify significant overlaps between co-regulated module members and genes assigned to a particular functional annotation category. P-values are corrected for multiple comparisons by using Benjamini-Hochberg correction and filtered for p-values ≤ 0.05.</p>
+    		<p>Network Portal presents functional ontologies from KEGG, GO, TIGRFAM, and COG as separate tables that include function name, type, corrected and uncorrected hypergeometric p-values, and the number of genes assigned to this category out of total number of genes in the module.</p>
+    	</div>
+    	<div id="gene-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2>Genes</h2>
+    		<p> Gene member table shows all the genes included in the module. Listed attributes are;
+    		<ol>
+    			<li> Name: Gene name or Locus tag</li>
+    			<li> Common Name: Gene short name</li>
+    			<li> Type: Type of the feature, usually CDS.</li>
+    			<li> Gene ID: Link to NCBI Gene ID</li>
+    			<li> Chromosome: Chromosome name from annotation file</li>
+    			<li> Start/End:Feature start and end coordinates</li>
+    			<li> Strand: strand of the gene</li>
+    			<li> Description: Description of the gene from annotation file</li>
+    			<li> TF: If the gene is a Transcription Factor or not.</li>
+    		</ol>
+    		<p>If you are browsing the Network Portal by using Gaggle/Firegoose, firegoose plugin will capture the NameList of the gene members. Captured names can be saved into your Workspace by clicking on <b> "Capture"</b> in the firegoose toolbar or can be directly sent other desktop and web resources by using <b>"Broadcast"</b> option.
+        	</div>
+
+    	<div id="social-info" style='padding:10px; background:#fff; text-align:left;'>
+    		<h2>Social</h2>
+			<p>You can start a conversation about this module or join the existing discussion by adding your comments. In order to be able to add your comments you need to sign in by using any of the following services;Disqus, Google, Facebook or Twitter. For full compatibility with other network portal features, we recommend using your Google ID.</p>  
+		 </div>
+		 <div id="definitions-info" style='padding:10px; background:#fff; text-align:left;'>
+		 	<h2> Definitions</h2>
+		 	<p><b>Residual:</b> is a measure of bicluster quality. Mean bicluster residual is smaller when the expression profile of the genes in the module
+    	is "tighter". So smaller residuals are usually indicative of better bicluster quality.</p>
+    		<p><b>Expression Profile:</b> is a preview of the expression profiles of all the genes under subset of conditions included in the module.
+    	Tighter expression profiles are usually indicative of better bicluster quality.</p>
+    		<p><b> Motif e-value:</b> cMonkey tries to identify two motifs per modules in the upstream sequences of the module member genes.
+    	Motif e-value is an indicative of the motif co-occurences between the members of the module.Smaller e-values are indicative of significant sequence motifs. Our experience showed that e-values smaller than 10 are generally indicative of significant motifs.</p>
+    		<p><b> Genes:</b> Number of genes included in the module.</p>
+    		<p><b> Functions:</b> We identify functional enrichment of each module by camparing to different functional categories such as KEGG, COG, GO etc. by using hypergeometric function. If the module is significantly enriched for any of the functions, this column will list few of the these functions as an overview. 
+    	Full list of functions is available upon visiting the module page under the Functions tab.</p>
+      	</div>
       </div>
 	  
     </div><!-- #top-tabs -->

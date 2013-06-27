@@ -195,7 +195,7 @@ def workflow(request):
 
     # captureddata = WorkflowCapturedData.objects.filter(owner_id = user.id)
 
-    organisms = Organisms.objects.all()
+    organisms = Organisms.objects.all().order_by('name')
 
     organismdatatypes = OrganismDataTypes.objects.all().order_by('id')
 

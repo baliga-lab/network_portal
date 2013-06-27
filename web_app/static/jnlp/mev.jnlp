@@ -68,6 +68,7 @@
 
 	<jar href="lib/MeV/JSciPartial.jar"/>
 
+	<jar href="lib/MeV/magetab-parser.jar" />
 	
 
 	<jar href="lib/MeV/mev-algorithm-impl.jar"/>
@@ -105,11 +106,8 @@
   <application-desc main-class="org.tigr.microarray.mev.TMEV">
 
 	<argument>-gaggle</argument>
-
 	<argument>-fileType</argument>
 	<argument>tsv</argument>
-	<argument>-fileUrl</argument>
-	<argument>NONE</argument>
   </application-desc>
 
 </jnlp>

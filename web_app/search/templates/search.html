@@ -3,9 +3,13 @@
 {% load filters %}
 {% load search_tags %}
 {% block title %}Network Portal - Search{% endblock %}
-{% block cssspecial %}<link rel="stylesheet" href="{% static "stylesheets/redmond/jquery-ui-1.8.16.custom.css" %}">{% endblock %}
+{% block cssspecial %}
+<link rel="stylesheet" href="{% static "stylesheets/redmond/jquery-ui-1.8.16.custom.css" %}">
+<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+{% endblock %}
 {% block jsspecial %}
 <script src="{% static "javascripts/search_helpers.js" %}"></script>
+<script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 {% endblock %}
 {% block content %}
 <script type="text/javascript">
@@ -39,16 +43,18 @@ $(document).ready(function() {
     {% endfor %}
 
     searchhelpers.bindResultTableEvents(geneMap);
+    $('.help').colorbox({inline: true, width: "50%"});
 });
 </script>
 <div class="sub-page">
-  <h5>Search</h5><span><a href="/advsearch">Advanced search</a>
+  <a class="help" href="#help"><img align="right" src="/static/images/help.png" /></a><h5>Search</h5>
   <span class="search_help">(Start typing keywords, press ESC to close suggestions)</span>
   <form action="/search" method="get">
     <ul id="search">
       <input type="text" id="query" name="q" value="{{ q }}"></input>
       <input type="submit" value="Search" class="medium blue awesome"></input>
       <input type="reset" value="Reset" class="medium yellow awesome"></input>
+      <a href="/advsearch"><input type="text" value="Advanced Search" class="medium red awesome"></input></a>
     </ul>
   </form>
   <p><b>Example 1: </b><span class="example-search">DVU0848 DVU0694 DVU0693 DVU0778 DVU0846</span>
@@ -113,5 +119,23 @@ $(document).ready(function() {
    </p>
   {% endif %} <!-- for results -->
   {% endif %} <!-- if q -->
+  <div style="display:none">
+	<div id='help' style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Search Help</h5>
+    <p>Enter you search terms in the box and click "Submit". All the fields in the database will be searched to match the query. 
+    You query could be gene names or functions. You can switch to "Advanced Search" anytime to build more specific queries.
+    <p> Results will be presented as table of search results containing the columns "Genes", "Description", "Regulated by", "Regulates" and "In modules".</p>
+    <p>
+    <b>Genes:</b> Link to genes matching to query</br>
+    <b>Description:</b> Description of the gene</br>
+    <b>Regulated by:</b> List of Transcription factors or environmental factors identified by Inferelator to influence this gene.</br>
+    <b>Regulates:</b> If the matching gene is a transcription factor, modules that are regulated by this transcription factor will be listed.</br>
+    <b>In Modules:</b> Modules that contain this gene will be listed</br>
+    </p>
+    <p> There is a checkbox next to each row. Selecting a particular gene or genes will enable the link under the table to access the cytoscape web
+     network of all the modules that includes these genes.
+	</div>
+  </div>
+  
 </div><!-- End #main -->
 {% endblock %}

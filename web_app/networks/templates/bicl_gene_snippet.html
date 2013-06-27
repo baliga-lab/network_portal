@@ -1,4 +1,5 @@
 {% load filters %}
+<a class="help" href="#help-genes"><img align="right" src="/static/images/help.png" /></a>
 <h5> Members for Module {{ bicluster.k }} </h5>
 <p>
   {% if filter == 'tf' %}
@@ -57,4 +58,23 @@ $(document).ready(function() {
   </tbody>
 </table>
 <br />
+<div style="display:none">
+	<div id='help-genes' class="help" style='padding:10px; background:#fff; text-align:left;'>
+	<h2>Genes Help</h2>
+	    		<p> Gene member table shows all the genes included in the module. Listed attributes are;
+	    		<ol>
+	    			<li> Name: Gene name or Locus tag</li>
+	    			<li> Common Name: Gene short name</li>
+	    			<li> Type: Type of the feature, usually CDS.</li>
+	    			<li> Gene ID: Link to NCBI Gene ID</li>
+	    			<li> Chromosome: Chromosome name from annotation file</li>
+	    			<li> Start/End:Feature start and end coordinates</li>
+	    			<li> Strand: strand of the gene</li>
+	    			<li> Description: Description of the gene from annotation file</li>
+	    			<li> TF: If the gene is a Transcription Factor or not.</li>
+	    		</ol>
+	    		<p>If you are browsing the Network Portal by using Gaggle/Firegoose, firegoose plugin will capture the NameList of the gene members. Captured names can be saved into your Workspace by clicking on <b> "Capture"</b> in the firegoose toolbar or can be directly sent other desktop and web resources by using <b>"Broadcast"</b> option.
+	</div>
+</div>
+
 </div>

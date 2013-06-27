@@ -1,4 +1,5 @@
 <div class="main">
+<a class="help" href="#help-network"><img align="right" src="/static/images/help.png" /></a>
 <img alt="Gene" src="{{ STATIC_PREFIX }}images/network_gene.png" style="background:none;border:0px;position:relative; bottom:-10px;">Module member <img alt="Regulator" src="{{ STATIC_PREFIX }}images/network_regulator.png" style="background:none;border:0px;position:relative; bottom:-10px;">Regulator  <img alt="Motif" src="{{ STATIC_PREFIX }}images/network_motif.png" style="background:none;border:0px;position:relative; bottom:-10px;">Motif
 
 <script type="text/javascript">
@@ -15,4 +16,14 @@ nwhelpers.initCanvas(django_pssm);
 </script>
 <div id="cytoscapeweb">Cytoscape Web</div>
 <div id="pop_up"></div>
+<div style="display:none">
+	<div id='help-network' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Network Help</h5>
+		 <p>A network view of the module is created using <a target="blanl" href="http://cytoscapeweb.cytoscape.org/">cytoscapeWeb</a> and enables dynamic, interactive exploration of the module properties. In this view, module member genes, motifs, and regulatory influences are represented as peripheral nodes connected to core module node via edges. </p>
+		 <p>Module members are green circles, regulators are red triangles and motifs are blue diamonds. Selection of a node gives access to detailed information in a pop-up window, which allows dragging and pinning to compare multiple selections. Selecting module members will show information about the selected gene such as name, species and fucntions. Motif selection will show motif logo image and e-values. Bicluster selction will show expression profile and summary statistics for the module.</p>
+		 <img alt="Gene" src="{{ STATIC_PREFIX }}images/network_gene.png" style="background:none;border:0px;position:relative; bottom:-10px;">Module member <img alt="Regulator" src="{{ STATIC_PREFIX }}images/network_regulator.png" style="background:none;border:0px;position:relative; bottom:-10px;">Regulator  <img alt="Motif" src="{{ STATIC_PREFIX }}images/network_motif.png" style="background:none;border:0px;position:relative; bottom:-10px;">Motif
+		 
+	</div>
+ </div>
+
 </div>

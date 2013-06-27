@@ -45,15 +45,15 @@
                 {% endif %}
                 {% endfor %}
             </select>
-            <table id="tblNetworkPortalFiles"><caption style="font-size: 10pt;"> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete UnSelected</a></caption>
+            <table id="tblNetworkPortalFiles"><caption style="font-size: 10pt;"> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete Unselected</a></caption>
                 <tbody>
                 <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <p>
-            <table id="tblUserFiles"><caption style="font-size: 10pt;"> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open</a> | <a href="javascript:SaveCollectedData();">Save</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete UnSelected</a></caption>
+            <table id="tblUserFiles"><caption style="font-size: 10pt;"> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open</a> | <a href="javascript:SaveCollectedData();">Save</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete Unselected</a></caption>
                 <tbody>
-                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
+                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desciption</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
@@ -115,7 +115,7 @@
                     <div>
                         <div class="componentheader"><h3>Modules</h3></div>
                         <a class="componenthelp" href="#inlinecomponenthelp">
-                            <img src="/static/images/question.gif" />
+                            <img src="/static/images/help.png" />
                         </a>
                     </div>
                 </th>
@@ -133,7 +133,7 @@
                     <div>
                         <div class="componentheader"><h3>Workflows</h3></div>
                         <a class="componenthelp" href="#workflowshelp">
-                            <img src="/static/images/question.gif" />
+                            <img src="/static/images/help.png" />
                         </a>
                     </div>
                 </th>
@@ -175,7 +175,7 @@
                             <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
                             <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
                             <a class="componentquestion" href="#inlinewfpath">
-                                <img src="/static/images/question.gif" />
+                                <img src="/static/images/help.png" />
                             </a>
                             <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
                   title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
@@ -189,7 +189,9 @@
                             <input type="hidden" value="{{component.Component.name}}" />
                             <input type="hidden" value="{{component.Component.short_name}}" />
                             <input type="hidden" value="" />
-                            <input type="hidden" value="{{component.Component.arguments}}" />
+                            <input class="componentchildinput" type="text" value="{{component.Component.arguments}}"
+                                   placeholder="Enter the arguments to be passed to the component"
+                                   title="Enter the arguments to be passed to the component"/>
                             <input type="hidden" value="" />
 
                         </div>

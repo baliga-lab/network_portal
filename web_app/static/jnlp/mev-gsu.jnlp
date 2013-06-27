@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<jnlp
+ codebase="http://networks.systemsbiology.net/static" href="jnlp/mev.jnlp">
+  
+  <information>
+
+    <title>MeV</title>
+
+    <vendor>http://www.tm4.org/</vendor>
+
+    <homepage href="http://www.tm4.org/mev.html"/>
+
+    <offline-allowed/>
+
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+    </information>
+
+  <security>
+
+      <all-permissions/>
+
+  </security>
+
+  <resources>
+
+        <j2se version="1.5+" max-heap-size="1024M"/>
+
+	<jar href="lib/MeV/args4j-2.0.9.jar"/>
+
+	<jar href="lib/MeV/base64.jar"/>
+
+	<jar href="lib/MeV/colt.jar"/>
+
+	<jar href="lib/MeV/comcgh.jar"/>
+
+	<jar href="lib/MeV/educgh.jar"/>
+
+	<jar href="lib/MeV/ftpbean.jar"/>
+
+	<jar href="lib/MeV/boss.jar" />
+	<jar href="lib/MeV/gaggle-connector.jar" />
+	<jar href="lib/MeV/HTTPClient.jar"/>
+
+	<jar href="lib/MeV/images.jar"/>
+
+	<jar href="lib/MeV/j3dcore.jar"/>
+
+	<jar href="lib/MeV/j3dutils.jar"/>
+
+	<jar href="lib/MeV/jai_codec.jar"/>
+
+	<jar href="lib/MeV/jai_core.jar"/>
+
+	<jar href="lib/MeV/jama.jar"/>
+
+	<jar href="lib/MeV/jbcl.jar"/>
+
+	<jar href="lib/MeV/jcommon-1.0.16.jar"/>
+
+	<jar href="lib/MeV/jfreechart-1.0.13.jar"/>
+
+	<jar href="lib/MeV/JRI.jar"/>
+
+	<jar href="lib/MeV/jsch-0.1.39.jar"/>
+
+	<jar href="lib/MeV/JSciCore.jar"/>
+
+	<jar href="lib/MeV/JSciPartial.jar"/>
+
+	<jar href="lib/MeV/magetab-parser.jar" />
+	
+
+	<jar href="lib/MeV/mev-algorithm-impl.jar"/>
+
+	<jar href="lib/MeV/mev-algorithm-support.jar"/>
+
+	<jar href="lib/MeV/mev-base.jar"/>
+
+	<jar href="lib/MeV/mev-gui-impl.jar"/>
+
+	<jar href="lib/MeV/mev-gui-support.jar"/>
+
+	<jar href="lib/MeV/mev-util.jar"/>
+
+	<jar href="lib/MeV/normalization.jar"/>
+
+	<jar href="lib/MeV/piccolo.jar"/>
+
+	<jar href="lib/MeV/piccolox.jar"/>
+
+	<jar href="lib/MeV/servlet.jar"/>
+
+	<jar href="lib/MeV/Text_JDBC30.jar"/>
+
+	<jar href="lib/MeV/vecmath.jar"/>
+
+	<jar href="lib/MeV/weka.jar"/>
+
+	<jar href="lib/MeV/xerces.jar"/>
+
+	<jar href="lib/MeV/xml-apis.jar"/>
+ 
+ </resources>
+
+  <application-desc main-class="org.tigr.microarray.mev.TMEV">
+
+	<argument>-gaggle</argument>
+	<argument>-fileType</argument>
+	<argument>tsv</argument>
+    <argument>http://networks.systemsbiology.net/static/data-files/expression/gsu-ratios.tsv</argument>
+  </application-desc>
+
+</jnlp>
+
+
