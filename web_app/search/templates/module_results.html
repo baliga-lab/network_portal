@@ -7,12 +7,12 @@
     <div style="margin-left: 1em; color: red">{{key}} = {{value}}</div>
   {% endfor %}
 <div></div>
-  <h3>Found modules</h3>
+  <h3>Modules matching to your query</h3>
 <div></div>
 {% for species, modules in mresults.items %}
 </div>
-<b>Organism:</b> {{species_names|lookup:species}}
-<table>
+<h5><b>Organism:</b> {{species_names|lookup:species}}</h5>
+<table id="module-search-results">
   <tr><th>k</th><th>residual</th><th>Motif 1 e-value</th><th>Motif 2 e-value</th></tr>
   {% for k, module in modules.items %}
   <tr>

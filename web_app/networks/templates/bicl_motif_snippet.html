@@ -1,3 +1,4 @@
+<a class="help" href="#help-motif"><img align="right" src="/static/images/help.png" /></a>
 <h5> Motif information <span class="search_help">(de novo identified motifs for modules)</span>
 </h5>
 <div class="tabs">
@@ -44,5 +45,15 @@ There are {{ motifs|length }} motifs predicted. {% if species.short_name == 'dvu
 
 </div>
 {% endif %}
+<div style="display:none">
+	<div id='help-motif' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    <h5>Motif Help</h5>
+    	<p>Transcription factor binding motifs help to elucidate regulatory mechanism. cMonkey integrates powerful de novo motif detection to identify conditionally co-regulated sets of genes. De novo predicted motifs for each module are listed in the module page as motif logo images along with associated prediction statistics (e-values). The main module page also shows the location of these motifs within the upstream sequences of the module member genes.</p>
+    	<p> Motifs of interest can be broadcasted to RegPredict (currently only available for Desulfovibrio vulgaris Hildenborough) in order to compare conservation in similar species. This integrated motif prediction and comparative analysis provides an additional checkpoint for regulatory motif prediction confidence.</p>
+		 <p><b> Motif e-value:</b> cMonkey tries to identify two motifs per modules in the upstream sequences of the module member genes.
+    	Motif e-value is an indicative of the motif co-occurences between the members of the module.Smaller e-values are indicative of significant sequence motifs. Our experience showed that e-values smaller than 10 are generally indicative of significant motifs.</p>
+	</div>
+ </div>
+ 
 </div>
 </div>
