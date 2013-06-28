@@ -1,4 +1,6 @@
-{% load static %}{% get_static_prefix as STATIC_PREFIX %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+{% load format_tags %}
   <script>
     $(document).ready(function() {
       $("#tabs").tabs();
@@ -62,11 +64,11 @@
       {% for s in kegg_functions %}
       <tr>
         <td><a href="/function/{{ s.function.id }}">{{ s.function.name }}</a></td>
-        <td>{{ s.function.namespace }}</td>
-        <td>{{ s.p }}</td>
-        <td>{{ s.p_bh }}</td>
-        <td>{{ s.gene_count }}/{{ gene_count }}</td>
-        <td>{{ s.method }}</td>
+        <td>{{s.function.namespace }}</td>
+        <td>{{s.p|format_scientific}}</td>
+        <td>{{s.p_bh|format_scientific}}</td>
+        <td>{{s.gene_count}}/{{gene_count}}</td>
+        <td>{{s.method}}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -93,11 +95,11 @@
       {% for s in go_functions %}
       <tr>
         <td><a href="/function/{{ s.function.id }}">{{ s.function.name }}</a></td>
-        <td>{{ s.function.namespace }}</td>
-        <td>{{ s.p }}</td>
-        <td>{{ s.p_bh }}</td>
-        <td>{{ s.gene_count }}/{{ gene_count }}</td>
-        <td>{{ s.method }}</td>
+        <td>{{s.function.namespace}}</td>
+        <td>{{s.p|format_scientific}}</td>
+        <td>{{s.p_bh|format_scientific}}</td>
+        <td>{{s.gene_count}}/{{gene_count}}</td>
+        <td>{{s.method}}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -124,11 +126,11 @@
       {% for s in tigr_functions %}
       <tr>
         <td><a href="/function/{{ s.function.id }}">{{ s.function.name }}</a></td>
-        <td>{{ s.function.namespace }}</td>
-        <td>{{ s.p }}</td>
-        <td>{{ s.p_bh }}</td>
-        <td>{{ s.gene_count }}/{{ gene_count }}</td>
-        <td>{{ s.method }}</td>
+        <td>{{s.function.namespace}}</td>
+        <td>{{s.p|format_scientific}}</td>
+        <td>{{s.p_bh|format_scientific}}</td>
+        <td>{{s.gene_count}}/{{gene_count}}</td>
+        <td>{{s.method}}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -154,11 +156,11 @@
       {% for s in cog_functions %}
       <tr>
         <td><a href="/function/{{s.function.id}}">{{ s.function.name }}</a></td>
-        <td>{{ s.function.namespace }}</td>
-        <td>{{ s.p }}</td>
-        <td>{{ s.p_bh }}</td>
-        <td>{{ s.gene_count }}/{{ gene_count }}</td>
-        <td>{{ s.method }}</td>
+        <td>{{s.function.namespace }}</td>
+        <td>{{s.p|format_scientific}}</td>
+        <td>{{s.p_bh|format_scientific}}</td>
+        <td>{{s.gene_count}}/{{gene_count}}</td>
+        <td>{{s.method}}</td>
       </tr>
       {% endfor %}
     </tbody>

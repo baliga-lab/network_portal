@@ -1,3 +1,4 @@
+{% load format_tags %}
 <a class="help" href="#help-motif"><img align="right" src="/static/images/help.png" /></a>
 <h5> Motif information <span class="search_help">(de novo identified motifs for modules)</span>
 </h5>
@@ -22,7 +23,7 @@ There are {{ motifs|length }} motifs predicted. {% if species.short_name == 'dvu
     {% for m in motifs %}
   <tr>
     <td>{{m.id}}</td>
-    <td>{{m.e_value}}</td>
+    <td>{{m.e_value|format_scientific}}</td>
     <td>{{m.consensus}}</td>
     <td>
       <div id="canvas_{{m.id}}"><img alt="Loader icon" src="{{STATIC_PREFIX}}images/ajax-loader.gif"></img></div>

@@ -1,6 +1,7 @@
 {% extends "base2.html" %}
 {% block title %}Network Portal - Module {{ bicluster.k }}{% endblock %}
 {% load filters %}
+{% load format_tags %}
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 {% block cssspecial %}
@@ -105,9 +106,9 @@
 					<th>Conditions</th>
 				</tr>
 				<tr>
-				<td>{{ bicluster.residual }}</td>
-				<td>{{ gene_count }}</td>
-				<td>{{ conditions.count }}</td>
+				<td>{{bicluster.residual|format_decimal}}</td>
+				<td>{{gene_count}}</td>
+				<td>{{conditions.count}}</td>
 				</tr>
 			</table>
 			<table>
@@ -117,8 +118,8 @@
 				</tr>
 				<tr>
 					{% if motifs  %}
-					<td>{{motifs.0.e_value}}</td>
-					<td>{{motifs.1.e_value}}</td>
+					<td>{{motifs.0.e_value|format_scientific}}</td>
+					<td>{{motifs.1.e_value|format_scientific}}</td>
 					{% else %}
 					<td>NA</td>
 					<td>NA</td>
