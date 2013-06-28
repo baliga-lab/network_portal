@@ -244,12 +244,12 @@
       <div id="tab-help" class="sub-page">
 	{% include 'gene_help_snippet.html' %}
       </div>
-      <div id="tab-social" class="sub-page">
+      <div id="tab-social" class="main">
       <a class="help" href="#social"><img align="right" src="/static/images/help.png" /></a>
       <h5>Comments for {{ gene.name }} </h5>
       Please add your comments for this gene by using the form below. Your comments will be publicly available.</br>
-      <p>
-      <div id="disqus_thread" class="main"></div> <!-- Commenting from Disqus-->
+      <p></br>
+      <div id="disqus_thread" class="sub-page"></div> <!-- Commenting from Disqus-->
     <script type="text/javascript">
         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
         var disqus_shortname = 'thenetworkportal'; // required: replace example with your forum shortname
@@ -271,6 +271,8 @@
    <div style="display:none">
 	<div id='gene-info' class="help" style='padding:10px; background:#fff; text-align:left;'>
     <h5>Gene Help</h5>
+    <h2>Watch the screencast</h2></br>
+    <iframe width="560" height="315" src="//www.youtube.com/embed/JO-9-vcnGiQ?rel=0" frameborder="0" allowfullscreen></iframe>
     <h2>Overview</h2>
     <p>Gene landing pages present genomic, functional, and regulatory information for individual genes. A circular visualization displays connections between the selected gene and genes in the same modules, with as edges drawn between the respective coordinates of the whole genome.</p>
     <p> The gene page also lists functional ontology assignments, module membership, and motifs associated with these modules. Genes in the network inherit regulatory influences from the modules to which they belong. Therefore, the regulatory information for each gene is a collection of all regulatory influences on these modules. These are listed as a table that includes influence name, type, and target module. If the gene is a transcription factor, its target modules are also displayed in a table that provides residual values and number of genes.</p>	
