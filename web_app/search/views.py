@@ -69,7 +69,7 @@ def search_modules(request):
     def make_attr_cond(key):
         attr = key.split('_')[0]
         value = request.GET.get(key, '').strip()
-        print "attr: %s, value: %s" % (attr, value)
+        #print "attr: %s, value: %s" % (attr, value)
         if value:
             if attr == 'gene':
                 return "+module_gene_name:%s" % value
@@ -89,7 +89,7 @@ def search_modules(request):
     filter_pairs = [(key.split('_')[0], value)
                     for key, value in request.GET.items()
                     if value]
-    print "pairs: ", filter_pairs
+    #print "pairs: ", filter_pairs
 
     conds = " ".join(args).strip()
     q = "*:*" if not conds else conds
@@ -122,7 +122,7 @@ def search_genes(request):
     species_cond = _make_species_cond(request)
     attr = request.GET['attribute']
     term = request.GET.get('term')
-    print "ATTRIBUTE: %s, TERM = %s" % (attr, term)
+    #print "ATTRIBUTE: %s, TERM = %s" % (attr, term)
     conds = [species_cond]
     if term:
         if attr == 'locustag':
@@ -139,7 +139,7 @@ def search_genes(request):
     gene_docs = solr_search(settings.SOLR_SELECT_GENES, q)
     for doc in gene_docs:
         gene_id = doc['id']
-        print "gene id: ", gene_id
+        #print "gene id: ", gene_id
         gresults.append(SearchGene(gene_id,
                                    doc['species_short_name'],
                                    doc['species_name'],

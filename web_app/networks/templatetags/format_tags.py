@@ -4,12 +4,18 @@ register = template.Library()
 
 @register.filter
 def format_decimal(d):
-    return "%0.2f" % d
+    try:
+        return "%0.2f" % float(d)
+    except:
+        return "-"
 
 
 @register.filter
 def format_scientific(d):
-    return "%.2e" % d
+    try:
+        return "%.2e" % float(d)
+    except:
+        return "-"
 
 @register.filter
 def format_influence(influence):

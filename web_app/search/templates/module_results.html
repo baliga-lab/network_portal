@@ -1,4 +1,5 @@
 {% load filters %}
+{% load format_tags %}
 {% load search_tags %}
 <div id="results">
 <div class="filter-display">
@@ -17,9 +18,9 @@
   {% for k, module in modules.items %}
   <tr>
     <td>{{species|searchmodule_link:k}}</td>
-    <td>{{module.residual}}</td>
-    <td>{{ module.motif1_evalue }}</td>
-    <td>{{ module.motif2_evalue }}</td>
+    <td>{{module.residual|format_decimal}}</td>
+    <td>{{module.motif1_evalue|format_scientific}}</td>
+    <td>{{module.motif2_evalue|format_scientific}}</td>
   </tr>
   {% endfor %}
 </table>
