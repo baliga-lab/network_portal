@@ -408,18 +408,6 @@
 
         <input id="inputDataSignal" type="hidden" value="0" />
 
-        <div>
-            <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
-            </applet>
-
-            <!-- <input type="text" id="htmlLoader" />
-          <input type="button" value="Load" onclick="LoadHTML()" />
-          <input type="button" value="Filter" onclick="FilterHTML()" />
-          <div id="divHTMLResult"></div> -->
-
-        </div>
-
-
     </div>
 
     <div id="tab-states">
@@ -502,6 +490,17 @@
 
 </div>
 
+
+<div>
+    <applet id="GaggleProxy" archive="{{ STATIC_PREFIX }}lib/GaggleProxy.jar, {{ STATIC_PREFIX }}lib/gaggle-connector.jar, {{ STATIC_PREFIX }}lib/boss.jar" code="org.systemsbiology.gaggle.geese.proxygoose.GaggleProxyApplet.class" width="0" height="0">
+    </applet>
+
+    <!-- <input type="text" id="htmlLoader" />
+  <input type="button" value="Load" onclick="LoadHTML()" />
+  <input type="button" value="Filter" onclick="FilterHTML()" />
+  <div id="divHTMLResult"></div> -->
+
+</div>
 
 </div>
 
