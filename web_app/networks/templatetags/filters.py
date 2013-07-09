@@ -114,19 +114,6 @@ def lookup(dict, key):
         return dict[key]
     return ''
 
-
-@register.filter
-def format_influence(influence):
-    if influence.type == 'tf':
-        result = '<a class="reggene" href="/%s/gene/%s">%s</a>' % (influence.gene.species.short_name, influence.name, influence.name)
-    elif influence.type == 'combiner':
-        result = "<br>".join([format_influence(part)
-                              for part in influence.parts.all()])
-    else:
-        result = influence.name
-    return mark_safe(result)
-
-
 @register.filter
 def influences_to_gene_description_map(influence_biclusters):
     gene_description_map = {}
@@ -150,13 +137,13 @@ def influences_to_gene_description_map(influence_biclusters):
 @register.filter
 def motif1consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
-    return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[0].consensus(), motifs[0].e_value)) if len(motifs) > 0 else ""
+    return mark_safe("<b>%s</b><br>evalue: %.2e" % (motifs[0].consensus(), motifs[0].e_value)) if len(motifs) > 0 else ""
 
 
 @register.filter
 def motif2consensus(bicluster):
     motifs = [m for m in bicluster.motif_set.all()]
-    return mark_safe("<b>%s</b><br>evalue: %f" % (motifs[1].consensus(), motifs[1].e_value)) if len(motifs) > 1 else ""
+    return mark_safe("<b>%s</b><br>evalue: %.2e" % (motifs[1].consensus(), motifs[1].e_value)) if len(motifs) > 1 else ""
 
 
 MAX_BFNAMES = 5

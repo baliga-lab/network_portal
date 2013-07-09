@@ -1,4 +1,5 @@
 {% load filters %}
+{% load format_tags %}
 <a class="help" href="#regulation"><img align="right" src="/static/images/help.png" /></a>
 <h5> Regulation information for {{ gene }} </h5> <span class="search_help">(Mouseover regulator name to see its description)</span> 
 <p>
@@ -60,7 +61,7 @@
     {% for bicluster in regulated_biclusters %}
     <tr>
       <td><a href="/bicluster/{{bicluster.id}}">{{bicluster.id}}</a></td>
-      <td>{{bicluster.residual}}</td>
+      <td>{{bicluster.residual|format_decimal}}</td>
       <td>{{bicluster.genes.count}}</td>
     </tr>
     {% endfor %}

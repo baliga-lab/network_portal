@@ -17,7 +17,9 @@ class SearchModule:
 
 
 class SearchGene:
-    def __init__(self, species, species_name, name, common_name, description):
+    def __init__(self, id, species, species_name, name, common_name,
+                 description):
+        self.id = id
         self.species = species
         self.species_name = species_name
         self.name = name
@@ -29,13 +31,10 @@ class SearchGene:
 
 
 class GeneResultEntry:
-    def __init__(self,
-                 species,
-                 gene_name,
-                 gene_description,
-                 biclusters,
-                 regulated_biclusters,
+    def __init__(self, id, species, gene_name, gene_description,
+                 biclusters, regulated_biclusters,
                  num_influences):
+        self.id = id
         self.species = species
         self.name = gene_name
         self.description = gene_description
@@ -70,7 +69,7 @@ def search_modules(request):
     def make_attr_cond(key):
         attr = key.split('_')[0]
         value = request.GET.get(key, '').strip()
-        print "attr: %s, value: %s" % (attr, value)
+        #print "attr: %s, value: %s" % (attr, value)
         if value:
             if attr == 'gene':
                 return "+module_gene_name:%s" % value
@@ -90,7 +89,7 @@ def search_modules(request):
     filter_pairs = [(key.split('_')[0], value)
                     for key, value in request.GET.items()
                     if value]
-    print "pairs: ", filter_pairs
+    #print "pairs: ", filter_pairs
 
     conds = " ".join(args).strip()
     q = "*:*" if not conds else conds
@@ -123,7 +122,7 @@ def search_genes(request):
     species_cond = _make_species_cond(request)
     attr = request.GET['attribute']
     term = request.GET.get('term')
-    print "ATTRIBUTE: %s, TERM = %s" % (attr, term)
+    #print "ATTRIBUTE: %s, TERM = %s" % (attr, term)
     conds = [species_cond]
     if term:
         if attr == 'locustag':
@@ -140,7 +139,9 @@ def search_genes(request):
     gene_docs = solr_search(settings.SOLR_SELECT_GENES, q)
     for doc in gene_docs:
         gene_id = doc['id']
-        gresults.append(SearchGene(doc['species_short_name'],
+        #print "gene id: ", gene_id
+        gresults.append(SearchGene(gene_id,
+                                   doc['species_short_name'],
                                    doc['species_name'],
                                    doc.get('gene_name'),
                                    doc.get('gene_common_name'),
@@ -169,7 +170,7 @@ def search(request):
                     species_genes[species_short_name] = []
 
                 genes = species_genes[species_short_name]
-                genes.append(GeneResultEntry(
+                genes.append(GeneResultEntry(doc['id'],
                         species_short_name,
                         doc['gene_name'],
                         doc.get('gene_description'),

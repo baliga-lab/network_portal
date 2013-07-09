@@ -73,7 +73,7 @@ $(document).ready(function() {
    <span class="search_help">(Click on numbers to see results for specific organism)</span>
    <font color=#FF4040> {{species_genes|search_result_map:species_names}}</font> You searched for <font color=#FF4040>"{{q}}"</font>.
    {% for species, genes in species_genes.items %}
-  <a name="species_{{species_id}}"></a>
+  <a name="species_{{species}}"></a>
 
   <table id="search-results-table" class="tablesorter">
     <caption> Search results for '{{species_names|lookup:species}}' ({{genes|length}})</caption>

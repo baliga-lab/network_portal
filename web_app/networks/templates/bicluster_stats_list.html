@@ -1,5 +1,6 @@
 <div class="sub-page">
 {% load filters %}
+{% load format_tags %}
 <div id="modulelist">
   <table>
     <thead>
@@ -15,7 +16,7 @@
     {% for bicl in biclusters %}
     <tr>
       <td>{{bicl|bicluster_link}}</td>
-      <td>{{bicl.residual}}</td>
+      <td>{{bicl.residual|format_decimal}}</td>
       <td><div id="chart-{{bicl.id}}"></div></td>
       <td>{{bicl|motif1consensus}}</td>
       <td>{{bicl|motif2consensus}}</td>
