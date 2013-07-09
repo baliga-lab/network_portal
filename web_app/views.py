@@ -409,7 +409,8 @@ def saveworkflow(request):
                                          datauri = nodelist[key]['datauri'],
                                          component_id = nodelist[key]['componentid'],
                                          isstartnode = isStartnode,
-                                         workflow_id = wfid)
+                                         workflow_id = wfid,
+                                         workflowindex = nodelist[key]['workflowindex'])
                     node.save()
                     nodeobjs[nodelist[key]['id']] = node
                     print "Node saved with id: " + str(node.id)
@@ -502,7 +503,7 @@ def generateworkflowobj(workflow_id):
             node_dict = {}
             print node.serviceuri
             component = WorkflowComponents.objects.filter(id = node.component_id)[0]
-            node_dict = {'id': node.id, 'name': component.short_name, 'serviceuri': node.serviceuri, 'arguments': node.arguments, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id}
+            node_dict = {'id': node.id, 'name': component.short_name, 'serviceuri': node.serviceuri, 'arguments': node.arguments, 'subaction': node.subaction, 'datauri': node.datauri, 'componentid': node.component_id, 'workflowindex': node.workflowindex}
             if (node.isstartnode):
                 startnode = node.id
             nodes_obj[node.id] = node_dict
