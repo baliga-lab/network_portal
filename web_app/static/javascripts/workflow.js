@@ -1709,7 +1709,17 @@ function DisplayWorkflow(flowdata, workflowid) {
         for (var key in nodes_obj)
         {
             //alert(key);
-            SearchAndCreateNode(nodes_obj, key, WF_nodecnt, componentarray, startnodeid);
+            var node = nodes_obj[key];
+            if (node != null)
+            {
+                //alert(node['workflowindex']);
+                // if workflowindex is defined for the workflow node, we use it, otherwise, we juse WF_nodecnt
+                var nodecnt = (node['workflowindex'] == "-1" || node['workflowindex'] == null || node['workflowindex'].length == 0)?
+                    WF_nodecnt : parseInt(node['workflowindex']);
+                WF_nodecnt = nodecnt;
+                //alert(nodecnt);
+                SearchAndCreateNode(nodes_obj, key, WF_nodecnt, componentarray, startnodeid);
+            }
         }
 
         var j = 0;
@@ -2432,6 +2442,8 @@ function UploadDataFiles()
                     var formdata = new FormData();
                     var userid = $("#authenticated").val();
                     var datatype = $('input[name="dataType"]:checked').val();
+                    if (datatype == null || datatype.length == 0)
+                        datatype = "Generic";
                     var description = $("#uploadFileDescription").val();
                     //alert(WF_currOrganism);
                     DoUploadFiles(fileinput.files, userid, WF_currOrganism, datatype, description, true);
