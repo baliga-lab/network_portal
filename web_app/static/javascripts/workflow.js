@@ -1521,7 +1521,15 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
                 $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
             }
             var subactioninput = $(sourcelement).children()[componentsubactioninputindex];
-            $(subactioninput).val(node.subaction);
+            // The Generic goose's subaction is concatenation of execution path and goose name, we need to handle it correctly
+            //alert(node.subaction);
+            if (node.subaction != null)
+            {
+                var splittedsubaction = node.subaction.split(";;");
+                var subactionvalue = splittedsubaction[0];
+                //alert(subactionvalue);
+                $(subactioninput).val(subactionvalue);
+            }
             var datauriinput = $(sourcelement).children()[componentdatauriindex];
             $(datauriinput).val(node.datauri);
         }
