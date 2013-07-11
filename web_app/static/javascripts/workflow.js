@@ -3123,7 +3123,7 @@ function ProcessGooseOpen(goosename, group, groupname)
         var checkbox = $(gooseli).children()[0];
         SetDataPass(checkbox);
         //alert(gooseli);
-        OpenGoose(gooseli, group);
+        OpenGoose(gooseli, group, groupname);
         $('#divDataspaceComponentMenu').dialog('close');
         return true;
     }
@@ -3174,7 +3174,7 @@ function OpenDataGroup(group, groupname)
                            if ($(checkbox).prop('checked'))
                            {
                                var goosenameli = $(checkbox).parent();
-                               OpenGoose(goosenameli, group);
+                               OpenGoose(goosenameli, group, groupname);
                            }
                            $('#divDataspaceComponentMenu').dialog('close');
                     });
