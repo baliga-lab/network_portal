@@ -224,7 +224,7 @@ function SetDataPass(event)
                     var datalink = FG_currentDataToOpen[i];
                     var url = $(datalink).prop("href").toString().toLowerCase();
                     //alert(url);
-                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0)
+                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0 || url.indexOf(".xml") >= 0)
                     {
                         // If there is a txt file, we should NOT pass names
                         //alert("Set check to false");
