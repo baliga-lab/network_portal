@@ -26,6 +26,7 @@ var WF_nodecnt = 0;
 var WF_groupcnt = -1;
 var WF_captureddataid = -1;
 var WF_currOrganism = "Generic";
+var WF_currOrganismFullName = "Generic";
 var FG_currentDataToOpen = null;
 var WF_capturedDataType = "Generic";
 var WF_filesToUpload = null;
@@ -262,14 +263,29 @@ function ContextSubactionSelected(event)
     }
 }
 
+function getOrganismFullName()
+{
+    WF_currOrganismFullName = $("#organismSelect option[value=" + WF_currOrganism + "]").text();
+    // WF_currOrganismFullName looks like {{organism.description}} | {{organism.name}}
+    var splitfullname = WF_currOrganismFullName.split("|");
+    if (splitfullname != null)
+    {
+        //alert(splitfullname[0]);
+        WF_currOrganismFullName = splitfullname[0].substring(0, splitfullname[0].length);
+        //alert(WF_currOrganismFullName);
+    }
+    else
+        WF_currOrganismFullName = "";
+}
+
 // Load data space data
 function LoadDataSpace()
 {
     var queryobj = {};
     WF_currOrganism = $("#organismSelect").val();
-
     if (WF_currOrganism == null || WF_currOrganism.length ==0)
         WF_currOrganism = "Generic";
+    getOrganismFullName();
 
     //alert(WF_currOrganism);
     queryobj['organism'] = WF_currOrganism;
@@ -975,6 +991,7 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
     jsonObj.desc = description;
     jsonObj.userid = userid.toString();
     jsonObj.startNode = WF_startNode;
+    jsonObj.organism = WF_currOrganism + ";" + WF_currOrganismFullName;
     //jsonObj.edgelist = WF_edges;
 
     //alert(jsonObj["name"]);
@@ -1014,6 +1031,7 @@ function organismSelected(sel)
         if (organismvalue != null && organismvalue.length > 0)
         {
             WF_currOrganism = $("#organismSelect").val();
+            getOrganismFullName();
 
             var cytowebstarturl = "http://networks.systemsbiology.net/static/jnlp/cytoscape-" + organismvalue + ".jnlp";
             var mevwebstarturl = "http://networks.systemsbiology.net/static/jnlp/mev-" + organismvalue + ".jnlp";
