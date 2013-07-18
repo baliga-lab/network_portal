@@ -2454,11 +2454,21 @@ function DoUploadFiles(files, userid, organismtype, datatype, description, showR
 
 function UploadDataFiles()
 {
-    WF_currOrganism = $("#organismSelect").val();
-    $("#labelOrganism").html("Upload file for " + WF_currOrganism);
+    var userid = $("#authenticated").val();
+    //alert(userid);
+    if (userid == null || userid.length == 0 || userid == "0")
+    {
+        alert("Please login before uploading data.");
+        return;
+    }
+
+    var targetOrganism = $("#selectUploadDataOrganism").val();
+    if (targetOrganism == null || targetOrganism.length == 0)
+        targetOrganism = "Generic";
+    //$("#labelOrganism").html("Upload file for " + WF_currOrganism);
     $( "#dlgUploadData" ).dialog({
         resizable: false,
-        height:500,
+        height:450,
         width:450,
         modal: true,
         buttons: {
@@ -2466,13 +2476,13 @@ function UploadDataFiles()
                 var fileinput = document.getElementById('filesToUpload');
                 if (fileinput.files.length > 0) {
                     var formdata = new FormData();
-                    var userid = $("#authenticated").val();
+
                     var datatype = $('input[name="dataType"]:checked').val();
                     if (datatype == null || datatype.length == 0)
                         datatype = "Generic";
                     var description = $("#uploadFileDescription").val();
                     //alert(WF_currOrganism);
-                    DoUploadFiles(fileinput.files, userid, WF_currOrganism, datatype, description, true);
+                    DoUploadFiles(fileinput.files, userid, targetOrganism, datatype, description, true);
                 }
                 $( this ).dialog( "close" );
             },

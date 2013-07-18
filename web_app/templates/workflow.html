@@ -27,7 +27,7 @@
 <div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
 <ul>
     <li><a class="name" href="#tab-data">Dataspace -></a></li>
-    <li><a class="network" href="#tab-workflow">Workflows -></a></li>
+    <!--<li><a class="network" href="#tab-workflow">Workflows -></a></li> -->
     <li><a class="regulator" href="#tab-states">Saved States -></a></li>
     <li><a class="regulator" href="#tab-reports">Reports -> </a></li>
     <li><a class="motif" href="#tab-history">History</a></li>
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <div id="tab-workflow">
+    <div id="tab-workflow" style="display: none">
         <div class="sub-page">
         <h5> Gaggle Workflow</h5>
 
@@ -388,12 +388,22 @@
             <p>Description: <input type="text" /></p>
         </div>
 
-        <div id="dlgUploadData" style="display:none">
-            <p><label id="labelOrganism"></label></p>
-            <p><form method="post" enctype="multipart/form-data">
+        <div id="dlgUploadData" style="display:none" title="Upload Data">
+            <!--<p><label id="labelOrganism"></label></p> -->
+            <select id="selectUploadDataOrganism">
+            <option value = "" selected>Select an organism</option>
+            {% for organism in organisms %}
+            {% if organism.name != "Generic"  %}
+            <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+            {% endif %}
+            {% endfor %}
+            </select>
+            <br />
+            <form method="post" enctype="multipart/form-data">
             <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
             Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
-        </form></p>
+            </form>
+            <br />
             <p>
                 {% for datatype in organismdatatypes %}
                 <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
