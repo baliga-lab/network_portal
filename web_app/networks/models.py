@@ -633,6 +633,7 @@ class WorkflowNodes(models.Model):
     isstartnode = models.BooleanField(default=False)
     workflow = models.ForeignKey(Workflows)
     component = models.ForeignKey(WorkflowComponents)
+    workflowindex = models.IntegerField(default=0, null=True)
 
 class WorkflowEdgeDataTypes(models.Model):
     name = models.CharField(max_length=64)

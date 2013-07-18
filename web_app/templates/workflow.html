@@ -27,7 +27,7 @@
 <div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
 <ul>
     <li><a class="name" href="#tab-data">Dataspace -></a></li>
-    <li><a class="network" href="#tab-workflow">Workflows -></a></li>
+    <!--<li><a class="network" href="#tab-workflow">Workflows -></a></li> -->
     <li><a class="regulator" href="#tab-states">Saved States -></a></li>
     <li><a class="regulator" href="#tab-reports">Reports -> </a></li>
     <li><a class="motif" href="#tab-history">History</a></li>
@@ -56,11 +56,11 @@
                 <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desciption</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
-            <input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
+            <!--<input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
             <select id="selectDataAppliedHistory" class="selectDataAppliedHistory">
                 <option value="-1">Select a data application record to apply to the workflow</option>
                 <option value="-2">---------------------------------------</option>
-            </select>
+            </select> -->
         </div>
         <div id="sidebar" class="sidebar" style="width:25%"><h5> My Groups</h5>
             <div id="wfgrpaccordion" class="datagroupaccordion">
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <div id="tab-workflow">
+    <div id="tab-workflow" style="display: none">
         <div class="sub-page">
         <h5> Gaggle Workflow</h5>
 
@@ -121,7 +121,7 @@
                 </th>
                 <th style="width: 65%">
                     <!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
-                    <input type="button" value="Run" onclick="SubmitWorkflow(null)" class="button-run" title="Run selected workflow"/>
+                    <input type="button" value="Run" onclick="SubmitWorkflow(null, 'Submit workflow')" class="button-run" title="Run selected workflow"/>
                     <input type="button" value="Save" onclick="SaveClicked()" class="button" title="Save or edit current workflow"/>
                     <input type="button" value="Delete" onclick="DeleteClicked()" class="button" title="Delete current workflow"/>
                     <input type="button" value="Clear" onclick="InitializeWorkflow()" class="button" title="Clear workflow canvas"/>
@@ -388,12 +388,22 @@
             <p>Description: <input type="text" /></p>
         </div>
 
-        <div id="dlgUploadData" style="display:none">
-            <p><label id="labelOrganism"></label></p>
-            <p><form method="post" enctype="multipart/form-data">
+        <div id="dlgUploadData" style="display:none" title="Upload Data">
+            <!--<p><label id="labelOrganism"></label></p> -->
+            <select id="selectUploadDataOrganism">
+            <option value = "" selected>Select an organism</option>
+            {% for organism in organisms %}
+            {% if organism.name != "Generic"  %}
+            <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+            {% endif %}
+            {% endfor %}
+            </select>
+            <br />
+            <form method="post" enctype="multipart/form-data">
             <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
             Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
-        </form></p>
+            </form>
+            <br />
             <p>
                 {% for datatype in organismdatatypes %}
                 <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}

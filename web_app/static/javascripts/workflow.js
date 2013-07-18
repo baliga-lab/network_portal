@@ -26,6 +26,7 @@ var WF_nodecnt = 0;
 var WF_groupcnt = -1;
 var WF_captureddataid = -1;
 var WF_currOrganism = "Generic";
+var WF_currOrganismFullName = "Generic";
 var FG_currentDataToOpen = null;
 var WF_capturedDataType = "Generic";
 var WF_filesToUpload = null;
@@ -224,7 +225,7 @@ function SetDataPass(event)
                     var datalink = FG_currentDataToOpen[i];
                     var url = $(datalink).prop("href").toString().toLowerCase();
                     //alert(url);
-                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0)
+                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0 || url.indexOf(".xml") >= 0)
                     {
                         // If there is a txt file, we should NOT pass names
                         //alert("Set check to false");
@@ -262,14 +263,29 @@ function ContextSubactionSelected(event)
     }
 }
 
+function getOrganismFullName()
+{
+    WF_currOrganismFullName = $("#organismSelect option[value=" + WF_currOrganism + "]").text();
+    // WF_currOrganismFullName looks like {{organism.description}} | {{organism.name}}
+    var splitfullname = WF_currOrganismFullName.split("|");
+    if (splitfullname != null)
+    {
+        //alert(splitfullname[0]);
+        WF_currOrganismFullName = splitfullname[0].substring(0, splitfullname[0].length);
+        //alert(WF_currOrganismFullName);
+    }
+    else
+        WF_currOrganismFullName = "";
+}
+
 // Load data space data
 function LoadDataSpace()
 {
     var queryobj = {};
     WF_currOrganism = $("#organismSelect").val();
-
     if (WF_currOrganism == null || WF_currOrganism.length ==0)
         WF_currOrganism = "Generic";
+    getOrganismFullName();
 
     //alert(WF_currOrganism);
     queryobj['organism'] = WF_currOrganism;
@@ -975,6 +991,7 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
     jsonObj.desc = description;
     jsonObj.userid = userid.toString();
     jsonObj.startNode = WF_startNode;
+    jsonObj.organism = WF_currOrganism + ";" + WF_currOrganismFullName;
     //jsonObj.edgelist = WF_edges;
 
     //alert(jsonObj["name"]);
@@ -1014,6 +1031,7 @@ function organismSelected(sel)
         if (organismvalue != null && organismvalue.length > 0)
         {
             WF_currOrganism = $("#organismSelect").val();
+            getOrganismFullName();
 
             var cytowebstarturl = "http://networks.systemsbiology.net/static/jnlp/cytoscape-" + organismvalue + ".jnlp";
             var mevwebstarturl = "http://networks.systemsbiology.net/static/jnlp/mev-" + organismvalue + ".jnlp";
@@ -1521,7 +1539,15 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
                 $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
             }
             var subactioninput = $(sourcelement).children()[componentsubactioninputindex];
-            $(subactioninput).val(node.subaction);
+            // The Generic goose's subaction is concatenation of execution path and goose name, we need to handle it correctly
+            //alert(node.subaction);
+            if (node.subaction != null)
+            {
+                var splittedsubaction = node.subaction.split(";;");
+                var subactionvalue = splittedsubaction[0];
+                //alert(subactionvalue);
+                $(subactioninput).val(subactionvalue);
+            }
             var datauriinput = $(sourcelement).children()[componentdatauriindex];
             $(datauriinput).val(node.datauri);
         }
@@ -1709,7 +1735,17 @@ function DisplayWorkflow(flowdata, workflowid) {
         for (var key in nodes_obj)
         {
             //alert(key);
-            SearchAndCreateNode(nodes_obj, key, WF_nodecnt, componentarray, startnodeid);
+            var node = nodes_obj[key];
+            if (node != null)
+            {
+                //alert(node['workflowindex']);
+                // if workflowindex is defined for the workflow node, we use it, otherwise, we juse WF_nodecnt
+                var nodecnt = (node['workflowindex'] == "-1" || node['workflowindex'] == null || node['workflowindex'].length == 0)?
+                    WF_nodecnt : parseInt(node['workflowindex']);
+                WF_nodecnt = nodecnt;
+                //alert(nodecnt);
+                SearchAndCreateNode(nodes_obj, key, WF_nodecnt, componentarray, startnodeid);
+            }
         }
 
         var j = 0;
@@ -2418,11 +2454,21 @@ function DoUploadFiles(files, userid, organismtype, datatype, description, showR
 
 function UploadDataFiles()
 {
-    WF_currOrganism = $("#organismSelect").val();
-    $("#labelOrganism").html("Upload file for " + WF_currOrganism);
+    var userid = $("#authenticated").val();
+    //alert(userid);
+    if (userid == null || userid.length == 0 || userid == "0")
+    {
+        alert("Please login before uploading data.");
+        return;
+    }
+
+    var targetOrganism = $("#selectUploadDataOrganism").val();
+    if (targetOrganism == null || targetOrganism.length == 0)
+        targetOrganism = "Generic";
+    //$("#labelOrganism").html("Upload file for " + WF_currOrganism);
     $( "#dlgUploadData" ).dialog({
         resizable: false,
-        height:500,
+        height:450,
         width:450,
         modal: true,
         buttons: {
@@ -2430,11 +2476,13 @@ function UploadDataFiles()
                 var fileinput = document.getElementById('filesToUpload');
                 if (fileinput.files.length > 0) {
                     var formdata = new FormData();
-                    var userid = $("#authenticated").val();
+
                     var datatype = $('input[name="dataType"]:checked').val();
+                    if (datatype == null || datatype.length == 0)
+                        datatype = "Generic";
                     var description = $("#uploadFileDescription").val();
                     //alert(WF_currOrganism);
-                    DoUploadFiles(fileinput.files, userid, WF_currOrganism, datatype, description, true);
+                    DoUploadFiles(fileinput.files, userid, targetOrganism, datatype, description, true);
                 }
                 $( this ).dialog( "close" );
             },
@@ -3103,7 +3151,7 @@ function ProcessGooseOpen(goosename, group, groupname)
         var checkbox = $(gooseli).children()[0];
         SetDataPass(checkbox);
         //alert(gooseli);
-        OpenGoose(gooseli, group);
+        OpenGoose(gooseli, group, groupname);
         $('#divDataspaceComponentMenu').dialog('close');
         return true;
     }
@@ -3154,7 +3202,7 @@ function OpenDataGroup(group, groupname)
                            if ($(checkbox).prop('checked'))
                            {
                                var goosenameli = $(checkbox).parent();
-                               OpenGoose(goosenameli, group);
+                               OpenGoose(goosenameli, group, groupname);
                            }
                            $('#divDataspaceComponentMenu').dialog('close');
                     });
