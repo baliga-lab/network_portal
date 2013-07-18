@@ -316,7 +316,16 @@ function LoadDataSpace()
                 }); */
 
                 $("#tblNetworkPortalFiles").find("tr:gt(0)").remove();
-                $("#tblUserFiles").find("tr:gt(0)").remove();
+
+                // We should not remove the Gaggle Data captured by Firegoose
+                $(".dataspacelabel").each(function() {
+                    var userid = $(this).children()[4];
+                    //alert(userid);
+                    //alert($(userid).val());
+                    if ($(userid).val() != "*")
+                        $(this).parent().parent().remove();
+                });
+                //$("#tblUserFiles").find("tr:gt(0)").remove();
 
                 var finished = false;
                 do
