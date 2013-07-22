@@ -112,6 +112,7 @@ $(document).ready(function () {
 
     jsplumbInstance = jsPlumb.getInstance();
 
+    CheckLogin();
 
     setTimeout(function() { TimerFunc() }, 3000);
     GetEdgeDataTypes();
@@ -120,6 +121,16 @@ $(document).ready(function () {
     LoadDataSpace();
 });
 
+
+function CheckLogin()
+{
+    var userid = $("#authenticated").val();
+    //alert(userid);
+    if (userid == null || userid == "0" || userid.length == 0)
+        $("#lblLoginWarning").css("text-decoration", "blink");
+    else
+        $("#lblLoginWarning").hide();
+}
 
 function TimerFunc()
 {
@@ -138,7 +149,12 @@ function TimerFunc()
     // remove the class so the event handler won't get hooked again
     $(".firegooseInsertedSelect").removeClass("firegooseInsertedSelect")
 
+    CheckLogin();
+
     setTimeout(function() { TimerFunc() }, 3000);
+
+
+
     //UpdateGeeseInfo();
 }
 
