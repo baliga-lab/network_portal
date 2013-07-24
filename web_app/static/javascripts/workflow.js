@@ -112,6 +112,7 @@ $(document).ready(function () {
 
     jsplumbInstance = jsPlumb.getInstance();
 
+    CheckLogin();
 
     setTimeout(function() { TimerFunc() }, 3000);
     GetEdgeDataTypes();
@@ -120,6 +121,16 @@ $(document).ready(function () {
     LoadDataSpace();
 });
 
+
+function CheckLogin()
+{
+    var userid = $("#authenticated").val();
+    //alert(userid);
+    if (userid == null || userid == "0" || userid.length == 0)
+        $("#lblLoginWarning").css("text-decoration", "blink");
+    else
+        $("#lblLoginWarning").hide();
+}
 
 function TimerFunc()
 {
@@ -138,7 +149,12 @@ function TimerFunc()
     // remove the class so the event handler won't get hooked again
     $(".firegooseInsertedSelect").removeClass("firegooseInsertedSelect")
 
+    CheckLogin();
+
     setTimeout(function() { TimerFunc() }, 3000);
+
+
+
     //UpdateGeeseInfo();
 }
 
@@ -316,7 +332,16 @@ function LoadDataSpace()
                 }); */
 
                 $("#tblNetworkPortalFiles").find("tr:gt(0)").remove();
-                $("#tblUserFiles").find("tr:gt(0)").remove();
+
+                // We should not remove the Gaggle Data captured by Firegoose
+                $(".dataspacelabel").each(function() {
+                    var userid = $(this).children()[4];
+                    //alert(userid);
+                    //alert($(userid).val());
+                    if ($(userid).val() != "*")
+                        $(this).parent().parent().remove();
+                });
+                //$("#tblUserFiles").find("tr:gt(0)").remove();
 
                 var finished = false;
                 do
@@ -1862,54 +1887,56 @@ function CheckSessions()
     {
         $.get("/workflow/sessions/" + currWorkflowID + "/",
                     function (result) {
-                        //if (result['id'] != undefined && result['id'].length > 0)
-                        var ul = ($("#divReport").children())[0];
-                        $(ul).empty();
-                        for (var key in result)
-                        {
-                            var session = result[key];
-                            if (session != undefined)
+                        if (result.length > 0) {
+                            $("#tblReport tr").remove();
+                            var ul = ($("#divReport").children())[0];
+                            $(ul).empty();
+                            for (var key in result)
                             {
-                                var row = document.createElement("tr");
-                                row.setAttribute('id', ("lisession_" + session['id']));
-                                $("#tblReport").append($(row));
+                                var session = result[key];
+                                if (session != undefined)
+                                {
+                                    var row = document.createElement("tr");
+                                    row.setAttribute('id', ("lisession_" + session['id']));
+                                    $("#tblReport").append($(row));
 
-                                var td0 = document.createElement("td");
-                                $(row).append($(td0));
-                                var label = document.createElement("label");
-                                label.className = "reportlabel";
-                                $(td0).append($(label));
-                                var checkbox = document.createElement("input");
-                                checkbox.setAttribute("type", "checkbox");
-                                $(label).append($(checkbox));
-                                var link = document.createElement("a");
-                                link.href = "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")";
-                                link.innerHTML = session['date'];
-                                $(label).append($(link));
+                                    var td0 = document.createElement("td");
+                                    $(row).append($(td0));
+                                    var label = document.createElement("label");
+                                    label.className = "reportlabel";
+                                    $(td0).append($(label));
+                                    var checkbox = document.createElement("input");
+                                    checkbox.setAttribute("type", "checkbox");
+                                    $(label).append($(checkbox));
+                                    var link = document.createElement("a");
+                                    link.href = "javascript:GetWorkflowSessionReport(\"" + session['id'] + "\")";
+                                    link.innerHTML = session['date'];
+                                    $(label).append($(link));
 
-                                var inputid = document.createElement("input");
-                                inputid.setAttribute("type", "hidden");
-                                inputid.className = "reportinput";
-                                inputid.setAttribute("value", session['id']);
-                                $(label).append($(inputid));
+                                    var inputid = document.createElement("input");
+                                    inputid.setAttribute("type", "hidden");
+                                    inputid.className = "reportinput";
+                                    inputid.setAttribute("value", session['id']);
+                                    $(label).append($(inputid));
 
-                                var td1 = document.createElement("td");
-                                $(row).append($(td1));
+                                    var td1 = document.createElement("td");
+                                    $(row).append($(td1));
 
-                                var td2 = document.createElement("td");
-                                $(row).append($(td2));
-                                td2.innerHTML = session['date'];
+                                    var td2 = document.createElement("td");
+                                    $(row).append($(td2));
+                                    td2.innerHTML = session['date'];
 
-                                var td3 = document.createElement("td");
-                                $(row).append($(td3));
-                                var inputopen = document.createElement("input");
-                                inputopen.setAttribute("type", "button");
-                                inputopen.setAttribute("value", "open");
-                                inputopen.onclick = function() { GetWorkflowSessionReport(session['id']); };
-                                $(td3).append($(inputopen));
+                                    var td3 = document.createElement("td");
+                                    $(row).append($(td3));
+                                    var inputopen = document.createElement("input");
+                                    inputopen.setAttribute("type", "button");
+                                    inputopen.setAttribute("value", "open");
+                                    inputopen.onclick = function() { GetWorkflowSessionReport(session['id']); };
+                                    $(td3).append($(inputopen));
+                                }
                             }
+                            $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
                         }
-                        $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
                     }
                 );
     }
