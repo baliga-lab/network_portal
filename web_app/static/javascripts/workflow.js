@@ -2283,8 +2283,21 @@ function DataOperationSelected(event)
         else if (selectedvalue == "3")
         {
             // Download
+            //alert("download");
             var url = GetSelectedRowData(source);
-            window.open($(url).prop("href"),'Download');
+            //alert(url.href);
+            var urlstring = url.href;
+            if (url.href.indexOf("http:") < 0)
+            {
+                // this is a file url
+                //urlstring = "file:///" + urlstring;
+                //urlstring = urlstring.replace(":\\", "|/");
+                //urlstring = urlstring.replace(/\\/g, "/");
+
+                alert("The captured data is stored locally. Due to security, you cannot download a local file. Please open the file " + urlstring + " using a file browser");
+            }
+            //alert(urlstring);
+            window.open(urlstring); //,'Download');
         }
     }
 }
