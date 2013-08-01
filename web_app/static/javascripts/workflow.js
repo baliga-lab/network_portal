@@ -3441,10 +3441,16 @@ function OnSaveState(param)
         <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
         <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
     </div> */
-    var splitted = param.split(";;");
-    var name = splitted[1];
-    var desc = splitted[2];
-    var stateid = splitted[0];
+    var jsonobj = JSON.parse(param);
+    var stateObj = jsonobj["state"];
+    var name = stateObj["name"];
+    var desc = stateObj["desc"];
+    var stateid = stateObj["id"];
+
+    //var splitted = param.split(";;");
+    //var name = splitted[1];
+    //var desc = splitted[2];
+    //var stateid = splitted[0];
     //alert(name + " " + desc + " " + stateid);
 
     var targettable = "#tblSavedStates";
