@@ -1120,6 +1120,37 @@ def savestate(request):
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
 
 @csrf_exempt
+def updatestate(request):
+    try:
+        statedata = json.loads(request.raw_post_data)
+        print statedata
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'desc': 'Failed to load json' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    try:
+        #print captureddata['userid']
+        responsedata = {}
+        idx = 0
+        stateid = int(statedata['id'])
+        content = SavedStates.objects.filter(id = stateid)[0]
+        content.name = statedata['name']
+        content.description = statedata['description']
+        content.save()
+
+        print "State saved with id: " + str(content.id)
+        pair = {'id': str(stateid), 'name': content.name, 'description': content.description }
+        responsedata['data'] = pair
+
+    except Exception as e1:
+        print str(e1)
+
+    print json.dumps(responsedata)
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+
+@csrf_exempt
 def getuserdata(request, organismtype, datatype, userid, filename):
     print organismtype
     print datatype

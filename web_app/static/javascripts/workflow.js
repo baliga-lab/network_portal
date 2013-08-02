@@ -3617,6 +3617,93 @@ function LoadState(event)
     }
 }
 
+function EditState(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+       var row = $(source).parent().parent();
+       var td0 = $(row).children()[0];
+       var pname = $(td0).children()[0];
+       var stateidinput = $(td0).children()[1];
+       var stateid = $(stateidinput).val();
+       //alert(stateid);
+
+       var p1 = ($("#dlgSaveState").children())[0];
+       var nameinput = ($(p1).children())[0];
+       $(nameinput).val($(pname).html());
+
+       var td1 = $(row).children()[1];
+       var p2 = ($("#dlgSaveState").children())[1];
+       var descinput = ($(p2).children())[0];
+       $(descinput).val($(td1).html());
+
+       $('#dlgSaveState').dialog( { height:300,
+           buttons: {
+               "Save": function() {
+                   // Save state
+                   var userid = $("#authenticated").val();
+                   var name = $(nameinput).val();
+                   var desc = $(descinput).val();
+                   var dataobj = {};
+                   dataobj.id = stateid;
+                   dataobj.name = name;
+                   dataobj.description = desc;
+                   stateidinput.setAttribute("id", ("statedata-" + stateid.toString()));
+
+                   //alert(userid);
+                   $('#dlgSaveState').dialog('close');
+
+                   jQuery.ajax({
+                      url: "/workflow/updatestate",
+                      type: "POST",
+                      data: JSON.stringify(dataobj), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+                      contentType: "application/json; charset=UTF-8",
+                      dataType: "json",
+                      beforeSend: function (x) {
+                          if (x && x.overrideMimeType) {
+                              x.overrideMimeType("application/json;charset=UTF-8");
+                          }
+                      },
+                      success: function (result) {
+                          //Write your code here
+                          //alert(result['id']);
+                          //alert(($("#divWorkflow").children().length));
+                          //alert(result);
+                          if (result != null) {
+                              // Need to update the id of each saved data
+                              var pair = result["data"];
+                              if (pair != null)
+                              {
+                                 var originalindex = pair['id'];
+                                 var dataid = pair['id'];
+                                 var originalinputid = "#statedata-" + originalindex;
+                                 $(originalinputid).val(dataid);
+                                 var row = $(originalinputid).parent().parent();
+                                 //alert(row);
+                                 if (row != null)
+                                 {
+                                    var cell0 = $(row).children()[0];
+                                    $(cell0).html(pair['name']);
+                                    var cell1 = $(row).children()[1];
+                                    $(cell1).html(pair['description']);
+                                 }
+                              }
+                              alert("State saved");
+                          }
+                      }
+                   });
+               },
+               "Cancel": function() {
+                   $('#dlgSaveState').dialog('close');
+               }
+
+           }
+       });
+    }
+}
+
 function DeleteState(event)
 {
     var source = event.target || event.srcElement;
