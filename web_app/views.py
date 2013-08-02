@@ -827,31 +827,46 @@ def savecaptureddata(request):
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     try:
-        print captureddata['userid']
+        #print captureddata['userid']
         responsedata = {}
         idx = 0
         nodelist = captureddata['data']
         nodeobjs = {}
         for key in nodelist.keys():
             link = nodelist[key]
-            if int(link['nodeindex']) < 0:
-                organismtype = link['organism']
-                if (organismtype is None or len(organismtype) == 0):
-                    organismtype = 'Generic'
+            dataid = int(link['nodeindex'])
+            print 'data id: ' + str(dataid)
+            content = None
+            if dataid >= 0:
+                content = WorkflowCapturedData.objects.filter(id = dataid)[0]
 
-                organism = Organisms.objects.filter(name = organismtype)[0]
-                print 'organism id: ' + str(organism.id)
+            organismtype = link['organism']
+            if (organismtype is None or len(organismtype) == 0):
+                organismtype = 'Generic'
 
-                dtype =  link['datatype']
-                print 'data type: ' + dtype
-                datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+            organism = Organisms.objects.filter(name = organismtype)[0]
+            print 'organism id: ' + str(organism.id)
 
-                content = WorkflowCapturedData(owner_id = captureddata['userid'], type_id = datatypeobj.id, dataurl = link['url'], urltext = link['text'], organism_id = organism.id)
+            dtype =  link['datatype']
+            print 'data type: ' + dtype
+            datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+
+            desc = link['description']
+
+            if (content is None):
+                content = WorkflowCapturedData(owner_id = captureddata['userid'], type_id = datatypeobj.id, dataurl = link['url'], urltext = link['text'], organism_id = organism.id, description = desc)
                 content.save()
-                print "Data group content saved with id: " + str(content.id)
-                pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'organism': organism.name, 'datatype': datatypeobj.type }
-                responsedata[str(idx)] = pair
-                idx = idx + 1
+            else:
+                content.type_id = datatypeobj.id
+                content.dataurl = link['url']
+                content.urltext = link['text']
+                content.description = desc
+                content.save()
+
+            print "Data group content saved with id: " + str(content.id)
+            pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'organism': organism.name, 'datatype': datatypeobj.type, 'description': desc }
+            responsedata[str(idx)] = pair
+            idx = idx + 1
     except Exception as e1:
         print str(e1)
 

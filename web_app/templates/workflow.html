@@ -412,6 +412,27 @@
             </p>
         </div>
 
+        <div id="dlgEditData" style="display:none" title="Edit Data">
+            <p><label id="labelTargetData"></label></p>
+            <select id="selectEditDataOrganism">
+                <option value = "" selected>Select an organism</option>
+                {% for organism in organisms %}
+                {% if organism.name != "Generic"  %}
+                <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <br />
+            Description: <input id="inputEditDataDesc" type="text" />
+            <p>
+                {% for datatype in organismdatatypes %}
+                <input type="radio" id="radioEditDataType" name="editDataType" value="{{datatype.type}}">{{datatype.type}}
+                {% endfor %}
+            </p>
+        </div>
+
+
+
         <div id="dlgSaveState" style="display: none">
             <p>Name: <input type="text" /></p>
             <p>Description: <input type="text" /></p>

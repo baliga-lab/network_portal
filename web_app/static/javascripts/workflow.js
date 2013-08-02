@@ -2059,14 +2059,13 @@ function DeleteSessionReport()
     ); */
 }
 
-function SaveCollectedData()
+function SaveCollectedData(targetdata)
 {
     var collecteddata = {};
     var userid = $("#authenticated").val();
     WF_currOrganism = $("#organismSelect").val();
     collecteddata['userid'] = userid;
     var data = {};
-    var index = 0;
     var hasdatatosave = false;
     $(".dataspacelabel").each(function() {
            //alert("dataspace div: " + $(this).html());
@@ -2108,50 +2107,67 @@ function SaveCollectedData()
            collecteddata['data'] = data;
     });
 
+
     if (hasdatatosave) {
         //alert(JSON.stringify(collecteddata));
         if (index > 0) {
-            jQuery.ajax({
-               url: "/workflow/savecaptureddata",
-               type: "POST",
-               data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
-               contentType: "application/json; charset=UTF-8",
-               dataType: "json",
-               beforeSend: function (x) {
-                   if (x && x.overrideMimeType) {
-                       x.overrideMimeType("application/json;charset=UTF-8");
-                   }
-               },
-               success: function (result) {
-                   //Write your code here
-                   //alert(result['id']);
-                   //alert(($("#divWorkflow").children().length));
-                   //alert(result);
-                   if (result != null) {
-                       // Need to update the id of each saved data
-                       var index = 0;
-                       var finished = false;
-                       do
-                       {
-                           var pair = result[index.toString()];
-                           if (pair != null)
-                           {
-                              var originalindex = pair['nodeindex'];
-                              var dataid = pair['id'];
-                              var originalinputid = "#cdata-" + originalindex;
-                              $(originalinputid).val(dataid);
-                              index++;
-                           }
-                           else
-                              finished = true;
-                       }
-                       while (!finished);
-                       alert("Data saved");
-                   }
-               }
-            });
+            DoSaveData(collecteddata);
         }
     }
+}
+
+function DoSaveData(collecteddata)
+{
+    //alert("Save data " + JSON.stringify(collecteddata));
+
+    jQuery.ajax({
+       url: "/workflow/savecaptureddata",
+       type: "POST",
+       data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+       contentType: "application/json; charset=UTF-8",
+       dataType: "json",
+       beforeSend: function (x) {
+           if (x && x.overrideMimeType) {
+               x.overrideMimeType("application/json;charset=UTF-8");
+           }
+       },
+       success: function (result) {
+           //Write your code here
+           //alert(result['id']);
+           //alert(($("#divWorkflow").children().length));
+           //alert(result);
+           if (result != null) {
+               // Need to update the id of each saved data
+               var index = 0;
+               var finished = false;
+               do
+               {
+                   var pair = result[index.toString()];
+                   if (pair != null)
+                   {
+                      var originalindex = pair['nodeindex'];
+                      var dataid = pair['id'];
+                      var originalinputid = "#cdata-" + originalindex;
+                      $(originalinputid).val(dataid);
+                      var row = $(originalinputid).parent().parent().parent();
+                      //alert(row);
+                      if (row != null)
+                      {
+                         var cell1 = $(row).children()[1];
+                         $(cell1).html(pair['datatype']);
+                         var cell2 = $(row).children()[2];
+                         $(cell2).html(pair['description']);
+                      }
+                      index++;
+                   }
+                   else
+                      finished = true;
+               }
+               while (!finished);
+               alert("Data saved");
+           }
+       }
+    });
 }
 
 // Insert data to target element
@@ -2240,10 +2256,12 @@ function InsertDataToTarget(linkpair)
         option3.innerHTML = "Download";
         $(select).append($(option3));
 
-        //var option4 = document.createElement("option");
-        //option3.value = "4";
-        //option3.innerHTML = "Edit";
-        //$(select).append($(option4));
+        if (targettable != "#tblNetworkPortalFiles") {
+            var option4 = document.createElement("option");
+            option4.value = "4";
+            option4.innerHTML = "Edit";
+            $(select).append($(option4));
+        }
     }
 }
 
@@ -2307,6 +2325,71 @@ function DataOperationSelected(event)
         else if (selectedvalue == "4")
         {
             // Edit data
+            //var url = GetSelectedRowData(source);
+            //alert("Data to edit: " + url);
+
+            var row = $(source).parent().parent();
+            var td0 = $(row).children()[0];
+            var td2 = $(row).children()[2];
+            var label = $(td0).children()[0];
+            var link = $(label).children()[1];
+            //alert(link);
+            $("#labelTargetData").html($(link).html());
+            $("#inputEditDataDesc").val($(td2).html());
+
+            $( "#dlgEditData" ).dialog({
+                    resizable: false,
+                    height:380,
+                    width:450,
+                    modal: true,
+                    buttons: {
+                        "Save": function() {
+                            var collecteddata = {};
+                            var data = {};
+                            var linkobj = {};
+                            var index = 0;
+                            var description = $("#inputEditDataDesc").val();
+                            //alert(description);
+                            linkobj.text = $(link).text();
+                            linkobj.url = $(link).prop("href");
+                            linkobj.organism = $("#selectEditDataOrganism").val();
+                            linkobj.description = description;
+
+                            //alert(linkobj.url);
+                            var datatype =  $('input[name="editDataType"]:checked').val();
+                            if (datatype == null || datatype.length == 0)
+                                datatype = "Generic";
+                            linkobj.datatype = datatype;
+                            //alert(datatype);
+                            //var datatypeinput = $(this).children()[4];
+                            //linkobj.datatype = $(datatypeinput).val();
+                            var dataidinput = $(label).children()[2];
+                            var dataid = $(dataidinput).val();
+                            //alert(dataid);
+                            if (dataid == null || dataid.length == 0)
+                            {
+                                dataid = WF_captureddataid.toString();
+                                WF_captureddataid--;
+                                dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                                dataidinput.setAttribute("value", dataid.toString());
+                                linkobj.nodeindex = dataid;
+                            }
+                            else {
+                                dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                                linkobj.nodeindex = dataid;
+                            }
+                               //alert($(input).is(':checked'));
+                            index++;
+                            data[index.toString()] = linkobj;
+                            collecteddata['data'] = data;
+                            DoSaveData(collecteddata);
+                            $( this ).dialog( "close" );
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
 
         }
     }
