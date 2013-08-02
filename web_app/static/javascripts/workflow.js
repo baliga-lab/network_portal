@@ -2239,6 +2239,11 @@ function InsertDataToTarget(linkpair)
         option3.value = "3";
         option3.innerHTML = "Download";
         $(select).append($(option3));
+
+        //var option4 = document.createElement("option");
+        //option3.value = "4";
+        //option3.innerHTML = "Edit";
+        //$(select).append($(option4));
     }
 }
 
@@ -2298,6 +2303,11 @@ function DataOperationSelected(event)
             }
             //alert(urlstring);
             window.open(urlstring); //,'Download');
+        }
+        else if (selectedvalue == "4")
+        {
+            // Edit data
+
         }
     }
 }
@@ -3570,6 +3580,11 @@ function DisplayInfo(targetdiv, info, style)
     }
 }
 
+function StartBoss()
+{
+    $("#inputFiregoose").val("BossStarting");
+    window.open("/static/jnlp/boss.jnlp");
+}
 
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");
@@ -3619,6 +3634,7 @@ function SubmitWorkflowToBoss(jsonworkflow, info) {
         proxy.SubmitWorkflow(jsonworkflow);
         var datetime = GetCurrentDateTimeString();
         DisplayInfo("#divHistoryInfo", (datetime + " " + info), "historyinfo");
+        $("#inputFiregoose").val("BossStarting");
         //alert("workflow action done");
     }
 }

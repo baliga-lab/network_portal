@@ -21,7 +21,7 @@
 <h5> Gaggle Workspace</h5>
 
 <p>
-    <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a>
+    <a class="small red awesome" href='javascript:StartBoss()' title="First start Gaggle Boss">Start Boss</a>
     <a id="btnSaveState" class="small green awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
     <label id="lblLoginWarning" class="lblWarning">Please login to take full advantage of the Gaggle Workspace!</label>
 </p>
@@ -512,7 +512,7 @@
   <div id="divHTMLResult"></div> -->
 
 </div>
-
+<input id="inputFiregoose" type="hidden" value="" />
 </div>
 
 {% endblock %}
