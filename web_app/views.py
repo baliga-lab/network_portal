@@ -549,6 +549,7 @@ def getsessions(request):
        workflowid = jsonobj['workflowid']
        userid = jsonobj['userid']
 
+       print 'Get sessions for workflow ' + workflowid
        workflowobj = Workflows.objects.filter(id = int(workflowid))[0]
        sessions_obj = []
        sessions = []
@@ -718,6 +719,7 @@ def savereportdata(request):
         except Exception as e0:
             url = None
         print 'Saving files...'
+        urlist = []
         if (url is None or len(url) == 0):
             print 'Joining os path...'
             dataType = 'file'
@@ -759,15 +761,19 @@ def savereportdata(request):
                     destination.close()
             url = savepath + '/' + filename
             print 'File url: ' + url
+            urlist.append(url)
+        else:
+            urlist = re.split(';', url)
 
         # save to the db
-        reportdata = WorkflowReportData(workflow_id = wfid,
-                                    sessionid = sessionId,
-                                    workflownode_id = wfnodeid,
-                                    workflowcomponentname = wfcomponentname,
-                                    dataurl = url,
-                                    datatype = dataType)
-        reportdata.save()
+        for oneurl in urlist:
+            reportdata = WorkflowReportData(workflow_id = wfid,
+                                        sessionid = sessionId,
+                                        workflownode_id = wfnodeid,
+                                        workflowcomponentname = wfcomponentname,
+                                        dataurl = oneurl,
+                                        datatype = dataType)
+            reportdata.save()
         return HttpResponse(wfid, content_type="text/plain")
     except Exception as e:
         print 'Failed to save session ' + str(e)
