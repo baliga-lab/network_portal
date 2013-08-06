@@ -1885,8 +1885,21 @@ function CheckSessions()
     //alert(currWorkflowID);
     if (currWorkflowID != '')
     {
-        $.get("/workflow/sessions/" + currWorkflowID + "/",
-                    function (result) {
+        var jsonObj = {};
+        jsonObj.workflowid = currWorkflowID;
+        jsonObj.userid = $("#authenticated").val();
+        jQuery.ajax({
+                    url: "/workflow/sessions/",
+                    type: "POST",
+                    data: JSON.stringify(jsonObj),
+                    contentType: "application/json; charset=UTF-8",
+                    dataType: "json",
+                    beforeSend: function (x) {
+                        if (x && x.overrideMimeType) {
+                            x.overrideMimeType("application/json;charset=UTF-8");
+                        }
+                    },
+                    success: function (result) {
                         if (result.length > 0) {
                             $("#tblReport tr").remove();
                             var ul = ($("#divReport").children())[0];
@@ -1931,14 +1944,15 @@ function CheckSessions()
                                     var inputopen = document.createElement("input");
                                     inputopen.setAttribute("type", "button");
                                     inputopen.setAttribute("value", "open");
-                                    inputopen.onclick = function() { GetWorkflowSessionReport(session['id']); };
+                                    var sid = session['id'];
+                                    inputopen.onclick = GetWorkflowSessionReportClicked;
                                     $(td3).append($(inputopen));
                                 }
                             }
                             $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
                         }
                     }
-                );
+                });
     }
     if (WF_timercnt < 10)
     {
@@ -1948,6 +1962,24 @@ function CheckSessions()
     }
 }
 
+function GetWorkflowSessionReportClicked(event)
+{
+    //alert(event);
+    var source = event.target || event.srcElement;
+    //alert(source);
+    if (source == null)
+        source = event;
+    //alert(source);
+    if (source != null) {
+        var row = $(source).parent().parent();
+        var td0 = $(row).children()[0];
+        var label = $(td0).children()[0];
+        var reportinput = $(label).children()[2];
+        var sessionid = $(reportinput).val();
+        //alert(sessionid);
+        GetWorkflowSessionReport(sessionid);
+    }
+}
 
 function ToggleCurrentWorkflowSessionLink(currsessionid, newsessionid)
 {
@@ -3833,6 +3865,16 @@ function SetWorkflowStatus(componentid, status)
 
 }
 
+function SetWorkflowID(workflowid)
+{
+    //alert(workflowid);
+    if (workflowid != null && workflowid.length > 0)
+    {
+        // the workflowid string contains date and time info. We need to extract only the ID part
+        var splitted = workflowid.split(" ");
+        currWorkflowID = splitted[2];
+    }
+}
 
 // Applet reports it is ready to use
 function java_socket_bridge_ready() {

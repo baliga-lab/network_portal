@@ -183,7 +183,7 @@ def workflow(request):
         user = createuser(request.user)
     userid = str(user.id)
     print 'user ID: ' + userid
-    myworkflows = Workflows.objects.filter(owner_id = user.id)
+    myworkflows = Workflows.objects.filter(owner_id = user.id).filter(temporary = False)
     mydatagroups = WorkflowDataGroups.objects.filter(owner_id = user.id)
     datagroups = []
     for group in mydatagroups:
@@ -495,7 +495,7 @@ def generateworkflowobj(workflow_id):
         nodes = WorkflowNodes.objects.filter(workflow_id = workflowid)
         edges = WorkflowEdges.objects.filter(workflow_id = workflowid)
 
-        data_dict = {'id': workflow.id, 'name': workflow.name, 'desc': workflow.description}
+        data_dict = {'id': workflow.id, 'name': workflow.name, 'desc': workflow.description, 'temporary': workflow.temporary}
 
         nodes_obj = {}
         startnode = ''
@@ -540,12 +540,27 @@ def getworkflow(request, workflow_id):
     return HttpResponse(json.dumps(workflowobj), mimetype='application/json')
 
 
-def getsessions(request, workflowid):
+@csrf_exempt
+def getsessions(request):
     #print "Get sessions for workflow " + workflowid
 
     try:
+       jsonobj = json.loads(request.raw_post_data)
+       workflowid = jsonobj['workflowid']
+       userid = jsonobj['userid']
+
+       workflowobj = Workflows.objects.filter(id = int(workflowid))[0]
        sessions_obj = []
-       sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')
+       sessions = []
+       if (workflowobj.temporary):
+           #if this is a temporary workflow (i.e., a workflow that has not been saved yet),
+           #we just get one session since all the "sessions" actually belong to one uber-session
+           #In getsessiondata, we retrieve all the data belong to the workflow
+           session = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')[0]
+           sessions.append(session)
+       else:
+           sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')
+
        for session in sessions:
            session_dict = {}
            print session.sessionid
@@ -577,7 +592,11 @@ def getsessiondata(request, sessionId):
         sessiondata_dict = {'wfobj': workflowobj}
 
         print 'Generating report data...'
-        sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
+        if (workflowobj['temporary']):
+            #this is a temporary workflow, we get ALL its sessions
+            sessiondata = WorkflowReportData.objects.filter(workflow_id = workflowobj['id'])
+        else:
+            sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
         data_obj = {}
         for data in sessiondata:
             data_dict = {}
@@ -641,6 +660,7 @@ def deletesessionreports(request):
 def savereportdata(request):
     print "save workflow report data"
     print request.META.get('CONTENT_TYPE')
+    print request.REQUEST['userid']
     print request.REQUEST['sessionid']
     print request.REQUEST['componentid']
     print request.REQUEST['componentworkflownodeid']
@@ -649,6 +669,7 @@ def savereportdata(request):
 
     # Create a directory with the session ID
     try:
+        userid = request.REQUEST['userid']
         sessionId = request.REQUEST['sessionid']
         wfid = request.REQUEST['workflowid']
         wfcomponentid = request.REQUEST['componentid']
@@ -657,6 +678,34 @@ def savereportdata(request):
 
         #if the session is not stored in the WorkflowSessions table, add it
         print 'Adding session info...'
+        newwfid = wfid
+        isTempWorkflow = True
+        if int(wfid) < 0:
+            print 'Adding temprorary workflow...'
+            tempwf = Workflows(name = 'temp', owner_id = int(userid), shared = False, temporary = True)
+            tempwf.save()
+            newwfid = str(tempwf.id)
+        elif Workflows.objects.filter(id = int(wfid)).count() > 0:
+            workflowobj = Workflows.objects.filter(id = int(wfid))[0]
+            isTempWorkflow = workflowobj.temporary
+        print str(isTempWorkflow)
+
+        if (isTempWorkflow):
+            print 'Adding temporary workflow node...'
+            componentid = int(wfcomponentid[(wfcomponentid.rfind('_') + 1) :])
+            print 'component id: ' + str(componentid)
+            tempwfnode = WorkflowNodes(serviceuri = '',
+                                      arguments = '',
+                                      subaction = '',
+                                      datauri = '',
+                                      component_id = componentid,
+                                      isstartnode = False,
+                                      workflow_id = newwfid,
+                                      workflowindex = 0)
+            tempwfnode.save()
+            wfnodeid = str(tempwfnode.id)
+
+        wfid = newwfid
         if WorkflowSessions.objects.filter(sessionid = sessionId).count() == 0:
             wfsessions = WorkflowSessions(workflow_id = int(wfid),
                                           sessionid = sessionId)
@@ -681,7 +730,7 @@ def savereportdata(request):
             #Comment on test machine
             sessionpath = makedir('reportdata/' + wfid)
 
-            savepath = '/static/reportdata/' + wfid
+            savepath = '/workflow/getreportdata/' + wfid
             sessionpath = sessionpath + '/' + sessionId
             savepath = savepath + '/' + sessionId
             print 'wfnode path: ' + sessionpath
@@ -719,9 +768,9 @@ def savereportdata(request):
                                     dataurl = url,
                                     datatype = dataType)
         reportdata.save()
-        return HttpResponse("1", content_type="text/plain")
+        return HttpResponse(wfid, content_type="text/plain")
     except Exception as e:
-        print str(e)
+        print 'Failed to save session ' + str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')
 
 def getedgedatatypes(request):
@@ -1178,6 +1227,36 @@ def getuserdata(request, organismtype, datatype, userid, filename):
         response = HttpResponseNotFound()
 
     return response
+
+@csrf_exempt
+def getreportdata(request, workflowid, sessionid, workflownodeid, filename):
+    print workflowid
+    print sessionid
+    print workflownodeid
+    print filename
+
+    try:
+        mimetypes.init()
+
+        file_path = settings.USERDATA_ROOT + '/' + 'reportdata/' + workflowid + '/' + sessionid + '/' + workflownodeid + '/' + filename
+        print 'file path: ' + file_path
+        fsock = open(file_path,"rb")
+        #file = fsock.read()
+        #fsock = open(file_path,"rb").read()
+        file_name = os.path.basename(file_path)
+        print file_name
+        file_size = os.path.getsize(file_path)
+        print "file size is: " + str(file_size)
+        mime_type_guess = mimetypes.guess_type(file_name)
+        if mime_type_guess is not None:
+            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+    except Exception as e:
+        print str(e)
+        response = HttpResponseNotFound()
+
+    return response
+
 
 
 

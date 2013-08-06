@@ -624,6 +624,7 @@ class Workflows(models.Model):
     description = models.CharField(max_length=1024, blank=True, null=True)
     owner = models.ForeignKey(Users)
     shared = models.BooleanField(default=True)
+    temporary = models.BooleanField(default=False)
 
 class WorkflowNodes(models.Model):
     serviceuri = models.CharField(max_length=1024)
@@ -690,6 +691,7 @@ class SavedStates(models.Model):
     name = models.CharField(max_length = 1024, blank = True)
     description = models.CharField(max_length = 1024, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    #organismname = models.CharField(max_length = 1024, blank=True, null=True)
 
 class StateFiles(models.Model):
     state = models.ForeignKey(SavedStates)
