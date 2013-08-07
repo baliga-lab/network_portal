@@ -3059,7 +3059,7 @@ function SaveOneGroup(event)
            },
            success: function (result) {
                //Write your code here
-               alert(result);
+               //alert(result);
                //alert(($("#divWorkflow").children().length));
                if (result['id'] != undefined && result['id'].length > 0)
                {
@@ -3879,11 +3879,18 @@ function SetWorkflowStatus(componentid, status)
 function SetWorkflowID(workflowid)
 {
     //alert(workflowid);
-    if (workflowid != null && workflowid.length > 0)
+    try
     {
-        // the workflowid string contains date and time info. We need to extract only the ID part
-        var splitted = workflowid.split(" ");
-        currWorkflowID = splitted[2];
+        if (workflowid != null && workflowid.length > 0)
+        {
+            // the workflowid string contains date and time info. We need to extract only the ID part
+            var splitted = workflowid.split(" ");
+            currWorkflowID = splitted[2];
+        }
+    }
+    catch (e)
+    {
+
     }
 }
 
