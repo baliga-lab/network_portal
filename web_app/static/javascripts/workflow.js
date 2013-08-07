@@ -3404,8 +3404,9 @@ function FindComponent(gname)
         var titleelement = ($(this).children())[0];
         var titleahref = ($(titleelement).children())[0];
         var goosename = $(titleahref).text();
+        //alert("component name " + goosename);
         if (gname.indexOf(goosename) >= 0)
-            return $(this);
+            return $(this).attr("id");
     });
     return null;
 }
@@ -3418,19 +3419,17 @@ function GetGooseFromCanvas(gooseid)
         return $("#" + gooseid);
     }
 
-    var nodes = $("#workflowcanvas").children();
-    if (nodes.length > 0)
+    $("#workflowcanvas").children().each(function()
     {
-        for (var i = 0; i < nodes.length; i++)
-        {
-            var source = nodes[i];
-            var titleelement = ($(source).children())[componenttitledivindex];
-            var goosename = $(titleahref).text();
-            if (gooseid.indexOf(goosename) >= 0) {
-                return source;
-            }
+        var source = $(this);
+        var titleelement = ($(source).children())[componenttitledivindex];
+        var titleahref = ($(titleelement).children())[0];
+        var goosename = $(titleahref).text();
+        if (gooseid.indexOf(goosename) >= 0) {
+            //alert("Found goose on canvas " + goosename);
+            return source;
         }
-    }
+    });
     return null;
 }
 
@@ -3438,55 +3437,62 @@ function HandleGooseRecording(gooseid)
 {
     //alert(gooseid);
     var component = GetGooseFromCanvas(gooseid);
-    if (component == null)
+    //alert("Found component from canvas " + component);
+
+    // TODO: fix this logic
+    /*if (component == null)
     {
         // The component is not there, we need to insert it to the canvas
         //alert(gooseid);
-        var goosecomponent = FindComponent(gooseid);
-        if (goosecomponent != null) {
-            var inputcomponentid = $(goosecomponent).children()[1];
+        var goosecomponentid = FindComponent(gooseid);
+        alert("Found component from component list " + goosecomponentid);
+        if (goosecomponentid != null) {
+            var inputcomponentid = $(("#" + goosecomponentid)).children()[1];
             var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
+            alert(sourceid);
             component = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
         }
-    }
+    } */
     return component;
 }
 
 function ConnectNodes(source, target)
 {
-    //alert("connect nodes...");
-    var connectionList = jsplumbInstance.getConnections();
-    var found = false;
-    //alert(connectionList.length);
-    for (i = 0; i < connectionList.length; i++) {
-        var conn = connectionList[i];
-        var src = conn.source;
-        var trgt = conn.target;
+    //alert("connect nodes " + source + " " + target);
+    if (source != null && target != null) {
+        var connectionList = jsplumbInstance.getConnections();
+        var found = false;
+        //alert(connectionList.length);
+        for (i = 0; i < connectionList.length; i++) {
+            var conn = connectionList[i];
+            var src = conn.source;
+            var trgt = conn.target;
 
-        if (src != null && target != null && source != null && target != null) {
-            if (source.attr("id") == src.attr("id") && target.attr("id") == trgt.attr("id")) {
-                found = true;
-                break;
+            if (src != null && target != null && source != null && target != null) {
+                if (source.attr("id") == src.attr("id") && target.attr("id") == trgt.attr("id")) {
+                    found = true;
+                    break;
+                }
             }
         }
-    }
-    if (!found) {
-        var sourceid = source.attr("id");
-        var targetid = target.attr("id");
-        //alert(sourceid + " " + targetid);
-        var srcEP = WF_endpoints[sourceid].SourceEP;
-        //alert(srcEP);
-        var targetEP = WF_endpoints[targetid].TargetEP;
-        var c = jsplumbInstance.connect({
-            source: srcEP,
-            target: targetEP,
-            //overlays: connoverlays
-            overlays: [
-                        ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
-                        ["Label", { label: "data", location: 0.5}]
-                    ]
-        });
-        ConnectionEstablished(c);
+        if (!found) {
+            var sourceid = source.attr("id");
+            var targetid = target.attr("id");
+            //alert(sourceid + " " + targetid);
+            var srcEP = WF_endpoints[sourceid].SourceEP;
+            //alert(srcEP);
+            var targetEP = WF_endpoints[targetid].TargetEP;
+            var c = jsplumbInstance.connect({
+                source: srcEP,
+                target: targetEP,
+                //overlays: connoverlays
+                overlays: [
+                            ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
+                            ["Label", { label: "data", location: 0.5}]
+                        ]
+            });
+            ConnectionEstablished(c);
+        }
     }
 }
 
@@ -3504,10 +3510,15 @@ function UpdateRecordingInfo(params)
         var target = paramssplitted[2];
         //alert(source + " " + target);
 
-        if (source != target) {
-            var src = HandleGooseRecording(source);
-            var trgt = HandleGooseRecording(target);
-            ConnectNodes(src, trgt);
+        try {
+            if (source != target) {
+                var src = HandleGooseRecording(source);
+                var trgt = HandleGooseRecording(target);
+                ConnectNodes(src, trgt);
+            }
+        }
+        catch (e) {
+            //alert(e);
         }
     }
 }
