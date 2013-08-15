@@ -1017,6 +1017,7 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
     jsonObj.userid = userid.toString();
     jsonObj.startNode = WF_startNode;
     jsonObj.organism = WF_currOrganism + ";" + WF_currOrganismFullName;
+
     //jsonObj.edgelist = WF_edges;
 
     //alert(jsonObj["name"]);
@@ -3628,6 +3629,14 @@ function OnSaveState(param)
     loadbutton.className = "button";
     loadbutton.onclick = LoadState;
     $(td4).append($(loadbutton));
+
+    var editbutton = document.createElement("input");
+    editbutton.setAttribute("type", "button");
+    editbutton.setAttribute("value", "Edit");
+    editbutton.className = "button";
+    editbutton.onclick = EditState;
+    $(td4).append($(editbutton));
+
 
     var deletebutton = document.createElement("input");
     deletebutton.setAttribute("type", "button");
