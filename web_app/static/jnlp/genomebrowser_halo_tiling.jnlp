@@ -22,9 +22,10 @@
     <jar href="lib/GenomeBrowser/commons-lang3-3.1.jar"/>
     <jar href="lib/GenomeBrowser/boss.jar"/>
   <jar href="lib/GenomeBrowser/gaggle-connector.jar"/>
-   <jar href="lib/GenomeBrowser/glazedlists-1.8.0_java15.jar"/>
-    <jar href="lib/GenomeBrowser/log4j-1.2.14.jar"/>
-    <jar href="lib/GenomeBrowser/sqlitejdbc-v056.jar"/>
+ <jar href="lib/GenomeBrowser/genomebrowser-core_2.9.2-1.0.jar"/>  <jar href="lib/GenomeBrowser/glazedlists-1.8.0_java15.jar"/> <jar href="lib/GenomeBrowser/log4j-1.2.14.jar"/>
+
+    <jar href="lib/GenomeBrowser/scala-library.jar"/>
+  <jar href="lib/GenomeBrowser/HaloTilingArrayReferenceConditions.jar"/>   <jar href="lib/GenomeBrowser/sqlitejdbc-v056.jar"/>
   </resources>
 
   <application-desc>
