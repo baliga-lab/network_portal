@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp codebase="http://networks.systemsbiology.net/static" href="jnlp/genomebrowser.jnlp">
+
+  <information>
+    <title> Genome Browser </title>
+    <vendor> Institute for Systems Biology </vendor>
+    <homepage href="http://gaggle.systemsbiology.net/docs/geese/genomebrowser/"/>
+    <offline-allowed/>
+    <icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/>
+    <icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+
+  <security>
+      <all-permissions/>
+  </security>
+
+  <resources>
+    <j2se version="1.6+" max-heap-size="512M"/>
+    <jar href="lib/GenomeBrowser/genomebrowser.jar"/>
+    <jar href="lib/GenomeBrowser/colorpicker.jar"/>
+    <jar href="lib/GenomeBrowser/commons-lang3-3.1.jar"/>
+    <jar href="lib/GenomeBrowser/boss.jar"/>
+
+
+<jar href="lib/GenomeBrowser/gaggle-connector.jar"/>
+    <jar href="lib/GenomeBrowser/glazedlists-1.8.0_java15.jar"/>
+    <jar href="lib/GenomeBrowser/log4j-1.2.14.jar"/>
+    <jar href="lib/GenomeBrowser/sqlitejdbc-v056.jar"/>
+
+<jar href="lib/GenomeBrowser/genomebrowser-core_2.9.2-1.0.jar"/>
+
+<jar href="lib/GenomeBrowser/junit-4.4.jar"/>
+
+<jar href="lib/GenomeBrowser/scala-library.jar"/>
+
+<jar href="lib/GenomeBrowser/ui.jar"/>
+
+<jar href="lib/GenomeBrowser/HaloTilingArrayReferenceConditions.jar"/>
+
+  </resources>
+
+  <application-desc>
+<argument>--autostart-boss</argument></application-desc>
+</jnlp>
+
+
