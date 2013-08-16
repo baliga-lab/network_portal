@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp
-  codebase="http://localhost:8000/static/"
+  codebase="http://networks.systemsbiology.net/static/"
   href="jnlp/anno.sbeams.kegg.jnlp">
   <information>
     <title>Halobacterium/TIGR Annotation Goose</title>
