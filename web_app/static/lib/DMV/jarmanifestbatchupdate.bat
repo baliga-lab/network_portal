@@ -1,0 +1,1 @@
+for /r . %%i in (*.jar) do jar ufm %%i C:\GitHub\BaligaLab\java7u25jarmanifest.txt

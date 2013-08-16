@@ -1,0 +1,1 @@
+for /r . %%i in (*.jar) do jarsigner %%i njiangcertisb -storepass Soccer01
