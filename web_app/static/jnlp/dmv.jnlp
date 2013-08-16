@@ -23,7 +23,7 @@
     <jar href="lib/DMV/jfreechart-1.0.0-rc1.jar"/>
     <jar href="lib/DMV/forms-1.0.7.jar"/>
     <jar href="lib/DMV/db4o-6.1-java5.jar"/>
- <jar href="lib/boss.jar"/> <jar href="lib/gaggle-connector.jar"/>    <jar href="lib/DMV/db4o-6.1-nqopt.jar"/>
+ <jar href="lib/DMV/boss.jar"/> <jar href="lib/DMV/gaggle-connector.jar"/>    <jar href="lib/DMV/db4o-6.1-nqopt.jar"/>
     <jar href="lib/DMV/bloat-1.0.jar"/>
 
   </resources>
