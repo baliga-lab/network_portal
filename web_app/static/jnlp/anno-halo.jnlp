@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp
   codebase="http://networks.systemsbiology.net/static/"
-  href="jnlp/anno.jnlp">
+  href="jnlp/anno-halo.jnlp">
   <information>
     <title>Halobacterium/TIGR Annotation Goose</title>
     <vendor> (March 2006)</vendor>
