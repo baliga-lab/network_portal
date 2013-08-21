@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+  codebase="http://networks.systemsbiology.net/static/"
+  href="jnlp/translator-blank.jnlp">
+  <information>
+    <title>Translator Goose (Halobacterium - Haloarcula)</title>
+    <vendor>(2007-04)</vendor>
+    <homepage href="http://gaggle.systemsbiology.net/docs/geese/translator/"/>
+    <offline-allowed/>
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/translator/translator.jar"/>
+    <jar href="lib/translator/log4j-1.2.14.jar"/>
+ <jar href="lib/translator/boss.jar"/> <jar href="lib/translator/gaggle-connector.jar"/>  </resources>
+  <application-desc>
+  <argument>-n</argument>
+    <argument>Blank Slate Translator</argument>
+  </application-desc>
+</jnlp>
