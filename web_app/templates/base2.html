@@ -60,7 +60,7 @@
 	<ul>
 	  {% if request.user.is_authenticated %}
 	  <li><a href="logout" title="Click to logout">{{ request.user.email }}</a></li>
-      <li><a href="workflow" title="Go to My workspace">My Workspace</a></li>
+      <li><a href="/workflow" title="Go to My workspace">My Workspace</a></li>
 	  {% else %}
 	  <li><a href="openid/login" title="Use your Google ID to login">Login</a></li>
 	  {% endif %}
