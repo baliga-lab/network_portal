@@ -70,6 +70,8 @@ def about(request):
 def contact(request):
     return render_to_response('contact.html', locals())
 
+def inference(request):
+    return render_to_response('inference.html', locals())
 
 class WorkflowComponentSubactionInfo:
     def __init__(self, n, v):

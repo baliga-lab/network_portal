@@ -1,0 +1,71 @@
+{% extends "base2.html" %}{% load static %}{% get_static_prefix as STATIC_PREFIX %}
+{% load staticfiles %}
+{% block title %}Network Portal - Network Inference{% endblock %}
+{% block cssspecial %}<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />{% endblock %}
+{% block jsspecial %}<script type='text/javascript' src="{% static "javascripts/jquery.colorbox.js" %}"></script>{% endblock %}
+{% block content %}
+<script type="text/javascript">
+            $(document).ready(function() {
+                 $('.help').colorbox({inline: true, width: "80%"});
+             });
+</script>
+
+
+
+<div class="sub-page">
+	<div class="main">
+		<h5> Network Inference</h5>
+		</p>
+		<a class="help" href="#example-matrix"><img align="right" src="/static/images/help.png" /></a><h3> Step 1. Upload your gene expression file </h3>
+		<b>Format:</b> Your gene expresion file should be in tab-delimited format with conditions as column names and gene ids as row names. Expression values should be log2 ratios.
+		<p><input size="50" name="file" type="file"> <input size="50" name="upload" type="submit" value="Upload"></p>
+		
+		<a class="help" href="organism-help"><img align="right" src="/static/images/help.png" /></a><h3> Step 2. Enter organism Name or shortcode </h3>
+		<b>Warning:</b> Organism must be supported in RSAT. <a target="_blank" href="http://rsat.ulb.ac.be/supported-organisms.cgi">Click here</a> to find the list of supported organisms			    <input placeholder= "Organism" type="text" size=75 id="organism" name="q" value="{{ q }}"></input><br>
+		
+		<a class="help" href="#example-matrix"><img align="right" src="/static/images/help.png" /></a><h3> Step 3. Choose run options </h3>
+		<b>Info:</b> Runs that are shorter than 10 hours can be run directly from here. Otherwise you can enter your Amazon credentials to run this by using your own account.
+		<p><b> Please select an option</b><br>
+		<input size="50" name="run-here" type="checkbox" value="I would like to use your service" checked>I would like to use Network Portal Amazon service<br>
+		<input size="50" name="run-out" type="checkbox" value="I would like to use my Amazon account">I would like to use my Amazon account<br>
+		<input placeholder= "AWS Key ID" type="text" size=50 id="organism" name="q" value="{{ q }}"></input><br>
+		<input placeholder= "AWS Secret Key" type="text" size=50 id="organism" name="q" value="{{ q }}"></input></p>
+		
+		<a class="help" href="#example-matrix"><img align="right" src="/static/images/help.png" /></a><h3> Step 4. Choose Result options </h3>
+		<b>Info:</b> If you choose to explore your results in the portal, your results will be uploaded into temporary folder for exploration. Otherwise you can download html output<br>
+		<input size="50" name="run-here" type="checkbox" value="use-portal" checked>Use Portal to explore results<br>
+		<input size="50" name="run-out" type="checkbox" value="download-output">Download results<br>
+		
+		
+		</div><!-- End Subpage-->
+		
+		<div id="sidebar">
+		<h5> Run files</h5>
+		<h4>1. Expresion file:<img align="right" src="/static/images/checkmark.png" /></h4>
+		<font color="green">MyExpresionFile.tsv</font><br>
+		<h4>2. Organism:<img align="right" src="/static/images/checkmark.png" /></h4>
+		<font color="green">Desulfovibrio vulgaris Hildenborough</font>
+		<h4>3. Run Option:<img align="right" src="/static/images/checkmark.png" /></h4>
+		<font color="green">I would like to use Network Portal Amazon service</font>
+		<h4>4. Result Option:<img align="right" src="/static/images/checkmark.png" /></h4>
+		<font color="green">Use Portal to explore results</font>
+		<p> You are ready to run Network Inference. Please click on the run. This will start preset Amazon instance and will start processing your files. If there is any problem in your run, you will be notified via email.<br>
+		<input type="submit" value="Run Network Inference" class="medium blue awesome"></input>
+		
+		</div>
+		
+		
+		<div style="display:none">
+		<div id='example-matrix' class="help" style='padding:10px; background:#fff; text-align:left;'>
+    	<h5>Example Expression Matrix</h5>
+		
+		<code>
+			<b>colname	Cond.1	Cond.2	Cond.3	Cond.4	Cond.5 </b></br>			<b>DVU0002</b>	0.189785566	-0.816179189	-0.583139704	0.041802809	-0.352623153</br>			<b>DVU0003</b>	-0.662227353	-0.378385356	0.282744876	-0.191261812	-0.715020062</br>			<b>DVU0004</b>	-0.497577464	-0.568940726	-0.110627167	0.251149936	-0.506164744</br>			<b>DVU0005</b>	-0.523678364	0.694038669	0.150308403	0.325350675	0.837700264</br>			<b>DVU0006</b>	0.70615713	-0.42528008	-0.130504121	0.310387441	-0.183627453</br>			<b>DVU0007</b>	0.538517477	-0.044732843	-0.217682283	0.736216748	0.879483357</br>			<b>DVU0008</b>	0.321436098	-0.535109915	-0.871289459	-0.205176021	0.883372904</br>			<b>DVU0009</b>	-0.153352927	0.808872292	-0.813038356	0.646466634	0.028517533</br>			<b>DVU0010</b>	-0.154341653	-0.030233122	0.665694243	-0.208106895	-0.410747178</br>			<b>DVU0011</b>	-0.161528851	0.412342307	1.35158581	0.397177288	0.003618419</br>			<b>DVU0012</b>	-0.415792854	0.673112961	-0.1841119	-0.153605014	-0.250385782</br>			<b>DVU0013</b>	0.313103185	0.037662781	0.846204327	-0.059646298	-0.269736419</br>			<b>DVU0014</b>	0.159380211	-0.1588211	0.327996036	0.198526704	-0.367484119</br>			<b>DVU0015</b>	-1.789342612	-0.246223731	NA	0.188672332	NA</br>			<b>DVU0016</b>	0.016688608	-0.046292391	0.32600789	0.246324256	-0.539681086</br>
+		</code>
+		</div>
+		</div>
+		
+
+	
+</div><!-- End #main -->
+{% endblock %}
