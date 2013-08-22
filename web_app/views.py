@@ -1116,6 +1116,7 @@ def savestate(request):
     try:
         print request.REQUEST['userid']
 
+        stateid = request.REQUEST['stateid']
         userid = request.REQUEST['userid']
         statename = request.REQUEST['name']
         statedesc = request.REQUEST['desc']
@@ -1139,9 +1140,13 @@ def savestate(request):
         #responsedata['datatype'] = dtype
 
         # save to DB
-        data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
-        data.save()
-        pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc }
+        if len(stateid) == 0:
+            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
+            data.save()
+            stateid = str(data.id)
+            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc }
+        else:
+            pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
         responsedata['state'] = pair
 
         for key in request.FILES.keys():
@@ -1162,8 +1167,8 @@ def savestate(request):
             #    destination.close()
 
             dataurl = savepathurl + '/' + filename
-            print 'File url: ' + dataurl
-            sf = StateFiles(state_id = data.id, name = filename, url = dataurl)
+            print 'File url: ' + dataurl + ' state id: ' + stateid
+            sf = StateFiles(state_id = stateid, name = filename, url = dataurl)
             sf.save()
 
     except Exception as e:
