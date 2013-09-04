@@ -2095,17 +2095,27 @@ function DeleteSessionReport()
 function SaveCollectedData(targetdata)
 {
     var collecteddata = {};
+    var collectedlocalfiles = {};
     var userid = $("#authenticated").val();
     WF_currOrganism = $("#organismSelect").val();
     collecteddata['userid'] = userid;
+    collectedlocalfiles['organismtype'] = WF_currOrganism;
+    collectedlocalfiles['userid'] = userid;
+
     var data = {};
+    var localfiledata = {};
     var hasdatatosave = false;
+    var index = 0;
+    var findex = 0;
+
     $(".dataspacelabel").each(function() {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
            var checkbox = $(this).children()[0];
            if ($(checkbox).is(':checked'))
            {
+               var row = $(this).parent().parent();
+               var tddesc = $(row).children()[2];
                //var label = $(this).children()[0];
                //alert($(this).html());
                var link = $(this).children()[1];
@@ -2129,20 +2139,46 @@ function SaveCollectedData(targetdata)
                   WF_captureddataid--;
                   dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
                   dataidinput.setAttribute("value", dataid.toString());
-
-                  linkobj.nodeindex = dataid;
-                  data[index.toString()] = linkobj;
-                  index++;
+                  if (linkobj.url.slice(0, 7) == "file://")
+                  {
+                      // Store the local file in a seperate array
+                      var localfileobj = {};
+                      localfileobj['datatype'] = $(datatypeinput).val();
+                      localfileobj['description'] = $(tddesc).html();
+                      localfileobj['text'] = $(link).text();
+                      localfileobj['fileurl'] = linkobj.url;
+                      localfileobj['nodeindex'] = dataid;
+                      localfiledata[findex.toString()] = localfileobj;
+                      findex++;
+                  }
+                  else
+                  {
+                      linkobj.nodeindex = dataid;
+                      data[index.toString()] = linkobj;
+                      index++;
+                  }
                }
 
                //alert($(input).is(':checked'));
            }
            collecteddata['data'] = data;
+           collectedlocalfiles['data'] = localfiledata;
     });
 
 
     if (hasdatatosave) {
         //alert(JSON.stringify(collecteddata));
+        if (findex > 0)
+        {
+            var proxy = get_proxyapplet();
+            if (proxy != undefined) {
+              //alert("Submit workflow to boss");
+              proxy.UploadFiles(JSON.stringify(collectedlocalfiles));
+              var datetime = GetCurrentDateTimeString();
+              DisplayInfo("#divHistoryInfo", (datetime + " upload file " + linkobj.url), "historyinfo");
+            }
+        }
+
         if (index > 0) {
             DoSaveData(collecteddata);
         }
@@ -2553,6 +2589,44 @@ function DeleteCollectedData(tableid, selected)
     }
 }
 
+
+function ProcessUploadResult(result)
+{
+    //alert(result);
+    var finished = false;
+    var index = 0;
+    do
+    {
+       var pair = result[index.toString()];
+       //alert(pair);
+       if (pair != null)
+       {
+           var dataid = pair['dataid'];
+           if (dataid.length == 0)
+              InsertDataToTarget(pair);
+           else {
+              var originalinputid = "#cdata-" + dataid;
+              $(originalinputid).val(dataid);
+              var datalabel = $(originalinputid).parent();
+              var ahref = $(datalabel).children()[1];
+              $(ahref).prop("href", pair["url"]);
+              alert(ahref.prop("href"));
+           }
+
+           index++;
+       }
+       else
+          finished = true;
+    }
+    while (!finished);
+}
+
+function ProcessBossUploadResult(result)
+{
+    var jsonobj = JSON.parse(result);
+    ProcessUploadResult(jsonobj);
+}
+
 function DoUploadFiles(files, userid, organismtype, datatype, description, showResult)
 {
     if (files.length > 0) {
@@ -2597,20 +2671,7 @@ function DoUploadFiles(files, userid, organismtype, datatype, description, showR
                 if (showResult && result != null)
                 {
                     //alert(targetid);
-                    var finished = false;
-                    var index = 0;
-                    do
-                    {
-                       var pair = result[index.toString()];
-                       if (pair != null)
-                       {
-                           InsertDataToTarget(pair);
-                           index++;
-                       }
-                       else
-                          finished = true;
-                    }
-                    while (!finished);
+                    ProcessUploadResult(result);
                 }
             }
         });

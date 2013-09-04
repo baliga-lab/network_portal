@@ -972,6 +972,7 @@ def uploaddata(request):
         if (organismtype is None or len(organismtype) == 0):
            organismtype = 'Generic'
 
+
         desc = request.REQUEST['description']
         if organismtype is None:
             organismtype = 'Generic'
@@ -982,6 +983,20 @@ def uploaddata(request):
         if (dtype == 'undefined'):
             dtype = 'Generic'
         datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+
+        datatext = ''
+        try:
+            datatext = request.REQUEST['text']
+        except Exception as e2:
+            datatext = ''
+        print 'data text: ' + str(datatext)
+
+        dataid = ''
+        try:
+            dataid = request.REQUEST['nodeindex']
+        except Exception as e1:
+            dataid = ''
+        print 'data id: ' + str(dataid)
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
         #sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
@@ -1018,16 +1033,20 @@ def uploaddata(request):
 
             dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
+
+            if (datatext is None):
+               datatext = filename
+
             # save to DB
-            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id, description = desc)
+            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = datatext, organism_id = organism.id, description = desc)
             data.save()
 
-            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : filename, 'url': dataurl, 'desc': desc }
+            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : datatext, 'url': dataurl, 'desc': desc, 'dataid': dataid }
             responsedata[str(idx)] = pair
             idx = idx + 1
     except Exception as e:
         print str(e)
-        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        error = {'status':500, 'message': 'Failed to save data file' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     print 'Upload files response: ' + json.dumps(responsedata)
