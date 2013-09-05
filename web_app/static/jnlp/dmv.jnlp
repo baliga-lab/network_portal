@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- todo move this file to the logical place (projects/halo/2007-04)-->
+<jnlp
+  codebase="http://networks.systemsbiology.net/static/"
+  href="jnlp/dmv.jnlp">
+  <information>
+    <title>DataMatrixViewer</title>
+    <vendor> (April 2007)</vendor>
+    <homepage href="docs/help.html"/>
+    <offline-allowed/>
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/DMV/dmv.jar"/>
+    <jar href="lib/DMV/colt.jar"/>
+    <jar href="lib/DMV/jdom.jar"/>
+    <jar href="lib/DMV/cytoscape.jar"/>
+    <jar href="lib/DMV/jcommon-1.0.0-rc1.jar"/>
+    <jar href="lib/DMV/jfreechart-1.0.0-rc1.jar"/>
+    <jar href="lib/DMV/forms-1.0.7.jar"/>
+    <jar href="lib/DMV/db4o-6.1-java5.jar"/>
+ <jar href="lib/DMV/boss.jar"/> <jar href="lib/DMV/gaggle-connector.jar"/>    <jar href="lib/DMV/db4o-6.1-nqopt.jar"/>
+    <jar href="lib/DMV/bloat-1.0.jar"/>
+
+  </resources>
+  <application-desc main-class="org.systemsbiology.gaggle.geese.dmv.GaggledTreeDataViewer">    <argument>httpIndirect://db.systemsbiology.net:8080/halo/DataFetcher.py</argument>
+  </application-desc>
+</jnlp>
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+  codebase="http://networks.systemsbiology.net/static/"
+  href="jnlp/translator-gi_to_vng.jnlp">
+  <information>
+    <title>Translator</title>
+    <vendor>Institute for Systems Biology</vendor>
+    <homepage href="http://gaggle.systemsbiology.net/docs/geese/translator/"/>
+    <offline-allowed/>
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/translator/translator.jar"/>
+    <jar href="lib/translator/log4j-1.2.14.jar"/>
+ <jar href="lib/translator/boss.jar"/> <jar href="lib/translator/gaggle-connector.jar"/>  </resources>
+  <application-desc>
+    <argument>-f</argument>
+    <argument>http://gaggle.systemsbiology.net/projects/halo/2005-11/names/halo_GI.tsv</argument>
+    <argument>-oneToOne</argument>
+    <argument>-untranslatableTermsDropped</argument>
+    <argument>-sc</argument>
+    <argument>1</argument>
+    <argument>-tc</argument>
+    <argument>0</argument>
+    <argument>-n</argument>
+    <argument>Halo to GI Translator</argument>
+  </application-desc>
+</jnlp>
+

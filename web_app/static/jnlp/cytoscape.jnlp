@@ -26,6 +26,7 @@
     <jar href="lib/Cytoscape/manual-layout-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/ncbi-client-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/network-analyzer-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/filters-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/rfilters-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/sbml-reader-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/table-import-2.8.3-jar-with-dependencies.jar" />
@@ -33,6 +34,7 @@
     <jar href="lib/Cytoscape/editor-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/biomart-client-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/biopax-2.8.3-jar-with-dependencies.jar" />
+    <jar href="lib/Cytoscape/psi-mi-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/cpath-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/cpath2-2.8.3-jar-with-dependencies.jar" />
     <jar href="lib/Cytoscape/linkout-2.8.3-jar-with-dependencies.jar" />
@@ -64,6 +66,8 @@
     <argument>-p</argument>
     <argument>de.mpg.mpi_inf.bioinf.netanalyzer.Plugin</argument>
     <argument>-p</argument>
+    <argument>cytoscape.filters.FilterPlugin</argument>
+    <argument>-p</argument>
     <argument>filter.cytoscape.FilterPlugin</argument>
     <argument>-p</argument>
     <argument>sbmlreader.SBMLReaderPlugin</argument>
@@ -81,5 +85,7 @@
     <argument>org.cytoscape.coreplugin.cpath.plugin.CPathPlugIn</argument>
     <argument>-p</argument>
     <argument>linkout.LinkOutPlugin</argument>
+    <argument>-p</argument>
+    <argument>org.cytoscape.coreplugin.psi_mi.plugin.PsiMiPlugIn</argument>
   </application-desc>
 </jnlp>

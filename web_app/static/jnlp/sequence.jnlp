@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+  codebase="http://networks.systemsbiology.net/static/"
+  href="jnlp/sequence.jnlp">
+  <information>
+    <title>Sequence Goose</title>
+    <vendor> (2007-04)</vendor>
+    <homepage href="docs/help.html"/>
+    <offline-allowed/>
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/sequence/sequence.jar"/>
+    <jar href="lib/sequence/orfs.jar"/>
+ <jar href="lib/sequence/boss.jar"/> <jar href="lib/sequence/gaggle-connector.jar"/>
+
+ </resources>
+  <application-desc>
+    <argument> -s </argument>
+    <argument> Halobacterium sp.</argument>
+    <argument> -d </argument>
+    <argument> jar://halobacterium_orfs </argument>
+  </application-desc>
+</jnlp>
+
+

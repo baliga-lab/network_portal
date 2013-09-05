@@ -183,7 +183,7 @@ def workflow(request):
         user = createuser(request.user)
     userid = str(user.id)
     print 'user ID: ' + userid
-    myworkflows = Workflows.objects.filter(owner_id = user.id)
+    myworkflows = Workflows.objects.filter(owner_id = user.id).filter(temporary = False)
     mydatagroups = WorkflowDataGroups.objects.filter(owner_id = user.id)
     datagroups = []
     for group in mydatagroups:
@@ -495,7 +495,7 @@ def generateworkflowobj(workflow_id):
         nodes = WorkflowNodes.objects.filter(workflow_id = workflowid)
         edges = WorkflowEdges.objects.filter(workflow_id = workflowid)
 
-        data_dict = {'id': workflow.id, 'name': workflow.name, 'desc': workflow.description}
+        data_dict = {'id': workflow.id, 'name': workflow.name, 'desc': workflow.description, 'temporary': workflow.temporary}
 
         nodes_obj = {}
         startnode = ''
@@ -540,12 +540,28 @@ def getworkflow(request, workflow_id):
     return HttpResponse(json.dumps(workflowobj), mimetype='application/json')
 
 
-def getsessions(request, workflowid):
+@csrf_exempt
+def getsessions(request):
     #print "Get sessions for workflow " + workflowid
 
     try:
+       jsonobj = json.loads(request.raw_post_data)
+       workflowid = jsonobj['workflowid']
+       userid = jsonobj['userid']
+
+       print 'Get sessions for workflow ' + workflowid
+       workflowobj = Workflows.objects.filter(id = int(workflowid))[0]
        sessions_obj = []
-       sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')
+       sessions = []
+       if (workflowobj.temporary):
+           #if this is a temporary workflow (i.e., a workflow that has not been saved yet),
+           #we just get one session since all the "sessions" actually belong to one uber-session
+           #In getsessiondata, we retrieve all the data belong to the workflow
+           session = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')[0]
+           sessions.append(session)
+       else:
+           sessions = WorkflowSessions.objects.filter(workflow_id = int(workflowid)).order_by('-date')
+
        for session in sessions:
            session_dict = {}
            print session.sessionid
@@ -577,7 +593,11 @@ def getsessiondata(request, sessionId):
         sessiondata_dict = {'wfobj': workflowobj}
 
         print 'Generating report data...'
-        sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
+        if (workflowobj['temporary']):
+            #this is a temporary workflow, we get ALL its sessions
+            sessiondata = WorkflowReportData.objects.filter(workflow_id = workflowobj['id'])
+        else:
+            sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
         data_obj = {}
         for data in sessiondata:
             data_dict = {}
@@ -641,6 +661,7 @@ def deletesessionreports(request):
 def savereportdata(request):
     print "save workflow report data"
     print request.META.get('CONTENT_TYPE')
+    print request.REQUEST['userid']
     print request.REQUEST['sessionid']
     print request.REQUEST['componentid']
     print request.REQUEST['componentworkflownodeid']
@@ -649,6 +670,7 @@ def savereportdata(request):
 
     # Create a directory with the session ID
     try:
+        userid = request.REQUEST['userid']
         sessionId = request.REQUEST['sessionid']
         wfid = request.REQUEST['workflowid']
         wfcomponentid = request.REQUEST['componentid']
@@ -657,6 +679,34 @@ def savereportdata(request):
 
         #if the session is not stored in the WorkflowSessions table, add it
         print 'Adding session info...'
+        newwfid = wfid
+        isTempWorkflow = True
+        if int(wfid) < 0:
+            print 'Adding temprorary workflow...'
+            tempwf = Workflows(name = 'temp', owner_id = int(userid), shared = False, temporary = True)
+            tempwf.save()
+            newwfid = str(tempwf.id)
+        elif Workflows.objects.filter(id = int(wfid)).count() > 0:
+            workflowobj = Workflows.objects.filter(id = int(wfid))[0]
+            isTempWorkflow = workflowobj.temporary
+        print str(isTempWorkflow)
+
+        if (isTempWorkflow):
+            print 'Adding temporary workflow node...'
+            componentid = int(wfcomponentid[(wfcomponentid.rfind('_') + 1) :])
+            print 'component id: ' + str(componentid)
+            tempwfnode = WorkflowNodes(serviceuri = '',
+                                      arguments = '',
+                                      subaction = '',
+                                      datauri = '',
+                                      component_id = componentid,
+                                      isstartnode = False,
+                                      workflow_id = newwfid,
+                                      workflowindex = 0)
+            tempwfnode.save()
+            wfnodeid = str(tempwfnode.id)
+
+        wfid = newwfid
         if WorkflowSessions.objects.filter(sessionid = sessionId).count() == 0:
             wfsessions = WorkflowSessions(workflow_id = int(wfid),
                                           sessionid = sessionId)
@@ -669,6 +719,7 @@ def savereportdata(request):
         except Exception as e0:
             url = None
         print 'Saving files...'
+        urlist = []
         if (url is None or len(url) == 0):
             print 'Joining os path...'
             dataType = 'file'
@@ -681,7 +732,7 @@ def savereportdata(request):
             #Comment on test machine
             sessionpath = makedir('reportdata/' + wfid)
 
-            savepath = '/static/reportdata/' + wfid
+            savepath = '/workflow/getreportdata/' + wfid
             sessionpath = sessionpath + '/' + sessionId
             savepath = savepath + '/' + sessionId
             print 'wfnode path: ' + sessionpath
@@ -710,18 +761,22 @@ def savereportdata(request):
                     destination.close()
             url = savepath + '/' + filename
             print 'File url: ' + url
+            urlist.append(url)
+        else:
+            urlist = re.split(';', url)
 
         # save to the db
-        reportdata = WorkflowReportData(workflow_id = wfid,
-                                    sessionid = sessionId,
-                                    workflownode_id = wfnodeid,
-                                    workflowcomponentname = wfcomponentname,
-                                    dataurl = url,
-                                    datatype = dataType)
-        reportdata.save()
-        return HttpResponse("1", content_type="text/plain")
+        for oneurl in urlist:
+            reportdata = WorkflowReportData(workflow_id = wfid,
+                                        sessionid = sessionId,
+                                        workflownode_id = wfnodeid,
+                                        workflowcomponentname = wfcomponentname,
+                                        dataurl = oneurl,
+                                        datatype = dataType)
+            reportdata.save()
+        return HttpResponse(wfid, content_type="text/plain")
     except Exception as e:
-        print str(e)
+        print 'Failed to save session ' + str(e)
         return HttpResponse(json.dumps(e), mimetype='application/json')
 
 def getedgedatatypes(request):
@@ -827,31 +882,46 @@ def savecaptureddata(request):
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     try:
-        print captureddata['userid']
+        #print captureddata['userid']
         responsedata = {}
         idx = 0
         nodelist = captureddata['data']
         nodeobjs = {}
         for key in nodelist.keys():
             link = nodelist[key]
-            if int(link['nodeindex']) < 0:
-                organismtype = link['organism']
-                if (organismtype is None or len(organismtype) == 0):
-                    organismtype = 'Generic'
+            dataid = int(link['nodeindex'])
+            print 'data id: ' + str(dataid)
+            content = None
+            if dataid >= 0:
+                content = WorkflowCapturedData.objects.filter(id = dataid)[0]
 
-                organism = Organisms.objects.filter(name = organismtype)[0]
-                print 'organism id: ' + str(organism.id)
+            organismtype = link['organism']
+            if (organismtype is None or len(organismtype) == 0):
+                organismtype = 'Generic'
 
-                dtype =  link['datatype']
-                print 'data type: ' + dtype
-                datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+            organism = Organisms.objects.filter(name = organismtype)[0]
+            print 'organism id: ' + str(organism.id)
 
-                content = WorkflowCapturedData(owner_id = captureddata['userid'], type_id = datatypeobj.id, dataurl = link['url'], urltext = link['text'], organism_id = organism.id)
+            dtype =  link['datatype']
+            print 'data type: ' + dtype
+            datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+
+            desc = link['description']
+
+            if (content is None):
+                content = WorkflowCapturedData(owner_id = captureddata['userid'], type_id = datatypeobj.id, dataurl = link['url'], urltext = link['text'], organism_id = organism.id, description = desc)
                 content.save()
-                print "Data group content saved with id: " + str(content.id)
-                pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'organism': organism.name, 'datatype': datatypeobj.type }
-                responsedata[str(idx)] = pair
-                idx = idx + 1
+            else:
+                content.type_id = datatypeobj.id
+                content.dataurl = link['url']
+                content.urltext = link['text']
+                content.description = desc
+                content.save()
+
+            print "Data group content saved with id: " + str(content.id)
+            pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'organism': organism.name, 'datatype': datatypeobj.type, 'description': desc }
+            responsedata[str(idx)] = pair
+            idx = idx + 1
     except Exception as e1:
         print str(e1)
 
@@ -902,6 +972,7 @@ def uploaddata(request):
         if (organismtype is None or len(organismtype) == 0):
            organismtype = 'Generic'
 
+
         desc = request.REQUEST['description']
         if organismtype is None:
             organismtype = 'Generic'
@@ -912,6 +983,20 @@ def uploaddata(request):
         if (dtype == 'undefined'):
             dtype = 'Generic'
         datatypeobj = OrganismDataTypes.objects.filter(type = dtype)[0]
+
+        datatext = ''
+        try:
+            datatext = request.REQUEST['text']
+        except Exception as e2:
+            datatext = ''
+        print 'data text: ' + str(datatext)
+
+        dataid = ''
+        try:
+            dataid = request.REQUEST['nodeindex']
+        except Exception as e1:
+            dataid = ''
+        print 'data id: ' + str(dataid)
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', organismtype)
         #sessionpath = os.path.join('/github/baligalab/network_portal/web_app/static/data', organismtype)
@@ -948,16 +1033,20 @@ def uploaddata(request):
 
             dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
+
+            if (datatext is None):
+               datatext = filename
+
             # save to DB
-            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = filename, organism_id = organism.id, description = desc)
+            data = WorkflowCapturedData(owner_id = userid, type_id = datatypeobj.id, dataurl = dataurl, urltext = datatext, organism_id = organism.id, description = desc)
             data.save()
 
-            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : filename, 'url': dataurl, 'desc': desc }
+            pair =  {'id': str(data.id), 'userid': userid, 'organism': organismtype, 'datatype': dtype, 'text' : datatext, 'url': dataurl, 'desc': desc, 'dataid': dataid }
             responsedata[str(idx)] = pair
             idx = idx + 1
     except Exception as e:
         print str(e)
-        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        error = {'status':500, 'message': 'Failed to save data file' }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     print 'Upload files response: ' + json.dumps(responsedata)
@@ -1046,6 +1135,7 @@ def savestate(request):
     try:
         print request.REQUEST['userid']
 
+        stateid = request.REQUEST['stateid']
         userid = request.REQUEST['userid']
         statename = request.REQUEST['name']
         statedesc = request.REQUEST['desc']
@@ -1069,9 +1159,13 @@ def savestate(request):
         #responsedata['datatype'] = dtype
 
         # save to DB
-        data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
-        data.save()
-        pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc }
+        if len(stateid) == 0:
+            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
+            data.save()
+            stateid = str(data.id)
+            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc }
+        else:
+            pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
         responsedata['state'] = pair
 
         for key in request.FILES.keys():
@@ -1092,8 +1186,8 @@ def savestate(request):
             #    destination.close()
 
             dataurl = savepathurl + '/' + filename
-            print 'File url: ' + dataurl
-            sf = StateFiles(state_id = data.id, name = filename, url = dataurl)
+            print 'File url: ' + dataurl + ' state id: ' + stateid
+            sf = StateFiles(state_id = stateid, name = filename, url = dataurl)
             sf.save()
 
     except Exception as e:
@@ -1103,6 +1197,37 @@ def savestate(request):
 
     print json.dumps(responsedata)
     return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+@csrf_exempt
+def updatestate(request):
+    try:
+        statedata = json.loads(request.raw_post_data)
+        print statedata
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'desc': 'Failed to load json' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    try:
+        #print captureddata['userid']
+        responsedata = {}
+        idx = 0
+        stateid = int(statedata['id'])
+        content = SavedStates.objects.filter(id = stateid)[0]
+        content.name = statedata['name']
+        content.description = statedata['description']
+        content.save()
+
+        print "State saved with id: " + str(content.id)
+        pair = {'id': str(stateid), 'name': content.name, 'description': content.description }
+        responsedata['data'] = pair
+
+    except Exception as e1:
+        print str(e1)
+
+    print json.dumps(responsedata)
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
 
 @csrf_exempt
 def getuserdata(request, organismtype, datatype, userid, filename):
@@ -1132,6 +1257,36 @@ def getuserdata(request, organismtype, datatype, userid, filename):
         response = HttpResponseNotFound()
 
     return response
+
+@csrf_exempt
+def getreportdata(request, workflowid, sessionid, workflownodeid, filename):
+    print workflowid
+    print sessionid
+    print workflownodeid
+    print filename
+
+    try:
+        mimetypes.init()
+
+        file_path = settings.USERDATA_ROOT + '/' + 'reportdata/' + workflowid + '/' + sessionid + '/' + workflownodeid + '/' + filename
+        print 'file path: ' + file_path
+        fsock = open(file_path,"rb")
+        #file = fsock.read()
+        #fsock = open(file_path,"rb").read()
+        file_name = os.path.basename(file_path)
+        print file_name
+        file_size = os.path.getsize(file_path)
+        print "file size is: " + str(file_size)
+        mime_type_guess = mimetypes.guess_type(file_name)
+        if mime_type_guess is not None:
+            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+    except Exception as e:
+        print str(e)
+        response = HttpResponseNotFound()
+
+    return response
+
 
 
 

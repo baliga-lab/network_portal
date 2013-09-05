@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+  codebase="http://networks.systemsbiology.net/static/"
+  href="jnlp/anno-halo.jnlp">
+  <information>
+    <title>Halobacterium/TIGR Annotation Goose</title>
+    <vendor> (March 2006)</vendor>
+    <homepage href="docs/help.html"/>
+    <offline-allowed/>
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="1024M"/>
+    <jar href="lib/annotation-halo/annotation.jar"/>
+    <jar href="lib/annotation-halo/data.jar"/>
+ <jar href="lib/annotation-halo/boss.jar"/> <jar href="lib/annotation-halo/gaggle-connector.jar"/>
+
+ </resources>
+  <application-desc>
+    <argument>-d</argument>
+    <argument>jar://haloTigr.anno</argument>
+    <argument>-s</argument>
+    <argument>Halobacterium sp.</argument>
+    <argument>--gooseName</argument>
+    <argument>Halo/TIGR Annotation</argument>
+  <application-desc>
+</jnlp>
+
+

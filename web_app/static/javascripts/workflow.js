@@ -1017,6 +1017,7 @@ function ConstructWorkflowJSON(name, description, workflowid, userid) {
     jsonObj.userid = userid.toString();
     jsonObj.startNode = WF_startNode;
     jsonObj.organism = WF_currOrganism + ";" + WF_currOrganismFullName;
+
     //jsonObj.edgelist = WF_edges;
 
     //alert(jsonObj["name"]);
@@ -1885,8 +1886,21 @@ function CheckSessions()
     //alert(currWorkflowID);
     if (currWorkflowID != '')
     {
-        $.get("/workflow/sessions/" + currWorkflowID + "/",
-                    function (result) {
+        var jsonObj = {};
+        jsonObj.workflowid = currWorkflowID;
+        jsonObj.userid = $("#authenticated").val();
+        jQuery.ajax({
+                    url: "/workflow/sessions/",
+                    type: "POST",
+                    data: JSON.stringify(jsonObj),
+                    contentType: "application/json; charset=UTF-8",
+                    dataType: "json",
+                    beforeSend: function (x) {
+                        if (x && x.overrideMimeType) {
+                            x.overrideMimeType("application/json;charset=UTF-8");
+                        }
+                    },
+                    success: function (result) {
                         if (result.length > 0) {
                             $("#tblReport tr").remove();
                             var ul = ($("#divReport").children())[0];
@@ -1931,14 +1945,15 @@ function CheckSessions()
                                     var inputopen = document.createElement("input");
                                     inputopen.setAttribute("type", "button");
                                     inputopen.setAttribute("value", "open");
-                                    inputopen.onclick = function() { GetWorkflowSessionReport(session['id']); };
+                                    var sid = session['id'];
+                                    inputopen.onclick = GetWorkflowSessionReportClicked;
                                     $(td3).append($(inputopen));
                                 }
                             }
                             $('.workflowcomponentclose').click(function(clickevent){RemoveComponent(clickevent.target)});
                         }
                     }
-                );
+                });
     }
     if (WF_timercnt < 10)
     {
@@ -1948,6 +1963,24 @@ function CheckSessions()
     }
 }
 
+function GetWorkflowSessionReportClicked(event)
+{
+    //alert(event);
+    var source = event.target || event.srcElement;
+    //alert(source);
+    if (source == null)
+        source = event;
+    //alert(source);
+    if (source != null) {
+        var row = $(source).parent().parent();
+        var td0 = $(row).children()[0];
+        var label = $(td0).children()[0];
+        var reportinput = $(label).children()[2];
+        var sessionid = $(reportinput).val();
+        //alert(sessionid);
+        GetWorkflowSessionReport(sessionid);
+    }
+}
 
 function ToggleCurrentWorkflowSessionLink(currsessionid, newsessionid)
 {
@@ -2059,21 +2092,30 @@ function DeleteSessionReport()
     ); */
 }
 
-function SaveCollectedData()
+function SaveCollectedData(targetdata)
 {
     var collecteddata = {};
+    var collectedlocalfiles = {};
     var userid = $("#authenticated").val();
     WF_currOrganism = $("#organismSelect").val();
     collecteddata['userid'] = userid;
+    collectedlocalfiles['organismtype'] = WF_currOrganism;
+    collectedlocalfiles['userid'] = userid;
+
     var data = {};
-    var index = 0;
+    var localfiledata = {};
     var hasdatatosave = false;
+    var index = 0;
+    var findex = 0;
+
     $(".dataspacelabel").each(function() {
            //alert("dataspace div: " + $(this).html());
            //alert("li: " + $(this).html());
            var checkbox = $(this).children()[0];
            if ($(checkbox).is(':checked'))
            {
+               var row = $(this).parent().parent();
+               var tddesc = $(row).children()[2];
                //var label = $(this).children()[0];
                //alert($(this).html());
                var link = $(this).children()[1];
@@ -2097,61 +2139,104 @@ function SaveCollectedData()
                   WF_captureddataid--;
                   dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
                   dataidinput.setAttribute("value", dataid.toString());
-
-                  linkobj.nodeindex = dataid;
-                  data[index.toString()] = linkobj;
-                  index++;
+                  if (linkobj.url.slice(0, 7) == "file://")
+                  {
+                      // Store the local file in a seperate array
+                      var localfileobj = {};
+                      localfileobj['datatype'] = $(datatypeinput).val();
+                      localfileobj['description'] = $(tddesc).html();
+                      localfileobj['text'] = $(link).text();
+                      localfileobj['fileurl'] = linkobj.url;
+                      localfileobj['nodeindex'] = dataid;
+                      localfiledata[findex.toString()] = localfileobj;
+                      findex++;
+                  }
+                  else
+                  {
+                      linkobj.nodeindex = dataid;
+                      data[index.toString()] = linkobj;
+                      index++;
+                  }
                }
 
                //alert($(input).is(':checked'));
            }
            collecteddata['data'] = data;
+           collectedlocalfiles['data'] = localfiledata;
     });
+
 
     if (hasdatatosave) {
         //alert(JSON.stringify(collecteddata));
+        if (findex > 0)
+        {
+            var proxy = get_proxyapplet();
+            if (proxy != undefined) {
+              //alert("Submit workflow to boss");
+              proxy.UploadFiles(JSON.stringify(collectedlocalfiles));
+              var datetime = GetCurrentDateTimeString();
+              DisplayInfo("#divHistoryInfo", (datetime + " upload file " + linkobj.url), "historyinfo");
+            }
+        }
+
         if (index > 0) {
-            jQuery.ajax({
-               url: "/workflow/savecaptureddata",
-               type: "POST",
-               data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
-               contentType: "application/json; charset=UTF-8",
-               dataType: "json",
-               beforeSend: function (x) {
-                   if (x && x.overrideMimeType) {
-                       x.overrideMimeType("application/json;charset=UTF-8");
-                   }
-               },
-               success: function (result) {
-                   //Write your code here
-                   //alert(result['id']);
-                   //alert(($("#divWorkflow").children().length));
-                   //alert(result);
-                   if (result != null) {
-                       // Need to update the id of each saved data
-                       var index = 0;
-                       var finished = false;
-                       do
-                       {
-                           var pair = result[index.toString()];
-                           if (pair != null)
-                           {
-                              var originalindex = pair['nodeindex'];
-                              var dataid = pair['id'];
-                              var originalinputid = "#cdata-" + originalindex;
-                              $(originalinputid).val(dataid);
-                              index++;
-                           }
-                           else
-                              finished = true;
-                       }
-                       while (!finished);
-                       alert("Data saved");
-                   }
-               }
-            });
+            DoSaveData(collecteddata);
         }
     }
+}
+
+function DoSaveData(collecteddata)
+{
+    //alert("Save data " + JSON.stringify(collecteddata));
+
+    jQuery.ajax({
+       url: "/workflow/savecaptureddata",
+       type: "POST",
+       data: JSON.stringify(collecteddata), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+       contentType: "application/json; charset=UTF-8",
+       dataType: "json",
+       beforeSend: function (x) {
+           if (x && x.overrideMimeType) {
+               x.overrideMimeType("application/json;charset=UTF-8");
+           }
+       },
+       success: function (result) {
+           //Write your code here
+           //alert(result['id']);
+           //alert(($("#divWorkflow").children().length));
+           //alert(result);
+           if (result != null) {
+               // Need to update the id of each saved data
+               var index = 0;
+               var finished = false;
+               do
+               {
+                   var pair = result[index.toString()];
+                   if (pair != null)
+                   {
+                      var originalindex = pair['nodeindex'];
+                      var dataid = pair['id'];
+                      var originalinputid = "#cdata-" + originalindex;
+                      $(originalinputid).val(dataid);
+                      var row = $(originalinputid).parent().parent().parent();
+                      //alert(row);
+                      if (row != null)
+                      {
+                         var cell1 = $(row).children()[1];
+                         $(cell1).html(pair['datatype']);
+                         var cell2 = $(row).children()[2];
+                         $(cell2).html(pair['description']);
+                      }
+                      index++;
+                   }
+                   else
+                      finished = true;
+               }
+               while (!finished);
+               alert("Data saved");
+           }
+       }
+    });
 }
 
 // Insert data to target element
@@ -2239,6 +2324,13 @@ function InsertDataToTarget(linkpair)
         option3.value = "3";
         option3.innerHTML = "Download";
         $(select).append($(option3));
+
+        if (targettable != "#tblNetworkPortalFiles") {
+            var option4 = document.createElement("option");
+            option4.value = "4";
+            option4.innerHTML = "Edit";
+            $(select).append($(option4));
+        }
     }
 }
 
@@ -2298,6 +2390,76 @@ function DataOperationSelected(event)
             }
             //alert(urlstring);
             window.open(urlstring); //,'Download');
+        }
+        else if (selectedvalue == "4")
+        {
+            // Edit data
+            //var url = GetSelectedRowData(source);
+            //alert("Data to edit: " + url);
+
+            var row = $(source).parent().parent();
+            var td0 = $(row).children()[0];
+            var td2 = $(row).children()[2];
+            var label = $(td0).children()[0];
+            var link = $(label).children()[1];
+            //alert(link);
+            $("#labelTargetData").html($(link).html());
+            $("#inputEditDataDesc").val($(td2).html());
+
+            $( "#dlgEditData" ).dialog({
+                    resizable: false,
+                    height:380,
+                    width:450,
+                    modal: true,
+                    buttons: {
+                        "Save": function() {
+                            var collecteddata = {};
+                            var data = {};
+                            var linkobj = {};
+                            var index = 0;
+                            var description = $("#inputEditDataDesc").val();
+                            //alert(description);
+                            linkobj.text = $(link).text();
+                            linkobj.url = $(link).prop("href");
+                            linkobj.organism = $("#selectEditDataOrganism").val();
+                            linkobj.description = description;
+
+                            //alert(linkobj.url);
+                            var datatype =  $('input[name="editDataType"]:checked').val();
+                            if (datatype == null || datatype.length == 0)
+                                datatype = "Generic";
+                            linkobj.datatype = datatype;
+                            //alert(datatype);
+                            //var datatypeinput = $(this).children()[4];
+                            //linkobj.datatype = $(datatypeinput).val();
+                            var dataidinput = $(label).children()[2];
+                            var dataid = $(dataidinput).val();
+                            //alert(dataid);
+                            if (dataid == null || dataid.length == 0)
+                            {
+                                dataid = WF_captureddataid.toString();
+                                WF_captureddataid--;
+                                dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                                dataidinput.setAttribute("value", dataid.toString());
+                                linkobj.nodeindex = dataid;
+                            }
+                            else {
+                                dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                                linkobj.nodeindex = dataid;
+                            }
+                               //alert($(input).is(':checked'));
+                            index++;
+                            data[index.toString()] = linkobj;
+                            collecteddata['data'] = data;
+                            DoSaveData(collecteddata);
+                            $( this ).dialog( "close" );
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+
         }
     }
 }
@@ -2427,6 +2589,44 @@ function DeleteCollectedData(tableid, selected)
     }
 }
 
+
+function ProcessUploadResult(result)
+{
+    //alert(result);
+    var finished = false;
+    var index = 0;
+    do
+    {
+       var pair = result[index.toString()];
+       //alert(pair);
+       if (pair != null)
+       {
+           var dataid = pair['dataid'];
+           if (dataid.length == 0)
+              InsertDataToTarget(pair);
+           else {
+              var originalinputid = "#cdata-" + dataid;
+              $(originalinputid).val(dataid);
+              var datalabel = $(originalinputid).parent();
+              var ahref = $(datalabel).children()[1];
+              $(ahref).prop("href", pair["url"]);
+              alert(ahref.prop("href"));
+           }
+
+           index++;
+       }
+       else
+          finished = true;
+    }
+    while (!finished);
+}
+
+function ProcessBossUploadResult(result)
+{
+    var jsonobj = JSON.parse(result);
+    ProcessUploadResult(jsonobj);
+}
+
 function DoUploadFiles(files, userid, organismtype, datatype, description, showResult)
 {
     if (files.length > 0) {
@@ -2471,20 +2671,7 @@ function DoUploadFiles(files, userid, organismtype, datatype, description, showR
                 if (showResult && result != null)
                 {
                     //alert(targetid);
-                    var finished = false;
-                    var index = 0;
-                    do
-                    {
-                       var pair = result[index.toString()];
-                       if (pair != null)
-                       {
-                           InsertDataToTarget(pair);
-                           index++;
-                       }
-                       else
-                          finished = true;
-                    }
-                    while (!finished);
+                    ProcessUploadResult(result);
                 }
             }
         });
@@ -2934,7 +3121,7 @@ function SaveOneGroup(event)
            },
            success: function (result) {
                //Write your code here
-               alert(result);
+               //alert(result);
                //alert(($("#divWorkflow").children().length));
                if (result['id'] != undefined && result['id'].length > 0)
                {
@@ -3279,8 +3466,9 @@ function FindComponent(gname)
         var titleelement = ($(this).children())[0];
         var titleahref = ($(titleelement).children())[0];
         var goosename = $(titleahref).text();
+        //alert("component name " + goosename);
         if (gname.indexOf(goosename) >= 0)
-            return $(this);
+            return $(this).attr("id");
     });
     return null;
 }
@@ -3293,19 +3481,17 @@ function GetGooseFromCanvas(gooseid)
         return $("#" + gooseid);
     }
 
-    var nodes = $("#workflowcanvas").children();
-    if (nodes.length > 0)
+    $("#workflowcanvas").children().each(function()
     {
-        for (var i = 0; i < nodes.length; i++)
-        {
-            var source = nodes[i];
-            var titleelement = ($(source).children())[componenttitledivindex];
-            var goosename = $(titleahref).text();
-            if (gooseid.indexOf(goosename) >= 0) {
-                return source;
-            }
+        var source = $(this);
+        var titleelement = ($(source).children())[componenttitledivindex];
+        var titleahref = ($(titleelement).children())[0];
+        var goosename = $(titleahref).text();
+        if (gooseid.indexOf(goosename) >= 0) {
+            //alert("Found goose on canvas " + goosename);
+            return source;
         }
-    }
+    });
     return null;
 }
 
@@ -3313,55 +3499,62 @@ function HandleGooseRecording(gooseid)
 {
     //alert(gooseid);
     var component = GetGooseFromCanvas(gooseid);
-    if (component == null)
+    //alert("Found component from canvas " + component);
+
+    // TODO: fix this logic
+    /*if (component == null)
     {
         // The component is not there, we need to insert it to the canvas
         //alert(gooseid);
-        var goosecomponent = FindComponent(gooseid);
-        if (goosecomponent != null) {
-            var inputcomponentid = $(goosecomponent).children()[1];
+        var goosecomponentid = FindComponent(gooseid);
+        alert("Found component from component list " + goosecomponentid);
+        if (goosecomponentid != null) {
+            var inputcomponentid = $(("#" + goosecomponentid)).children()[1];
             var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(inputcomponentid).val();
+            alert(sourceid);
             component = AppendComponent(null, "", $(inputcomponentid).val(), sourceid, WF_nodecnt);
         }
-    }
+    } */
     return component;
 }
 
 function ConnectNodes(source, target)
 {
-    //alert("connect nodes...");
-    var connectionList = jsplumbInstance.getConnections();
-    var found = false;
-    //alert(connectionList.length);
-    for (i = 0; i < connectionList.length; i++) {
-        var conn = connectionList[i];
-        var src = conn.source;
-        var trgt = conn.target;
+    //alert("connect nodes " + source + " " + target);
+    if (source != null && target != null) {
+        var connectionList = jsplumbInstance.getConnections();
+        var found = false;
+        //alert(connectionList.length);
+        for (i = 0; i < connectionList.length; i++) {
+            var conn = connectionList[i];
+            var src = conn.source;
+            var trgt = conn.target;
 
-        if (src != null && target != null && source != null && target != null) {
-            if (source.attr("id") == src.attr("id") && target.attr("id") == trgt.attr("id")) {
-                found = true;
-                break;
+            if (src != null && target != null && source != null && target != null) {
+                if (source.attr("id") == src.attr("id") && target.attr("id") == trgt.attr("id")) {
+                    found = true;
+                    break;
+                }
             }
         }
-    }
-    if (!found) {
-        var sourceid = source.attr("id");
-        var targetid = target.attr("id");
-        //alert(sourceid + " " + targetid);
-        var srcEP = WF_endpoints[sourceid].SourceEP;
-        //alert(srcEP);
-        var targetEP = WF_endpoints[targetid].TargetEP;
-        var c = jsplumbInstance.connect({
-            source: srcEP,
-            target: targetEP,
-            //overlays: connoverlays
-            overlays: [
-                        ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
-                        ["Label", { label: "data", location: 0.5}]
-                    ]
-        });
-        ConnectionEstablished(c);
+        if (!found) {
+            var sourceid = source.attr("id");
+            var targetid = target.attr("id");
+            //alert(sourceid + " " + targetid);
+            var srcEP = WF_endpoints[sourceid].SourceEP;
+            //alert(srcEP);
+            var targetEP = WF_endpoints[targetid].TargetEP;
+            var c = jsplumbInstance.connect({
+                source: srcEP,
+                target: targetEP,
+                //overlays: connoverlays
+                overlays: [
+                            ["Arrow", { width: 5, length: 15, location: 1, id: "arrow"}],
+                            ["Label", { label: "data", location: 0.5}]
+                        ]
+            });
+            ConnectionEstablished(c);
+        }
     }
 }
 
@@ -3379,10 +3572,15 @@ function UpdateRecordingInfo(params)
         var target = paramssplitted[2];
         //alert(source + " " + target);
 
-        if (source != target) {
-            var src = HandleGooseRecording(source);
-            var trgt = HandleGooseRecording(target);
-            ConnectNodes(src, trgt);
+        try {
+            if (source != target) {
+                var src = HandleGooseRecording(source);
+                var trgt = HandleGooseRecording(target);
+                ConnectNodes(src, trgt);
+            }
+        }
+        catch (e) {
+            //alert(e);
         }
     }
 }
@@ -3441,10 +3639,16 @@ function OnSaveState(param)
         <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
         <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
     </div> */
-    var splitted = param.split(";;");
-    var name = splitted[1];
-    var desc = splitted[2];
-    var stateid = splitted[0];
+    var jsonobj = JSON.parse(param);
+    var stateObj = jsonobj["state"];
+    var name = stateObj["name"];
+    var desc = stateObj["desc"];
+    var stateid = stateObj["id"];
+
+    //var splitted = param.split(";;");
+    //var name = splitted[1];
+    //var desc = splitted[2];
+    //var stateid = splitted[0];
     //alert(name + " " + desc + " " + stateid);
 
     var targettable = "#tblSavedStates";
@@ -3487,6 +3691,14 @@ function OnSaveState(param)
     loadbutton.onclick = LoadState;
     $(td4).append($(loadbutton));
 
+    var editbutton = document.createElement("input");
+    editbutton.setAttribute("type", "button");
+    editbutton.setAttribute("value", "Edit");
+    editbutton.className = "button";
+    editbutton.onclick = EditState;
+    $(td4).append($(editbutton));
+
+
     var deletebutton = document.createElement("input");
     deletebutton.setAttribute("type", "button");
     deletebutton.setAttribute("value", "Delete");
@@ -3515,6 +3727,93 @@ function LoadState(event)
             proxy.LoadStateDelegate(stateid);
             //alert("workflow action done");
         }
+    }
+}
+
+function EditState(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+       var row = $(source).parent().parent();
+       var td0 = $(row).children()[0];
+       var pname = $(td0).children()[0];
+       var stateidinput = $(td0).children()[1];
+       var stateid = $(stateidinput).val();
+       //alert(stateid);
+
+       var p1 = ($("#dlgSaveState").children())[0];
+       var nameinput = ($(p1).children())[0];
+       $(nameinput).val($(pname).html());
+
+       var td1 = $(row).children()[1];
+       var p2 = ($("#dlgSaveState").children())[1];
+       var descinput = ($(p2).children())[0];
+       $(descinput).val($(td1).html());
+
+       $('#dlgSaveState').dialog( { height:300,
+           buttons: {
+               "Save": function() {
+                   // Save state
+                   var userid = $("#authenticated").val();
+                   var name = $(nameinput).val();
+                   var desc = $(descinput).val();
+                   var dataobj = {};
+                   dataobj.id = stateid;
+                   dataobj.name = name;
+                   dataobj.description = desc;
+                   stateidinput.setAttribute("id", ("statedata-" + stateid.toString()));
+
+                   //alert(userid);
+                   $('#dlgSaveState').dialog('close');
+
+                   jQuery.ajax({
+                      url: "/workflow/updatestate",
+                      type: "POST",
+                      data: JSON.stringify(dataobj), //({"name": "workflow", "desc": "Hello World", "userid": "1"}),
+                      contentType: "application/json; charset=UTF-8",
+                      dataType: "json",
+                      beforeSend: function (x) {
+                          if (x && x.overrideMimeType) {
+                              x.overrideMimeType("application/json;charset=UTF-8");
+                          }
+                      },
+                      success: function (result) {
+                          //Write your code here
+                          //alert(result['id']);
+                          //alert(($("#divWorkflow").children().length));
+                          //alert(result);
+                          if (result != null) {
+                              // Need to update the id of each saved data
+                              var pair = result["data"];
+                              if (pair != null)
+                              {
+                                 var originalindex = pair['id'];
+                                 var dataid = pair['id'];
+                                 var originalinputid = "#statedata-" + originalindex;
+                                 $(originalinputid).val(dataid);
+                                 var row = $(originalinputid).parent().parent();
+                                 //alert(row);
+                                 if (row != null)
+                                 {
+                                    var cell0 = $(row).children()[0];
+                                    $(cell0).html(pair['name']);
+                                    var cell1 = $(row).children()[1];
+                                    $(cell1).html(pair['description']);
+                                 }
+                              }
+                              alert("State saved");
+                          }
+                      }
+                   });
+               },
+               "Cancel": function() {
+                   $('#dlgSaveState').dialog('close');
+               }
+
+           }
+       });
     }
 }
 
@@ -3564,6 +3863,11 @@ function DisplayInfo(targetdiv, info, style)
     }
 }
 
+function StartBoss()
+{
+    $("#inputFiregoose").val("BossStarting");
+    window.open("/static/jnlp/boss.jnlp");
+}
 
 jsPlumb.ready(function () {
     jsPlumb.Defaults.Container = $(".main");
@@ -3613,6 +3917,7 @@ function SubmitWorkflowToBoss(jsonworkflow, info) {
         proxy.SubmitWorkflow(jsonworkflow);
         var datetime = GetCurrentDateTimeString();
         DisplayInfo("#divHistoryInfo", (datetime + " " + info), "historyinfo");
+        $("#inputFiregoose").val("BossStarting");
         //alert("workflow action done");
     }
 }
@@ -3641,6 +3946,23 @@ function SetWorkflowStatus(componentid, status)
 
 }
 
+function SetWorkflowID(workflowid)
+{
+    //alert(workflowid);
+    try
+    {
+        if (workflowid != null && workflowid.length > 0)
+        {
+            // the workflowid string contains date and time info. We need to extract only the ID part
+            var splitted = workflowid.split(" ");
+            currWorkflowID = splitted[2];
+        }
+    }
+    catch (e)
+    {
+
+    }
+}
 
 // Applet reports it is ready to use
 function java_socket_bridge_ready() {

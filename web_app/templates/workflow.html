@@ -21,7 +21,7 @@
 <h5> Gaggle Workspace</h5>
 
 <p>
-    <a class="small red awesome" href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">Start Boss</a>
+    <a class="small red awesome" href='javascript:StartBoss()' title="First start Gaggle Boss">Start Boss</a>
     <a id="btnSaveState" class="small green awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
     <label id="lblLoginWarning" class="lblWarning">Please login to take full advantage of the Gaggle Workspace!</label>
 </p>
@@ -37,7 +37,7 @@
     <div id="tab-data">
         <div class="main" style="width:70%">
             <h5>Data Files </h5>
-            <font color="Blue">Select an organisms from the portal to see available data:</font>
+            <font color="Blue">Select an organism from the portal to see available data:</font>
             <select id="organismSelect" onchange="javascript:organismSelected(this);">
                 <option value = "" selected>Select an organism</option>
                 {% for organism in organisms %}
@@ -48,13 +48,13 @@
             </select>
             <table id="tblNetworkPortalFiles"><caption style="font-size: 10pt;"> Network Portal Files - <a id='ahrefNPSelectAll' href="javascript:SelectAllData('#tblNetworkPortalFiles', '#ahrefNPSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblNetworkPortalFiles');">Group</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblNetworkPortalFiles', false);">Delete Unselected</a></caption>
                 <tbody>
-                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desc</th><th style="width:50%">Operations</th>
+                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Description</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <p>
             <table id="tblUserFiles"><caption style="font-size: 10pt;"> User Files - <font color="red"><a href="javascript:UploadDataFiles();">Upload Data</a> </font>| <a id='ahrefUserSelectAll' href="javascript:SelectAllData('#tblUserFiles', '#ahrefUserSelectAll')">Select All</a> | <a href="javascript:GroupData('#tblUserFiles');">Group</a> | <a href="javascript:GroupOpen('#tblUserFiles');">Open</a> | <a href="javascript:SaveCollectedData();">Save</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', true);">Delete</a> | <a href="javascript:DeleteCollectedData('#tblUserFiles', false);">Delete Unselected</a></caption>
                 <tbody>
-                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Desciption</th><th style="width:50%">Operations</th>
+                <th style="width:30%">Name</th><th style="width:30%">Type</th><th style="width:40%"> Description</th><th style="width:50%">Operations</th>
                 </tbody>
             </table>
             <!--<input type="button" id="btnBatchRun" value="Batch Run" onclick="javascript:BatchRun();" class="button"/>
@@ -412,6 +412,27 @@
             </p>
         </div>
 
+        <div id="dlgEditData" style="display:none" title="Edit Data">
+            <p><label id="labelTargetData"></label></p>
+            <select id="selectEditDataOrganism">
+                <option value = "" selected>Select an organism</option>
+                {% for organism in organisms %}
+                {% if organism.name != "Generic"  %}
+                <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <br />
+            Description: <input id="inputEditDataDesc" type="text" />
+            <p>
+                {% for datatype in organismdatatypes %}
+                <input type="radio" id="radioEditDataType" name="editDataType" value="{{datatype.type}}">{{datatype.type}}
+                {% endfor %}
+            </p>
+        </div>
+
+
+
         <div id="dlgSaveState" style="display: none">
             <p>Name: <input type="text" /></p>
             <p>Description: <input type="text" /></p>
@@ -445,6 +466,7 @@
                         <td> {{state.created_at}} </td>
                         <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
                             <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
+                            <input type="button" value="Edit" class="button" onclick="javascript:EditState(this);" />
                             <input type="button" value="Delete" class="button" onclick="javascript:DeleteState(this);" />
                             <br />
                         </td>
@@ -512,7 +534,7 @@
   <div id="divHTMLResult"></div> -->
 
 </div>
-
+<input id="inputFiregoose" type="hidden" value="" />
 </div>
 
 {% endblock %}

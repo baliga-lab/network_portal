@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+  codebase="http://networks.systemsbiology.net/static/"
+  href="jnlp/haloEntrezAnno.jnlp">
+  <information>
+    <title>Halobacterium Entrez Annotation</title>
+    <vendor> (2007-04)</vendor>
+    <homepage href="docs/help.html"/>
+    <offline-allowed/>
+	<icon href="http://gaggle.systemsbiology.net/images/icons/gaggle_icon.gif"/><icon kind="splash" href="http://gaggle.systemsbiology.net/images/icons/gaggle_splash.gif"/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+"/>
+    <jar href="lib/annotation-halo/annotation.jar"/>
+ <jar href="lib/annotation-halo/boss.jar"/> <jar href="lib/annotation-halo/gaggle-connector.jar"/> </resources>
+  <application-desc>
+    <argument>-d</argument>
+    <argument>http://gaggle.systemsbiology.net/projects/halo/2007-04/anno/haloEntrez.canonicalized.tsv</argument>
+    <argument>-s</argument>
+    <argument>Halobacterium sp.</argument>
+    <argument>--gooseName</argument>
+    <argument>Halobacterium Entrez Annotation</argument>
+  <application-desc>
+</jnlp>
+
