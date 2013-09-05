@@ -49,6 +49,10 @@ urlpatterns = patterns('',
     url(r'^help', 'views.help', name='help'),
     url(r'^seqviewer', 'views.seqviewer', name='seqviewer'),
 
+    # network inference app
+    url(r'^configjob$', 'inference.views.configjob', name='configjob'),
+    
+
     # Proxy URLs
     url(r'^sviewer/ncfetch.cgi', 'views.sviewer_cgi', name='ncfetch'),
     url(r'^sviewer/objinfo.cgi', 'views.sviewer_cgi', name='objinfo'),
