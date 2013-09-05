@@ -24,7 +24,7 @@
 
   <resources>
 
-        <j2se version="1.5+" java-vm-args="-Xmx2048m -Xms1024m -Xss8m"/>
+        <j2se version="1.5+" max-heap-size="2048M/>
 
 	<jar href="lib/MeV/args4j-2.0.9.jar"/>
 
