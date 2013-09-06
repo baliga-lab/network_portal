@@ -60,7 +60,7 @@
     </tr>
     {% for bicluster in regulated_biclusters %}
     <tr>
-      <td><a href="/bicluster/{{bicluster.id}}">{{bicluster.id}}</a></td>
+      <td>{{bicluster|bicluster_link}}</td>
       <td>{{bicluster.residual|format_decimal}}</td>
       <td>{{bicluster.genes.count}}</td>
     </tr>
