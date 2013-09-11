@@ -151,7 +151,7 @@ function TimerFunc()
 
     CheckLogin();
 
-    setTimeout(function() { TimerFunc() }, 3000);
+    setTimeout(function() { TimerFunc() }, 5000);
 
 
 
@@ -384,6 +384,7 @@ function CheckDataInjection()
     var newsignal = parseInt($("#inputDataSignal").val());
     if (newsignal != WF_dataSignal)
     {
+        WF_dataSignal = newsignal;
         $(".dataspacehoverimage").hover(function(e){
               //alert("moseover...");
               //alert($("#divDataspaceMenu").css("display"));
@@ -447,10 +448,8 @@ function CheckDataInjection()
             {
                 //$('#divDataspaceMenu').dialog('close');
             });
-
-        WF_dataSignal = newsignal;
     }
-    setTimeout(function() { CheckDataInjection() }, 3000);
+    //setTimeout(function() { CheckDataInjection() }, 5000);
 }
 
 function LoadHTML() {
