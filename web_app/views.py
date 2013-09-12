@@ -1034,7 +1034,7 @@ def uploaddata(request):
             dataurl = savepathurl + '/' + filename
             print 'File url: ' + dataurl
 
-            if (datatext is None):
+            if (len(datatext) == 0):
                datatext = filename
 
             # save to DB

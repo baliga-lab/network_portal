@@ -1228,7 +1228,13 @@ function SubmitWorkflow(nodelist, info) {
 function OnSubmitWorkflow(jsongooseinfo)
 {
     //alert("Workflow response: " + jsongooseinfo);
+    if (jsongooseinfo == null || jsongooseinfo.length == 0)
+        return;
+
     var jsonobj = JSON.parse(jsongooseinfo);
+    if (jsonobj == null)
+        return;
+
     for (var key in jsonobj)
     {
         var exepath = jsonobj[key];
@@ -2609,7 +2615,7 @@ function ProcessUploadResult(result)
               var datalabel = $(originalinputid).parent();
               var ahref = $(datalabel).children()[1];
               $(ahref).prop("href", pair["url"]);
-              alert(ahref.prop("href"));
+              //alert(ahref.prop("href"));
            }
 
            index++;
