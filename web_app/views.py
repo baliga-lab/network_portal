@@ -1253,7 +1253,7 @@ def getuserdata(request, organismtype, datatype, userid, filename):
             response = HttpResponse(fsock, mimetype=mime_type_guess[0])
         response['Content-Disposition'] = 'attachment; filename=' + filename
     except Exception as e:
-        print str(e)
+        print 'Failed to get user file ' + str(e)
         response = HttpResponseNotFound()
 
     return response
