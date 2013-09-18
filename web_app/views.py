@@ -195,7 +195,7 @@ def workflow(request):
 
     # captureddata = WorkflowCapturedData.objects.filter(owner_id = user.id)
 
-    organisms = Organisms.objects.all().order_by('name')
+    organisms = Species.objects.all().order_by('name')
 
     organismdatatypes = OrganismDataTypes.objects.all().order_by('id')
 
@@ -229,7 +229,7 @@ def getdataspace(request):
         returndata = {}
         index = 0
 
-        organismobj = Organisms.objects.filter(name = query['organism'])[0]
+        organismobj = Species.objects.filter(name = query['organism'])[0]
 
         print 'Get predefined data'
         predefinedorganismdata = WorkflowCapturedData.objects.filter(owner_id = 0, organism_id = organismobj.id)
@@ -253,7 +253,7 @@ def getdataspace(request):
         # get captured data (i.e., captured)
         if query['organism'] != 'Generic':
             print 'Get captured data'
-            genericorganismobj = Organisms.objects.filter(name = 'Generic')[0]
+            genericorganismobj = Species.objects.filter(name = 'Generic')[0]
             genericdatatypeobj = OrganismDataTypes.objects.filter(type = 'Generic')[0]
             ownercaptureddata = WorkflowCapturedData.objects.filter(owner_id = int(query['userid']), organism_id = genericorganismobj.id, type_id = genericdatatypeobj.id)
             for data in ownercaptureddata:
@@ -899,7 +899,7 @@ def savecaptureddata(request):
             if (organismtype is None or len(organismtype) == 0):
                 organismtype = 'Generic'
 
-            organism = Organisms.objects.filter(name = organismtype)[0]
+            organism = Species.objects.filter(name = organismtype)[0]
             print 'organism id: ' + str(organism.id)
 
             dtype =  link['datatype']
@@ -976,7 +976,7 @@ def uploaddata(request):
         desc = request.REQUEST['description']
         if organismtype is None:
             organismtype = 'Generic'
-        organism = Organisms.objects.filter(name = organismtype)[0]
+        organism = Species.objects.filter(name = organismtype)[0]
         print 'organism id: ' + str(organism.id)
 
         dtype =  request.REQUEST['datatype']

@@ -263,7 +263,9 @@ function SetDataPass(event)
             {
                 // Pass name to Firegoose by default
                 $("#inputNameValue").prop("checked", true);
+                return;
             }
+            $("#inputNameValue").prop("checked", true);
         }
     }
 }
@@ -2368,10 +2370,12 @@ function DataOperationSelected(event)
         {
             // Open the data in a goose
             //alert("Open data...");
-            var url = GetSelectedRowData(source);
+            var dataobj = GetSelectedRowData(source);
+            var url = dataobj.url;
+            var datatype = dataobj.datatype;
             var dataname = url.innerHTML;
             //alert(dataname);
-            OpenDataGroup(WF_batchedData, dataname);
+            OpenDataGroup(WF_batchedData, dataname, datatype);
         }
         else if (selectedvalue == "2")
         {
@@ -2381,7 +2385,8 @@ function DataOperationSelected(event)
         {
             // Download
             //alert("download");
-            var url = GetSelectedRowData(source);
+            var dataobj = GetSelectedRowData(source);
+            var url = dataobj.url;
             //alert(url.href);
             var urlstring = url.href;
             if (url.href.indexOf("http:") < 0)
@@ -2472,6 +2477,7 @@ function DataOperationSelected(event)
 function GetSelectedRowData(source)
 {
     WF_batchedData = [];
+    var dataobj = {};
     var row = $(source).parent().parent();
     //alert(row);
     var td0 = $(row).children()[0];
@@ -2480,6 +2486,9 @@ function GetSelectedRowData(source)
     var url = $(label).children()[1];
     var dataname = url.innerHTML;
     //alert(dataname);
+
+    var td1 = $(row).children()[1];
+    var datatype = $(td1).html();
 
        //alert($(this).children()[1]);
     if (label != null) {
@@ -2492,7 +2501,9 @@ function GetSelectedRowData(source)
             WF_batchedData.push(link);
         }
     }
-    return url;
+    dataobj.url = url;
+    dataobj.datatype = datatype;
+    return dataobj;
 }
 
 function SelectAllData(tableid, ctrlid)
@@ -3290,7 +3301,7 @@ function OpenOneGroup(event)
           if ($(checkbox).is(':checked'))
             datatoopen.push(link);
       });
-      OpenDataGroup(datatoopen, groupname);
+      OpenDataGroup(datatoopen, groupname, "");
   }
 }
 
@@ -3390,31 +3401,46 @@ function ProcessGooseOpen(goosename, group, groupname)
     return false;
 }
 
-function OpenDataGroup(group, groupname)
+function OpenDataGroup(group, groupname, datatype)
 {
     //alert("Opening data..." + group.length);
+    //alert(datatype);
     if (group.length > 0)
     {
           //ClearWorkflowCanvas();
           FG_currentDataToOpen = group;
 
-          if (group.length == 1)
-          {
-             var url = group[0];
-             var data = $(url).prop("href");
-             //alert(data);
-             if (data.indexOf(".cys") >= 0 || data.indexOf(".sif") >= 0)
-             {
-                //alert("Searching for Cytoscape...");
-                if (ProcessGooseOpen("Cytoscape", group, groupname))
-                   return;
-             }
-             else if (data.indexOf(".tsv") >= 0 || data.indexOf("anl") >= 0) {
-                if (ProcessGooseOpen("MeV", group, groupname))
-                   return;
-             }
+          var activeGeese = [];
+          var proxy = get_proxyapplet();
+          if (proxy != undefined) {
+             activeGeese = proxy.getGeeseNames();
           }
 
+          if (group.length == 1)
+          {
+               var url = group[0];
+               var data = $(url).prop("href");
+               //alert(data);
+               if (data.indexOf(".cys") >= 0 || data.indexOf(".sif") >= 0 || datatype.indexOf("Cytoscape") >= 0)
+               {
+                  //alert("Searching for Cytoscape...");
+                  if (ProcessGooseOpen("Cytoscape", group, groupname))
+                     return;
+               }
+               else if (data.indexOf(".tsv") >= 0 || data.indexOf("anl") >= 0 || datatype.indexOf("MeV") >= 0) {
+                  if (ProcessGooseOpen("MeV", group, groupname))
+                     return;
+               }
+          }
+
+          if (activeGeese == null || activeGeese.length == 0)
+          {
+
+          }
+          else
+          {
+              // There are open geese
+          }
           //alert("Checking checkbox");
           $("#ulctxcomponents").children().each(function() {
                var checkbox = $(this).children()[0];
@@ -3459,7 +3485,7 @@ function GroupOpen(datatable)
 {
     //alert("Open data...");
     GetSelectedData(datatable);
-    OpenDataGroup(WF_batchedData, "selected data");
+    OpenDataGroup(WF_batchedData, "selected data", "");
 }
 
 function FindComponent(gname)
@@ -3917,7 +3943,7 @@ function ProcessAction(sourcename, sourcecommand, targetname, targetcommand, typ
 
 function SubmitWorkflowToBoss(jsonworkflow, info) {
     var proxy = get_proxyapplet();
-    if (proxy != undefined) {
+                                 if (proxy != undefined) {
         //alert("Submit workflow to boss");
         proxy.SubmitWorkflow(jsonworkflow);
         var datetime = GetCurrentDateTimeString();
