@@ -283,7 +283,7 @@ function ContextSubactionSelected(event)
 
 function getOrganismFullName()
 {
-    WF_currOrganismFullName = $("#organismSelect option[value=" + WF_currOrganism + "]").text();
+    WF_currOrganismFullName = $("#organismSelect option[value='" + WF_currOrganism + "']").text();
     // WF_currOrganismFullName looks like {{organism.description}} | {{organism.name}}
     var splitfullname = WF_currOrganismFullName.split("|");
     if (splitfullname != null)
