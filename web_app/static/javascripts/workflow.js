@@ -290,7 +290,7 @@ function getOrganismFullName()
     {
         //alert(splitfullname[0]);
         WF_currOrganismFullName = splitfullname[0].substring(0, splitfullname[0].length);
-        alert("Full name: " + WF_currOrganismFullName);
+        //alert("Full name: " + WF_currOrganismFullName);
     }
     else
         WF_currOrganismFullName = "";
@@ -301,7 +301,7 @@ function LoadDataSpace()
 {
     var queryobj = {};
     WF_currOrganism = $("#organismSelect").val();
-    alert(WF_currOrganism);
+    //alert(WF_currOrganism);
 
     if (WF_currOrganism == null || WF_currOrganism.length ==0)
         WF_currOrganism = "Generic";

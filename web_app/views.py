@@ -229,7 +229,7 @@ def getdataspace(request):
         returndata = {}
         index = 0
 
-        organismobj = Species.objects.filter(name = query['organism'])[0]
+        organismobj = Species.objects.filter(short_name = query['organism'])[0]
 
         print 'Get predefined data for ' + str(organismobj.id)
         predefinedorganismdata = WorkflowCapturedData.objects.filter(owner_id = 0, organism_id = organismobj.id)
@@ -899,7 +899,7 @@ def savecaptureddata(request):
             if (organismtype is None or len(organismtype) == 0):
                 organismtype = 'Generic'
 
-            organism = Species.objects.filter(name = organismtype)[0]
+            organism = Species.objects.filter(short_name = organismtype)[0]
             print 'organism id: ' + str(organism.id)
 
             dtype =  link['datatype']
@@ -976,7 +976,7 @@ def uploaddata(request):
         desc = request.REQUEST['description']
         if organismtype is None:
             organismtype = 'Generic'
-        organism = Species.objects.filter(name = organismtype)[0]
+        organism = Species.objects.filter(short_name = organismtype)[0]
         print 'organism id: ' + str(organism.id)
 
         dtype =  request.REQUEST['datatype']
