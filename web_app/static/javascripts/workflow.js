@@ -2411,12 +2411,15 @@ function DataOperationSelected(event)
 
             var row = $(source).parent().parent();
             var td0 = $(row).children()[0];
+            var td1 = $(row).children()[1];
             var td2 = $(row).children()[2];
             var label = $(td0).children()[0];
             var link = $(label).children()[1];
             //alert(link);
             $("#labelTargetData").html($(link).html());
             $("#inputEditDataDesc").val($(td2).html());
+            var datatyperadiobuttonid = "#radioEditDataType_" + $(td1).html();
+            $(datatyperadiobuttonid).prop("checked", true);
 
             $( "#dlgEditData" ).dialog({
                     resizable: false,

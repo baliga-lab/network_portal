@@ -395,7 +395,7 @@
             <option value = "" selected>Select an organism</option>
             {% for organism in organisms %}
             {% if organism.name != "Generic"  %}
-            <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+            <option value="{{organism.short_name}}">{{organism.name}} | {{organism.short_name}}</option>
             {% endif %}
             {% endfor %}
             </select>
@@ -407,7 +407,11 @@
             <br />
             <p>
                 {% for datatype in organismdatatypes %}
-                <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
+                {% if datatype.type == "Generic" %}
+                    <input type="radio" name="dataType" value="{{datatype.type}}" checked>{{datatype.type}}
+                {% else %}
+                    <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
+                {% endif %}
                 {% endfor %}
             </p>
         </div>
@@ -418,7 +422,7 @@
                 <option value = "" selected>Select an organism</option>
                 {% for organism in organisms %}
                 {% if organism.name != "Generic"  %}
-                <option value="{{organism.name}}">{{organism.description}} | {{organism.name}}</option>
+                <option value="{{organism.short_name}}">{{organism.name}} | {{organism.short_name}}</option>
                 {% endif %}
                 {% endfor %}
             </select>
@@ -426,7 +430,7 @@
             Description: <input id="inputEditDataDesc" type="text" />
             <p>
                 {% for datatype in organismdatatypes %}
-                <input type="radio" id="radioEditDataType" name="editDataType" value="{{datatype.type}}">{{datatype.type}}
+                <input type="radio" id="radioEditDataType_{{datatype.type}}" name="editDataType" value="{{datatype.type}}">{{datatype.type}}
                 {% endfor %}
             </p>
         </div>
