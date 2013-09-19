@@ -42,7 +42,7 @@
                 <option value = "" selected>Select an organism</option>
                 {% for organism in organisms %}
                 {% if organism.name != "Generic"  %}
-                <option value="{{organism.name}}">{{organism.short_name}} | {{organism.name}}</option>
+                <option value="{{organism.short_name}}">{{organism.name}} | {{organism.short_name}}</option>
                 {% endif %}
                 {% endfor %}
             </select>
