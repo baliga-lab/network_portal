@@ -231,7 +231,7 @@ def getdataspace(request):
 
         organismobj = Species.objects.filter(name = query['organism'])[0]
 
-        print 'Get predefined data'
+        print 'Get predefined data for ' + str(organismobj.id)
         predefinedorganismdata = WorkflowCapturedData.objects.filter(owner_id = 0, organism_id = organismobj.id)
         for data in predefinedorganismdata:
             datatypeobj = OrganismDataTypes.objects.filter(id = data.type_id)[0]

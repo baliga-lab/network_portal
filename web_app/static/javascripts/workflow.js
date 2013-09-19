@@ -326,7 +326,7 @@ function LoadDataSpace()
             //alert(($("#divWorkflow").children().length));
             if (result != null)
             {
-                //alert("loading data space...");
+                alert("loading data space...");
                 var index = 0;
                 /*$("#wfdataspace").children().each(function() {
                     uldata = $(this).children()[2];
@@ -353,9 +353,9 @@ function LoadDataSpace()
                    {
                        //alert(index);
                        //var targetid = "#ul";
-                       //var organism = pair['organism'];
-                       //var datatype = pair['datatype'];
-                       //alert("organism: " + organism);
+                       var organism = pair['organism'];
+                       var datatype = pair['datatype'];
+                       alert("organism: " + organism);
                        //alert("data type: " + datatype);
                        //if (organism == WF_currOrganism)
                        //{
