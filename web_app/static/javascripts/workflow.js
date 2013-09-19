@@ -301,6 +301,8 @@ function LoadDataSpace()
 {
     var queryobj = {};
     WF_currOrganism = $("#organismSelect").val();
+    alert(WF_currOrganism);
+
     if (WF_currOrganism == null || WF_currOrganism.length ==0)
         WF_currOrganism = "Generic";
     getOrganismFullName();
