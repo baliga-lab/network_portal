@@ -288,9 +288,9 @@ function getOrganismFullName()
     var splitfullname = WF_currOrganismFullName.split("|");
     if (splitfullname != null)
     {
-        //alert(splitfullname[0]);
+        alert(splitfullname[0]);
         WF_currOrganismFullName = splitfullname[0].substring(0, splitfullname[0].length);
-        //alert(WF_currOrganismFullName);
+        alert(WF_currOrganismFullName);
     }
     else
         WF_currOrganismFullName = "";
@@ -307,7 +307,7 @@ function LoadDataSpace()
         WF_currOrganism = "Generic";
     getOrganismFullName();
 
-    //alert(WF_currOrganism);
+    alert(WF_currOrganism + " " + WF_currOrganismFullname);
     queryobj['organism'] = WF_currOrganism;
     queryobj['userid'] = $("#authenticated").val();
 
