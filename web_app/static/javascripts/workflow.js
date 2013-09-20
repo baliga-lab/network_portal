@@ -773,7 +773,7 @@ function startDownload(url)
 function NodeProcessed(node, processednodes) {
     //alert($(node).attr('id'));
     //alert(processednodes.length);
-    for (i = 0; i < processednodes.length; i++) {
+    for (var i = 0; i < processednodes.length; i++) {
         //alert($(processednodes[i]).attr('id'));
         if ($(processednodes[i]).attr('id') == $(node).attr('id'))
             return true;
@@ -934,7 +934,7 @@ function ExtractWorkflow(nodelist) {
         }
     }
 
-    for (j = 0; j < nodes.length; j++)
+    for (var j = 0; j < nodes.length; j++)
     {
         //alert(j);
         if (!NodeProcessed(nodes[j], processednodes))
@@ -1239,8 +1239,10 @@ function OnSubmitWorkflow(jsongooseinfo)
     if (jsonobj == null)
         return;
 
+    alert(jsonobj);
     for (var key in jsonobj)
     {
+        alert("JSON key " + key + " object " + jsonobj[key]);
         var exepath = jsonobj[key];
         //alert("Executable for " + key + ": " + exepath);
         if (exepath != undefined && exepath.length > 0)
