@@ -2655,7 +2655,7 @@ function DoUploadFiles(files, userid, organismtype, datatype, description, showR
     if (files.length > 0) {
         var formdata = new FormData();
         formdata.append('userid', userid);
-        alert(organismtype);
+        //alert(organismtype);
         formdata.append('organismtype', organismtype);
         //alert(datatype);
         formdata.append('datatype', datatype);
