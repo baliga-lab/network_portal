@@ -2708,8 +2708,8 @@ function UploadDataFiles()
     //alert(userid);
     if (userid == null || userid.length == 0 || userid == "0")
     {
-        //alert("Please login before uploading data.");
-        //return;
+        alert("Please login before uploading data.");
+        return;
     }
 
     //$("#labelOrganism").html("Upload file for " + WF_currOrganism);
