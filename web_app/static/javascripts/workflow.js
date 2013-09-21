@@ -1239,10 +1239,10 @@ function OnSubmitWorkflow(jsongooseinfo)
     if (jsonobj == null)
         return;
 
-    alert(jsonobj);
+    //alert(jsonobj);
     for (var key in jsonobj)
     {
-        alert("JSON key " + key + " object " + jsonobj[key]);
+        //alert("JSON key " + key + " object " + jsonobj[key]);
         var exepath = jsonobj[key];
         //alert("Executable for " + key + ": " + exepath);
         if (exepath != undefined && exepath.length > 0)
@@ -2655,7 +2655,7 @@ function DoUploadFiles(files, userid, organismtype, datatype, description, showR
     if (files.length > 0) {
         var formdata = new FormData();
         formdata.append('userid', userid);
-        //alert(organismtype);
+        alert(organismtype);
         formdata.append('organismtype', organismtype);
         //alert(datatype);
         formdata.append('datatype', datatype);
@@ -2708,13 +2708,10 @@ function UploadDataFiles()
     //alert(userid);
     if (userid == null || userid.length == 0 || userid == "0")
     {
-        alert("Please login before uploading data.");
-        return;
+        //alert("Please login before uploading data.");
+        //return;
     }
 
-    var targetOrganism = $("#selectUploadDataOrganism").val();
-    if (targetOrganism == null || targetOrganism.length == 0)
-        targetOrganism = "Generic";
     //$("#labelOrganism").html("Upload file for " + WF_currOrganism);
     $( "#dlgUploadData" ).dialog({
         resizable: false,
@@ -2725,6 +2722,12 @@ function UploadDataFiles()
             "Upload": function() {
                 var fileinput = document.getElementById('filesToUpload');
                 if (fileinput.files.length > 0) {
+
+                    var targetOrganism = $("#selectUploadDataOrganism").val();
+                    //alert(targetOrganism);
+                    if (targetOrganism == null || targetOrganism.length == 0)
+                        targetOrganism = "Generic";
+
                     var formdata = new FormData();
 
                     var datatype = $('input[name="dataType"]:checked').val();
