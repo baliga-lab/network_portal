@@ -3430,14 +3430,14 @@ function OpenDataGroup(group, groupname, datatype)
           {
                var url = group[0];
                var data = $(url).prop("href");
-               //alert(data);
-               if (data.indexOf(".cys") >= 0 || data.indexOf(".sif") >= 0 || datatype.indexOf("Cytoscape") >= 0)
+               //alert(datatype);
+               if (data.toLowerCase().indexOf(".cys") >= 0 || data.toLowerCase().indexOf(".sif") >= 0 || datatype.toLowerCase().indexOf("cytoscape") >= 0)
                {
                   //alert("Searching for Cytoscape...");
                   if (ProcessGooseOpen("Cytoscape", group, groupname))
                      return;
                }
-               else if (data.indexOf(".tsv") >= 0 || data.indexOf("anl") >= 0 || datatype.indexOf("MeV") >= 0) {
+               else if (data.toLowerCase().indexOf(".tsv") >= 0 || data.toLowerCase().indexOf("anl") >= 0 || datatype.toLowerCase().indexOf("mev") >= 0) {
                   if (ProcessGooseOpen("MeV", group, groupname))
                      return;
                }
