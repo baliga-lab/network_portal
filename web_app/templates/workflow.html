@@ -17,14 +17,15 @@
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
 
 <div id="container" style="width: 100%">
-<img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png">
-<h5> Gaggle Workspace</h5>
+<!--<img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png"> -->
 
-<p>
-    <a class="small red awesome" href='javascript:StartBoss()' title="First start Gaggle Boss">Start Boss</a>
-    <a id="btnSaveState" class="small green awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
-    <label id="lblLoginWarning" class="lblWarning">Please login to take full advantage of the Gaggle Workspace!</label>
-</p>
+<div class="componentheader">
+    <h5> Gaggle Workspace&nbsp;&nbsp;&nbsp;<label id="lblLoginWarning" class="lblWarning">Please login to take full advantage of the Gaggle Workspace!</label></h5>
+</div>
+<!--<a class="componenthelp" align="right" href="#inlineworkspacehelp">
+    <img src="/static/images/help.png" />
+</a> -->
+<a class="small red awesome" style="visibility: hidden" href='javascript:StartBoss()' title="First start Gaggle Boss">Start Boss</a>
 <div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
 <ul>
     <li><a class="name" href="#tab-data">Dataspace -></a></li>
@@ -115,9 +116,9 @@
                 <th style="width: 15%">
                     <div>
                         <div class="componentheader"><h3>Modules</h3></div>
-                        <a class="componenthelp" href="#inlinecomponenthelp">
+                        <!--<a class="componenthelp" href="#inlinecomponenthelp">
                             <img src="/static/images/help.png" />
-                        </a>
+                        </a> -->
                     </div>
                 </th>
                 <th style="width: 65%">
@@ -391,15 +392,21 @@
 
         <div id="dlgUploadData" style="display:none" title="Upload Data">
             <!--<p><label id="labelOrganism"></label></p> -->
-            <select id="selectUploadDataOrganism">
-            <option value = "" selected>Select an organism</option>
-            {% for organism in organisms %}
-            {% if organism.name != "Generic"  %}
-            <option value="{{organism.short_name}}">{{organism.name}} | {{organism.short_name}}</option>
-            {% endif %}
-            {% endfor %}
-            </select>
-            <br />
+            <div style="width: 360px; float: left">
+                <select id="selectUploadDataOrganism">
+                <option value = "" selected>Select an organism</option>
+                {% for organism in organisms %}
+                {% if organism.name != "Generic"  %}
+                <option value="{{organism.short_name}}">{{organism.name}} | {{organism.short_name}}</option>
+                {% endif %}
+                {% endfor %}
+                </select>
+            </div>
+            <div style="margin-left: 370px">
+                <a class="componenthelp" align="right" href="#inlineuploadfilehelp">
+                    <img src="/static/images/help.png" />
+                </a>
+            </div>
             <form method="post" enctype="multipart/form-data">
             <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
             Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
@@ -436,6 +443,71 @@
         </div>
 
 
+        <div style="display:none">
+            <div id='inlineworkspacehelp' style='padding:10px; background:#fff'>
+                <h5>How to Build a Workflow</h5>
+                <p align="justify"><strong>Important:</strong> Go to the <a href="http://www.java.com/en/download/testjava.jsp">Java Test Page</a> and verify that the version of your Java is at least Java SE 6 (or 1.6).</p>
+                <p align="justify">
+                    1. Install each goose by using the links below. (If this is your first time).
+                    This will download the updated goose. You will need to install them for your application
+                </p>
+                <p align="justify">
+                    2. <strong>Drag the goose you want in your workflow and drop into the Workflow canvas.</strong>
+                </p>
+                <p align="justify">
+                    3. For each goose "Enter the url of the executable in your computer"
+                    e.g for cytoscape: "C:\Program Files\Cytoscape_v2.8.3\Cytoscape.exe" in Windows or "/Applications/Cytoscape_v2.8.3" in Mac OSX
+                </p>
+                <p align="justify">
+                    4. Select any subactions or data you want to open.
+                </p>
+                <p align="justify">
+                    5. Input the url (or path) to the data file to be opened by a the component.
+                </p>
+                <p align="justify">
+                    6. In order to connect to components in the workflow <strong>drag the circle from the input goose to square of next workflow component.</strong>
+                </p>
+                <p align="justify">
+                    7. Save your workflow.
+                </p>
+                </ul>
+                </p>
+            </div>
+        </div>
+
+        <div style="display:none">
+            <div id='inlineuploadfilehelp' style='padding:10px; background:#fff'>
+                <h5>How to Upload File to the Workspace</h5>
+                <p align="justify">
+                    1. Select the target organism for which the files you want to upload. If you want the files to be
+                    available for all organisms, don't select any organism.
+                </p>
+                <p align="justify">
+                    2. Click the "Browse" button and select one or more files you want to upload.
+                </p>
+                <p align="justify">
+                    3. Type additional information in the "Description" box.
+                </p>
+                <p align="justify">
+                    4. Select the type of files (MeV, Cytoscape, Generic) you are uploading. Later on, the files will be automatically opened by
+                    their associated applications if possible.  For example, suppose you select "Mev Analysis File" as the type of a file,
+                    later on when you select the "Open" action in the User File table, MeV will be started automatically and the file will be opened.
+                    MeV .tsv files should look like the following.
+                    You can
+                </p>
+                <p align="justify">
+                    5. Input the url (or path) to the data file to be opened by a the component.
+                </p>
+                <p align="justify">
+                    6. In order to connect to components in the workflow <strong>drag the circle from the input goose to square of next workflow component.</strong>
+                </p>
+                <p align="justify">
+                    7. Save your workflow.
+                </p>
+                </ul>
+                </p>
+            </div>
+        </div>
 
         <div id="dlgSaveState" style="display: none">
             <p>Name: <input type="text" /></p>
@@ -448,7 +520,8 @@
 
     <div id="tab-states">
         <div class="sub-page">
-
+            <br />
+            <a id="btnSaveState" class="small green awesome" href='javascript:SaveState();' title="Save current state of the work">Save State</a>
             <table id="tblSavedStates" class="tblDataSpace"><caption> Saved Analysis States</caption>
                 <tbody>
                 <tr>
