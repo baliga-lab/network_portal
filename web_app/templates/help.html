@@ -1,7 +1,9 @@
 {% extends "base2.html" %}
 {% load staticfiles %}
 {% block title %}Network Portal - Help {% endblock %}
-{% block cssspecial %}<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/cupertino/jquery-ui.css" />
+{% block cssspecial %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/cupertino/jquery-ui.css"
+      xmlns="http://www.w3.org/1999/html"/>
 <link href="{% static "javascripts/jquery.qtip.min.css" %}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 {% endblock %}
@@ -339,13 +341,29 @@
 				</div>
 			</div> 
 			   
-			<div id="tabs-3"> <h5> Gaggle Workflow</h5>
+			<div id="tabs-3"> <h5> Gaggle Workspace</h5>
 				<div id="accordion2" class="">
-					<h4> Workflow Concept</h4>
+					<h4> Workspace Concept</h4>
+                    <div>
+                        <p>
+                            Gaggle Workspace offers a comprehensive data analysis environment allowing users to:
+                        </p>
+                        <ol style="margin-left: 50px">
+                            <li>Capture and organize data from websites and local files;</li>
+                            <li>Manipulate data from the Workspace and via automatically opened applications;</li>
+                            <li>Create workflows automatically or manually which include multiple applications, websites, and datasets;</li>
+                            <li>Save the state of an analysis session across all open websites and desktop applications and reload the state later from any machine;</li>
+                            <li>Automatically generate summary reports;</li>
+                            <li>Keep a log of recent activities.</li>
+                        </ol>
+                        <p>
+                            A series of video tutorials can be found <a href="https://www.youtube.com/channel/UCj-R-nu4f6DiI5bYls6pKsw">here</a>.
+                        </p>
+                    </div>
+                    <h4> Workflow Concept</h4>
 					<div>
 						<p><img align="right" src="{% static "images/workflow_concept.png" %}">Researchers often come across repetitive analysis tasks where the same/different inputs are analyzed by using the same/different tools multiple times. In addition, a number of analyses tools may need to be used for analyzing the same set of inputs. The workflow allows automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools. </p>
-						<p>The workflow is developed based on our extensive experience with Gaggle in exchanging data between independently developed software tools and databases to enable interactive exploration of systems biology data. Exporting the "boss" and "goose" concept into the workflow, each goose becomes a module in the workflow. These modules can be added into a workflow sequentially or in parallel and can accept output from other modules in the workflow. Once the workflow is built, it can be saved into a personal workspace and can be called out anytime to invoke the same analysis steps.</p> 
-						
+						<p>The Workflow is developed based on our extensive experience with Gaggle in exchanging data between independently developed software tools and databases to enable interactive exploration of systems biology data. Exporting the "boss" and "goose" concept into the workflow, each goose becomes a module in the workflow. These modules can be added into a workflow sequentially or in parallel and can accept output from other modules in the workflow. Once the workflow is built, it can be saved into a personal workspace and can be called out anytime to invoke the same analysis steps.</p>
 					</div>
 					<h4> Case 1 - Discovering Detailed Regulon Information</h4>
 					<div> <img align="right" src="{% static "images/workflow_case-1.png" %}">
