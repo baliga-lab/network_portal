@@ -106,7 +106,7 @@ $(document).ready(function () {
         drop: componentDropEvent
     });
 
-    $(".componenthelp").colorbox({inline: true, width: "50%"});
+    $(".componenthelp").colorbox({inline: true, width: "60%"});
 
     $( "#tabs" ).tabs();
 
