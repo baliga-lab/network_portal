@@ -113,6 +113,7 @@ $(document).ready(function () {
     jsplumbInstance = jsPlumb.getInstance();
 
     CheckLogin();
+    $("#lblSaveStateWarning").hide();
 
     setTimeout(function() { TimerFunc() }, 3000);
     GetEdgeDataTypes();
@@ -3651,7 +3652,8 @@ function SaveState()
                     //alert(name + " " + desc);
                     var datetime = GetCurrentDateTimeString();
                     DisplayInfo("#divHistoryInfo", (datetime + " Save state " + name), "historyinfo");
-
+                    $("#lblSaveStateWarning").show();
+                    $("#lblSaveStateWarning").css("text-decoration", "blink");
                     proxy.SaveStateDelegate(userid, name, desc);
                     //alert("workflow action done");
                 }
@@ -3672,6 +3674,8 @@ function OnSaveState(param)
 {
     //alert("state saved " + param);
     // Insert into saved state accordion
+    alert("State saved.");
+    $("#lblSaveStateWarning").hide();
 
     /*<a href='#' id='astate_{{state.ID|stringformat:"i"}}'>{{state.name}}</a>
     <div id='divstate_{{datagroup.ID|stringformat:"i"}}'>
