@@ -368,6 +368,7 @@ def saveworkflow(request):
             wfownerid = workflow['userid']
             wfid = workflow['workflowid']
             startnode = workflow['startNode']
+            print 'workflow id: ' + wfid + ' owner ' + wfownerid
 
             if wfid:
                     # this is an existing workflow
@@ -381,14 +382,15 @@ def saveworkflow(request):
                         workflowobj = dbworkflow[0]
                         workflowobj.name = wfname
                         workflowobj.description = wfdesc
+                        workflowobj.temporary = False
                         workflowobj.save()
 
             else:
                 # save the workflow info
-                workflowentry = Workflows(name = wfname, description = wfdesc, owner_id = int(wfownerid))
+                workflowentry = Workflows(name = wfname, description = wfdesc, owner_id = int(wfownerid), temporary = False)
                 workflowentry.save()
                 wfid = workflowentry.id
-                print "Workflow saved with id: " + str(wfid)
+                print "Workflow saved with id: " + str(wfid) + " owner " + wfownerid
 
             # save workflow nodes
             nodelist = workflow['workflownodes']
