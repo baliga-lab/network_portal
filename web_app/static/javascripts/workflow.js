@@ -662,13 +662,19 @@ function componentDropEvent(ev, component) {
                $(argumentsinput).removeClass("workflowcomponentchildinput").addClass("componentchildinput");
 
             var serviceuriinput = ($(cloned).children())[2];
-            if (window.localStorage != null)
+            var serviceuri = $(serviceuriinput).val();
+            if (goosename != "R")
             {
-                //alert(component.draggable.attr("id"));
-                var uri = window.localStorage.getItem(component.draggable.attr("id"));
-                //alert(uri);
-                if (uri != null)
-                    $(serviceuriinput).val(uri);
+                if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
+                {
+                    if (window.localStorage != null)
+                    {
+                        var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
+                        //alert(uri);
+                        if (uri != null)
+                            $(serviceuriinput).val(uri);
+                    }
+                }
             }
 
             //var serviceurlelement = ($(cloned).children())[2];
@@ -1559,14 +1565,17 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
             $(serviceuriinput).val(node.serviceuri);
         var serviceuri = $(serviceuriinput).val();
         //alert(serviceuri);
-        if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
+        if (goosename != "R")
         {
-            if (window.localStorage != null)
+            if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
             {
-                var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
-                //alert(uri);
-                if (uri != null)
-                    $(serviceuriinput).val(uri);
+                if (window.localStorage != null)
+                {
+                    var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
+                    //alert(uri);
+                    if (uri != null)
+                        $(serviceuriinput).val(uri);
+                }
             }
         }
 
