@@ -357,11 +357,63 @@
                             <li>Automatically generate summary reports;</li>
                             <li>Keep a log of recent activities.</li>
                         </ol>
+                        <h4>FAQ</h4>
+                        <p>
+                            <u>1. What is the Dataspace tab? How can I upload data to it?</u><br />
+                            The Dataspace is a central place to store and manipulate the data.  There are two types of data.
+                            First, the system generated data, which is in the "Network Portal Files" table of the Dataspace tab.
+                            Second, user captured data, which is displayed in the "User Files" table.
+                            You can use the "Capture" button of the Firegoose to capture data from any web page (See <a href="http://www.youtube.com/watch?v=Z93VKagR6os">this</a> video).
+                            You can also upload your file to the workspace (<a href="http://www.youtube.com/watch?v=XrZMnaTLW0A">this</a> video explains how).
+                            You can save these data so you can reuse them later.
+                        </p>
+                        <p>
+                            <u>2. What can I do with the data in the Dataspace? What applications are supported by the Gaggle Workspace?</u> <br />
+                            You can open the data by selecting "Open" from the dropdown list on each row of the tables.
+                            Gaggle will try to automatically start the Boss and the goose associated with the data.
+                            For example, we will automatically start MeV if the file is a "MeV Analysis File".
+                            If we cannot decide which goose to open, a dialog will pop up and you can select which one to use to
+                            open the data. <a href="http://www.youtube.com/watch?v=K9ojLoqbRSI">This video</a> explains how to open data from the workspace.
+                            Once the geese are open, you can do analysis and broadcast data between them.
+                            For now we support three geese: Firegoose, Cytoscape, and MeV. Other geese will be added later.
+                        </p>
+                        <p>
+                            <u>3. What is the Workflow tab? How can I build a workflow?</u><br />
+                            The Gaggle Workspace supports the concept of workflow. It is very often that biologists need to perform repetitive analysis tasks
+                            where the same/different inputs are analyzed by using the same/different tools multiple times. In addition, a number
+                            of analyses tools may need to be used for analyzing the same set of inputs.
+                            The workflow allows automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools.<br />
+
+                            There are two ways you can create a workflow. First, the system will automatically record the
+                            geese you opened, and the source and target of each broadcast, and display it as a workflow
+                            on the "Workflow" page.
+                            You can also manually create workflows. To do this, you drag a rectangle with goose name
+                            under the "Modules" column, and drop it on to the Workflow Canvas. A box will show up.
+                            It contains the execution path of the goose (you can change it if you know the installation path).
+                            Tutorial video can be found <a href="http://www.youtube.com/watch?v=EwEC0WL9BKg">here</a>.
+
+                            More details about the workflow can be found <a href="#workflowconceptbookmark">here</a>.
+                        </p>
+                        <p>
+                            <u>4. What is save/load states? How can I use this feature?</u><br />
+                            Save/load state is a very useful feature. You can go to the "Saved States" tab and click the "Save State" button.
+                            What it will do is it will contact each geese and tell them to save their current state.
+                            The state files will be saved on the server so it takes some time. Once it is done, you will
+                            see an notification and a new row appear in the saved states table.  You can reload the state from
+                            any machine later on.  Note that currently only Firegoose, Cytoscape, and MeV support saving state.
+                            We are actively working to enable more geese.  <a href="http://www.youtube.com/watch?v=qiB7rs_2wW4">This video</a> explains save/load session states.
+                        </p>
+                        <p>
+                            <u>5. What are session reports?</u><br />
+                            Session reports are automatically generated for workflows. A report consists of
+                            snapshots of each applications of the workflow after the workflow is finished.  <a href="http://www.youtube.com/watch?v=Rk3Bv2vochA">This video</a>
+                            explains session reports.
+                        </p>
                         <p>
                             A series of video tutorials can be found <a href="https://plus.google.com/u/1/b/111789053530927127952/111789053530927127952/videos?cfem=1">here</a>.
                         </p>
                     </div>
-                    <h4> Workflow Concept</h4>
+                    <h4> Workflow Concept<a name="workflowconceptbookmark"></a></h4>
 					<div>
 						<p><img align="right" src="{% static "images/workflow_concept.png" %}">Researchers often come across repetitive analysis tasks where the same/different inputs are analyzed by using the same/different tools multiple times. In addition, a number of analyses tools may need to be used for analyzing the same set of inputs. The workflow allows automation of these repetitive tasks by linking inputs and outputs for various desktop and web based analysis tools. </p>
 						<p>The Workflow is developed based on our extensive experience with Gaggle in exchanging data between independently developed software tools and databases to enable interactive exploration of systems biology data. Exporting the "boss" and "goose" concept into the workflow, each goose becomes a module in the workflow. These modules can be added into a workflow sequentially or in parallel and can accept output from other modules in the workflow. Once the workflow is built, it can be saved into a personal workspace and can be called out anytime to invoke the same analysis steps.</p>
