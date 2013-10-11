@@ -663,16 +663,27 @@ function componentDropEvent(ev, component) {
 
             var serviceuriinput = ($(cloned).children())[2];
             var serviceuri = $(serviceuriinput).val();
-            if (goosename != "R")
+            //alert(serviceuri);
+            //if (goosename != "R")
             {
+                //alert(serviceuri.length);
                 if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
                 {
-                    if (window.localStorage != null)
+                    //alert("getting local storage");
+                    try
                     {
-                        var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
-                        //alert(uri);
-                        if (uri != null)
-                            $(serviceuriinput).val(uri);
+                        if (window.localStorage != null)
+                        {
+                            //alert(componentid);
+                            var uri = window.localStorage.getItem(componentid); //(("component_" + nodecomponentid));
+                            //alert(uri);
+                            if (uri != null)
+                                $(serviceuriinput).val(uri);
+                        }
+                    }
+                    catch (e)
+                    {
+                        //alert(e);
                     }
                 }
             }
@@ -1565,7 +1576,7 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
             $(serviceuriinput).val(node.serviceuri);
         var serviceuri = $(serviceuriinput).val();
         //alert(serviceuri);
-        if (goosename != "R")
+        //if (goosename != "R")
         {
             if (serviceuri == null || serviceuri.length == 0 || serviceuri.toLowerCase().indexOf('.jnlp') < 0)
             {
