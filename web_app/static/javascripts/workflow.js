@@ -3443,9 +3443,9 @@ function OpenDataGroup(group, groupname, datatype)
 
           var activeGeese = [];
           var proxy = get_proxyapplet();
-          if (proxy != undefined) {
-             activeGeese = proxy.getGeeseNames();
-          }
+          //if (proxy != undefined) {
+          //   activeGeese = proxy.getGeeseNames();
+          //}
 
           if (group.length == 1)
           {
