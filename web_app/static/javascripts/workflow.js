@@ -3775,6 +3775,7 @@ function OnSaveState(param)
 
 function LoadState(event)
 {
+    $("#inputFiregoose").val("BossStarting");
     var source = event.target || event.srcElement;
     if (source == null)
         source = event;
