@@ -72,6 +72,13 @@ def species_genes_link(species):
                                                        species.gene_set.count()))
 
 @register.filter
+def species_mo_link(species):
+    if species.ncbi_taxonomy_id:
+        return mark_safe("<a href=\"http://www.microbesonline.org/cgi-bin/microarray/viewExp.cgi?taxes=_%d&expOption=3&submit=Browse\">%s (Microbes Online)</a>" % (species.ncbi_taxonomy_id, species.name))
+    else:
+        return mark_safe("-")
+
+@register.filter
 def species_ncbi_link(species):
     """species list make link to NCBI for species"""
     if species.ncbi_taxonomy_id:

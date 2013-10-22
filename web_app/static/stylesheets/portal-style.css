@@ -463,14 +463,13 @@ input.button-record {
 /* Alternative top-menu */
 
 .underlinemenu {
-    font-weight: bold;
     width: 100%;
     bottom: 60px top:0px;
 }
 
 .underlinemenu ul{
     padding: 1px 0 60px 0; /*6px should equal top padding of "ul li a" below, 7px should equal bottom padding + bottom border of "ul li a" below*/
-   float:right;
+    float:right;
     margin: -50px 2px;
     text-align: right; /*set value to "left", "center", or "right"*/
 }
@@ -480,16 +479,20 @@ input.button-record {
 }
 
 .underlinemenu ul li a{
-    color: #51432F; /*#fff;*/
-    padding: 0px 4px 4px 3px; /*top padding is 6px, bottom padding is 4px*/
+	display: block;
+	float: left;
+    color: #003399; /*#fff;*/
+    padding:2px 4px 4px 3px; /*top padding is 6px, bottom padding is 4px*/
     margin-right: 10px; /*spacing between each menu link*/
     text-decoration: none;
-    border-bottom: 3px solid orange; /*bottom border is 3px*/
-    text-shadow: 0.5px 0.5px 1px #4D5A1C;
+    border-bottom: 4px solid orange; /*bottom border is 3px*/
+    text-shadow: 1px 1px 2px #4D5A1C;
+    height: 17px;
 }
 
 .underlinemenu ul li a:hover, .underlinemenu ul li a.selected{
     border-bottom-color: black;
+    color: #FF9900;
 }
 
 /* Navigation */

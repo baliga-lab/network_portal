@@ -40,7 +40,9 @@
     				    {{network|meme_pssm_link}}
   					  {% endfor %}
   				  {% else %}No networks for this species, yet.{% endif %}
-  			<td>{{ network.data_source }}</td>
+  			<td>
+          {{species|species_mo_link}}
+        </td>
   			</tr>
   		</tbody>
   	</table>
