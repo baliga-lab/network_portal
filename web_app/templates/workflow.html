@@ -4,7 +4,7 @@
 {% load static %}
 <div class="sub-page">
 <div class="main" style="width: 97%">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/redmond/jquery-ui.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
 <link type="text/css" rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dropdown.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/portal-style.css">
@@ -25,8 +25,7 @@
 <a class="componenthelp" align="right" href="#inlineworkspacehelp">
     <img src="/static/images/help.png" />
 </a>
-<br />
-<a class="small red awesome" style="visibility: hidden" href='javascript:StartBoss()' title="First start Gaggle Boss">Start Boss</a>
+<a class="small red awesome" style="visibility: collapse" href='javascript:StartBoss()' title="First start Gaggle Boss">Start Boss</a>
 <div id="tabs" class="sub-page ui-tabs ui-widget ui-widget-content ui-corner-all">
 <ul>
     <li><a class="name" href="#tab-data">Dataspace -></a></li>
@@ -174,7 +173,8 @@
                         {% for component in wfentry.WorkflowComponents %}
 
                         <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
-                            <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a></div>
+                            <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a>
+                            </div>
                             <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
                             <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
                             <a class="componentquestion" href="#inlinewfpath">
@@ -196,7 +196,8 @@
                                    placeholder="Enter the arguments to be passed to the component"
                                    title="Enter the arguments to be passed to the component"/>
                             <input type="hidden" value="" />
-
+                            <input type="hidden" value="0" />
+                            <input type="hidden" value="{{component.Component.name}}" />
                         </div>
 
                         {% endfor %}
@@ -377,9 +378,15 @@
         </div>
 
         <div id="divDataspaceComponentMenu" style="display: none">
+            <!--<strong>Open in an Existing Goose</strong><br/>
+            <ul id="ulctxExistingComponents">
+            </ul>
+            <hr />
+            <strong>Open in a New Goose</strong><br/> -->
             <strong>Select an Application</strong><br/>
             <ul id="ulctxcomponents">
             </ul>
+            <hr />
             <strong>Select a broadcast type</strong>
             <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>NameList
             <input id="inputUrlValue" type="radio" name="PassData" />File</p>
