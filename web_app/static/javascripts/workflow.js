@@ -143,8 +143,22 @@ $(document).ready(function () {
     LoadDataWorkspaceComponentMenu();
 
     LoadDataSpace();
+
+    CheckBrowser();
 });
 
+function CheckBrowser()
+{
+    //alert(navigator.userAgent);
+    if (navigator.userAgent.indexOf("Firefox") >= 0)
+    {
+        $("#lblBrowserWarning").hide();
+    }
+    else
+    {
+        $("#lblBrowserWarning").show();
+    }
+}
 
 function CheckLogin()
 {
