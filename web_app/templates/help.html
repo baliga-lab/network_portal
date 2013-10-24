@@ -34,32 +34,7 @@
       $(".figure1").colorbox({rel:'figure1'});
       });
     </script>
-    <title>ScreenFlow video</title>
-    <meta http-equiv="content-type" content="text/html;charset=iso-8859-1" />
-    <meta http-equiv="Content-Style-Type" content="text/css" />
-    <meta http-equiv="Content-Script-Type" content="text/Javascript" />
-    <script type="text/javascript" src="{% static "Network_Portal_Screencast_01/com/js/swfobject/swfobject.js" %}"></script>
-    <script type="text/javascript">
-      var flashvars = {};
-      var params = {};
-      
-      params.bgcolor = "#000000";
-      params.allowscriptaccess = "always";
-      
-      flashvars.videoPath = "{% static "Network_Portal_Screencast_01/movie.f4v" %}";
-      flashvars.posterPath = "{% static "Network_Portal_Screencast_01/com/poster/myPosterFrame.jpg" %}";
-      flashvars.skinPath = "{% static "Network_Portal_Screencast_01/com/skin/skin.swf" %}";
-      
-      var stageW = 572;
-      var stageH = 564;
-      
-      var attributes = {};
-      attributes.id = "flashcontent";
-
-      swfobject.embedSWF("{% static "Network_Portal_Screencast_01/player.swf" %}",
-        "flashcontent", stageW, stageH, "9.0.0", false, flashvars, params, attributes);
-    </script>
-		<script>
+    		<script>
 			$(function() {
 				$( "#accordion-portal" ).accordion({
 				collapsible: true,
