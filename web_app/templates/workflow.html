@@ -9,12 +9,44 @@
 <link type="text/css" rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dropdown.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/portal-style.css">
 
+
 <script src="http://www.java.com/js/deployJava.js"></script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.16-all.js'></script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
+<script> 
+    $(document).ready(function() {  
+    $.reject({  
+        reject: { safari: true, // Apple Safari  
+            chrome: true, // Google Chrome  
+            firefox: false, // Mozilla Firefox  
+            msie: true, // Microsoft Internet Explorer  
+            opera: true, // Opera  
+            konqueror: true, // Konqueror (Linux)  
+            unknown: true // Everything else
+             }, // Reject all renderers for demo
+              imagePath: "{{ STATIC_PREFIX }}images/",
+             display: ['firefox', 'firegoose'],  
+        browserInfo: {  
+            firegoose: { // Specifies browser name and image name (browser_konqueror.gif)  
+                text: 'Firegoose', // Text Link  
+                url: 'http://gaggle.systemsbiology.net/docs/geese/firegoose/' // URL To link to  
+            }  
+        },  
+             
+               
+        header: 'We recommend to use Firefox for best performance', // Header Text  
+        paragraph1: 'In order to take full advantage of the <strong>Workspace</strong>, please use Firefox', // Paragraph 1  
+        paragraph2: 'Please click the following links to install Firegoose plugin for Firefox',  
+        closeMessage: 'Close this window after you are done!', // Message below close window link
+        closeCookie: true  
+    }); // Customized Text  
+  
+    return false;  
+});        
+</script>
 
 <div id="container" style="width: 100%">
 <!--<img align="right" width="40px" src="{{STATIC_PREFIX}}images/workflow_logo.png"> -->
