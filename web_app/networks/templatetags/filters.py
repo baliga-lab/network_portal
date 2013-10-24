@@ -96,6 +96,10 @@ def species_string_link(species):
     return mark_safe("<a href=\"http://networks.systemsbiology.net/string9/%s.gz\">%s</a>" % (species.ncbi_taxonomy_id, species.ncbi_taxonomy_id))
 
 @register.filter
+def species_ratios_link(species):
+    return mark_safe("<a href=\"http://networks.systemsbiology.net/static/data-files/expression/%s-ratios.tsv\">%s-ratios.tsv</a>" % (species.short_name, species.short_name))
+
+@register.filter
 def species_mo_link(species):
     if species.ncbi_taxonomy_id:
         return mark_safe("<a href=\"http://www.microbesonline.org/cgi-bin/microarray/viewExp.cgi?taxes=_%d&expOption=3&submit=Browse\">%s (Microbes Online)</a>" % (species.ncbi_taxonomy_id, species.name))
