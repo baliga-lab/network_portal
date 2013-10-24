@@ -89,6 +89,9 @@ var targetWFEndpointOptions = {
 };
 
 $(document).ready(function () {
+
+
+
     $('#accordion').accordion({ active: false,
                                 collapsible: true,
 				                heightStyle: "content"});
@@ -129,6 +132,8 @@ $(document).ready(function () {
         drop: componentDropEvent
     });
 
+    CheckBrowser();
+
     $(".componenthelp").colorbox({inline: true, width: "60%"});
 
     $( "#tabs" ).tabs();
@@ -144,20 +149,39 @@ $(document).ready(function () {
 
     LoadDataSpace();
 
-    CheckBrowser();
+    return false;
 });
 
 function CheckBrowser()
 {
     //alert(navigator.userAgent);
-    if (navigator.userAgent.indexOf("Firefox") >= 0)
-    {
-        $("#lblBrowserWarning").hide();
-    }
-    else
-    {
-        $("#lblBrowserWarning").show();
-    }
+
+    $.reject({
+            reject: { safari: true, // Apple Safari
+                chrome: true, // Google Chrome
+                firefox: false, // Mozilla Firefox
+                msie: true, // Microsoft Internet Explorer
+                opera: true, // Opera
+                konqueror: true, // Konqueror (Linux)
+                unknown: true // Everything else
+                 }, // Reject all renderers for demo
+                  imagePath: "/static/images/",
+                 display: ['firefox', 'firegoose'],
+            browserInfo: {
+                firegoose: { // Specifies browser name and image name (browser_konqueror.gif)
+                    text: 'Firegoose', // Text Link
+                    url: 'http://gaggle.systemsbiology.net/docs/geese/firegoose/' // URL To link to
+                }
+            },
+
+
+            header: 'We recommend to use Firefox for best performance', // Header Text
+            paragraph1: 'In order to take full advantage of the <strong>Workspace</strong>, please use Firefox', // Paragraph 1
+            paragraph2: 'Please click the following links to install Firegoose plugin for Firefox',
+            closeMessage: 'Close this window after you are done!', // Message below close window link
+            closeCookie: false
+        }); // Customized Text
+
 }
 
 function CheckLogin()
@@ -436,6 +460,8 @@ function CheckDataInjection()
     var newsignal = parseInt($("#inputDataSignal").val());
     if (newsignal != WF_dataSignal)
     {
+        GroupData("#tblUserFiles");
+
         WF_dataSignal = newsignal;
         $(".dataspacehoverimage").hover(function(e){
               //alert("moseover...");
@@ -3115,6 +3141,15 @@ function GroupData(datatable)
                            $("#wfgrpaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
 
                            WF_groupcnt--;
+
+                           if ($("#chkSaveGroup").prop("checked"))
+                           {
+                               // The "save group" checkbox is checked, we save it right away
+                               var savedata = {};
+                               savedata.target = savebutton;
+                               SaveOneGroup(savedata);
+                           }
+
                            $('#divDataspaceGroup').dialog('close');
                            /*$('#wfgrpaccordion p').bind('click', function (event) {
                                   var source = event.target || event.srcElement;
@@ -3169,7 +3204,7 @@ function SelectAllInGroup(event)
 
 function SaveOneGroup(event)
 {
-   //alert("save group");
+   alert("save group " + event.target);
    var source = event.target || event.srcElement;
    if (source == null)
        source = event;
@@ -3581,11 +3616,11 @@ function OpenDataGroup(group, groupname, datatype)
           FG_currentDataToOpen = group;
 
           var activeGeese = [];
-          //var proxy = get_proxyapplet();
-          //if (proxy != undefined) {
+          var proxy = get_proxyapplet();
+          if (proxy != undefined) {
              //alert("Get opened geese...");
-          //   activeGeese = proxy.getGeeseNames();
-          //}
+             activeGeese = proxy.getGeeseNames();
+          }
 
           //alert(activeGeese);
           $("#ulctxExistingComponents").empty();
