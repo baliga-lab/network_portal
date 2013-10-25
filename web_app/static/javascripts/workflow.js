@@ -155,6 +155,7 @@ $(document).ready(function () {
 function CheckBrowser()
 {
     //alert(navigator.userAgent);
+<<<<<<< HEAD
     /*if (navigator.userAgent.indexOf("Firefox") >= 0)
     {
         $("#lblBrowserWarning").hide();
@@ -164,6 +165,8 @@ function CheckBrowser()
         $("#lblBrowserWarning").show();
     }  */
 
+=======
+>>>>>>> f4fe1aa6fd4705e128c580e98c236546e9ddd4c3
 
     $.reject({
             reject: { safari: true, // Apple Safari
