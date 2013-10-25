@@ -38,9 +38,32 @@ var componenttitledivindex = 0;
 var componenttitlelinkindex = 0;
 var componentsubactioninputindex = 4;
 var componentdatauriindex = 5;
+var componentopeninnewwindowindex = 11;
+var componentexistinggoosenameinputindex = 12;
+var componentnameinputindex = 6;
+var componentshortnameinputindex = 7;
+
 var jsplumbInstance = null;
 
 var WF_dataAppliedHistory = [];
+
+
+var WF_fileTypeGeeseNameDictionary = {
+    "tsv" : "MeV",
+    "anl" : "MeV",
+    "mev" : "MeV",
+    "mev analysis file": "MeV",
+    "multiple array viewer": "MeV",
+    "cytoscape network": "Cytoscape",
+    "cys" : "Cytoscape",
+    "sif" : "Cytoscape",
+    "cytoscape" : "Cytoscape",
+    "r" : "R",
+    "xml" : "",
+    "txt" : "",
+    "gdat" : ""
+};
+
 
 var sourceWFEndpointOptions = {
     anchor: "RightMiddle",
@@ -66,6 +89,9 @@ var targetWFEndpointOptions = {
 };
 
 $(document).ready(function () {
+
+
+
     $('#accordion').accordion({ active: false,
                                 collapsible: true,
 				                heightStyle: "content"});
@@ -106,6 +132,8 @@ $(document).ready(function () {
         drop: componentDropEvent
     });
 
+    CheckBrowser();
+
     $(".componenthelp").colorbox({inline: true, width: "60%"});
 
     $( "#tabs" ).tabs();
@@ -120,8 +148,50 @@ $(document).ready(function () {
     LoadDataWorkspaceComponentMenu();
 
     LoadDataSpace();
+
+    return false;
 });
 
+function CheckBrowser()
+{
+    //alert(navigator.userAgent);
+    /*if (navigator.userAgent.indexOf("Firefox") >= 0)
+    {
+        $("#lblBrowserWarning").hide();
+    }
+    else
+    {
+        $("#lblBrowserWarning").show();
+    }  */
+
+
+    $.reject({
+            reject: { safari: true, // Apple Safari
+                chrome: true, // Google Chrome
+                firefox: false, // Mozilla Firefox
+                msie: true, // Microsoft Internet Explorer
+                opera: true, // Opera
+                konqueror: true, // Konqueror (Linux)
+                unknown: true // Everything else
+                 }, // Reject all renderers for demo
+                  imagePath: "/static/images/",
+                 display: ['firefox', 'firegoose'],
+            browserInfo: {
+                firegoose: { // Specifies browser name and image name (browser_konqueror.gif)
+                    text: 'Firegoose', // Text Link
+                    url: 'http://gaggle.systemsbiology.net/docs/geese/firegoose/' // URL To link to
+                }
+            },
+
+
+            header: 'We recommend to use Firefox for best performance', // Header Text
+            paragraph1: 'In order to take full advantage of the <strong>Workspace</strong>, please use Firefox', // Paragraph 1
+            paragraph2: 'Please click the following links to install Firegoose plugin for Firefox',
+            closeMessage: 'Close this window after you are done!', // Message below close window link
+            closeCookie: false
+        }); // Customized Text
+
+}
 
 function CheckLogin()
 {
@@ -202,7 +272,7 @@ function LoadDataWorkspaceComponentMenu()
         }
         var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
         li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' /><label>" + goosename
-           + "</label><input type='hidden' value='" + $(this).attr("id") + "' />" + subactionhtml);
+           + "</label><input type='hidden' value='" + $(this).attr("id") + "' /><input type='hidden' value='1' />" + subactionhtml);
         $("#ulctxcomponents").append(li);
     });
 }
@@ -242,7 +312,17 @@ function SetDataPass(event)
                     var datalink = FG_currentDataToOpen[i];
                     var url = $(datalink).prop("href").toString().toLowerCase();
                     //alert(url);
-                    if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0 || url.indexOf(".xml") >= 0)
+                    var fileTypeFound = false;
+                    for (var ftype in WF_fileTypeGeeseNameDictionary)
+                    {
+                        if (url.indexOf(ftype.toLowerCase()) >= 0)
+                        {
+                            fileTypeFound = true;
+                            break;
+                        }
+                    }
+                    //if (url.indexOf(".txt") >= 0 || url.indexOf(".cys") >= 0 || url.indexOf(".tsv") >= 0 || url.indexOf(".anl") >= 0 || url.indexOf(".gdat") >= 0 || url.indexOf(".xml") >= 0)
+                    if (fileTypeFound)
                     {
                         // If there is a txt file, we should NOT pass names
                         //alert("Set check to false");
@@ -389,6 +469,8 @@ function CheckDataInjection()
     var newsignal = parseInt($("#inputDataSignal").val());
     if (newsignal != WF_dataSignal)
     {
+        GroupData("#tblUserFiles");
+
         WF_dataSignal = newsignal;
         $(".dataspacehoverimage").hover(function(e){
               //alert("moseover...");
@@ -996,6 +1078,13 @@ function ExtractWorkflow(nodelist) {
 
                 var subactiontext = $(subactionelement).find(":selected").text();
                 //alert(subactiontext);
+
+                var openinnewwindowinput = $(source).children()[componentopeninnewwindowindex];
+                wfnode.openinnewwindow = $(openinnewwindowinput).val();
+                //alert(wfnode.openinnewwindow);
+                var existinggoosenameinput = $(source).children()[componentexistinggoosenameinputindex];
+                wfnode.opengoosename = $(existinggoosenameinput).val();
+                //alert("Open goose name " + wfnode.opengoosename);
 
                 wfnode.subaction = (wfnode.goosename == "Generic") ? (subaction + ";;" + subactiontext) : subaction; //.attr("value");
                 wfnode.datauri = $(dataurielement).val(); //.attr("value");
@@ -3061,6 +3150,15 @@ function GroupData(datatable)
                            $("#wfgrpaccordion").append($(divelement)).accordion('destroy').accordion({ active : -1});
 
                            WF_groupcnt--;
+
+                           if ($("#chkSaveGroup").prop("checked"))
+                           {
+                               // The "save group" checkbox is checked, we save it right away
+                               var savedata = {};
+                               savedata.target = savebutton;
+                               SaveOneGroup(savedata);
+                           }
+
                            $('#divDataspaceGroup').dialog('close');
                            /*$('#wfgrpaccordion p').bind('click', function (event) {
                                   var source = event.target || event.srcElement;
@@ -3115,7 +3213,7 @@ function SelectAllInGroup(event)
 
 function SaveOneGroup(event)
 {
-   //alert("save group");
+   alert("save group " + event.target);
    var source = event.target || event.srcElement;
    if (source == null)
        source = event;
@@ -3340,6 +3438,7 @@ function OpenGoose(goosenameli, group, groupname)
 {
       //alert(goosenameli);
       if (goosenameli != null) {
+          var newgooseinput = $(goosenameli).children()[3];
           var goosenamelabel = $(goosenameli).children()[1];
           //alert(goosenamelabel);
           var goosename = $(goosenamelabel).text();
@@ -3382,6 +3481,17 @@ function OpenGoose(goosenameli, group, groupname)
           //alert(datauriinput)
           $(datauriinput).val(datauri);
 
+          var openinnewwindowinput = $(sourceelement).children()[componentopeninnewwindowindex];
+          var openinnewwindow = $(newgooseinput).val();
+          //alert("Open in new window " + openinnewwindow);
+          $(openinnewwindowinput).val(openinnewwindow);
+
+          var opengoosenameinput = $(sourceelement).children()[componentexistinggoosenameinputindex];
+          //alert(opengoosenameinput);
+          if (openinnewwindow == "0")
+          {
+            $(opengoosenameinput).val(goosename);
+          }
           // Now we form the workflow of this new component and submit the workflow to Boss
           var nodelist = [];
           nodelist.push(nodeobj.Element);
@@ -3415,6 +3525,29 @@ function FindGooseControlByName(goosename)
     return gooseindex
 }
 
+function FindGooseComponentByName(goosename)
+{
+    if (goosename != null && goosename.length > 0)
+    {
+        var splitted = goosename.split("-");
+        var truegoosename = (splitted[0].split(";;"))[0];
+        var component = null;
+        //alert("Goose name to find: " + truegoosename);
+        $("#components").children().each(function() {
+            var componentnameinput = $(this).children()[componentnameinputindex];
+            var componentname = $(componentnameinput).val();
+            //alert("component name: " + componentname);
+            if (componentname.toLowerCase().indexOf(truegoosename.toLowerCase()) >= 0)
+            {
+                //alert("Found!");
+                component = $(this);
+                return;
+            }
+        });
+    }
+    return component;
+}
+
 function ProcessGooseOpen(goosename, group, groupname)
 {
     var gooseliindex = FindGooseControlByName(goosename);
@@ -3432,6 +3565,56 @@ function ProcessGooseOpen(goosename, group, groupname)
     return false;
 }
 
+// If we can start a goose for te data directly without starting the Open Goose Dialog
+function GetInstantStart(activeGeese, data, datatype)
+{
+    //alert(activeGeese);
+    var dotloc = data.lastIndexOf(".");
+    var extension = data;
+    if (dotloc >= 0)
+       extension = data.substring(dotloc + 1);
+    //alert(extension);
+    var gooseName = WF_fileTypeGeeseNameDictionary[extension.toLowerCase()];
+    //alert("Goose name " + gooseName);
+    if (gooseName == null || gooseName.length == 0)
+    {
+        //alert(datatype);
+        if (datatype != null)
+            gooseName = WF_fileTypeGeeseNameDictionary[datatype.toLowerCase()];
+    }
+
+
+    // If goose is not already opened, we can start it instantly
+    if (gooseName == null || gooseName.length == 0 || activeGeese == null || activeGeese.length == 0)
+        return gooseName;
+
+    for (var i = 0; i < activeGeese.length; i++)
+    {
+        var splitted = activeGeese[i].split("-");
+        //alert(splitted[0]);
+        var translatedGooseName = WF_fileTypeGeeseNameDictionary[splitted[0].toLowerCase()];
+        if (translatedGooseName == null || translatedGooseName.length == 0)
+            translatedGooseName = splitted[0];
+        if (translatedGooseName.toLowerCase() == gooseName.toLowerCase())
+        {
+            return null;
+        }
+    }
+    return gooseName;
+
+    /*if (data.toLowerCase().indexOf(".cys") >= 0 || data.toLowerCase().indexOf(".sif") >= 0 || datatype.toLowerCase().indexOf("cytoscape") >= 0)
+    {
+      //alert("Searching for Cytoscape...");
+      if (ProcessGooseOpen("Cytoscape", group, groupname))
+         return;
+    }
+    else if (data.toLowerCase().indexOf(".tsv") >= 0 || data.toLowerCase().indexOf("anl") >= 0 || datatype.toLowerCase().indexOf("mev") >= 0) {
+      if (ProcessGooseOpen("MeV", group, groupname))
+         return ;
+    }
+    return null; */
+}
+
 function OpenDataGroup(group, groupname, datatype)
 {
     //alert("Opening data..." + group.length);
@@ -3443,35 +3626,58 @@ function OpenDataGroup(group, groupname, datatype)
 
           var activeGeese = [];
           var proxy = get_proxyapplet();
-          //if (proxy != undefined) {
-          //   activeGeese = proxy.getGeeseNames();
-          //}
+          if (proxy != undefined) {
+             //alert("Get opened geese...");
+             activeGeese = proxy.getGeeseNames();
+          }
+
+          //alert(activeGeese);
+          $("#ulctxExistingComponents").empty();
+          if (activeGeese != null && activeGeese.length > 0)
+          {
+              for (var i = 0; i < activeGeese.length; i++)
+              {
+                    var component = FindGooseComponentByName(activeGeese[i]);
+                    if (component != null)
+                    {
+                        var subactionselect = $(component).children()[componentsubactioninputindex];
+                        //alert(subactionselect);
+                        var values = [];
+                        $(subactionselect).children("option").each(function() {
+                            //alert($(this).val());
+                            values.push( $(this).val() );
+                        });
+
+                        var subactionhtml = "";
+                        if (values.length > 2)
+                        {
+                            // we have subactions
+                            subactionhtml = $(subactionselect).html();
+                            subactionhtml = "<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+                        }
+
+                        var li = document.createElement("li");
+                        li.innerHTML = ("<input type='radio' name='grpgoose' " + " onchange='javascript:SetDataPass(this)' /><label>" + activeGeese[i]
+                               + "</label><input type='hidden' value='" + $(component).attr("id") + "' /><input type='hidden' value='0' />" + subactionhtml);
+                        $("#ulctxExistingComponents").prepend(li);
+                    }
+              }
+          }
 
           if (group.length == 1)
           {
                var url = group[0];
                var data = $(url).prop("href");
+
+               var gooseName = GetInstantStart(activeGeese, data, datatype);
                //alert(datatype);
-               if (data.toLowerCase().indexOf(".cys") >= 0 || data.toLowerCase().indexOf(".sif") >= 0 || datatype.toLowerCase().indexOf("cytoscape") >= 0)
+               if (gooseName != null && gooseName.length > 0)
                {
-                  //alert("Searching for Cytoscape...");
-                  if (ProcessGooseOpen("Cytoscape", group, groupname))
-                     return;
-               }
-               else if (data.toLowerCase().indexOf(".tsv") >= 0 || data.toLowerCase().indexOf("anl") >= 0 || datatype.toLowerCase().indexOf("mev") >= 0) {
-                  if (ProcessGooseOpen("MeV", group, groupname))
-                     return;
+                  if (ProcessGooseOpen(gooseName, group, groupname))
+                    return;
                }
           }
 
-          if (activeGeese == null || activeGeese.length == 0)
-          {
-
-          }
-          else
-          {
-              // There are open geese
-          }
           //alert("Checking checkbox");
           $("#ulctxcomponents").children().each(function() {
                var checkbox = $(this).children()[0];
@@ -3482,15 +3688,26 @@ function OpenDataGroup(group, groupname, datatype)
           });
 
           //alert("open dialog");
-          $('#divDataspaceComponentMenu').dialog( { height:450, width:500,
+          $('#divDataspaceComponentMenu').dialog( { height:550, width:450,
             buttons: {
                 "Open": function() {
                     // Get all the selected data
+                    $("#ulctxExistingComponents").children().each(function() {
+                           var checkbox = $(this).children()[0];
+                           if ($(checkbox).prop('checked'))
+                           {
+                               var goosenameli = $(checkbox).parent();
+                               //alert("Open goose...");
+                               OpenGoose(goosenameli, group, groupname);
+                           }
+                           $('#divDataspaceComponentMenu').dialog('close');
+                    });
                     $("#ulctxcomponents").children().each(function() {
                            var checkbox = $(this).children()[0];
                            if ($(checkbox).prop('checked'))
                            {
                                var goosenameli = $(checkbox).parent();
+                               //alert("Open goose...");
                                OpenGoose(goosenameli, group, groupname);
                            }
                            $('#divDataspaceComponentMenu').dialog('close');
