@@ -155,18 +155,6 @@ $(document).ready(function () {
 function CheckBrowser()
 {
     //alert(navigator.userAgent);
-<<<<<<< HEAD
-    /*if (navigator.userAgent.indexOf("Firefox") >= 0)
-    {
-        $("#lblBrowserWarning").hide();
-    }
-    else
-    {
-        $("#lblBrowserWarning").show();
-    }  */
-
-=======
->>>>>>> f4fe1aa6fd4705e128c580e98c236546e9ddd4c3
 
     $.reject({
             reject: { safari: true, // Apple Safari
@@ -3629,12 +3617,12 @@ function OpenDataGroup(group, groupname, datatype)
 
           var activeGeese = [];
           var proxy = get_proxyapplet();
-          if (proxy != undefined) {
-             //alert("Get opened geese...");
-             activeGeese = proxy.getGeeseNames();
-          }
+          //if (proxy != undefined) {
+          //   alert("Get opened geese...");
+          //   activeGeese = proxy.getGeeseNames();
+          //}
 
-          //alert(activeGeese);
+          alert(activeGeese);
           $("#ulctxExistingComponents").empty();
           if (activeGeese != null && activeGeese.length > 0)
           {
