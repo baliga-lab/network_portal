@@ -3622,7 +3622,7 @@ function OpenDataGroup(group, groupname, datatype)
           //   activeGeese = proxy.getGeeseNames();
           //}
 
-          alert(activeGeese);
+          //alert(activeGeese);
           $("#ulctxExistingComponents").empty();
           if (activeGeese != null && activeGeese.length > 0)
           {
