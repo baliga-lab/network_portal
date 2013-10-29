@@ -1,8 +1,11 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.conf import settings
+import re
 
 register = template.Library()
+COND_X_PATTERN = re.compile('X(\d+)[.](\d+)')
+LOG_RATIO_PATTERN = re.compile('Log_Ratio_(\d+)[_](\d+)')
 
 ######################################################################
 #### Link tags
@@ -30,6 +33,23 @@ def bicluster_links(biclusters):
 def gene_link(gene):
     """gene list: make link to gene view"""
     return mark_safe("<a href=\"/%s/gene/%s\">%s</a>" % (gene.species.short_name, gene.name, gene.name))
+
+@register.filter
+def condition_link(cond):
+    def make_link(match):
+        exp_id = int(match.group(1))  # set number is group(2)
+        url = "http://www.microbesonline.org/cgi-bin/microarray/viewExp.cgi?expId=%d" % exp_id
+        return mark_safe("<a href=\"%s\">%s</a>" % (url, cond))
+
+    """turns a condition name into a Microbes Online link if possible"""
+    match = COND_X_PATTERN.match(cond)
+    if match:
+        return make_link(match)
+    match = LOG_RATIO_PATTERN.match(cond)
+    if match:
+        return make_link(match)
+    
+    return cond
 
 
 @register.filter
@@ -70,6 +90,14 @@ def species_link(species):
 def species_genes_link(species):
     return mark_safe("<a href=\"/%s/genes\">%d</a>" % (species.short_name,
                                                        species.gene_set.count()))
+
+@register.filter
+def species_string_link(species):
+    return mark_safe("<a href=\"http://networks.systemsbiology.net/string9/%s.gz\">%s</a>" % (species.ncbi_taxonomy_id, species.ncbi_taxonomy_id))
+
+@register.filter
+def species_ratios_link(species):
+    return mark_safe("<a href=\"http://networks.systemsbiology.net/static/data-files/expression/%s-ratios.tsv\">%s-ratios.tsv</a>" % (species.short_name, species.short_name))
 
 @register.filter
 def species_mo_link(species):
