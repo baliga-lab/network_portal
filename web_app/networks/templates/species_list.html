@@ -26,6 +26,9 @@ $(document).ready(function() {
 		    <th>Genes </th>
 		    <th>Regulators </th>
 		    <th>Network</th>
+		    <th>STRING</th>
+		    <th>Data source</th>
+		    <th>Gene Exp.</th>
       </tr>
     </thead>
     <tbody>
@@ -42,6 +45,9 @@ $(document).ready(function() {
 	        <a href="{{st|network_url}}"><img src="{% static "images/network.gif" %}"/></a>
 		      {% endif %}
 		      {% endfor %}</td>
+	      <td>{{sp|species_string_link}}</td>
+	      <td>{{sp|species_mo_link}}</td>
+	      <td>{{sp|species_ratios_link}}</td>
       </tr>
       {% endfor %}
      </tbody>
