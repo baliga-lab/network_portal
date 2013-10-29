@@ -3617,10 +3617,10 @@ function OpenDataGroup(group, groupname, datatype)
 
           var activeGeese = [];
           var proxy = get_proxyapplet();
-          //if (proxy != undefined) {
+          if (proxy != undefined) {
           //   alert("Get opened geese...");
-          //   activeGeese = proxy.getGeeseNames();
-          //}
+             activeGeese = proxy.getGeeseNames();
+          }
 
           //alert(activeGeese);
           $("#ulctxExistingComponents").empty();
