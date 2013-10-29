@@ -49,10 +49,6 @@
         });
         $('.help').colorbox({inline: true, width: "50%"});
         $(".figure1").colorbox({rel:'figure1'});
-        $("#bicl-conditions")
-        .tablesorter({widthFixed: true, widgets: ['zebra']})
-        {#.tablesorterPager({container: $("#tablepager")})#};
-
     });
   </script>
   {% endif %}
@@ -92,13 +88,6 @@
 			<div id="expression-graph"></div>
 			<div id="annotation-graph1"></div>
 			{% endif %}
-     <h5>Conditions</h5>
-     <table id="bicl-conditions" class="tablesorter">
-       <th>Name</th>
-       {% for c in conds %}
-       <tr><td>{{c.name|condition_link}}</td></tr>
-       {% endfor %}
-     </table>
 		</div>
 		<div id="sidebar">
 			<h5>Summary</h5>
