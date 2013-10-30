@@ -41,6 +41,7 @@ urlpatterns = patterns('',
     url(r'^workflow/save', 'views.saveworkflow', name='saveworkflow'),
     url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'views.deleteworkflow', name='deleteworkflow'),
     url(r'^workflow/(?P<workflow_id>\d+)/$', 'views.getworkflow', name='getworkflow'),
+    url(r'^workspace', 'views.workflow', name='workspace'),
     url(r'^workflow$', 'views.workflow', name='workflow'),
 
     # search app
