@@ -2501,7 +2501,7 @@ function DataOperationSelected(event)
                 //urlstring = urlstring.replace(":\\", "|/");
                 //urlstring = urlstring.replace(/\\/g, "/");
 
-                alert("The captured data is stored locally. Due to security, you cannot download a local file. Please open the file " + urlstring + " using a file browser");
+                //alert("The captured data is stored locally. Due to security, you cannot download a local file. Please open the file " + urlstring + " using a file browser");
             }
             //alert(urlstring);
             window.open(urlstring); //,'Download');
@@ -2569,6 +2569,7 @@ function DataOperationSelected(event)
                             index++;
                             data[index.toString()] = linkobj;
                             collecteddata['data'] = data;
+                            collecteddata['userid'] = $("#authenticated").val();
                             DoSaveData(collecteddata);
                             $( this ).dialog( "close" );
                         },
@@ -3618,7 +3619,7 @@ function OpenDataGroup(group, groupname, datatype)
           var activeGeese = [];
           var proxy = get_proxyapplet();
           if (proxy != undefined) {
-          //   alert("Get opened geese...");
+             //alert("Get opened geese...");
              activeGeese = proxy.getGeeseNames();
           }
 
