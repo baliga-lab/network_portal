@@ -460,7 +460,10 @@ function CheckDataInjection()
     var newsignal = parseInt($("#inputDataSignal").val());
     if (newsignal != WF_dataSignal)
     {
-        GroupData("#tblUserFiles");
+        // First we save the newly added data
+        var dataToSave = SaveCollectedData(null);
+        if (dataToSave > 1)
+            GroupData("#tblUserFiles");
 
         WF_dataSignal = newsignal;
         $(".dataspacehoverimage").hover(function(e){
@@ -2206,6 +2209,7 @@ function DeleteSessionReport()
 
 function SaveCollectedData(targetdata)
 {
+    var dataToSave = 0;
     var collecteddata = {};
     var collectedlocalfiles = {};
     var userid = $("#authenticated").val();
@@ -2246,6 +2250,7 @@ function SaveCollectedData(targetdata)
                //alert(dataid);
                if (dataid == null || dataid.length == 0)
                {
+                  dataToSave++;
                   hasdatatosave = true;
                   dataid = WF_captureddataid.toString();
                   WF_captureddataid--;
@@ -2295,6 +2300,7 @@ function SaveCollectedData(targetdata)
             DoSaveData(collecteddata);
         }
     }
+    return dataToSave;
 }
 
 function DoSaveData(collecteddata)

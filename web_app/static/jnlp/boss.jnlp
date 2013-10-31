@@ -12,7 +12,7 @@
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
     <jar href="lib/boss.jar" main="true"/>
     <jar href="lib/clipboardPlugin.jar"/>
-    <property name="jnlp.server" value="http://networks.systemsbiology.net" />
+    <property name="jnlp.server" value="http://localhost:8000" />
   </resources>
   <resources os="Windows" arch="x64 x86_64 amd64"> 
       <nativelib href="/static/lib/sigar-win-x64.jar"/> 
