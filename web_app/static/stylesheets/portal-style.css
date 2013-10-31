@@ -1883,6 +1883,30 @@ table#motif {
     list-style-image: url("/static/images/righthand.jpg");
 }
 
+#ulctxExistingComponents
+{
+    list-style-type:none;
+    padding-left: 0pt;
+}
+
+#ulctxExistingComponents li
+{
+   text-align: left;
+   align: left;
+}
+
+#ulctxcomponents
+{
+    list-style-type:none;
+    padding-left: 0pt;
+}
+
+#ulctxcomponents li
+{
+   text-align: left;
+   align: left;
+}
+
 .workflowaccordion
 {
     width: 95%; /*220px */;

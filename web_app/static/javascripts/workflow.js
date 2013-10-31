@@ -260,10 +260,10 @@ function LoadDataWorkspaceComponentMenu()
         {
             // we have subactions
             subactionhtml = $(subactionselect).html();
-            subactionhtml = "<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+            subactionhtml = "&nbsp;&nbsp;<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
         }
         var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
-        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' /><label>" + goosename
+        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />&nbsp;<label>" + goosename
            + "</label><input type='hidden' value='" + $(this).attr("id") + "' /><input type='hidden' value='1' />" + subactionhtml);
         $("#ulctxcomponents").append(li);
     });
@@ -3651,11 +3651,11 @@ function OpenDataGroup(group, groupname, datatype)
                         {
                             // we have subactions
                             subactionhtml = $(subactionselect).html();
-                            subactionhtml = "<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+                            subactionhtml = "&nbsp;&nbsp;<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
                         }
 
                         var li = document.createElement("li");
-                        li.innerHTML = ("<input type='radio' name='grpgoose' " + " onchange='javascript:SetDataPass(this)' /><label>" + activeGeese[i]
+                        li.innerHTML = ("<input type='radio' name='grpgoose' " + " onchange='javascript:SetDataPass(this)' />&nbsp;<label>" + activeGeese[i]
                                + "</label><input type='hidden' value='" + $(component).attr("id") + "' /><input type='hidden' value='0' />" + subactionhtml);
                         $("#ulctxExistingComponents").prepend(li);
                     }
@@ -3686,7 +3686,7 @@ function OpenDataGroup(group, groupname, datatype)
           });
 
           //alert("open dialog");
-          $('#divDataspaceComponentMenu').dialog( { height:550, width:450,
+          $('#divDataspaceComponentMenu').dialog( { height:600, width:550,
             buttons: {
                 "Open": function() {
                     // Get all the selected data
