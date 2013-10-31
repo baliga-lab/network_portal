@@ -32,6 +32,7 @@
       },
       });
       $(".figure1").colorbox({rel:'figure1'});
+      $(".youtube").colorbox({iframe:true, innerWidth:853, innerHeight:480});
       });
     </script>
     		<script>
@@ -441,19 +442,34 @@
 					</div></p>
 				</div>
 		
-            <div id="tabs-4"><h5> Network Portal Screencast</h5><br>
-			<h2>Discovering the regulation of target genes</h2>
-                 <iframe width="640" height="360" src="//www.youtube.com/embed/VNg0q70sLds?rel=0" frameborder="0" allowfullscreen></iframe>
-                 <p>In this screencast, we will explore the regulation of hemA gene in Rhodobacter sphaeroides. hemA and hemT genes encode isozymes that catalyze the formation of 5-aminolevulinic acid, the first step in the biosynthesis of all tetrapyrroles present in Rhodobacter spaheroides 2.4.1.<br>
-                 Previous studies have shown that hemA is transcribed from two promoters and that two global regulatory proteins, PrrA and FnrL, regulate hemA transcription in response to changes in oxygen tension.</br>
-                 In this screencast, we will see if we can validate some of these results from our network model and identify novel regulatory influences.</p>
-
-                <h2>Exploring gene function and regulation with Workspace</h2>
-                <iframe width="640" height="360" src="//www.youtube.com/embed/X_OqDXdZUKU" frameborder="0" allowfullscreen></iframe>
-                <p>In this screencast, we will learn how to explore genes, co-regulated genes, and regulators within a gene regulatory network. </p>
+            <div id="tabs-4"><h5> Network Portal Screencasts</h5><br>
+			<table id="youtube-screencasts" style{padding:10px;} border="">
+				<tr>
+					<td width="350px"><h2>Discovering the regulation of target genes</h2></br><a class="youtube" href="//www.youtube.com/embed/VNg0q70sLds?rel=0"> <img width="100" height="100" style="float:left" src="{{STATIC_PREFIX}}images/youtube_icon.png"></a><p>In this screencast, we will explore the regulation of hemA gene in Rhodobacter sphaeroides. hemA and hemT genes encode isozymes that catalyze the 								formation of 5-aminolevulinic acid, the first step in the biosynthesis of all tetrapyrroles present in Rhodobacter spaheroides 	2.4.1.<br>
+                 		Previous studies have shown that hemA is transcribed from two promoters and that two global regulatory proteins, PrrA and FnrL, regulate hemA transcription in response to changes in oxygen tension.</br>
+                 		In this screencast, we will see if we can validate some of these results from our network model and identify novel regulatory influences.</p>
+					</td>
+					
+					
+					<td width="350px"><h2>Exploring gene function and regulation with Workspace</h2></br><a class="youtube" href="//www.youtube.com/embed/X_OqDXdZUKU"> <img width="100" height="100" style="float:left" src="{{STATIC_PREFIX}}images/youtube_icon.png"></a>
+					<p>In this screencast, we will learn how to explore genes, co-regulated genes, and regulators within a gene regulatory network. </p>
                 <p>Here, we will use network information to learn more about one poorly characterized gene. Our biological question is to explore cytochrome gene function in Geobacter sulfurreducens.</p>
                 <p>G. sulfurreducens can receive electrons from other microbial species, which is useful in microbial fuel cells. Electron transfer involves c-type cytochromes. However, the specialization of the >100 c-type cytochromes in the genomes is only beginning to be described.</p>
-
+					
+					
+					</td>
+					<td width="350px" style="vertical-align:top"><h2>Filtering regulatory modules to identify candidate co-regulatory modules</h2></br><a class="youtube" href="//www.youtube.com/embed/1O7-0C0mRYY?rel=0"> <img width="100" height="100" style="float:left" src="{{STATIC_PREFIX}}images/youtube_icon.png"></a>
+					<p>In this use case we will browse and filter through the network modules table of Clostridium acetobutylicum in order to identify interesting pathways that display highly co-regulated structure. </p>
+					<p>In this way, Network Portal can enable a user to quickly filter through the network and identify potential regulatory modules for subsequent in-depth investigations.</p>
+					</td>
+				</tr>
+				<tr>
+					<td width="350px" style="vertical-align:top"><h2>Investigate regulation of specific metabolic pathways by using the search interface.</h2></br><a class="youtube" href="//www.youtube.com/embed/RVHjd24Htlw?rel=0"> <img width="100" height="100" style="float:left" src="{{STATIC_PREFIX}}images/youtube_icon.png"></a> <p>In this use case we will make use of the search interface to identify regulatory information about chemotaxis-related processes in Methanococcus maripaludis S2.</p><p>This exercise will allow us to query Network Portal for a specific keyword, find associated modules and drill down to various aspects of regulation.</p></td>
+					<td width="350px" style="vertical-align:top"><h2>Identifying potential function for genes of “unknown function” by using guilt-by-association.</h2></br><a class="youtube" href="//www.youtube.com/embed/y9pxTVEi4G8?rel=0"> <img width="100" height="100" style="float:left" src="{{STATIC_PREFIX}}images/youtube_icon.png"></a><p>This use case will seek potential new genes associated with carotenoid biosynthesis in R. sphaeroides 2.4.1 by investigating network modules enriched for genes involved in the carotenoid biosynthesis pathway.</p><p>These potential functions will give you a starting point for more thorough analysis to discover the functions of hypothetical proteins. </p></td>
+					<td width="350px" style="vertical-align:top"><h2>Using the Gaggle Firegoose toolbar to broadcast data from Network Portal to other web resources.</h2></br><a class="youtube" href="//www.youtube.com/embed/lymzld5y6JQ?rel=0"> <img width="100" height="100" style="float:left" src="{{STATIC_PREFIX}}images/youtube_icon.png"></a><p>In this use case we will go beyond the Network Portal by sending a list of genes that are included in a specific module to a web resource, EMBL String, to see what additional evidence indicates co-regulation for these genes. (Please note that Firegoose toolbar is currently only compatible with Firefox).</p><p>The EMBL String functional association network strongly supports co-regulation of these genes by displaying a tightly integrated network that includes multiple different types of evidence</p></td>
+				</tr>
+			</table>
+			<h2> For more screencasts visit our <a href="http://www.youtube.com/channel/UCj-R-nu4f6DiI5bYls6pKsw">YouTube channel</a>
 			</div>
 			
 			<div id="tabs-5"><h5> Get Involved</h5><br>
