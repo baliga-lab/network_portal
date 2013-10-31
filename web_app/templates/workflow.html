@@ -389,7 +389,13 @@
             <ul id="ulctxcomponents">
             </ul>
             <hr />
-            <strong>Select a broadcast type</strong>
+            <p>
+                <strong>Select a broadcast type</strong>
+                <a class="componenthelp" href="#inlinebroadcastdatatype">
+                    <img style="vertical-align:middle" src="/static/images/help.png" />
+                </a>
+            </p>
+
             <p><input id="inputNameValue" type="radio" name="PassData" checked="true"/>NameList
             <input id="inputUrlValue" type="radio" name="PassData" />File</p>
             <input id="inputContextSubaction" type="hidden" value="" />
@@ -579,7 +585,15 @@
                 </p>
             </div>
         </div>
-
+        <div style="display:none">
+            <div id="inlinebroadcastdatatype" style='padding:10px; background:#fff'>
+                <h5>Broadcast Data Type</h5>
+                <p align="justify">
+                    If you are opening a list of gene names (e.g., {DVU2025, DVU2028, DVU3038}, select "Namelist".
+                    If you are opening a file that contains a list of gene names, select "File".
+                </p>
+            </div>
+        </div>
         <div id="dlgSaveState" style="display: none">
             <p>Name: <input type="text" /></p>
             <p>Description: <input type="text" /></p>

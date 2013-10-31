@@ -1167,7 +1167,8 @@ def savestate(request):
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
             data.save()
             stateid = str(data.id)
-            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc }
+            datetime = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
+            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': datetime}
         else:
             pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
         responsedata['state'] = pair
