@@ -3955,7 +3955,7 @@ function OnSaveState(param)
 
     var td3 = document.createElement("td");
     $(row).append($(td3));
-    $(td3).innerHTML = datetime; // TODO add datetime of the state
+    td3.innerHTML = datetime; // TODO add datetime of the state
 
     var td4 = document.createElement("td");
     $(row).append($(td4));
