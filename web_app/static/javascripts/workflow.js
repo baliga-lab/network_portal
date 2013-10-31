@@ -461,7 +461,7 @@ function CheckDataInjection()
     if (newsignal != WF_dataSignal)
     {
         // First we save the newly added data
-        var dataToSave = SaveCollectedData(null);
+        var dataToSave = SaveCollectedData();
         if (dataToSave > 1)
             GroupData("#tblUserFiles");
 
@@ -2207,7 +2207,7 @@ function DeleteSessionReport()
     ); */
 }
 
-function SaveCollectedData(targetdata)
+function SaveCollectedData()
 {
     var dataToSave = 0;
     var collecteddata = {};
