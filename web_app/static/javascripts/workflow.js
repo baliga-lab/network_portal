@@ -30,6 +30,7 @@ var WF_currOrganismFullName = "Generic";
 var FG_currentDataToOpen = null;
 var WF_capturedDataType = "Generic";
 var WF_filesToUpload = null;
+var WF_dataToSave = 0;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -461,8 +462,8 @@ function CheckDataInjection()
     if (newsignal != WF_dataSignal)
     {
         // First we save the newly added data
-        var dataToSave = SaveCollectedData();
-        if (dataToSave > 1)
+        SaveCollectedData();
+        if (WF_dataToSave > 1)
             GroupData("#tblUserFiles");
 
         WF_dataSignal = newsignal;
@@ -2209,7 +2210,7 @@ function DeleteSessionReport()
 
 function SaveCollectedData()
 {
-    var dataToSave = 0;
+    WF_dataToSave = 0;
     var collecteddata = {};
     var collectedlocalfiles = {};
     var userid = $("#authenticated").val();
@@ -2250,7 +2251,7 @@ function SaveCollectedData()
                //alert(dataid);
                if (dataid == null || dataid.length == 0)
                {
-                  dataToSave++;
+                  WF_dataToSave++;
                   hasdatatosave = true;
                   dataid = WF_captureddataid.toString();
                   WF_captureddataid--;
@@ -2300,7 +2301,6 @@ function SaveCollectedData()
             DoSaveData(collecteddata);
         }
     }
-    return dataToSave;
 }
 
 function DoSaveData(collecteddata)
