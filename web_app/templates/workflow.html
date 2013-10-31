@@ -632,7 +632,7 @@
                             <input type="hidden" value='{{state.id|stringformat:"i"}}' />
                         </td>
                         <td> {{state.description}} </td>
-                        <td> {{state.created_at}} </td>
+                        <td> {{state.created_at|date:"SHORT_DATETIME_FORMAT"}} </td>
                         <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
                             <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
                             <input type="button" value="Edit" class="button" onclick="javascript:EditState(this);" />
