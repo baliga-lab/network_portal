@@ -1166,7 +1166,7 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            now = datetime.datetime.utcnow().replace(tzinfo=utc)
+            now = datetime.utcnow().replace(tzinfo=utc)
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = now)
             data.save()
             stateid = str(data.id)
