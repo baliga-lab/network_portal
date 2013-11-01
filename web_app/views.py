@@ -1172,7 +1172,7 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            statetime = datetime.fromtimestamp(long(createtime / 1000))
+            statetime = datetime.fromtimestamp(round(long(createtime)/1000))
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = statetime)
             data.save()
             stateid = str(data.id)
