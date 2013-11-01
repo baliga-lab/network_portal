@@ -690,7 +690,9 @@ class SavedStates(models.Model):
     owner = models.ForeignKey(Users)
     name = models.CharField(max_length = 1024, blank = True)
     description = models.CharField(max_length = 1024, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    created_datetime = models.CharField(max_length=1023, blank=True, null=True)
+
     #organismname = models.CharField(max_length = 1024, blank=True, null=True)
 
 class StateFiles(models.Model):

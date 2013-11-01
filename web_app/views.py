@@ -1172,16 +1172,16 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            statetime = datetime.fromtimestamp(round(long(createtime)/1000))
-            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = statetime)
+            #statetime = datetime.fromtimestamp(round(long(createtime)/1000))
+            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_datetime = createtime)
             data.save()
             stateid = str(data.id)
             #totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
             #print 'seconds difference: ' + str(totalseconds)
             #tdelta = timedelta(seconds = totalseconds)
             #lcltm = data.created_at + tdelta
-            dt = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
-            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
+            #dt = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
+            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': createtime}
         else:
             pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
         responsedata['state'] = pair
