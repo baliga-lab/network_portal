@@ -14,6 +14,8 @@ from django.utils import formats
 from django.utils.formats import get_format
 from django.db import transaction
 from django.conf import settings
+import datetime
+from django.utils.timezone import utc
 
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
@@ -1164,7 +1166,8 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc)
+            now = datetime.datetime.utcnow().replace(tzinfo=utc)
+            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = now)
             data.save()
             stateid = str(data.id)
             datetime = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
