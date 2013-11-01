@@ -20,31 +20,31 @@ $(document).ready(function() {
     <caption>Complete list of species in the Network Portal database</caption>
     <thead>
       <tr>
+      		<th>Explore Network</th>
 		    <th style="width:30%">Org code</th>
             <th>Species</th>
             <th style="width:60%">Taxonomy id</th>
 		    <th>Genes </th>
 		    <th>Regulators </th>
-		    <th>Network</th>
-		    <th>STRING</th>
+		    <th>STRING Data</th>
 		    <th>Data source</th>
-		    <th>Gene Exp.</th>
+		    <th>Gene Expression Data</th>
       </tr>
     </thead>
     <tbody>
       {% for sp in species %}
       <tr>
-	      <td>{{ sp.short_name }}</td>
-          <td><i>{{sp|species_link}}</i></td>
-          <td>{{sp|species_ncbi_link}}</td>
-	      <td>{{sp|species_genes_link}}</td>
-	      <td>{{sp|species_tfs_link}}</td>
-	      <td>
+      	  <td>
 	        {% for st in network %}
 	        {% if st.species_id == sp.id %}
 	        <a href="{{st|network_url}}"><img src="{% static "images/network.gif" %}"/></a>
 		      {% endif %}
 		      {% endfor %}</td>
+	      <td>{{ sp.short_name }}</td>
+          <td><i>{{sp|species_link}}</i></td>
+          <td>{{sp|species_ncbi_link}}</td>
+	      <td>{{sp|species_genes_link}}</td>
+	      <td>{{sp|species_tfs_link}}</td>
 	      <td>{{sp|species_string_link}}</td>
 	      <td>{{sp|species_mo_link}}</td>
 	      <td>{{sp|species_ratios_link}}</td>

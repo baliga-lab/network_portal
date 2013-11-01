@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/redmond/jquery-ui.css" />
 	<link rel="stylesheet" href="{{ STATIC_PREFIX }}stylesheets/portal-style.css">
 	<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/colorbox.css" />
+	<link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery.dataTables.css" />
 {% endblock %}
 {% block jsspecial %}
   <script src="{{ STATIC_PREFIX }}cytoscapeweb/js/AC_OETags.min.js"></script>
@@ -18,6 +19,7 @@
   <script src="{{ STATIC_PREFIX }}javascripts/network_helpers.js"></script>
   <script src="http://cdn.wijmo.com/jquery.wijmo-open.1.5.0.min.js"></script>
   <script src="{{ STATIC_PREFIX }}javascripts/jquery.qtip.min.js"></script>
+  <script src="{{ STATIC_PREFIX }}javascripts/jquery.dataTables.min.js"></script>
   <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 
   {% if img_url %}
@@ -49,9 +51,10 @@
         });
         $('.help').colorbox({inline: true, width: "50%"});
         $(".figure1").colorbox({rel:'figure1'});
-        $("#bicl-conditions")
-        .tablesorter({widthFixed: true, widgets: ['zebra']})
-        {#.tablesorterPager({container: $("#tablepager")})#};
+        $("#bicl-conditions").dataTable({
+          'bFilter': false,
+          'bSort': false
+        });
 
     });
   </script>
@@ -93,11 +96,13 @@
 			<div id="annotation-graph1"></div>
 			{% endif %}
      <h5>Conditions</h5>
-     <table id="bicl-conditions" class="tablesorter">
-       <th>Name</th>
+     <table id="bicl-conditions">
+       <thead><th>Name</th></thead>
+       <tbody>
        {% for c in conds %}
        <tr><td>{{c.name|condition_link}}</td></tr>
        {% endfor %}
+       </tbody>
      </table>
 		</div>
 		<div id="sidebar">
