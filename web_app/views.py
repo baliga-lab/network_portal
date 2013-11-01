@@ -1173,7 +1173,7 @@ def savestate(request):
             data.save()
             stateid = str(data.id)
             lcltm = data.created_at + datetime.timedelta(seconds=time.timezone)
-            dt = formats.date_format(localtime, "SHORT_DATETIME_FORMAT")
+            dt = formats.date_format(lcltm, "SHORT_DATETIME_FORMAT")
             pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
         else:
             pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
