@@ -14,8 +14,6 @@ from django.utils import formats
 from django.utils.formats import get_format
 from django.db import transaction
 from django.conf import settings
-import pytz
-import time
 from datetime import datetime
 from datetime import timedelta
 from django.utils.timezone import utc
@@ -207,6 +205,8 @@ def workflow(request):
     organismdatatypes = OrganismDataTypes.objects.all().order_by('id')
 
     savedstates = SavedStates.objects.filter(owner_id = user.id)
+    totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
+    tdelta = timedelta(seconds = totalseconds)
 
     # jpype executes java code
     #try:
