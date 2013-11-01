@@ -16,7 +16,7 @@ from django.db import transaction
 from django.conf import settings
 import pytz
 import time
-import datetime
+from datetime import datetime
 from django.utils.timezone import utc
 
 # apparently, the location of this changed between Django versions?
