@@ -1172,7 +1172,11 @@ def savestate(request):
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = utcnow)
             data.save()
             stateid = str(data.id)
-            lcltm = data.created_at + datetime.timedelta(seconds=time.timezone)
+            totalseconds = (datetime.now() - datetime.utcnow()).total_seconds()
+            print 'seconds difference: ' + str(totalseconds)
+            print 'timezone ' + str(time.timezone)
+            print 'timezone name ' + time.tzname
+            lcltm = data.created_at + totalseconds
             dt = formats.date_format(lcltm, "SHORT_DATETIME_FORMAT")
             pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
         else:
