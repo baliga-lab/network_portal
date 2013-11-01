@@ -1148,6 +1148,8 @@ def savestate(request):
         userid = request.REQUEST['userid']
         statename = request.REQUEST['name']
         statedesc = request.REQUEST['desc']
+        createtime = request.REQUEST['createtime']
+
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
         #statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
 
@@ -1169,15 +1171,15 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            utcnow = datetime.utcnow().replace(tzinfo=utc)
-            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = utcnow)
+            statetime = datetime.fromtimestamp(long(createtime))
+            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = statetime)
             data.save()
             stateid = str(data.id)
-            totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
-            print 'seconds difference: ' + str(totalseconds)
-            tdelta = timedelta(seconds = totalseconds)
-            lcltm = data.created_at + tdelta
-            dt = formats.date_format(lcltm, "SHORT_DATETIME_FORMAT")
+            #totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
+            #print 'seconds difference: ' + str(totalseconds)
+            #tdelta = timedelta(seconds = totalseconds)
+            #lcltm = data.created_at + tdelta
+            dt = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
             pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
         else:
             pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
