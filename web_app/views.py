@@ -17,6 +17,7 @@ from django.conf import settings
 import pytz
 import time
 from datetime import datetime
+from datetime import timedelta
 from django.utils.timezone import utc
 
 # apparently, the location of this changed between Django versions?
@@ -1172,9 +1173,10 @@ def savestate(request):
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = utcnow)
             data.save()
             stateid = str(data.id)
-            totalseconds = (datetime.now() - datetime.utcnow()).total_seconds()
+            totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
             print 'seconds difference: ' + str(totalseconds)
-            lcltm = data.created_at + round(totalseconds)
+            tdelta = timedelta(seconds = totalseconds)
+            lcltm = data.created_at + tdelta
             dt = formats.date_format(lcltm, "SHORT_DATETIME_FORMAT")
             pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
         else:
