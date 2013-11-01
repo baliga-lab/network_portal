@@ -1174,9 +1174,7 @@ def savestate(request):
             stateid = str(data.id)
             totalseconds = (datetime.now() - datetime.utcnow()).total_seconds()
             print 'seconds difference: ' + str(totalseconds)
-            print 'timezone ' + str(time.timezone)
-            print 'timezone name ' + time.tzname
-            lcltm = data.created_at + totalseconds
+            lcltm = data.created_at + round(totalseconds)
             dt = formats.date_format(lcltm, "SHORT_DATETIME_FORMAT")
             pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
         else:
