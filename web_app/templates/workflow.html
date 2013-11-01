@@ -633,7 +633,7 @@
                         </td>
                         <td> {{state.description}} </td>
 
-                        <td> {{state.created_at | localtime |date:"SHORT_DATETIME_FORMAT"}} </td>
+                        <td> {{state.created_at | localtime }} </td>
 
                         <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
                             <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
