@@ -396,6 +396,25 @@
                             dialog will popup. Checking/unchecking the checkbox besides a web handler enables/disables it.
                         </p>
                         <p>
+                            <u>7. How to add custom web handlers in Firegoose?</u><br />
+                            Open Firefox, in the Firegoose toolbar, click the "Target" dropdown menu, select "Custom" menuitem. An "Add New Website Target"
+                            dialog will popup. Enter a descripte "Name" for the target and fill in the url. There are three mechanisms to receive.
+                            <ol>
+                            <li>JavaScript Object awaiting braodcast: Enter name of the awaiting Javascript Object on the website in to the textbox</li>
+                            <li>Empty textbox awaiting to be filled: Enter Website's DOM object's id in to the textbox</li>
+                            <li>Expects arguments embedded in the requested URL: Enter the name of the parameter to be used in the URL in to the textbox</li>
+                            </ol>
+                            <p> For example: If you would like to add "Network Portal" as target,
+                            New Target's name: Network Portal</br>
+                            New target's URL: http://networks.systemsbiology.net/search</br>
+                            Select: Expects arguments embedded in the requested URL</br>
+                            Enter "q" in the textbox.</br>
+                            When you broadcast your gene list from Firegoose into Network Portal,a new tab will open with search results using your gene list as query.</br>
+                            The URL will look like that:http://networks.systemsbiology.net/search?q=DVU0692%3BDVU0693</br> 
+                                                       
+                        </p>
+
+                        <p>
                             A series of video tutorials can be found <a href="https://plus.google.com/u/1/b/111789053530927127952/111789053530927127952/videos?cfem=1">here</a>.
                         </p>
                     </div>
