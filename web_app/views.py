@@ -572,8 +572,8 @@ def getsessions(request):
            session_dict = {}
            print session.sessionid
            #short_datetime_format = get_format("SHORT_DATETIME_FORMAT")
-           datetime = formats.date_format(session.date, "SHORT_DATETIME_FORMAT")
-           session_dict = {'id': session.sessionid, 'date':  datetime } #.isoformat()}
+           dt = formats.date_format(session.date, "SHORT_DATETIME_FORMAT")
+           session_dict = {'id': session.sessionid, 'date':  dt } #.isoformat()}
            sessions_obj.append(session_dict)
 
        print json.dumps(sessions_obj)
@@ -1170,8 +1170,8 @@ def savestate(request):
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = utcnow)
             data.save()
             stateid = str(data.id)
-            datetime = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
-            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': datetime}
+            dt = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
+            pair =  {'id': str(data.id), 'name': statename, 'desc': statedesc, 'timestamp': dt}
         else:
             pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
         responsedata['state'] = pair
