@@ -1166,8 +1166,8 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            now = datetime.utcnow().replace(tzinfo=utc)
-            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = now)
+            utcnow = datetime.datetime.utcnow().replace(tzinfo=utc)
+            data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = utcnow)
             data.save()
             stateid = str(data.id)
             datetime = formats.date_format(data.created_at, "SHORT_DATETIME_FORMAT")
@@ -1200,7 +1200,7 @@ def savestate(request):
 
     except Exception as e:
         print str(e)
-        error = {'status':500, 'message': 'Failed to delete workflow data group' }
+        error = {'status':500, 'message': str(e) }
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     print json.dumps(responsedata)
