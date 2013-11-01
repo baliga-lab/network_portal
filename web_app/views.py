@@ -1149,6 +1149,7 @@ def savestate(request):
         statename = request.REQUEST['name']
         statedesc = request.REQUEST['desc']
         createtime = request.REQUEST['createtime']
+        print createtime
 
         #sessionpath = os.path.join('/local/network_portal/web_app/static/data', 'states')
         #statepath = os.path.join('/github/baligalab/network_portal/web_app/static/data', 'states')
@@ -1171,7 +1172,7 @@ def savestate(request):
 
         # save to DB
         if len(stateid) == 0:
-            statetime = datetime.fromtimestamp(long(createtime))
+            statetime = datetime.fromtimestamp(long(createtime / 1000))
             data = SavedStates(owner_id = int(userid), name = statename, description = statedesc, created_at = statetime)
             data.save()
             stateid = str(data.id)
