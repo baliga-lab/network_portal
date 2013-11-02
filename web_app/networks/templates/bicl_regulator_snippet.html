@@ -34,6 +34,20 @@ $(document).ready(function() {
   </tbody>
 </table>
 <br />
+
+    <div class="gaggle-data" style="display:none;">
+        <span class="gaggle-name hidden">{{ species.short_name}} regulators</span>
+        <span class="gaggle-species hidden">{{species.name}}</span>
+        <span class="gaggle-size hidden">{{inf_count}}</span>
+        <div class="gaggle-namelist">
+            <ul>
+                {% for influence in influences %}
+                    {{ influence|format_influence_gaggle }}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
 {% else %}
 <div class="main">
 	<div class="ui-widget">

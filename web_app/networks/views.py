@@ -261,6 +261,11 @@ def bicluster(request, species=None, network_num=None, bicluster_num=None):
     bicluster = Bicluster.objects.filter(network__species__short_name=species,
                                          k=bicluster_num)[0]
     expressions = bicluster.expressions()
+    expressionmatrix = expression_matrix(bicluster.conditions.all())
+    expressionmatrixstring = expression_matrix_to_tsv(expressionmatrix)
+    expressionmatrixrows = expressionmatrix.data.shape[0]
+    expressionmatrixcolumns = expressionmatrix.data.shape[1]
+
     expmap = {}
     genes = bicluster.genes.all()
     gene_map = { gene.id: gene.name for gene in genes }

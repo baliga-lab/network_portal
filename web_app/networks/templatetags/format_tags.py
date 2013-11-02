@@ -27,3 +27,14 @@ def format_influence(influence):
     else:
         result = influence.name
     return mark_safe(result)
+
+@register.filter
+def format_influence_gaggle(influence):
+    if influence.type == 'tf':
+        result = '<li>%s</li>' % (influence.name)
+    elif influence.type == 'combiner':
+        result = "<br>".join([format_influence_gaggle(part)
+                              for part in influence.parts.all()])
+    else:
+        result = '<li>%s</li>' % (influence.name)
+    return mark_safe(result)
