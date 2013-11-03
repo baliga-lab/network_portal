@@ -34,7 +34,7 @@ There are {{ motifs|length }} motifs predicted. {% if species.short_name == 'dvu
   </tbody>
 </table>
     {% for m in motifs %}
-    <div id="pssm" class="gaggle-data ratios" style="display:none;">
+    <div class="gaggle-data ratios" style="display:none;">
         <span class="gaggle-name hidden">{{ species.short_name}} motif {{m.id}}</span>
         <span class="gaggle-species hidden">{{species.name}}</span>
         <span class="gaggle-size hidden">{{m.pssm | length}}x4</span>

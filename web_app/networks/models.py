@@ -388,13 +388,13 @@ class PSSM():
         Serialize the PSSM out to a string to stick in a URL and send to RegPredict
         """
         ostr = StringIO.StringIO()
-        ostr.write("POSITION A C G T ")
+        ostr.write("POSITION\tA\tC\tG\tT\n")
         i = 1
         for p in self.positions:
             ostr.write(str(i))
-            ostr.write(" ")
-            ostr.write(" ".join([ str(p[base]) for base in ('a', 'c', 'g', 't')]))
-            ostr.write(" ")
+            ostr.write("\t")
+            ostr.write("\t".join([ str(p[base]) for base in ('a', 'c', 'g', 't')]))
+            ostr.write("\n")
             i += 1
         return ostr.getvalue()
     
