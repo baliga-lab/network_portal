@@ -463,8 +463,13 @@ function CheckDataInjection()
     {
         // First we save the newly added data
         SaveCollectedData();
+        // Set the onchange event handler for the operation drop down list
+        $(".firegooseInsertedSelect").on("change", DataOperationSelected);
+
         if (WF_dataToSave > 1)
             GroupData("#tblUserFiles");
+
+
 
         WF_dataSignal = newsignal;
         $(".dataspacehoverimage").hover(function(e){
