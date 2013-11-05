@@ -84,6 +84,19 @@ def networkbicl(request, species=None):
     return render_to_response('bicluster_network.html', locals())
 
 
+def species_network_export(request, species=None):
+    biclusters = Bicluster.objects.filter(network__species__short_name=species)
+    graph = get_nx_graph_for_biclusters(biclusters, True)
+    
+    # write graphml to response
+    writer = nx.readwrite.graphml.GraphMLWriter(encoding='utf-8',prettyprint=True)
+    writer.add_graph_element(graph)
+    response = HttpResponse(content_type='application/xml')
+    writer.dump(response)
+    response['Content-Disposition'] = 'attachment; filename=%s-network.gml' % species
+    return response
+
+
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):
         bicluster_nums = re.split( r'[\s,;]+', request.GET['biclusters'] )
