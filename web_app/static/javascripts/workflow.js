@@ -464,12 +464,12 @@ function CheckDataInjection()
         // First we save the newly added data
         SaveCollectedData();
         // Set the onchange event handler for the operation drop down list
-        $(".firegooseInsertedSelect").on("change", DataOperationSelected);
+        $(".firegooseInsertedSelect").on("change", function() {
+            ProcessDataOperationSelected(this);
+        });
 
         if (WF_dataToSave > 1)
             GroupData("#tblUserFiles");
-
-
 
         WF_dataSignal = newsignal;
         $(".dataspacehoverimage").hover(function(e){
@@ -2481,116 +2481,124 @@ function DataOperationSelected(event)
         source = event;
     if (source != null) {
         //alert("data operation selected " + $(source).val());
-        var selectedvalue = $(source).val();
-        if (selectedvalue == "1")
+        ProcessDataOperationSelected(source);
+    }
+}
+
+function ProcessDataOperationSelected(source)
+{
+    if (source == null)
+        return;
+
+    var selectedvalue = $(source).val();
+    if (selectedvalue == "1")
+    {
+        // Open the data in a goose
+        //alert("Open data...");
+        var dataobj = GetSelectedRowData(source);
+        var url = dataobj.url;
+        var datatype = dataobj.datatype;
+        var dataname = url.innerHTML;
+        //alert(dataname);
+        OpenDataGroup(WF_batchedData, dataname, datatype);
+    }
+    else if (selectedvalue == "2")
+    {
+        // QuickView
+    }
+    else if (selectedvalue == "3")
+    {
+        // Download
+        //alert("download");
+        var dataobj = GetSelectedRowData(source);
+        var url = dataobj.url;
+        //alert(url.href);
+        var urlstring = url.href;
+        if (url.href.indexOf("http:") < 0)
         {
-            // Open the data in a goose
-            //alert("Open data...");
-            var dataobj = GetSelectedRowData(source);
-            var url = dataobj.url;
-            var datatype = dataobj.datatype;
-            var dataname = url.innerHTML;
-            //alert(dataname);
-            OpenDataGroup(WF_batchedData, dataname, datatype);
+            // this is a file url
+            //urlstring = "file:///" + urlstring;
+            //urlstring = urlstring.replace(":\\", "|/");
+            //urlstring = urlstring.replace(/\\/g, "/");
+
+            //alert("The captured data is stored locally. Due to security, you cannot download a local file. Please open the file " + urlstring + " using a file browser");
         }
-        else if (selectedvalue == "2")
-        {
-            // QuickView
-        }
-        else if (selectedvalue == "3")
-        {
-            // Download
-            //alert("download");
-            var dataobj = GetSelectedRowData(source);
-            var url = dataobj.url;
-            //alert(url.href);
-            var urlstring = url.href;
-            if (url.href.indexOf("http:") < 0)
-            {
-                // this is a file url
-                //urlstring = "file:///" + urlstring;
-                //urlstring = urlstring.replace(":\\", "|/");
-                //urlstring = urlstring.replace(/\\/g, "/");
+        //alert(urlstring);
+        window.open(urlstring); //,'Download');
+    }
+    else if (selectedvalue == "4")
+    {
+        // Edit data
+        //var url = GetSelectedRowData(source);
+        //alert("Data to edit: " + url);
 
-                //alert("The captured data is stored locally. Due to security, you cannot download a local file. Please open the file " + urlstring + " using a file browser");
-            }
-            //alert(urlstring);
-            window.open(urlstring); //,'Download');
-        }
-        else if (selectedvalue == "4")
-        {
-            // Edit data
-            //var url = GetSelectedRowData(source);
-            //alert("Data to edit: " + url);
+        var row = $(source).parent().parent();
+        var td0 = $(row).children()[0];
+        var td1 = $(row).children()[1];
+        var td2 = $(row).children()[2];
+        var label = $(td0).children()[0];
+        var link = $(label).children()[1];
+        //alert(link);
+        $("#labelTargetData").html($(link).html());
+        $("#inputEditDataDesc").val($(td2).html());
+        var datatyperadiobuttonid = "#radioEditDataType_" + $(td1).html();
+        $(datatyperadiobuttonid).prop("checked", true);
 
-            var row = $(source).parent().parent();
-            var td0 = $(row).children()[0];
-            var td1 = $(row).children()[1];
-            var td2 = $(row).children()[2];
-            var label = $(td0).children()[0];
-            var link = $(label).children()[1];
-            //alert(link);
-            $("#labelTargetData").html($(link).html());
-            $("#inputEditDataDesc").val($(td2).html());
-            var datatyperadiobuttonid = "#radioEditDataType_" + $(td1).html();
-            $(datatyperadiobuttonid).prop("checked", true);
+        $( "#dlgEditData" ).dialog({
+                resizable: false,
+                height:380,
+                width:450,
+                modal: true,
+                buttons: {
+                    "Save": function() {
+                        var collecteddata = {};
+                        var data = {};
+                        var linkobj = {};
+                        var index = 0;
+                        var description = $("#inputEditDataDesc").val();
+                        //alert(description);
+                        linkobj.text = $(link).text();
+                        linkobj.url = $(link).prop("href");
+                        linkobj.organism = $("#selectEditDataOrganism").val();
+                        linkobj.description = description;
 
-            $( "#dlgEditData" ).dialog({
-                    resizable: false,
-                    height:380,
-                    width:450,
-                    modal: true,
-                    buttons: {
-                        "Save": function() {
-                            var collecteddata = {};
-                            var data = {};
-                            var linkobj = {};
-                            var index = 0;
-                            var description = $("#inputEditDataDesc").val();
-                            //alert(description);
-                            linkobj.text = $(link).text();
-                            linkobj.url = $(link).prop("href");
-                            linkobj.organism = $("#selectEditDataOrganism").val();
-                            linkobj.description = description;
-
-                            //alert(linkobj.url);
-                            var datatype =  $('input[name="editDataType"]:checked').val();
-                            if (datatype == null || datatype.length == 0)
-                                datatype = "Generic";
-                            linkobj.datatype = datatype;
-                            //alert(datatype);
-                            //var datatypeinput = $(this).children()[4];
-                            //linkobj.datatype = $(datatypeinput).val();
-                            var dataidinput = $(label).children()[2];
-                            var dataid = $(dataidinput).val();
-                            //alert(dataid);
-                            if (dataid == null || dataid.length == 0)
-                            {
-                                dataid = WF_captureddataid.toString();
-                                WF_captureddataid--;
-                                dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
-                                dataidinput.setAttribute("value", dataid.toString());
-                                linkobj.nodeindex = dataid;
-                            }
-                            else {
-                                dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
-                                linkobj.nodeindex = dataid;
-                            }
-                               //alert($(input).is(':checked'));
-                            index++;
-                            data[index.toString()] = linkobj;
-                            collecteddata['data'] = data;
-                            collecteddata['userid'] = $("#authenticated").val();
-                            DoSaveData(collecteddata);
-                            $( this ).dialog( "close" );
-                        },
-                        Cancel: function() {
-                            $( this ).dialog( "close" );
+                        //alert(linkobj.url);
+                        var datatype =  $('input[name="editDataType"]:checked').val();
+                        if (datatype == null || datatype.length == 0)
+                            datatype = "Generic";
+                        linkobj.datatype = datatype;
+                        //alert(datatype);
+                        //var datatypeinput = $(this).children()[4];
+                        //linkobj.datatype = $(datatypeinput).val();
+                        var dataidinput = $(label).children()[2];
+                        var dataid = $(dataidinput).val();
+                        //alert(dataid);
+                        if (dataid == null || dataid.length == 0)
+                        {
+                            dataid = WF_captureddataid.toString();
+                            WF_captureddataid--;
+                            dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                            dataidinput.setAttribute("value", dataid.toString());
+                            linkobj.nodeindex = dataid;
                         }
+                        else {
+                            dataidinput.setAttribute("id", ("cdata-" + dataid.toString()));
+                            linkobj.nodeindex = dataid;
+                        }
+                           //alert($(input).is(':checked'));
+                        index++;
+                        data[index.toString()] = linkobj;
+                        collecteddata['data'] = data;
+                        collecteddata['userid'] = $("#authenticated").val();
+                        DoSaveData(collecteddata);
+                        $( this ).dialog( "close" );
+                    },
+                    Cancel: function() {
+                        $( this ).dialog( "close" );
                     }
-                });
+                }
+            });
 
-        }
     }
 }
 
