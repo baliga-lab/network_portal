@@ -462,11 +462,16 @@ function CheckDataInjection()
     if (newsignal != WF_dataSignal)
     {
         // First we save the newly added data
-        SaveCollectedData();
+        //alert("Data injected...");
+        //alert($(".firegooseInsertedSelect"));
         // Set the onchange event handler for the operation drop down list
-        $(".firegooseInsertedSelect").on("change", function() {
-            ProcessDataOperationSelected(this);
+
+        $(".firegooseInsertedSelect").change(function(e) {
+            //alert(e.target);
+            ProcessDataOperationSelected(e.target);
         });
+
+        SaveCollectedData();
 
         if (WF_dataToSave > 1)
             GroupData("#tblUserFiles");
@@ -2487,6 +2492,7 @@ function DataOperationSelected(event)
 
 function ProcessDataOperationSelected(source)
 {
+    //alert("Processing data selection " + source);
     if (source == null)
         return;
 
