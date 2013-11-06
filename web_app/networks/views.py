@@ -57,8 +57,9 @@ def bicluster_hcseries(request, bicluster_id=None):
         data = []
         for gene in genes:
             data.append({ 'name': gene,
-                          'data': [exps[gene][cond] for cond in conds
-                                   if gene in exps and cond in exps[gene]] })
+                          'data': map(lambda v: 0 if math.isnan(v) else v,
+                                      [exps[gene][cond] for cond in conds
+                                       if gene in exps and cond in exps[gene]])})
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def networks(request):
