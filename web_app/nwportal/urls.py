@@ -110,6 +110,7 @@ urlpatterns = patterns('',
     url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)$', 'networks.views.network', name='network'),
     url(r'^(?P<species>[^/]*)/network$', 'networks.views.networkbicl',
         name='networkbicl'),
+    url(r'^(?P<species>[^/]*)/network/export$', 'networks.views.species_network_export'),
 
     url(r'^(?P<species>[^/]*)/gene/(?P<gene>.*)$', 'networks.views.gene', name='gene'),
     url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)/module/(?P<bicluster_num>\d+)$', 'networks.views.bicluster', name='biclusters'),

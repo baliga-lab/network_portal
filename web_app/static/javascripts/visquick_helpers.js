@@ -46,8 +46,8 @@ if (!vqhelpers) {
                 data_array: geneValues
             },
             OPTIONS: {
-                legend_label: 'Biclusters',
-                legend_description: 'Biclusters',
+                legend_label: 'Modules',
+                legend_description: 'Modules',
                 listener: function () { return null; },
                 outer_padding: 10
             }

@@ -57,8 +57,9 @@ def bicluster_hcseries(request, bicluster_id=None):
         data = []
         for gene in genes:
             data.append({ 'name': gene,
-                          'data': [exps[gene][cond] for cond in conds
-                                   if gene in exps and cond in exps[gene]] })
+                          'data': map(lambda v: 0 if math.isnan(v) else v,
+                                      [exps[gene][cond] for cond in conds
+                                       if gene in exps and cond in exps[gene]])})
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def networks(request):
@@ -82,6 +83,19 @@ def networkbicl(request, species=None):
     bicluster_ids = ",".join(map(lambda x: str(x),
                                  [b.id for b in biclusters]))
     return render_to_response('bicluster_network.html', locals())
+
+
+def species_network_export(request, species=None):
+    biclusters = Bicluster.objects.filter(network__species__short_name=species)
+    graph = get_nx_graph_for_biclusters(biclusters, True)
+    
+    # write graphml to response
+    writer = nx.readwrite.graphml.GraphMLWriter(encoding='utf-8',prettyprint=True)
+    writer.add_graph_element(graph)
+    response = HttpResponse(content_type='application/xml')
+    writer.dump(response)
+    response['Content-Disposition'] = 'attachment; filename=%s-network.gml' % species
+    return response
 
 
 def network_as_graphml(request):
