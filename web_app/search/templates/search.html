@@ -38,7 +38,7 @@ $(document).ready(function() {
     var geneMap = {};
     {% for species_id, genes in species_genes.items %}
     geneMap['{{species_id}}'] = {};
-    {% for gene in genes %}geneMap['{{species_id}}'][{{gene.id}}] = {biclusters: [{{ gene.bicluster_ids|join:"," }}]};
+    {% for gene in genes %}geneMap['{{species_id}}'][{{gene.id}}] = {biclusters: [{{ gene.biclusters|join:"," }}]};
     {% endfor %}
     {% endfor %}
 
