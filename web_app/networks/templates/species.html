@@ -103,16 +103,16 @@
       <tr>
         <th>Gene Expression</th>
         <th>Networks</th>
-        <th>Functions</th>
-        <th>Statistics</th>
+        <th>Functions/Modules</th>
+        <th>Functions/Gene</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><a href="{{ STATIC_PREFIX }}jnlp/mev-{{ species.short_name }}.jnlp">MeV File</a></td>
         <td><a href="{{ STATIC_PREFIX }}jnlp/cytoscape-{{ species.short_name }}.jnlp">Cytoscape File</a></td>
-        <td>{{species|species_function_download_link}}</td>
-        <td><a href="">PDF File</a></td>
+        <td>{{species|species_modfunction_download_link}}</td>
+        <td>{{species|species_genefunction_download_link}}</td>
       </tr>
      </tbody>
   </table>

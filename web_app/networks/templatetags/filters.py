@@ -92,8 +92,13 @@ def species_genes_link(species):
                                                        species.gene_set.count()))
 
 @register.filter
-def species_function_download_link(species):
-    return mark_safe("<a href=\"/%s/functions/export\">Tab-delimited</a>" %
+def species_modfunction_download_link(species):
+    return mark_safe("<a href=\"/%s/modfunctions/export\">Tab-delimited</a>" %
+                     species.short_name)
+
+@register.filter
+def species_genefunction_download_link(species):
+    return mark_safe("<a href=\"/%s/genefunctions/export\">Tab-delimited</a>" %
                      species.short_name)
 
 @register.filter
