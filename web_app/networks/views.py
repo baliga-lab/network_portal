@@ -97,6 +97,18 @@ def species_network_export(request, species=None):
     response['Content-Disposition'] = 'attachment; filename=%s-network.gml' % species
     return response
 
+def species_functions_export(request, species=None):
+    biclusters = Bicluster.objects.filter(network__species__short_name=species)
+    response = HttpResponse(content_type='text/plain')
+    response.write('Module\tFunctions\n')
+    for b in biclusters:
+        fnames = [f.name for f in b.functions.all()]
+        response.write('%d\t"%s"\n' % (b.k, ':'.join(fnames)))
+    response['Content-Disposition'] = 'attachment; filename=%s-functions.tsv' % species
+
+    return response
+
+
 
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):

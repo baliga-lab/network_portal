@@ -116,6 +116,7 @@ urlpatterns = patterns('',
     url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)/module/(?P<bicluster_num>\d+)$', 'networks.views.bicluster', name='biclusters'),
 
     url(r'^(?P<species>[^/]*)/?$', 'networks.views.species', name='species'),
+    url(r'^(?P<species>[^/]*)/functions/export$', 'networks.views.species_functions_export'),
  
     # URLs to the content displayed in the Cytoscape popups
     url(r'^gene_popup/(?P<gene_id>.*)$', 'networks.views.gene_popup',
