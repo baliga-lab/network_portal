@@ -116,6 +116,7 @@ urlpatterns = patterns('',
     url(r'^(?P<species>[^/]*)/network/(?P<network_num>\d+)/module/(?P<bicluster_num>\d+)$', 'networks.views.bicluster', name='biclusters'),
 
     url(r'^(?P<species>[^/]*)/?$', 'networks.views.species', name='species'),
+    url(r'^(?P<species>[^/]*)/modgenes/export$', 'networks.views.species_modgenes_export'),
     url(r'^(?P<species>[^/]*)/modfunctions/export$', 'networks.views.species_modfuncs_export'),
     url(r'^(?P<species>[^/]*)/genefunctions/export$', 'networks.views.species_genfuncs_export'),
  

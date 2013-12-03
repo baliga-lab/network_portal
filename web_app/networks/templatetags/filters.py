@@ -97,6 +97,11 @@ def species_modfunction_download_link(species):
                      species.short_name)
 
 @register.filter
+def species_modgene_download_link(species):
+    return mark_safe("<a href=\"/%s/modgenes/export\">Tab-delimited</a>" %
+                     species.short_name)
+
+@register.filter
 def species_genefunction_download_link(species):
     return mark_safe("<a href=\"/%s/genefunctions/export\">Tab-delimited</a>" %
                      species.short_name)

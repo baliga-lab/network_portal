@@ -97,6 +97,17 @@ def species_network_export(request, species=None):
     response['Content-Disposition'] = 'attachment; filename=%s-network.gml' % species
     return response
 
+
+def species_modgenes_export(request, species=None):
+    biclusters = Bicluster.objects.filter(network__species__short_name=species)
+    response = HttpResponse(content_type='text/plain')
+    response.write('Module\tGenes\n')
+    for b in biclusters:
+        gnames = [g.best_name() for g in b.genes.all()]
+        response.write('%d\t"%s"\n' % (b.k, ':'.join(gnames)))
+    response['Content-Disposition'] = 'attachment; filename=%s-module-genes.tsv' % species
+    return response
+
 def species_modfuncs_export(request, species=None):
     biclusters = Bicluster.objects.filter(network__species__short_name=species)
     response = HttpResponse(content_type='text/plain')
