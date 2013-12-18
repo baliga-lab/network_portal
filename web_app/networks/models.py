@@ -193,10 +193,10 @@ class Gene(models.Model):
     functions = models.ManyToManyField('Function', through='Gene_Function')
 
     def best_name(self):
-        if self.common_name != None:
-            return self.common_name
-        else:
+        if self.name != None:
             return self.name
+        else:
+            return self.common_name
 
     def display_name(self):
         if self.common_name is None or self.common_name == '':
