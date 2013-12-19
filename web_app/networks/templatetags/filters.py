@@ -92,6 +92,21 @@ def species_genes_link(species):
                                                        species.gene_set.count()))
 
 @register.filter
+def species_modfunction_download_link(species):
+    return mark_safe("<a href=\"/%s/modfunctions/export\">Tab-delimited</a>" %
+                     species.short_name)
+
+@register.filter
+def species_modgene_download_link(species):
+    return mark_safe("<a href=\"/%s/modgenes/export\">Tab-delimited</a>" %
+                     species.short_name)
+
+@register.filter
+def species_genefunction_download_link(species):
+    return mark_safe("<a href=\"/%s/genefunctions/export\">Tab-delimited</a>" %
+                     species.short_name)
+
+@register.filter
 def species_string_link(species):
     return mark_safe("<a href=\"http://networks.systemsbiology.net/string9/%s.gz\">%s</a>" % (species.ncbi_taxonomy_id, species.ncbi_taxonomy_id))
 

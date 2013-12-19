@@ -98,6 +98,36 @@ def species_network_export(request, species=None):
     return response
 
 
+def species_modgenes_export(request, species=None):
+    biclusters = Bicluster.objects.filter(network__species__short_name=species)
+    response = HttpResponse(content_type='text/plain')
+    response.write('Module\tGenes\n')
+    for b in biclusters:
+        gnames = [g.best_name() for g in b.genes.all()]
+        response.write('%d\t"%s"\n' % (b.k, ':'.join(gnames)))
+    response['Content-Disposition'] = 'attachment; filename=%s-module-genes.tsv' % species
+    return response
+
+def species_modfuncs_export(request, species=None):
+    biclusters = Bicluster.objects.filter(network__species__short_name=species)
+    response = HttpResponse(content_type='text/plain')
+    response.write('Module\tFunctions\n')
+    for b in biclusters:
+        fnames = [f.name for f in b.functions.all()]
+        response.write('%d\t"%s"\n' % (b.k, ':'.join(fnames)))
+    response['Content-Disposition'] = 'attachment; filename=%s-module-functions.tsv' % species
+    return response
+
+def species_genfuncs_export(request, species=None):
+    genes = Gene.objects.filter(species__short_name=species)
+    response = HttpResponse(content_type='text/plain')
+    response.write('Gene\tFunctions\n')
+    for g in genes:
+        fnames = [f.name for f in g.functions.all()]
+        response.write('%s\t"%s"\n' % (g.name, ':'.join(fnames)))
+    response['Content-Disposition'] = 'attachment; filename=%s-gene-functions.tsv' % species
+    return response
+
 def network_as_graphml(request):
     if request.GET.has_key('biclusters'):
         bicluster_nums = re.split( r'[\s,;]+', request.GET['biclusters'] )

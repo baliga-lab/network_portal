@@ -191,7 +191,13 @@ class Gene(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True)
     transcription_factor = models.BooleanField(default=False)
     functions = models.ManyToManyField('Function', through='Gene_Function')
-    
+
+    def best_name(self):
+        if self.name != None:
+            return self.name
+        else:
+            return self.common_name
+
     def display_name(self):
         if self.common_name is None or self.common_name == '':
             return self.name
