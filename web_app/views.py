@@ -39,6 +39,8 @@ import mimetypes
 import shutil
 from collections import namedtuple
 
+from django.contrib.auth.decorators import login_required
+
 Dialog = namedtuple('Dialog', ['name', 'short_name', 'network_url', 'ngenes', 'ntfs', 'coords'])
 
 def home(request):
@@ -138,6 +140,12 @@ class WorkFlowEntry:
             wci = WorkflowComponentInfo(component)
             self.WorkflowComponents.append(wci)
 
+
+class StateInfo:
+    def __init__(self, state, statefiles):
+        self.state = state
+        self.statefiles = statefiles
+
 class DataGroupEntry:
     def __init__(self, group, contents):
         print group.id
@@ -205,6 +213,12 @@ def workflow(request):
     organismdatatypes = OrganismDataTypes.objects.all().order_by('id')
 
     savedstates = SavedStates.objects.filter(owner_id = user.id)
+    stateentries = []
+    for state in savedstates:
+        files = StateFiles.objects.filter(state_id = int(state.id))
+        stateentry = StateInfo(state, files)
+        stateentries.append(stateentry)
+
     totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
     tdelta = timedelta(seconds = totalseconds)
 
@@ -229,6 +243,12 @@ def getdataspace(request):
     print request.raw_post_data
 
     try:
+        if request.user.is_authenticated():
+            print 'user ' + request.user.username + ' ' + request.user.email + ' is authenticated'
+        else:
+            print 'user not authenticated'
+
+
         query = json.loads(request.raw_post_data)
         print 'Organism: ' + query['organism']
         print 'user id: ' + query['userid']
@@ -928,7 +948,7 @@ def savecaptureddata(request):
                 content.save()
 
             print "Data group content saved with id: " + str(content.id)
-            pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'organism': organism.name, 'datatype': datatypeobj.type, 'description': desc }
+            pair = {'nodeindex': link['nodeindex'], 'id': str(content.id), 'userid': str(content.owner_id), 'organism': organism.name, 'datatype': datatypeobj.type, 'url': content.dataurl, 'text': content.urltext, 'desc': desc }
             responsedata[str(idx)] = pair
             idx = idx + 1
     except Exception as e1:
@@ -1075,19 +1095,24 @@ def getstateinfo(request, stateid):
         gooseobjs = {}
         for file in files:
             print file.name
-            goosefilename = re.split('_', file.name)[2]
+            goosefilename = re.split('_', file.name)[0]
             print goosefilename
-            goosename = os.path.splitext(goosefilename)[0]
+            goosename = goosefilename
+            #os.path.splitext(goosefilename)[0]
             print 'goose name: ' + goosename
 
             if gooseobjs.has_key(goosename):
                 pair = gooseobjs[goosename]
             else:
-                component = WorkflowComponents.objects.filter(short_name = goosename)[0]
-                pair = { 'goosename': component.name, 'serviceurl': component.serviceurl, 'files': 0 }
-                fileobj = {}
-                pair['fileobj'] = fileobj
-                gooseobjs[goosename] = pair
+                try:
+                    component = WorkflowComponents.objects.filter(short_name = goosename)[0]
+                    pair = { 'goosename': component.name, 'serviceurl': component.serviceurl, 'files': 0 }
+                    fileobj = {}
+                    pair['fileobj'] = fileobj
+                    gooseobjs[goosename] = pair
+                except Exception as e1:
+                    print 'Failed to get goose file ' + str(e1)
+                    continue
 
             print 'goose obj has ' + str(pair['files']) + ' files'
             #fileurl = 'http://' + request.get_host() + '/static/data/states/' + str(state.owner_id) + '/' + file.name
@@ -1096,7 +1121,7 @@ def getstateinfo(request, stateid):
             print fileurl
             filecnt = pair['files']
             fileobj = pair['fileobj']
-            fileinfo = { 'fileurl': fileurl }
+            fileinfo = {'id': file.id, 'fileurl': fileurl }
             pair['files'] = filecnt + 1
             fileobj[str(filecnt)] = fileinfo
             print json.dumps(gooseobjs)
@@ -1139,9 +1164,18 @@ def deletesavedstate(request, stateid):
 
 
 @csrf_exempt
+#@login_required
 def savestate(request):
     print 'Save state'
     try:
+        sessionid = request.POST.get('cookie', '')
+        print 'session id ' + sessionid
+
+        if request.user.is_authenticated():
+            print 'user ' + request.user.username + ' ' + request.user.email + ' is authenticated'
+        else:
+            print 'user not authenticated'
+
         print request.REQUEST['userid']
 
         stateid = request.REQUEST['stateid']
@@ -1186,6 +1220,8 @@ def savestate(request):
             pair =  {'id': stateid, 'name': statename, 'desc': statedesc }
         responsedata['state'] = pair
 
+        fileobj = {}
+        cnt = 0
         for key in request.FILES.keys():
             #each file is an UploadedFile object
             print 'FILE key: ' + key
@@ -1208,6 +1244,11 @@ def savestate(request):
             sf = StateFiles(state_id = stateid, name = filename, url = dataurl)
             sf.save()
 
+            fileid = sf.id
+            fileobj[str(cnt)] = {'id' : fileid, 'filename': filename }
+            cnt = cnt + 1
+        responsedata['fileobj'] = fileobj
+
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': str(e) }
@@ -1227,6 +1268,12 @@ def updatestate(request):
         return HttpResponse(json.dumps(error), mimetype='application/json')
 
     try:
+
+        if request.user.is_authenticated():
+            print 'user ' + request.user.username + ' ' + request.user.email + ' is authenticated'
+        else:
+            print 'user not authenticated'
+
         #print captureddata['userid']
         responsedata = {}
         idx = 0

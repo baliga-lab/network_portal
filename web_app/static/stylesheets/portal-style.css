@@ -1661,7 +1661,7 @@ table#motif {
 .dataspacelabel
 {
     display: inline;
-    white-space: nowrap;
+    white-space: wrap;
 }
 
 .selectDataAppliedHistory
@@ -2133,4 +2133,12 @@ background-color: #ffb515;
 .lblWarning
 {
     color: red;
+}
+
+.selStateFiles
+{
+    max-width: 300px;
+    max-height: 400px;
+    scroll: auto;
+    overflow-x: hidden;
 }

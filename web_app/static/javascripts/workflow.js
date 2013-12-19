@@ -2308,12 +2308,12 @@ function SaveCollectedData()
         }
 
         if (index > 0) {
-            DoSaveData(collecteddata);
+            DoSaveData(collecteddata, false);
         }
     }
 }
 
-function DoSaveData(collecteddata)
+function DoSaveData(collecteddata, isUpload)
 {
     //alert("Save data " + JSON.stringify(collecteddata));
 
@@ -2334,33 +2334,39 @@ function DoSaveData(collecteddata)
            //alert(($("#divWorkflow").children().length));
            //alert(result);
            if (result != null) {
-               // Need to update the id of each saved data
-               var index = 0;
-               var finished = false;
-               do
-               {
-                   var pair = result[index.toString()];
-                   if (pair != null)
+               if (!isUpload) {
+                   // Need to update the id of each saved data
+                   var index = 0;
+                   var finished = false;
+                   do
                    {
-                      var originalindex = pair['nodeindex'];
-                      var dataid = pair['id'];
-                      var originalinputid = "#cdata-" + originalindex;
-                      $(originalinputid).val(dataid);
-                      var row = $(originalinputid).parent().parent().parent();
-                      //alert(row);
-                      if (row != null)
-                      {
-                         var cell1 = $(row).children()[1];
-                         $(cell1).html(pair['datatype']);
-                         var cell2 = $(row).children()[2];
-                         $(cell2).html(pair['description']);
-                      }
-                      index++;
+                       var pair = result[index.toString()];
+                       if (pair != null)
+                       {
+                          var originalindex = pair['nodeindex'];
+                          var dataid = pair['id'];
+                          var originalinputid = "#cdata-" + originalindex;
+                          $(originalinputid).val(dataid);
+                          var row = $(originalinputid).parent().parent().parent();
+                          //alert(row);
+                          if (row != null)
+                          {
+                             var cell1 = $(row).children()[1];
+                             $(cell1).html(pair['datatype']);
+                             var cell2 = $(row).children()[2];
+                             $(cell2).html(pair['description']);
+                          }
+                          index++;
+                       }
+                       else
+                          finished = true;
                    }
-                   else
-                      finished = true;
+                   while (!finished);
                }
-               while (!finished);
+               else {
+                    //alert(result);
+                    ProcessUploadResult(result);
+               }
                alert("Data saved");
            }
        }
@@ -2752,7 +2758,7 @@ function ProcessUploadResult(result)
        if (pair != null)
        {
            var dataid = pair['dataid'];
-           if (dataid.length == 0)
+           if (dataid == null || dataid.length == 0)
               InsertDataToTarget(pair);
            else {
               var originalinputid = "#cdata-" + dataid;
@@ -2839,30 +2845,64 @@ function UploadDataFiles()
         return;
     }
 
+    $("#uploadDataTabs").tabs();
+
     //$("#labelOrganism").html("Upload file for " + WF_currOrganism);
     $( "#dlgUploadData" ).dialog({
         resizable: false,
         height:450,
-        width:450,
+        width:550,
         modal: true,
         buttons: {
             "Upload": function() {
-                var fileinput = document.getElementById('filesToUpload');
-                if (fileinput.files.length > 0) {
 
-                    var targetOrganism = $("#selectUploadDataOrganism").val();
-                    //alert(targetOrganism);
-                    if (targetOrganism == null || targetOrganism.length == 0)
-                        targetOrganism = "Generic";
+                var selectedtab = $("#uploadDataTabs").tabs('option', 'active');
+                if (selectedtab == 0) {
+                    var fileinput = document.getElementById('filesToUpload');
+                    if (fileinput.files.length > 0) {
 
-                    var formdata = new FormData();
+                        var targetOrganism = $("#selectUploadDataOrganism").val();
+                        //alert(targetOrganism);
+                        if (targetOrganism == null || targetOrganism.length == 0)
+                            targetOrganism = "Generic";
 
-                    var datatype = $('input[name="dataType"]:checked').val();
-                    if (datatype == null || datatype.length == 0)
-                        datatype = "Generic";
-                    var description = $("#uploadFileDescription").val();
-                    //alert(WF_currOrganism);
-                    DoUploadFiles(fileinput.files, userid, targetOrganism, datatype, description, true);
+                        var formdata = new FormData();
+
+                        var datatype = $('input[name="dataType"]:checked').val();
+                        if (datatype == null || datatype.length == 0)
+                            datatype = "Generic";
+                        var description = $("#uploadFileDescription").val();
+                        //alert(WF_currOrganism);
+                        DoUploadFiles(fileinput.files, userid, targetOrganism, datatype, description, true);
+                    }
+                }
+                else if (selectedtab == 1) {
+                    var urlstext = $("#inputURLs").val();
+                    if (urlstext.length > 0)
+                    {
+                        var data = {};
+                        var urls = urlstext.split(";");
+                        var userid = $("#authenticated").val();
+                        WF_currOrganism = $("#organismSelect").val();
+                        var datatype = $('input[name="urlDataType"]:checked').val();
+                        var description = $("#uploadURLDescription").val();
+                        var collecteddata = {};
+                        collecteddata['userid'] = userid;
+                        for (var i = 0; i < urls.length; i++)  {
+                            var linkobj = {};
+
+                            linkobj.text = urls[i];
+                            linkobj.url = urls[i];
+                            linkobj.organism = WF_currOrganism;
+                            linkobj.nodeindex = -1;
+                            linkobj.datatype = datatype;
+                            linkobj.description = description;
+                            //alert(linkobj.datatype);
+                            data[i.toString()] = linkobj;
+                        }
+                        collecteddata['data'] = data;
+                        DoSaveData(collecteddata, true);
+                    }
                 }
                 $( this ).dialog( "close" );
             },
@@ -3908,7 +3948,7 @@ function SaveState()
                     DisplayInfo("#divHistoryInfo", (datetime + " Save state " + name), "historyinfo");
                     $("#lblSaveStateWarning").show();
                     $("#lblSaveStateWarning").css("text-decoration", "blink");
-                    proxy.SaveStateDelegate(userid, name, desc);
+                    proxy.SaveStateDelegate(userid, name, desc); //, document.cookie);
                     //alert("workflow action done");
                 }
 
@@ -3944,6 +3984,16 @@ function OnSaveState(param)
     var desc = stateObj["desc"];
     var stateid = stateObj["id"];
     var datetime = stateObj["timestamp"];
+    var fileobj = jsonobj["fileobj"];
+    //alert(fileobj);
+    var cnt = 0;
+    var files = new Array();
+    for (var key in fileobj)
+    {
+        //alert(key);
+        var file = fileobj[key];
+        files.push(file);
+    }
 
     //var splitted = param.split(";;");
     //var name = splitted[1];
@@ -3982,21 +4032,40 @@ function OnSaveState(param)
     $(row).append($(td3));
     td3.innerHTML = datetime; // TODO add datetime of the state
 
+
     var td4 = document.createElement("td");
     $(row).append($(td4));
+    var select = document.createElement("select");
+    //alert("select created");
+    select.className = "selStateFiles";
+    select.setAttribute("multiple", "");
+    $(td4).append($(select));
+    for (var j = 0; j < files.length;j++)
+    {
+        var file = files[j];
+        //alert(file.id);
+        //alert(file.filename);
+        var option = document.createElement("option");
+        option.value = file["id"];
+        option.innerHTML = file["filename"];
+        $(select).append($(option));
+    }
+
+    var td5 = document.createElement("td");
+    $(row).append($(td5));
     var loadbutton = document.createElement("input");
     loadbutton.setAttribute("type", "button");
     loadbutton.setAttribute("value", "Load");
     loadbutton.className = "button";
     loadbutton.onclick = LoadState;
-    $(td4).append($(loadbutton));
+    $(td5).append($(loadbutton));
 
     var editbutton = document.createElement("input");
     editbutton.setAttribute("type", "button");
     editbutton.setAttribute("value", "Edit");
     editbutton.className = "button";
     editbutton.onclick = EditState;
-    $(td4).append($(editbutton));
+    $(td5).append($(editbutton));
 
 
     var deletebutton = document.createElement("input");
@@ -4004,7 +4073,7 @@ function OnSaveState(param)
     deletebutton.setAttribute("value", "Delete");
     deletebutton.className = "button";
     deletebutton.onclick = DeleteState;
-    $(td4).append($(deletebutton));
+    $(td5).append($(deletebutton));
 }
 
 
@@ -4019,13 +4088,31 @@ function LoadState(event)
         var td0 = $(row).children()[0];
         var stateidinput = $(td0).children()[1];
         var stateid = $(stateidinput).val();
+        var td3 = $(row).children()[3];
+        var statefilessel = $(td3).children()[0];
+        var items = new Array();
+        $(statefilessel).each(function()
+        {
+            var values = $(this).val();
+            //alert(values.length);
+            if (values != null && values.length > 0)
+            {
+               for (var i = 0; i < values.length; i++)
+                    items.push(values[i]);
+            }
+        });
+
         //alert(stateid);
+        //alert(items);
         var proxy = get_proxyapplet();
         if (proxy != undefined) {
             //alert("Load state...");
             var datetime = GetCurrentDateTimeString();
             DisplayInfo("#divHistoryInfo", (datetime + " Load state "), "historyinfo");
-            proxy.LoadStateDelegate(stateid);
+            if (items.length == 0)
+                proxy.LoadStateDelegate(stateid, null);
+            else
+                proxy.LoadStateDelegate(stateid, items);
             //alert("workflow action done");
         }
     }

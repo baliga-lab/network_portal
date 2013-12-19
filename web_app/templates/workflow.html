@@ -409,36 +409,57 @@
 
         <div id="dlgUploadData" style="display:none" title="Upload Data">
             <!--<p><label id="labelOrganism"></label></p> -->
-            <div style="width: 360px; float: left">
-                <select id="selectUploadDataOrganism">
+            <select id="selectUploadDataOrganism">
                 <option value = "" selected>Select an organism</option>
                 {% for organism in organisms %}
                 {% if organism.name != "Generic"  %}
                 <option value="{{organism.short_name}}">{{organism.name}} | {{organism.short_name}}</option>
                 {% endif %}
                 {% endfor %}
-                </select>
+            </select>
+            <div id="uploadDataTabs">
+                <ul>
+                    <li><a href="#datatabs-1">Files</a></li>
+                    <li><a href="#datatabs-2">URLs</a></li>
+                </ul>
+                <!--<div style="margin-left: 370px">
+                    <a class="componenthelp" align="right" href="#inlineuploadfilehelp">
+                        <img src="/static/images/help.png" />
+                    </a>
+                </div>
+                <br /> -->
+                <div id="datatabs-1" style="width: 460px; float: left">
+                    <form method="post" enctype="multipart/form-data">
+                        <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
+                        Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
+                    </form>
+                    <br />
+                    <p>
+                        {% for datatype in organismdatatypes %}
+                        {% if datatype.type == "Generic" %}
+                        <input type="radio" name="dataType" value="{{datatype.type}}" checked>{{datatype.type}}
+                        {% else %}
+                        <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+                <div id="datatabs-2">
+                    URLs (seperated by semicolon): <input id="inputURLs"><br />
+                    Description: <input id="uploadURLDescription" type="text" id='inputURLDesc' /><br />
+                    <p>
+                        {% for datatype in organismdatatypes %}
+                        {% if datatype.type == "Generic" %}
+                        <input type="radio" name="urlDataType" value="{{datatype.type}}" checked>{{datatype.type}}
+                        {% else %}
+                        <input type="radio" name="urlDataType" value="{{datatype.type}}">{{datatype.type}}
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+
             </div>
-            <div style="margin-left: 370px">
-                <a class="componenthelp" align="right" href="#inlineuploadfilehelp">
-                    <img src="/static/images/help.png" />
-                </a>
-            </div>
-            <br />
-            <form method="post" enctype="multipart/form-data">
-            <input name='uploads[]' id="filesToUpload" type="file" multiple><br />
-            Description: <input id="uploadFileDescription" type="text" id='inputFileDesc' />
-            </form>
-            <br />
-            <p>
-                {% for datatype in organismdatatypes %}
-                {% if datatype.type == "Generic" %}
-                    <input type="radio" name="dataType" value="{{datatype.type}}" checked>{{datatype.type}}
-                {% else %}
-                    <input type="radio" name="dataType" value="{{datatype.type}}">{{datatype.type}}
-                {% endif %}
-                {% endfor %}
-            </p>
+
         </div>
 
         <div id="dlgEditData" style="display:none" title="Edit Data">
@@ -622,18 +643,25 @@
                     </th>
                     <th>Description</th>
                     <th>Date</th>
+                    <th>Files</th>
                     <th>Operations</th>
                 </tr>
 
-                {% for state in savedstates %}
+                {% for stateentry in stateentries %}
                     <tr>
                         <td style="width:20%">
-                            <p id='astate_{{state.id|stringformat:"i"}}'>{{state.name}}</p>
-                            <input type="hidden" value='{{state.id|stringformat:"i"}}' />
+                            <p id='astate_{{state.id|stringformat:"i"}}'>{{stateentry.state.name}}</p>
+                            <input type="hidden" value='{{stateentry.state.id|stringformat:"i"}}' />
                         </td>
-                        <td> {{state.description}} </td>
-                        <td> {{state.created_datetime}} </td>
-
+                        <td> {{stateentry.state.description}} </td>
+                        <td> {{stateentry.state.created_datetime}} </td>
+                        <td>
+                            <select class="selStateFiles" multiple>
+                                {% for statefile in stateentry.statefiles %}
+                                    <option value="{{statefile.id}}" title="{{statefile.name}}">{{statefile.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
                         <td><!--<span id="boss"  class="boss"><a href='/static/jnlp/boss.jnlp' title="First start Gaggle Boss">start Gaggle boss</a></span>-->
                             <input type="button" value="Load" class="button" onclick="javascript:LoadState(this);" />
                             <input type="button" value="Edit" class="button" onclick="javascript:EditState(this);" />
