@@ -1,0 +1,19 @@
+<html>
+<head>
+    <title>Firegoose Object Page - Do Not Close</title>
+</head>
+<script type="text/javascript">
+var goose = null;   
+function afterloaded() {
+   var appletobj = document.DummyApplet;
+   //alert(appletobj);
+   goose = appletobj.getGoose();
+   //alert(goose);
+}
+</script>
+<body onload="afterloaded();">
+<h1>This page contains objects necessary to run Firegoose. Please do not close it.</h1>
+<applet id="DummyApplet" code="GaggleFiregooseApplet.class" archive="http://networks.systemsbiology.net/static/lib/GaggleFiregooseApplet.jar, http://networks.systemsbiology.net/static/lib/boss.jar, http://networks.systemsbiology.net/static/lib/gaggle-connector.jar" width="0" height="0">
+</applet>
+</body>
+</html>
