@@ -10,6 +10,14 @@ function afterloaded() {
    goose = appletobj.getGoose();
    //alert(goose);
 }
+
+function appletloaded()
+{
+   var appletobj = document.DummyApplet;
+   goose = appletobj.getGoose();	
+}
+
+
 </script>
 <body onload="afterloaded();">
 <h1>This page contains objects necessary to run Firegoose. Please do not close it.</h1>
