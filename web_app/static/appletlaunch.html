@@ -5,18 +5,26 @@
 <script type="text/javascript">
 var goose = null;   
 function afterloaded() {
-   var appletobj = document.DummyApplet;
-   //alert(appletobj);
-   goose = appletobj.getGoose();
-   //alert(goose);
+   setTimeout(function() { timerFunc() }, 3000);
 }
 
-function appletloaded()
+function timerFunc()
 {
-   var appletobj = document.DummyApplet;
-   goose = appletobj.getGoose();	
+   if (goose == null)
+   {
+      try {
+        var appletobj = document.DummyApplet;
+        //alert(appletobj);
+        goose = appletobj.getGoose();
+        //alert(goose);
+        if (goose == null)
+	   setTimeout(function() { timerFunc() }, 3000);
+      }
+      catch (e) {
+        setTimeout(function() { timerFunc() }, 3000);
+      }
+   }
 }
-
 
 </script>
 <body onload="afterloaded();">
