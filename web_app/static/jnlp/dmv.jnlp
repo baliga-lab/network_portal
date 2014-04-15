@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- todo move this file to the logical place (projects/halo/2007-04)-->
 <jnlp
-  codebase="http://networks.systemsbiology.net/static/"
+  codebase="http://localhost:8000/static/"
   href="jnlp/dmv.jnlp">
   <information>
     <title>DataMatrixViewer</title>

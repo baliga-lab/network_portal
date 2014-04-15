@@ -31,6 +31,8 @@ var FG_currentDataToOpen = null;
 var WF_capturedDataType = "Generic";
 var WF_filesToUpload = null;
 var WF_dataToSave = 0;
+var WF_argumentstrings = [];
+var WF_maxargumentindex = 0;
 
 // Below are the index of UI elements in the component div.
 // Everytime a UI element is added, we should modify the index here if necessary.
@@ -43,6 +45,15 @@ var componentopeninnewwindowindex = 11;
 var componentexistinggoosenameinputindex = 12;
 var componentnameinputindex = 6;
 var componentshortnameinputindex = 7;
+var componentargumentsinputindex = 9;
+var componentisscriptinputindex = 13;
+var componentidinputindex = 14;
+var componentdownloadurlinputindex = 15;
+var componenttemplatesselectindex = 16;
+
+var websocketconnection = null;
+
+var gaggleProxy = null;
 
 var jsplumbInstance = null;
 
@@ -60,6 +71,7 @@ var WF_fileTypeGeeseNameDictionary = {
     "sif" : "Cytoscape",
     "cytoscape" : "Cytoscape",
     "r" : "R",
+    "R" : "R",
     "xml" : "",
     "txt" : "",
     "gdat" : ""
@@ -91,7 +103,7 @@ var targetWFEndpointOptions = {
 
 $(document).ready(function () {
 
-
+    gaggleProxy = get_proxyapplet();
 
     $('#accordion').accordion({ active: false,
                                 collapsible: true,
@@ -150,6 +162,34 @@ $(document).ready(function () {
 
     LoadDataSpace();
 
+    $(".component").dblclick(ComponentDoubleClicked);
+
+
+    try {
+        websocketconnection = new WebSocket('ws://localhost:8083/BossWebSocket'); // (BossWebSocketUrl, ['soap', 'xmpp'], connectionOpened, parseData);
+        websocketconnection.onopen = function() {
+            alert('Web Socket OPENED ' + websocketconnection);
+            if (websocketconnection != null)
+                try
+                {
+                    websocketconnection.send('GetID'); // Send the message 'Ping' to the server
+                }
+                catch (e) {
+                    alert("Failed to send GetID " + e);
+                }
+        };
+        websocketconnection.onclose = function(event) {
+            alert("Websocket closed with code: " + event.code + " reason: " + event.reason);
+            websocketconnection = null;
+        };
+        websocketconnection.onmessage = function(message) {
+            alert(message.data);
+        };
+        //websocketconnection.onerror = onWebsocketError;
+    }
+    catch (e) {
+        alert("Failed to open web socket: " + e);
+    }
     return false;
 });
 
@@ -236,7 +276,7 @@ function UpdateGeeseInfo()
 // Load the data workspace menu for group opening feature
 function LoadDataWorkspaceComponentMenu()
 {
-    $("#components").children().each(function() {
+    $(".component").each(function() {
         //alert($(this).attr("id"));
         // Make all the child fields visible
         // include workflow index in component name
@@ -246,26 +286,29 @@ function LoadDataWorkspaceComponentMenu()
         //alert(goosename);
 
         // Add the goose name to the context menu div
-        var li = document.createElement("li");
-        var subactionselect = $(this).children()[4];
-        //alert(subactionselect);
-        var values = [];
-        $(subactionselect).children("option").each(function() {
-            //alert($(this).val());
-            values.push( $(this).val() );
-        });
-
-        var subactionhtml = "";
-        if (values.length > 2)
+        if (goosename != null && goosename.length > 0)
         {
-            // we have subactions
-            subactionhtml = $(subactionselect).html();
-            subactionhtml = "&nbsp;&nbsp;<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+            var li = document.createElement("li");
+            var subactionselect = $(this).children()[4];
+            //alert(subactionselect);
+            var values = [];
+            $(subactionselect).children("option").each(function() {
+                //alert($(this).val());
+                values.push( $(this).val() );
+            });
+
+            var subactionhtml = "";
+            if (values.length > 2)
+            {
+                // we have subactions
+                subactionhtml = $(subactionselect).html();
+                subactionhtml = "&nbsp;&nbsp;<select onchange='javascript:ContextSubactionSelected(this);'>" + subactionhtml + "</select>";
+            }
+            var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
+            li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />&nbsp;<label>" + goosename
+               + "</label><input type='hidden' value='" + $(this).attr("id") + "' /><input type='hidden' value='1' />" + subactionhtml);
+            $("#ulctxcomponents").append(li);
         }
-        var checkedtext = (goosename.toLowerCase().indexOf("firegoose") >= 0) ? "checked" : "";
-        li.innerHTML = ("<input type='radio' name='grpgoose' " + checkedtext + " onchange='javascript:SetDataPass(this)' />&nbsp;<label>" + goosename
-           + "</label><input type='hidden' value='" + $(this).attr("id") + "' /><input type='hidden' value='1' />" + subactionhtml);
-        $("#ulctxcomponents").append(li);
     });
 }
 
@@ -699,7 +742,13 @@ function GetEdgeDataTypes()
 }
 
 function componentDropEvent(ev, component) {
+    if (component == null)
+        return;
+
     var originalclass = $(component.draggable).attr("class");
+    if (originalclass.indexOf("scriptcomponent") >= 0)
+        return;
+
     if (originalclass != undefined && originalclass.indexOf("ui-dialog") >= 0)
         return;
     if ($(component.helper) != null) {
@@ -741,7 +790,7 @@ function componentDropEvent(ev, component) {
 
             $(($(cloned).children())[componentsubactioninputindex]).removeClass("workflowcomponentchildinput componentsubactions").addClass("workflowcomponentsubactions");
 
-            var argumentsinput = $(cloned).children()[9];
+            var argumentsinput = $(cloned).children()[componentargumentsinputindex];
             if (goosename == "Generic") {
                $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
             }
@@ -884,6 +933,346 @@ function NodeProcessed(node, processednodes) {
             return true;
     }
     return false;
+}
+
+function CreateArgumentDiv(index)
+{
+    var newargdiv = document.createElement("div");
+    $(newargdiv).prop("id", ("divArguments_" + index.toString()));
+    var newdivhtml = "<label>Argument:&nbsp;</label><input type='text' /><select><option value='0' selected>File</option>"
+                     +"<option value='1'>Url</option></select>"
+                     +"<input type='button' value='Add' onclick='javascript:AddModuleArgument(this);'/>"
+                     +"<input type='button' style='display: none' value='Remove' onclick='javascript:RemoveModuleArgument(this);'/>";
+    $(newargdiv).html(newdivhtml);
+    return newargdiv;
+}
+
+function AddModuleArgument(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+        //alert("Add argument...");
+        var parentdiv = $(source).parent();
+        var parentdivid = $(parentdiv).prop("id");
+        var argindex = parseInt(parentdivid.split("_")[1]);
+        //alert("Argument div index: " + argindex);
+        var argnameinput = ($(parentdiv).children())[1];
+        var argname = $(argnameinput).val();
+        //alert("Argument name: " + argname);
+        if (argname == null || argname.trim().length == 0)
+            return;
+
+        //var argiotypesel = ($(parentdiv).children())[2];
+        //var argiotype = $(argiotypesel).val();
+        //alert("Argument IO type: " + argiotype);
+        var argtypesel = ($(parentdiv).children())[2];
+        var argtype = $(argtypesel).val();
+        //alert("Argument type: " + argtype);
+        var argumentstring = "%t()" + argname;
+        argumentstring += (argtype == "0") ? "&&path" : "&&text";
+        //alert("Argument string: " + argumentstring);
+        // Save the argument string based on the argument index for easy removal
+        WF_argumentstrings[argindex.toString()] = argumentstring;
+        var addbutton = ($(parentdiv).children())[3];
+        //alert(addbutton);
+        $(addbutton).hide();
+        var removebutton = ($(parentdiv).children())[4];
+        //alert(removebutton);
+        $(removebutton).show();
+
+        // Add a new argument div to the dialog
+        var divargument = CreateArgumentDiv(argindex + 1);
+        $("#divArguments").append($(divargument));
+        WF_maxargumentindex = argindex + 1;
+    }
+}
+
+function RemoveModuleArgument(event)
+{
+    var source = event.target || event.srcElement;
+    if (source == null)
+        source = event;
+    if (source != null) {
+       var parentdiv = $(source).parent();
+       var parentdivid = $(parentdiv).prop("id");
+       $(("#" + parentdivid)).remove();
+       var argindex = parentdivid.split("_")[1];
+       WF_argumentstrings[argindex] = null;
+    }
+}
+
+
+function GenerateArgumentString()
+{
+    var result = "";
+    //alert(result);
+    var index = 0;
+    while (index <= WF_maxargumentindex) {
+        if (WF_argumentstrings[index.toString()] != null)
+        {
+            if (result.length > 0)
+                result += ";";
+            result += WF_argumentstrings[index.toString()];
+        }
+        index++;
+    }
+    return result;
+}
+
+
+function CreateNewWorkflowModule()
+{
+    var userid = $("#authenticated").val();
+    //alert(userid);
+    if (userid == null || userid.length == 0 || userid == "0")
+    {
+        alert("Please login before uploading module.");
+        return;
+    }
+
+    // Populate the target goose list
+    options = [];
+    options.push('<option value="-1'+ '">'+ "Select an application if applicable" +'</option>');
+    $(".component").each(function() {
+        //alert($(this).attr("id"));
+        // Make all the child fields visible
+        // include workflow index in component name
+
+        var isscriptinput = ($(this).children())[componentisscriptinputindex];
+        var componentidinput = ($(this).children())[componentidinputindex];
+        //alert(isscriptinput);
+        if (isscriptinput != null && componentidinput != null) {
+            var titleelement = ($(this).children())[0];
+            var titleahref = ($(titleelement).children())[0];
+            var goosename = $(titleahref).text();
+            var componentid = $(componentidinput).val();
+            var isscript = $(isscriptinput).val();
+            //alert(componentid); // + " " + isscriptinput.val());
+
+            // Add the non-script goose name to the dropdown menu
+            if (goosename != null && goosename.length > 0 && isscript == "False")
+            {
+                options.push('<option value="'+ componentid +'">'+ goosename +'</option>');
+            }
+        }
+    });
+
+    $('#selectModuleApplication').html(options.join(''));
+
+    // Initialize the upload module dialog
+    $("#divArguments").empty();
+    var divargument = CreateArgumentDiv(0);
+    //alert(divargument);
+    $("#divArguments").append($(divargument));
+
+    $("#dlgUploadModule").dialog( { height:650, width:550,
+      buttons: {
+          "Upload": function() {
+              var modulename = $("#inputModuleName").val();
+              var fileinput = document.getElementById('moduleToUpload');
+              var scriptname = $("#inputModuleScriptName").val();
+              if (modulename != null && modulename.length > 0 && fileinput.files.length > 0
+                  && scriptname != null && scriptname.length > 0) {
+                  var moduleshortname = $("#inputModuleShortName").val();
+                  var description = $("#inputModuleDesc").val();
+                  var arguments = GenerateArgumentString(); //$("#inputModuleArguments").val();
+                  arguments = "%h(" + scriptname + ")fn&&fn;" + arguments;
+                  //alert("Argument string to be saved: " + arguments);
+                  var category = $("#selectModuleCategory").val();
+                  var application = $("#selectModuleApplication").val();
+                  var isshared =  $('input[name="SharedModule"]:checked').val();
+                  //alert(application);
+
+                  var formdata = new FormData();
+                  formdata.append('userid', userid);
+                  //alert(organismtype);
+                  formdata.append('modulename', modulename);
+                  //alert(datatype);
+                  formdata.append('moduleshortname', moduleshortname);
+                  formdata.append("description", description);
+                  formdata.append("arguments", arguments);
+                  formdata.append("category", category);
+                  formdata.append("applicationid", application);
+                  formdata.append("isshared", isshared);
+
+                  //alert(fileinput.files[0].name);
+                  //formdata.append('file', fileinput.files);
+
+                  if (fileinput.files.length > 0) {
+                      for (var x = 0; x < fileinput.files.length; x++) {
+                          formdata.append('scriptfile', fileinput.files[x]);
+                      }
+                  }
+
+                  var templatefileinput = document.getElementById("inputTemplateFiles");
+                  //alert(templatefileinput.files.length);
+                  if (templatefileinput.files.length > 0) {
+                      for (var k = 0; k < templatefileinput.files.length; k++) {
+                          formdata.append(("templatefile_" + k.toString()), templatefileinput.files[k]);
+                      }
+                  }
+
+                  jQuery.ajax({
+                     url: "/workflow/saveworkflowcomponent",
+                     type: "POST",
+                     xhr: function () {  // custom xhr
+                         myXhr = $.ajaxSettings.xhr();
+                         if (myXhr.upload) { // check if upload property exists
+                             //myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                         }
+                         return myXhr;
+                     },
+                     data: formdata,
+                     cache: false,
+                     contentType: false,
+                     processData: false,
+                     //            beforeSend: function (x) {
+                     //                if (x && x.overrideMimeType) {
+                     //                    x.overrideMimeType("application/json;charset=UTF-8");
+                     //                }
+                     //            },
+                     success: function (result) {
+                         if (result != null)
+                         {
+                             //alert(result);
+                             ProcessUploadModuleResult(result);
+                         }
+                     }
+                  });
+              }
+
+              $('#dlgUploadModule').dialog('close');
+
+              //SubmitWorkflow();
+              //$('#divDataspaceComponentMenu').dialog('close');
+          },
+          "Cancel": function() {
+              $('#dlgUploadModule').dialog('close');
+          }
+
+      }
+    });
+}
+
+
+function ProcessUploadModuleResult(result)
+{
+    if (result != null) {
+       var index = 0;
+       var finished = false;
+       do
+       {
+          var pair = result[index.toString()];
+          //alert(pair);
+          if (pair != null)
+          {
+              var componentid = pair['id'];
+              var serviceurl = pair['serviceurl'];
+              var downloadurl = pair['downloadurl'];
+              var isscript = pair['isscript'];
+              var name = pair['name'];
+              var shortname = pair['shortname'];
+              var serviceurl = pair['serviceurl'];
+              var categoryid = pair["categoryid"];
+              var arguments = pair["arguments"];
+              var templates = pair["templates"];
+              InsertComponent(categoryid, componentid, name, shortname, serviceurl, downloadurl, isscript, arguments, templates);
+              index++;
+          }
+          else
+             finished = true;
+       }
+       while (!finished);
+    }
+}
+
+// Insert or update a saved component
+function InsertComponent(categoryid, componentid, name, shortname, serviceurl, downloadurl, isscript, arguments, templates)
+{
+    //alert(categoryid + " " + serviceurl);
+    var index = 0;
+    var finished = false;
+    var templateoptions = "";
+    do {
+        var templatefile = templates[index.toString()];
+        if (templatefile == null)
+            finished = true;
+        else {
+            var filename = templatefile["name"];
+            var url = templatefile["url"];
+            alert("file name: " + filename + " url: " + url);
+            if (filename != null && url != null)
+            {
+                templateoptions += "<option value='" + url + "'>" + filename + "</option>";
+            }
+            index++;
+        }
+    }
+    while (!finished);
+    alert(templateoptions);
+
+    var componenthtml = "<div class='component ui-draggable' id='component_" + componentid + "'>"
+                    + "<div class='componenttitle'><a href=\x22javascript:startDownload('" + downloadurl + "')\x22>"
+                    + shortname + "</a></div>"
+                    + "<img src='/static/images/close.png' class='componentclose' title='Remove from workflow'></img>"
+                    + "<input class='componentchildinput' type='text' value='" + serviceurl + "' placeholder='Enter the url or path to the executable of the component' title='Enter the url or path to the executable of the component' />"
+                    + "<a class='componentquestion' href='#inlinewfpath'>"
+                    + "<img src='/static/images/help.png' /></a>"
+                    + "<select class='componentsubactions'>"
+                        //{% for subaction in component.Subactions %}
+                        //<option value="{{subaction.url}}">{{subaction.name}}</option>
+                        //{% endfor %}
+                    + "</select>"
+                    + "<input class='componentchildinput' type='text' placeholder='Enter data url' "
+                    +       "title='Enter the url of data to be opened by the component' value=''/>"
+                    + "<input type='hidden' value='" + name + "' />"
+                    + "<input type='hidden' value='" + shortname + "' />"
+                    + "<input type='hidden' value='' />"
+                    + "<input class='componentchildinput' type='text' value='" + arguments + "' "
+                    +      "placeholder='Enter the arguments to be passed to the component' "
+                    +      "title='Enter the arguments to be passed to the component'/>"
+                    + "<input type='hidden' value='' />"
+                    + "<input type='hidden' value='0' />"
+                    + "<input type='hidden' value='" + name +"' />"
+                    + "<input type='hidden' value='" + isscript + "' />"
+                    + "<input type='hidden' value='" + componentid + "' />"
+                    + "<input type='hidden' value='' />"
+                    + "<select class='componenttemplates'>"
+                    + templateoptions
+                    + "</select>"
+                + "</div>";
+
+    alert(componenthtml);
+    $(componenthtml).insertAfter($("#categorypara_" + categoryid));
+
+    // Make the component draggable
+    $('.component').draggable({
+            helper: 'clone'
+        });
+
+    $(".component").dblclick(ComponentDoubleClicked);
+}
+
+function DecideExistingGoose(serviceuri, goosename)
+{
+    if (serviceuri == null && goosename == null)
+        return "";
+
+    if (serviceuri.length == 0 && goosename.length == 0)
+        return "";
+
+    for (var ftype in WF_fileTypeGeeseNameDictionary)
+    {
+        var ext = "." + ftype;
+        if (serviceuri.lastIndexOf(ext) == serviceuri.length - ext.length)
+        {
+            return WF_fileTypeGeeseNameDictionary[ftype];
+        }
+    }
+
+    return goosename;
 }
 
 // Extract workflow from UI
@@ -1088,7 +1477,11 @@ function ExtractWorkflow(nodelist) {
                 wfnode.openinnewwindow = $(openinnewwindowinput).val();
                 //alert(wfnode.openinnewwindow);
                 var existinggoosenameinput = $(source).children()[componentexistinggoosenameinputindex];
-                wfnode.opengoosename = $(existinggoosenameinput).val();
+                //alert(wfnode.serviceuri);
+                var existinggoosename = DecideExistingGoose(wfnode.serviceuri, $(existinggoosenameinput).val());
+                //alert(existinggoosename);
+                wfnode.opengoosename = existinggoosename;
+
                 //alert("Open goose name " + wfnode.opengoosename);
 
                 wfnode.subaction = (wfnode.goosename == "Generic") ? (subaction + ";;" + subactiontext) : subaction; //.attr("value");
@@ -1332,7 +1725,7 @@ function SubmitWorkflow(nodelist, info) {
             var userid = $("#authenticated").val(); //.attr("value");
             var jsonObj = ConstructWorkflowJSON(currWorkflowName, currWorkflowDesc, currWorkflowID, userid);
             var jsonString = JSON.stringify(jsonObj);
-            //alert(jsonString);
+            alert(jsonString);
             //alert(info);
             SubmitWorkflowToBoss(jsonString, info);
             WF_timercnt = 0;
@@ -1685,7 +2078,7 @@ function AppendComponent(node, nodeid, componentid, sourceid, nodecnt)
         }
 
         if (node != null) {
-            var argumentsinput = $(sourcelement).children()[9];
+            var argumentsinput = $(sourcelement).children()[componentargumentsinputindex];
             $(argumentsinput).val(node.arguments);
             if (goosename == "Generic") {
                 $(argumentsinput).removeClass("componentchildinput").addClass("workflowcomponentchildinput");
@@ -2406,6 +2799,7 @@ function InsertDataToTarget(linkpair)
         var text = linkpair["text"];
         link.href = url;
         link.innerHTML = text;
+        link.title = linkpair["desc"];
         $(label).append($(link));
 
         var idinput = document.createElement("input");
@@ -3590,7 +3984,7 @@ function FindGooseComponentByName(goosename)
         var truegoosename = (splitted[0].split(";;"))[0];
         var component = null;
         //alert("Goose name to find: " + truegoosename);
-        $("#components").children().each(function() {
+        $(".component").each(function() {
             var componentnameinput = $(this).children()[componentnameinputindex];
             var componentname = $(componentnameinput).val();
             //alert("component name: " + componentname);
@@ -3682,11 +4076,11 @@ function OpenDataGroup(group, groupname, datatype)
           FG_currentDataToOpen = group;
 
           var activeGeese = [];
-          var proxy = get_proxyapplet();
+          /*var proxy = get_proxyapplet();
           if (proxy != undefined) {
              //alert("Get opened geese...");
              activeGeese = proxy.getGeeseNames();
-          }
+          } */
 
           //alert(activeGeese);
           $("#ulctxExistingComponents").empty();
@@ -3795,7 +4189,7 @@ function GroupOpen(datatable)
 
 function FindComponent(gname)
 {
-    $("#components").children().each(function() {
+    $(".component").each(function() {
         //alert($(this).attr("id"));
         // Make all the child fields visible
         // include workflow index in component name
@@ -3829,6 +4223,203 @@ function GetGooseFromCanvas(gooseid)
         }
     });
     return null;
+}
+
+// User double clicked a component, we pop up the
+// component open dialog for user to fill in the
+// arguments and then opens the component
+function ComponentDoubleClicked(event)
+{
+    //alert(event);
+    var source = event.target || event.srcElement;
+    if (source == null)
+       source = event;
+    if (source != null) {
+       //alert(source);
+       var className = $(source).prop('class');
+       //alert(className);
+
+       // here "component " is very important. The components class is "component draggable"
+       // after they are made draggable by jQuery.
+       while (className.indexOf("component ") < 0 && source != null)
+       {
+           source = $(source).parent();
+           //alert(source);
+           className = $(source).attr('class');
+           //alert(className)
+       }
+
+       //alert("component " + $(source).prop('id'));
+       if (source != null) {
+           var argumentsinput = $(source).children()[componentargumentsinputindex];
+           //alert(argumentsinput);
+           var arguments = $(argumentsinput).val();
+           //alert(arguments);
+           var serviceurlinput = $(source).children()[serviceuriindex];
+           var serviceurl = $(serviceurlinput).val();
+           //alert(serviceurl);
+           var downloadurlinput = $(source).children()[componentdownloadurlinputindex];
+           var downloadurl = $(downloadurlinput).val();
+           var templateselect = $(source).children()[componenttemplatesselectindex];
+           //alert($(templateselect).html());
+
+           // Now we parse the arguments and generate the component open dialog
+           if (arguments != null)
+           {
+               var splitted = arguments.split(";");
+               if (splitted != null && splitted.length > 0)
+               {
+                  $("#ulParameters").empty();
+                  for (var i = 0; i < splitted.length; i++)
+                  {
+                      var argument = splitted[i];
+                      //alert(argument);
+                      if (argument != null) {
+                          var type = 0;
+                          if (argument.indexOf("%f") >= 0)
+                          {
+                              // file parameter
+                              type = 0;
+                          }
+                          else if (argument.indexOf("%t") >= 0)
+                          {
+                              // text parameter
+                              type = 1;
+                          }
+                          else if (arguments.indexOf("%h") >= 0)
+                          {
+                              // hidden parameter
+                              type = 2;
+                          }
+                          //alert(type);
+
+                          var loc1 = argument.indexOf("(");
+                          var loc2 = argument.indexOf(")");
+                          //alert(loc1 + " " + loc2);
+                          if (loc2 > loc1) {
+                              var argumentvalue = argument.substr(loc1 + 1, loc2 - loc1 - 1);
+                              //alert(argumentvalue);
+
+                              var loc3 = argument.lastIndexOf("&&");
+                              var argumentname = argument.substr(loc2 + 1, loc3 - loc2 - 1);
+                              var argumenttype = argument.substr(loc3 + 2);
+
+                              //alert(argumentname + " " + argumenttype + " " + argumentvalue);
+                              if (type == 0)
+                              {
+                                   // This is a file parameter
+                                  var li = document.createElement("li");
+                                  var parameterhtml = "<label>" + argumentname + "</label>&nbsp;&nbsp;<input type='file' class='inputParameter' /><input type='hidden' value='" + argumentname + "' /><input type='hidden' value='" + argumenttype + "' />";
+                                  li.innerHTML = parameterhtml;
+                                  $("#ulParameters").prepend(li);
+                              }
+                              else if (type == 1)
+                              {
+                                  // This is a file parameter
+                                  var li = document.createElement("li");
+                                  var parameterhtml = "<label>" + argumentname + "</label>&nbsp;&nbsp;<input type='text' class='inputParameter' /><input type='hidden' value='" + argumentname + "' /><input type='hidden' value='" + argumenttype + "' />";
+                                  li.innerHTML = parameterhtml;
+                                  $("#ulParameters").prepend(li);
+                              }
+                              else if (type == 2) {
+                                  var li = document.createElement("li");
+                                  var parameterhtml = "<label></label>&nbsp;&nbsp;<input type='hidden' class='inputParameter' value='" + argumentvalue + "' /><input type='hidden' value='" + argumentname + "' /><input type='hidden' value='" + argumenttype + "' />";
+                                  li.innerHTML = parameterhtml;
+                                  $("#ulParameters").prepend(li);
+                              }
+                          }
+                      }
+
+                  }
+                  // Add template select
+                  var templateli = document.createElement("li");
+                  $("#ulParameters").append($(templateli));
+
+                  var templatelabel = document.createElement("label");
+                  $(templatelabel).html("Template&nbsp;&nbsp;");
+                  $(templateli).append($(templatelabel));
+
+                  var newtemplateselect = document.createElement("select");
+                  $(newtemplateselect).html($(templateselect).html());
+                  $(templateli).append($(newtemplateselect));
+
+                  var inputparametername = document.createElement("input");
+                  inputparametername.setAttribute("type", "hidden");
+                  inputparametername.setAttribute("value", "template");
+                  $(templateli).append($(inputparametername));
+
+                  var inputparametertype = document.createElement("input");
+                  inputparametertype.setAttribute("type", "hidden");
+                  inputparametertype.setAttribute("value", "url");
+                  $(templateli).append($(inputparametertype));
+
+                  $('#dlgModuleParameters').dialog( { height:400, width:600,
+                      buttons: {
+                          "Open": function() {
+                              // Get all the selected data
+                              var parameterstring = "";
+                              var pcnt = 0;
+                              $("#ulParameters").children().each(function() {
+                                   // Each li
+                                   if (pcnt > 0)
+                                      parameterstring += "&&&";
+                                   var parameterelement = $(this).children()[1];
+                                   var parameternameinput = $(this).children()[2];
+                                   var parametertypeinput = $(this).children()[3];
+                                   var parametervalue = $(parameterelement).val();
+                                   //alert(parametervalue);
+                                   var parametername = $(parameternameinput).val();
+                                   //alert(parameterswitchname);
+                                   var parametertype = $(parametertypeinput).val();
+                                   if (parametertype == "path") {
+                                      // Replace \ with \\ in a path
+                                      var regex = /\\/g;
+                                      var parametervalue = parametervalue.replace(regex, "\\\\");
+                                      //alert(parametervalue);
+                                   }
+                                   parameterstring += (parametername + ";;;" + parametervalue);
+                                   pcnt++;
+                              });
+
+                              // Generate workflow json string
+                              //alert(parameterstring);
+                              var componentidinput = $(source).children()[componentidinputindex];
+                              var sourceid = 'wfcid' + wfcnt.toString() + "_" + $(componentidinput).val();
+                              //alert(sourceid);
+                              // Append the selected goose to the canvas
+                              var componentdivid = "component_" + $(componentidinput).val();
+                              var nodeobj = AppendComponent(null, "", componentdivid, sourceid, WF_nodecnt);
+                              var nodelist = [];
+                              var sourceelement = nodeobj.Element;
+                              var argumentinput = $(sourceelement).children()[componentargumentsinputindex];
+                              $(argumentinput).val(parameterstring);
+
+                              nodelist.push(nodeobj.Element);
+
+                              var info = "Submitting " + parameterstring;
+                              //alert(info);
+                              SubmitWorkflow(nodelist, info);
+
+                              $('#dlgModuleParameters').dialog('close');
+                          },
+                          "Close": function() {
+                              $('#dlgModuleParameters').dialog('close');
+                          }
+
+                      }
+                    });
+               }
+           }
+       }
+    }
+}
+
+
+function WorkspaceDataReceived(pageurl)
+{
+    alert(pageurl);
+    $("#inputFiregoose").val(pageurl);
+    //window.open(pageurl,'Result');
 }
 
 function HandleGooseRecording(gooseid)
@@ -4079,7 +4670,7 @@ function OnSaveState(param)
 
 function LoadState(event)
 {
-    $("#inputFiregoose").val("BossStarting");
+    $("#inputFiregooseBossStart").val("BossStarting");
     var source = event.target || event.srcElement;
     if (source == null)
         source = event;

@@ -14,6 +14,7 @@
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.jsPlumb-1.3.16-all.js'></script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.colorbox.js'></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/workflow.js"></script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/scripthandler.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.jeditable.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.dropdown.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}javascripts/jquery.reject.min.js"></script>
@@ -170,43 +171,55 @@
                     <div id="components" class="divcomponents">
                         {% if wfentries.count > 0 %}
                         {% for wfentry in wfentries %}
-                        <!--<p><strong>{{wfentry.Category.name}}</strong></p>-->
+                        <p id="categorypara_{{wfentry.Category.id}}"><strong>{{wfentry.Category.name}}</strong></p>
 
                         {% for component in wfentry.WorkflowComponents %}
-
-                        <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
-                            <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a>
+                        <!--<div style="width: 100%; postion: relative"> -->
+                            <!--<div style="display: inline; width: 20px; margin: 10px"><input type="checkbox" /></div> -->
+                            <div class="component" id='component_{{component.Component.id|stringformat:"i"}}'>
+                                <div class="componenttitle"><a href="javascript:startDownload('{{component.Component.downloadurl}}')">{{component.Component.short_name}}</a>
+                                </div>
+                                <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
+                                <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
+                                <a class="componentquestion" href="#inlinewfpath">
+                                    <img src="/static/images/help.png" />
+                                </a>
+                                <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
+                      title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
+                                <select class="componentsubactions">
+                                    {% for subaction in component.Subactions %}
+                                    <option value="{{subaction.url}}">{{subaction.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input class="componentchildinput" type="text" placeholder="Enter data url"
+                                       title="Enter the url of data to be opened by the component" value=""/>
+                                <input type="hidden" value="{{component.Component.name}}" />
+                                <input type="hidden" value="{{component.Component.short_name}}" />
+                                <input type="hidden" value="" />
+                                <input class="componentchildinput" type="text" value="{{component.Component.arguments}}"
+                                       placeholder="Enter the arguments to be passed to the component"
+                                       title="Enter the arguments to be passed to the component"/>
+                                <input type="hidden" value="" />
+                                <input type="hidden" value="0" />
+                                <input type="hidden" value="{{component.Component.name}}" />
+                                <input type="hidden" value="{{component.Component.isscript}}" />
+                                <input type="hidden" value="{{component.Component.id|stringformat:'i'}}" />
+                                <input type="hidden" value="{{component.Component.downloadurl}}" />
+                                <select class="componenttemplates">
+                                    {% for template in component.Templates %}
+                                    <option value="{{template.file}}">{{template.name}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <img src="/static/images/close.png" class="componentclose" title="Remove from workflow"></img>
-                            <input class="componentchildinput" type="text" value="{{component.Component.serviceurl}}" placeholder="Enter the url or path to the executable of the component" title="Enter the url or path to the executable of the component" />
-                            <a class="componentquestion" href="#inlinewfpath">
-                                <img src="/static/images/help.png" />
-                            </a>
-                            <!--<input class="componentchildinput" type="text" placeholder="Enter subaction"
-                  title="Enter subaction (for example, a web handler for firegoose)" value=""/> -->
-                            <select class="componentsubactions">
-                                {% for subaction in component.Subactions %}
-                                <option value="{{subaction.url}}">{{subaction.name}}</option>
-                                {% endfor %}
-                            </select>
-                            <input class="componentchildinput" type="text" placeholder="Enter data url"
-                                   title="Enter the url of data to be opened by the component" value=""/>
-                            <input type="hidden" value="{{component.Component.name}}" />
-                            <input type="hidden" value="{{component.Component.short_name}}" />
-                            <input type="hidden" value="" />
-                            <input class="componentchildinput" type="text" value="{{component.Component.arguments}}"
-                                   placeholder="Enter the arguments to be passed to the component"
-                                   title="Enter the arguments to be passed to the component"/>
-                            <input type="hidden" value="" />
-                            <input type="hidden" value="0" />
-                            <input type="hidden" value="{{component.Component.name}}" />
-                        </div>
-
+                        <!--</div> -->
                         {% endfor %}
 
                         {% endfor %}
                         {% endif %}
                     </div>
+                    <br />
+                    <input type="button" value="Create" onclick="CreateNewWorkflowModule()" />
+                    <!--<input type="button" value="Delete" onclick="RemoveWorkflowModule()" /> -->
                 </td>
                 <td valign="top" style="width: 65%"><h3>Workflow Canvas</h3>
                     <div id="workflowcanvas" class="workflowcanvas" >
@@ -481,6 +494,44 @@
             </p>
         </div>
 
+        <div id="dlgUploadModule" style="display:none" title="Upload Module">
+            <form method="post" enctype="multipart/form-data">
+                Name: <input type="text" id='inputModuleName' /><br/>
+                Abbreviation: <input type="text" id='inputModuleShortName' /><br/>
+                Description: <input type="text" id='inputModuleDesc' /><br/><br/>
+
+                <select id="selectModuleCategory">
+                    <option value = "0" selected>Select a category for the component</option>
+                    {% for wfentry in wfentries %}
+                    <option value = "{{wfentry.Category.id|stringformat:'i'}}">{{wfentry.Category.name}}</option>
+                    {% endfor %}
+                </select><br />
+
+                <select id="selectModuleApplication">
+                    <option value = "-1" selected>Select an application if applicable</option>
+                </select><br />
+
+                File: <input name='uploads[]' id="moduleToUpload" type="file"><br />
+                Function Name: <input type="text" id="inputModuleScriptName" /><br />
+
+                <div id="divArguments">
+
+                </div>
+
+                <div id="divTemplates">
+                    <label>Template:&nbsp;</label><input name="uploads[]" id="inputTemplateFiles" type='file' multiple/>
+                </div>
+                <p><input id="inputModulePrivate" type="radio" name="SharedModule" checked="true" value="Private"/>Private
+                    <input id="inputModuleShared" type="radio" name="SharedModule" value="Shared" />Shared</p>
+            </form>
+        </div>
+
+        <div id="dlgModuleParameters" style="display:none" title="Module Parameters">
+            <ul id="ulParameters">
+
+            </ul>
+        </div>
+
 
         <div style="display:none">
             <div id='inlineworkspacehelp' style='padding:10px; background:#fff'>
@@ -743,6 +794,7 @@
 
 </div>
 <input id="inputFiregoose" type="hidden" value="" />
+<input id="inputFiregooseBossStart" type="hidden" value="" />
 </div>
 
 {% endblock %}

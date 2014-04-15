@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0+" codebase="http://networks.systemsbiology.net/static/">
+<jnlp spec="1.0+" codebase="http://localhost:8000/static/">
   <information>
     <title>Cytoscape WebStart</title>
     <vendor>Baliga Lab | Institute for Systems Biology</vendor>
@@ -45,8 +45,8 @@
     <argument>org.systemsbiology.cytoscape.GagglePlugin</argument>
     <argument>-p</argument>
     <argument>org.cytoscape.scripting.ScriptEngineManagerPlugin</argument>
-    <argument>-p</argument>
-    <argument>tudelft.CytoscapeRPC.CytoscapeRPCPlugin</argument>
+    <!--<argument>-p</argument>
+    <argument>tudelft.CytoscapeRPC.CytoscapeRPCPlugin</argument> -->
     <argument>-p</argument>
     <argument>csplugins.network.merge.NetworkMergePlugin</argument>
     <argument>-p</argument>

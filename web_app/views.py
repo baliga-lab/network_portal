@@ -17,6 +17,7 @@ from django.conf import settings
 from datetime import datetime
 from datetime import timedelta
 from django.utils.timezone import utc
+from django.db.models import Q
 
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
@@ -85,7 +86,7 @@ class WorkflowComponentSubactionInfo:
 
 class WorkflowComponentInfo:
     def __init__(self, component):
-        print 'Paring workflow component ' + component.name
+        print 'Parsing workflow component ' + component.name
 
         self.Component = component
 
@@ -122,6 +123,10 @@ class WorkflowComponentInfo:
                 self.Subactions.append(subactioninfo)
         print self.Subactions
 
+        self.Templates = []
+        for template in component.workflowcomponenttemplates_set.all():
+            print template.name
+            self.Templates.append(template)
 
 class WorkFlowEntry:
     def __init__(self, category, components):
@@ -171,6 +176,81 @@ def createuser(user):
 def workflow(request):
     #print request.REQUEST
     print "workflow page"
+    print request.user.username
+    #print request.user.first_name
+
+
+    userid = '0' # by default the Guest user
+    dbuser = Users.objects.filter(id = 0)
+    isauthenticated = "false"
+    if request.user.is_authenticated():
+        isauthenticated = "true"
+        dbuser = Users.objects.filter(email = request.user.email)
+
+    if (len(dbuser) > 0):
+        user = dbuser[0]
+    elif (len(dbuser) == 0):
+        user = createuser(request.user)
+    userid = str(user.id)
+    print 'user ID: ' + userid
+
+    wfentries = []
+    componentstring = ''
+    wfcategories = WorkflowCategories.objects.all()
+    for category_obj in wfcategories:
+        wfentry = WorkFlowEntry(category_obj, category_obj.workflowcomponents_set.all())
+        wfentries.append(wfentry)
+        for component in category_obj.workflowcomponents_set.filter(Q(owner_id = 0) | Q(owner_id = userid)):
+            componentstring += (component.name + ',' + str(component.id) + ';')
+        #print("Category " + str(category_obj.id) + ": " + str(wfentries.count()))
+
+
+    myworkflows = Workflows.objects.filter(owner_id = user.id).filter(temporary = False)
+    mydatagroups = WorkflowDataGroups.objects.filter(owner_id = user.id)
+    datagroups = []
+    for group in mydatagroups:
+        print("Group ID: " + str(group.id))
+        groupcontents = WorkflowDataGroupContent.objects.filter(group_id = group.id)
+        datagroup = DataGroupEntry(group, groupcontents)
+        datagroups.append(datagroup)
+
+
+    # captureddata = WorkflowCapturedData.objects.filter(owner_id = user.id)
+
+    organisms = Species.objects.all().order_by('name')
+
+    organismdatatypes = OrganismDataTypes.objects.all().order_by('id')
+
+    savedstates = SavedStates.objects.filter(owner_id = user.id)
+    stateentries = []
+    for state in savedstates:
+        files = StateFiles.objects.filter(state_id = int(state.id))
+        stateentry = StateInfo(state, files)
+        stateentries.append(stateentry)
+
+    totalseconds = round((datetime.now() - datetime.utcnow()).total_seconds())
+    tdelta = timedelta(seconds = totalseconds)
+
+    # jpype executes java code
+    #try:
+    #    jvmpath = jpype.getDefaultJVMPath()
+    #    jpype.startJVM(jvmpath, "-ea", "-Djava.class.path=static/lib/boss-201105180306.jar")
+    #except Exception:
+    #    return
+
+    #Class = jpype.JClass("TestPy4j")
+    #t = Class()
+    #t.WriteFile()
+
+    # and you have to shutdown the VM at the end
+    #jpype.shutdownJVM()
+
+    return render_to_response('workflow.html', locals())
+
+
+def workspacecontrol(request):
+    #print request.REQUEST
+    print "workflow page"
     #print request.user.username
     #print request.user.first_name
     wfentries = []
@@ -181,6 +261,8 @@ def workflow(request):
         wfentries.append(wfentry)
         for component in category_obj.workflowcomponents_set.all():
             componentstring += (component.name + ',' + str(component.id) + ';')
+            #templates = component.workflowcomponenttemplates_set.all()
+
         #print("Category " + str(category_obj.id) + ": " + str(wfentries.count()))
 
     userid = '0' # by default the Guest user
@@ -236,7 +318,9 @@ def workflow(request):
     # and you have to shutdown the VM at the end
     #jpype.shutdownJVM()
 
-    return render_to_response('workflow.html', locals())
+    return render_to_response('workspacecontrol.html', locals())
+
+
 
 @csrf_exempt
 def getdataspace(request):
@@ -568,6 +652,127 @@ def getworkflow(request, workflow_id):
 
     return HttpResponse(json.dumps(workflowobj), mimetype='application/json')
 
+@csrf_exempt
+def saveworkflowcomponent(request):
+    print "Save workflow component "
+    try:
+        userid = request.REQUEST['userid']
+        componentname = request.REQUEST['modulename']
+        componentshortname = request.REQUEST['moduleshortname']
+        desc = request.REQUEST['description']
+        args = request.REQUEST['arguments']
+        isshared = request.REQUEST['isshared']
+        moduleshared = False
+        if (isshared == 'Shared'):
+            moduleshared = True
+        print 'arguments: ' + args
+
+        categoryid = request.REQUEST['category']
+        applicationid = request.REQUEST['applicationid']
+        print userid + ' ' + componentname + ' ' + categoryid + ' ' + applicationid + ' ' + isshared
+
+        physicalpath = 'scripts/components'
+        physicalpath = os.path.join(physicalpath, userid)
+        print physicalpath
+        physicalpath = makedir(physicalpath)
+        print 'save path: ' + physicalpath
+        savepathurl = 'http://' + request.get_host() + '/workflow/getuserdata/' + 'scripts' + '/' + 'components' + '/' + userid
+
+        responsedata = {}
+        idx = 0
+        scriptfileurl = ''
+        componentid = -1
+        for key in request.FILES.keys():
+            #each file is an UploadedFile object
+            print 'FILE key: ' + key
+            if (key.find('scriptfile') >= 0):
+                srcfile = request.FILES[key]
+                fullfilename = srcfile.name
+                print fullfilename
+                prefix, filename = os.path.split(fullfilename)
+                print 'File name: ' + filename
+                with open(os.path.join(physicalpath, filename), 'wb') as f:
+                    destination = File(f)
+                    for chunk in srcfile.chunks():
+                        destination.write(chunk)
+                    destination.close()
+
+                scriptfileurl = savepathurl + '/' + filename
+                print 'Script file url: ' + scriptfileurl
+
+                # save to DB
+                sourcecomponentdownloadurl = ''
+                if (int(applicationid) >= 0):
+                    sourcecomponent = WorkflowComponents.objects.filter(id = int(applicationid))[0]
+                    sourcecomponentdownloadurl = '' #sourcecomponent.downloadurl
+                if (sourcecomponentdownloadurl is None):
+                    sourcecomponentdownloadurl = ''
+                print sourcecomponentdownloadurl
+                data = WorkflowComponents(owner_id = int(userid), category_id = int(categoryid), name = componentname, short_name = componentshortname, serviceurl = scriptfileurl, downloadurl = sourcecomponentdownloadurl, isscript = True, description = desc, arguments = args, shared = moduleshared)
+                data.save()
+                componentid = data.id;
+
+        #save template files
+        if componentid >= 0:
+            templatefilephysicalpath = 'scripts/templates/' + str(componentid)
+            templatefilephysicalpath = makedir(templatefilephysicalpath)
+            templatesavepathurl = 'http://' + request.get_host() + '/workflow/getuserdata/' + 'scripts' + '/' + 'templates' + '/' + str(componentid)
+            print 'Template physical path: ' + templatefilephysicalpath
+            print 'Template save path url:' + templatesavepathurl
+
+            templatefiledata = {}
+            tidx = 0
+            for key in request.FILES.keys():
+                #each file is an UploadedFile object
+                print 'Template file key: ' + key
+                if (key.find('templatefile_') >= 0):
+                    srcfile = request.FILES[key]
+                    fullfilename = srcfile.name
+                    print fullfilename
+                    prefix, filename = os.path.split(fullfilename)
+                    print 'File name: ' + filename
+                    with open(os.path.join(templatefilephysicalpath, filename), 'wb') as f:
+                        destination = File(f)
+                        for chunk in srcfile.chunks():
+                            destination.write(chunk)
+                        destination.close()
+
+                    dataurl = templatesavepathurl + '/' + filename
+                    print 'File url: ' + dataurl
+                    templatefiledata[str(tidx)] = {'name' : filename, 'url' : dataurl}
+
+                    templatedata = WorkflowComponentTemplates(component_id = componentid, file = dataurl, name = filename)
+                    templatedata.save()
+
+
+            #downloadurl is the url of the application that can open this module (if this module is a script)
+            pair =  {'id': str(data.id), 'ownerid': userid, 'categoryid': str(categoryid), 'name': componentname, 'shortname': componentshortname, 'serviceurl' : scriptfileurl, 'downloadurl': sourcecomponentdownloadurl, 'description': desc, 'isscript': 'False', 'arguments': args,  'templates': templatefiledata}
+            responsedata[str(idx)] = pair
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': 'Failed to save data file' }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
+
+    print 'Upload files response: ' + json.dumps(responsedata)
+    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+def getworkflowcomponents(request):
+    print "Get workflow components info"
+
+    try:
+        components = WorkflowComponents.objects.all()
+        responsedata = {}
+        idx = 0
+        for component in components:
+            pair =  {'id': str(component.id), 'serviceurl': component.serviceurl, 'name': component.name, 'shortname': component.short_name, 'description': component.description, 'isscript': str(component.isscript), 'arguments': component.arguments}
+        responsedata[str(idx)] = pair
+        print 'get workflow components response: ' + json.dumps(responsedata)
+        return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+
+    except Exception as e:
+        print str(e)
+        error = {'status':500, 'message': str(e) }
+        return HttpResponse(json.dumps(error), mimetype='application/json')
 
 @csrf_exempt
 def getsessions(request):

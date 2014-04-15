@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <jnlp
- codebase="http://networks.systemsbiology.net/static" href="jnlp/mev.jnlp">
+ codebase="http://localhost:8000/static" href="jnlp/mev.jnlp">
   
   <information>
 

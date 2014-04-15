@@ -36,13 +36,16 @@ urlpatterns = patterns('',
     url(r'^workflow/getstateinfo/(?P<stateid>\d+)/$', 'views.getstateinfo', name='getstateinfo'),
     url(r'^workflow/getuserdata/(?P<organismtype>[\w|\W]+)/(?P<datatype>[\w|\W]+)/(?P<userid>\d+)/(?P<filename>[\w|\W]+)/$', 'views.getuserdata', name='getuserdata'),
     url(r'^workflow/getreportdata/(?P<workflowid>-*\d+)/(?P<sessionid>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/(?P<workflownodeid>\d+)/(?P<filename>[\w|\W]+)/$', 'views.getreportdata', name='getreportdata'),
-
+    url(r'^workflow/saveworkflowcomponent', 'views.saveworkflowcomponent', name='saveworkflowcomponent'),
+    url(r'^workflow/getworkflowcomponents', 'views.getworkflowcomponents', name='getworkflowcomponents'),
 
     url(r'^workflow/save', 'views.saveworkflow', name='saveworkflow'),
     url(r'^workflow/delete/(?P<workflowid>\d+)/$', 'views.deleteworkflow', name='deleteworkflow'),
     url(r'^workflow/(?P<workflow_id>\d+)/$', 'views.getworkflow', name='getworkflow'),
-    url(r'^workspace', 'views.workflow', name='workspace'),
+    url(r'^workspacecontrol$', 'views.workspacecontrol', name='workspacecontrol'),
+    url(r'^workspace$', 'views.workflow', name='workspace'),
     url(r'^workflow$', 'views.workflow', name='workflow'),
+
 
     # search app
     url(r'^advsearch$', 'search.views.advsearch', name='advsearch'),

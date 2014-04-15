@@ -604,7 +604,13 @@ class WorkflowCategories(models.Model):
 #    name = models.CharField(max_length=64)
 #    description = models.CharField(max_length=1024)
 #    type = models.IntegerField(blank=True, null=True)
-    
+
+class Users(models.Model):
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    password = models.CharField(max_length=2048, blank=True, null=True)
+    organization = models.CharField(max_length=255, blank=True, null=True)
     
 class WorkflowComponents(models.Model):
     name = models.CharField(max_length=255)
@@ -617,13 +623,14 @@ class WorkflowComponents(models.Model):
     downloadurl = models.CharField(max_length = 2048, blank = True, null=True)
     subactions = models.CharField(max_length=20480, blank = True, null = True)
     arguments = models.CharField(max_length=1024, blank = True, null=True)
+    owner = models.ForeignKey(Users)
+    shared = models.BooleanField(default=True)
+    isscript = models.BooleanField(default=False)
 
-class Users(models.Model):
-    firstname = models.CharField(max_length=255)
-    lastname = models.CharField(max_length=255)
-    email = models.CharField(max_length=255)
-    password = models.CharField(max_length=2048, blank=True, null=True)
-    organization = models.CharField(max_length=255, blank=True, null=True)
+class WorkflowComponentTemplates(models.Model):
+    component = models.ForeignKey(WorkflowComponents)
+    name = models.CharField(max_length = 1024, blank=False)
+    file = models.CharField(max_length = 4096, blank=False)
 
 class Workflows(models.Model):
     name = models.CharField(max_length=255)

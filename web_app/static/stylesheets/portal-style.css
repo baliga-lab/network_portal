@@ -1775,6 +1775,11 @@ table#motif {
     display: none;
 }
 
+.componenttemplates
+{
+    display: none;
+}
+
 .workflowcomponent
 {
     background: none repeat scroll 0 0 papayawhip;
@@ -2071,6 +2076,13 @@ background-color: #ffb515;
     max-width: 250px;
 }
 
+.datagroupcontrolaccordion
+{
+
+    max-width: 900px;
+}
+
+
 #wfgrpaccordion ul
 {
     list-style-type: circle;
@@ -2141,4 +2153,21 @@ background-color: #ffb515;
     max-height: 400px;
     scroll: auto;
     overflow-x: hidden;
+}
+
+
+.parameteraccordion
+{
+    background: none repeat scroll 0 0 papayawhip;
+    border-color: sandybrown;
+    border-right: 2px solid sandybrown;
+    border-style: solid;
+    border-width: 8px 2px 2px;
+    font-size: smaller;
+    font-weight: bold;
+    height: auto;
+    overflow: auto;
+    padding: 0.5em;
+    position: absolute;
+    width: 400px;
 }
