@@ -25,8 +25,7 @@ function GaggleMicroformatParser() {
  * check the given doc to see if we can parse it.
  */
 GaggleMicroformatParser.prototype.recognize = function (doc) {
-    alert("start...");
-    alert(gaggleMicroformat);
+    console.log("GaggleMicroformatParser recognizing page");
     result = gaggleMicroformat.hasGaggleData(doc);
     if (result)
         console.log("Recognized Gaggle microformat data!\n");
@@ -48,6 +47,7 @@ GaggleMicroformatParser.prototype.getPageData = function(doc) {
 		// have to be converted to Java objects before being broadcast to the Boss.
 		var pagedata = {};
 		pagedata.data = gaggleDataElements[i];
+		pagedata.guid = cg_util.generateUUID();
         var jsondata = JSON.stringify(pagedata);
         console.log("GaggleMicroformatParser JSON data: " + jsondata);
         pagedata.jsondata = jsondata;

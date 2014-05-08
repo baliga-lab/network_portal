@@ -291,5 +291,6 @@ gaggleXml_Parser.fetchIndirectDataMatrix = function(url, gaggleData) {
 	request.send(null);
 }
 
-gaggleXml_Parser.getPageData(document);
+if (gaggleXml_Parser.recognize(document))
+    gaggleXml_Parser.getPageData(document);
 

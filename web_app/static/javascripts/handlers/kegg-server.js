@@ -534,7 +534,7 @@ KEGG_Parser.toKeggSpeciesCode = function(s) {
 
 	s = s.replace(" str. ", " ");
 	s = s.replace(" substr. ", " ");
-	dump("converting species: " + s + "\n");
+	console.log("converting species: " + s + "\n");
 
 	// fudge for species synonyms
 	if (s in this.speciesSynonyms) {
@@ -1359,5 +1359,6 @@ KEGG_Parser.speciesCodes = {
 "neq": "nanoarchaeum equitans"
 }
 
-KEGG_Parser.getPageData(document);
+if (KEGG_Parser.recognize(document))
+    KEGG_Parser.getPageData(document);
 
