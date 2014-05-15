@@ -9,6 +9,7 @@ from django.template.loader import get_template
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.utils import simplejson as json
 from django.utils import formats
 from django.utils.formats import get_format
@@ -75,6 +76,7 @@ def about(request):
 def contact(request):
     return render_to_response('contact.html', locals())
 
+@login_required
 def inference(request):
     return render_to_response('inference.html', locals())
 

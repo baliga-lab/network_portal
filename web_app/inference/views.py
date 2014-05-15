@@ -7,6 +7,7 @@ import uuid
 import startboto
 
 def configjob(request):
+    user = request.user  # we retrieve the user here
     if request.method == 'POST':
         form = UploadConfigForm(request.POST, request.FILES)
         if form.is_valid():
