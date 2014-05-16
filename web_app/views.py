@@ -570,6 +570,19 @@ def getworkflow(request, workflow_id):
 
     return HttpResponse(json.dumps(workflowobj), mimetype='application/json')
 
+@csrf_exempt
+def getorganisms(request):
+    print "Get organisms"
+    try:
+        organisms = Species.objects.all().order_by('name')
+        result = []
+        for organism in organisms:
+            orgobj = {'shortname': organism.short_name, 'name': organism.name};
+            result.append(orgobj)
+        return HttpResponse(json.dumps(result), mimetype='application/json')
+    except Exception as e:
+        print str(e)
+
 
 @csrf_exempt
 def getsessions(request):
