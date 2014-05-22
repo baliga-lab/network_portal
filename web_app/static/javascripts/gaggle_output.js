@@ -26,19 +26,36 @@ function gaggleDataAddHandler(e) {
     output.funcname = funcname;
     output.species = species;
     output.enrichments = [];
+    output.properties = [];
+    var index = 0;
     $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
+        (output.enrichments).push([]);
         $(this).find("label").each(function () {
             var input1 = $(this).children()[0];
             var input2 = $(this).children()[1];
-            console.log("Property " + $(input1).val() + " Value " + $(input2).val());
-            enrichment[property] = $(input1).val();
-            enrichment[value] = $(input2).val();
+            var input3 = $(this).children()[2]; // type
+            console.log("Property " + $(input1).val() + " Value " + $(input2).val() + " Type: " + $(input3).val());
+            if (index == 0) {
+                output.properties.push($(input1).val());
+            }
+            console.log("Enrichments index: " + index);
+            var proppair = {};
+            proppair.value = $(input2).val();
+            proppair.type = $(input3).val();
+            (output.enrichments)[index].push(proppair);
         });
-        output.enrichments.push(enrichment);
+        //console.log("One enrichment: " + enrichment);
+        //(output.enrichments)[index] = enrichment;
+        index++;
     });
-    console.log("Output: " + output);
-    $scope.addOutput(output);
+    console.log("Output enrichments: " + output.enrichments);
+    var scope = angular.element($("#divGaggleOutput")).scope();
+        scope.$apply(function(){
+            scope.addOutput(output);
+        })
+
     $("#divNewGaggledData").prop("id", "");
+    $(".divGaggleOutputUnit").draggable();
 }
 
 document.addEventListener("GaggleDataAddEvent", gaggleDataAddHandler, false);

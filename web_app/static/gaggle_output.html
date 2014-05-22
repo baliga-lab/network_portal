@@ -12,8 +12,29 @@
 </head>
 <body>
     <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
-        <div ng-repeat="output in outputs">
-            <h2>Output {{ output.funcname  }} {{ output.species }}</h2>
+        <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
+            <div class='panel-heading'>
+                <h4 class='panel-title'>
+                    Output - {{ output.funcname  }} - {{ output.species }}
+                </h4>
+                <table>
+                    <tbody>
+                        <th ng-repeat="property in output.properties">
+                            {{ property }}
+                        </th>
+                        <tr ng-repeat="enrichment in output.enrichments">
+                            <td ng-repeat="proppair in enrichment track by $index">
+                                <div ng-if="proppair.type == 'value'">
+                                    {{proppair.value}}
+                                </div>
+                                <div ng-if="proppair.type=='url'">
+                                    <a target='_blank' href="{{proppair.value}}">module</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
