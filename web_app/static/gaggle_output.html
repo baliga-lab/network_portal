@@ -8,6 +8,9 @@
     <script type="text/javascript" src="/static/javascripts/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="/static/javascripts/jquery-ui-1.10.4.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script>
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/handlers/ufmt.js"></script>
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/handlers/gaggle_data.js"></script>
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/handlers/gaggleMicroformat.js"></script>
     <script type="text/javascript" src="/static/javascripts/gaggle_output.js"></script>
 </head>
 <body>
@@ -31,6 +34,16 @@
                                     <a target='_blank' href="{{proppair.value}}">module</a>
                                 </div>
                             </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br />
+                <h2>Overlapped Genes</h2>
+                <table>
+                    <tbody>
+                        <tr ng-repeat="gaggleddata in output.gaggledData">
+                            <td>{{gaggleddata._name}}</td>
+                            <td ng-repeat="data in gaggleddata._data">{{data}}</td>
                         </tr>
                     </tbody>
                 </table>

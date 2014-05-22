@@ -1,3 +1,5 @@
+var pageGaggleData = [];
+
 function GaggleOutputCtrl($scope) {
   $scope.outputs = {};
 
@@ -28,6 +30,7 @@ function gaggleDataAddHandler(e) {
     output.enrichments = [];
     output.properties = [];
     var index = 0;
+    // Parse enrichment results
     $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
         (output.enrichments).push([]);
         $(this).find("label").each(function () {
@@ -49,6 +52,19 @@ function gaggleDataAddHandler(e) {
         index++;
     });
     console.log("Output enrichments: " + output.enrichments);
+
+    // Parse gaggled data
+    output.gaggledData = gaggleMicroformat.scan(document);
+    if (output.gaggledData != null) {
+        for (var i = 0; i < output.gaggledData.length; i++) {
+            var data = (output.gaggledData)[i];
+            // Call the lazy parser
+            var fetcheddata = data.getData();
+            console.log(data.getData());
+        }
+    }
+    console.log("Output gaggled data: " + output.gaggledData);
+
     var scope = angular.element($("#divGaggleOutput")).scope();
         scope.$apply(function(){
             scope.addOutput(output);
