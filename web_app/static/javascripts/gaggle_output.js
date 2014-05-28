@@ -1,4 +1,8 @@
 var pageGaggleData = [];
+var dictGeese = {
+                 "DAVID": david,
+                 "KEGG": kegg
+                };
 
 function GaggleOutputCtrl($scope) {
   $scope.outputs = {};
@@ -74,4 +78,110 @@ function gaggleDataAddHandler(e) {
     $(".divGaggleOutputUnit").draggable();
 }
 
+function getOrganisms() {
+    //alert("Get organism from " + GAGGLE_SERVER); // + "/workflow/getorganisms);
+    cg_util.httpGet(GAGGLE_SERVER + "/workflow/getorganisms", function(jsonorganisms) {
+        // Get organisms from network portal
+        var organismsobj = JSON.parse(jsonorganisms);
+        // Generate the organism selection html
+        var organismSelectionHtml = "<option value=''>Select an organism</option>";
+        for (var i in organismsobj) {
+
+            var organism = organismsobj[i];
+            organismSelectionHtml += "<option value='" + organism.shortname + "'>" + organism.name + "</option>";
+        }
+        $("#selSpecies").html(organismSelectionHtml)
+    });
+}
+
+
+function generateNamelist(species, nameliststring)
+{
+    if (nameliststring != null && nameliststring.length > 0)
+    {
+        console.log("Generating namelist from " + nameliststring);
+        var list = new Array();
+        var splitted = nameliststring.split("\n");
+        for (var i = 0; i < splitted.length; i++)
+        {
+            var line = splitted[i];
+            console.log("Line: " + line);
+            var delimitted = line.split(";");
+            if (delimitted.length == 1)
+                delimitted = line.split("\t");
+            if (delimitted.length == 1)
+                delimitted = line.split(",");
+            for (var j = 0; j < delimitted.length; j++) {
+                console.log("Name " + delimitted[j]);
+                list.push(delimitted[j]);
+            }
+        }
+        var namelist = new GaggleData("", "NameList", list.length, species, list);
+        return namelist;
+    }
+    return null;
+}
+
+function getNamelist(callback)
+{
+    var species = $("#selSpecies").val();
+    //alert("Species: " + species);
+    var line = $("#inputNamelistText").val();
+    if (line != null && line.trim().length > 0) {
+        var names = line.split(";");
+        var namelist = new GaggleData("", "NameList", names.length, species, names);
+        if (callback != null)
+            callback(namelist);
+    }
+    else {
+        var file = $("#inputNamelistFile")[0].files[0];
+        if (file != null) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var contents = e.target.result;
+                console.log( "Got the file.\n"
+                  +"name: " + file.name + "\n"
+                  +"type: " + file.type + "\n"
+                  +"size: " + file.size + " bytes\n"
+                  + "Content: " + contents
+                );
+                var namelist = generateNamelist(species, contents);
+                if (callback != null)
+                    callback(namelist);
+            }
+            reader.readAsText(file);
+        }
+    }
+}
+
+function processNamelist()
+{
+    getNamelist(function(namelist) {
+        if (namelist == null)
+            return;
+
+        $("input:checkbox.chkboxGeese").each(function () {
+            if (this.checked) {
+                //alert("checkbox value: " + $(this).val() + " dictionary " + dictGeese);
+                var goose = dictGeese[$(this).val()];
+                if (goose != null && goose.handleNameList != null) {
+                    console.log("Passing namelist to " + $(this).val());
+                    goose.handleNameList(namelist);
+                }
+            }
+        });
+    });
+}
+
+function removeAllResults()
+{
+    $(".divResultIFrames").empty();
+}
+
+// Other data source can pass data to this page by firing the GaggleDataAddEvent
 document.addEventListener("GaggleDataAddEvent", gaggleDataAddHandler, false);
+
+$(document).ready(function () {
+    console.log("Get organisms...");
+    getOrganisms();
+});

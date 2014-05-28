@@ -8,12 +8,42 @@
     <script type="text/javascript" src="/static/javascripts/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="/static/javascripts/jquery-ui-1.10.4.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script>
-    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/handlers/ufmt.js"></script>
-    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/handlers/gaggle_data.js"></script>
-    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/handlers/gaggleMicroformat.js"></script>
+    <script type="text/javascript" src="/static/javascripts/handlers/util.js"></script>
+    <script type="text/javascript" src="/static/javascripts/handlers/gaggle_data.js"></script>
+    <script type="text/javascript" src="/static/javascripts/handlers/ufmt.js"></script>
+    <script type="text/javascript" src="/static/javascripts/handlers/handler.js"></script>
+    <script type="text/javascript" src="/static/javascripts/handlers/gaggleMicroformat.js"></script>
+
+    <script type="text/javascript" src="/static/javascripts/handlers/david.js"></script>
+    <script type="text/javascript" src="/static/javascripts/handlers/kegg.js"></script>
+
     <script type="text/javascript" src="/static/javascripts/gaggle_output.js"></script>
 </head>
 <body>
+    <div>
+        Species:
+        <select id="selSpecies">
+            <option value = "" selected>Select an organism</option>
+        </select>
+        <br />
+        Genes: <input type="text" id="inputNamelistText" /><br />
+        <input type="file" id="inputNamelistFile" /><br />
+
+
+        <div id="divGeese">
+            <input class="chkboxGeese" type="checkbox" name="goose" value="DAVID">DAVID<br/>
+            <input class="chkboxGeese" type="checkbox" name="goose" value="KEGG">KEGG Pathway<br/>
+        </div>
+        <br />
+        <input type="button" id="btnProcessNamelist" onclick="javascript:processNamelist();" value="Run" />
+        <input type="button" id="btnRemoveAllResults" onclick="javascript:removeAllResults();" value="Remove All" />
+    </div>
+    <br/>
+    <br/>
+    <div class="divResultIFrames">
+
+    </div>
+
     <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
         <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
             <div class='panel-heading'>

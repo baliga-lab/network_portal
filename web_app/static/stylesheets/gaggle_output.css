@@ -1,2 +1,18 @@
 .divGaggleOutputUnit {
 }
+
+
+.divResultIFrames {
+}
+
+.iframediv {
+    width: 800px;
+    height: 500px
+}
+
+.gaggleiframe {
+    width: 100%;
+    height: 80%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+}
