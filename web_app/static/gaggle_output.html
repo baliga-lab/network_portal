@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app>
+<html>
 <head>
     <title>Gaggle Output</title>
     <link type="text/css" rel="stylesheet" href="/static/javascripts/jquery-ui-1.10.4.css" />
@@ -44,6 +44,7 @@
 
     </div>
 
+    <div ng-app>
     <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
         <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
             <div class='panel-heading'>
@@ -79,6 +80,7 @@
                 </table>
             </div>
         </div>
+    </div>
     </div>
 
     <div id="divGaggledData">
