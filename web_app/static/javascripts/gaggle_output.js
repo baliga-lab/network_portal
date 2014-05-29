@@ -1,7 +1,8 @@
 var pageGaggleData = [];
 var dictGeese = {
                  "DAVID": david,
-                 "KEGG": kegg
+                 "KEGG": kegg,
+                 "EMBLString": emblString
                 };
 
 function GaggleOutputCtrl($scope) {
@@ -76,6 +77,7 @@ function gaggleDataAddHandler(e) {
 
     $("#divNewGaggledData").prop("id", "");
     $(".divGaggleOutputUnit").draggable();
+    $(".divGaggleOutputUnit").resizable();
 }
 
 function getOrganisms() {
@@ -160,6 +162,7 @@ function processNamelist()
         if (namelist == null)
             return;
 
+        //alert("Namelist species " + namelist.getSpecies());
         $("input:checkbox.chkboxGeese").each(function () {
             if (this.checked) {
                 //alert("checkbox value: " + $(this).val() + " dictionary " + dictGeese);
