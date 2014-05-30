@@ -2,7 +2,12 @@ var pageGaggleData = [];
 var dictGeese = {
                  "DAVID": david,
                  "KEGG": kegg,
-                 "EMBLString": emblString
+                 "EMBLString": emblString,
+                 "EGRIN2": egrin2,
+                 "HaloAnnotation": haloAnnotation,
+                 "EntrezGene": entrezGene,
+                 "EntrezProtein": entrezProtein,
+                 "Maggie": maggie
                 };
 
 function GaggleOutputCtrl($scope) {
