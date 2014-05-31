@@ -72,9 +72,11 @@ var gaggleMicroformat = {
 	scan: function(doc) {
 		var results = [];
 
-		var divs = ufmt.getElementsByClassName(doc, "gaggle-data");
+        //var divs = ufmt.getElementsByClassName(doc, "gaggle-data");
+		var divs = $(doc).find(".gaggle-data").toArray();
 		for (var i in divs) {
-			var name = this.getName(divs[i]);
+			var name = gaggleMicroformat.getName(divs[i]);
+			console.log("gaggle data name: " + name);
 			var size = ufmt.getProperty(divs[i], "gaggle-size");
 			if (size == "")
 				size = null;
@@ -99,35 +101,35 @@ var gaggleMicroformat = {
 	
 				// attach a function to gaggleData that will lazily parse the microformat data			
 				if (gaggleDataType.type == "gaggle-namelist") {
-					gaggleData.getData = this._createLazyParser(this.readList, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readList, gaggleDataType.element);
 				}
 				else if (gaggleDataType.type == "gaggle-namelist-tsv") {
-					gaggleData.getData = this._createLazyParser(this.readTsvList, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readTsvList, gaggleDataType.element);
 				}
 				else if (gaggleDataType.type == "gaggle-namelist-tag") {
 				    // tag is the CSS selector used to tag elements of the list
 					var tag = ufmt.getText(gaggleDataType.element);
-					gaggleData.getData = this._createLazyTaggedListParser(this.readTaggedList, doc, tag);
+					gaggleData.getData = gaggleMicroformat._createLazyTaggedListParser(this.readTaggedList, doc, tag);
 				}
 				else if (gaggleDataType.type == "gaggle-map") {
-					gaggleData.getData = this._createLazyParser(this.readMap, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readMap, gaggleDataType.element);
 				}
 				else if (gaggleDataType.type == "gaggle-network") {
-					gaggleData.getData = this._createLazyParser(this.readNetwork, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readNetwork, gaggleDataType.element);
 				}
 				else if (gaggleDataType.type == "gaggle-matrix") {
-					gaggleData.getData = this._createLazyParser(this.readDataMatrix, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readDataMatrix, gaggleDataType.element);
 				}
 				else if (gaggleDataType.type == "gaggle-matrix-tsv") {
-					gaggleData.getData = this._createLazyParser(this.readTsvDataMatrix, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readTsvDataMatrix, gaggleDataType.element);
 				}
 				else if (gaggleDataType.type == "gaggle-cluster") {
-					gaggleData.getData = this._createLazyParser(this.readCluster, gaggleDataType.element);
+					gaggleData.getData = gaggleMicroformat._createLazyParser(this.readCluster, gaggleDataType.element);
 				}
 				else {
-					FG_trace("Unknown gaggle data type: \"" + gaggleDataType.type + "\"");
+					console.log("Unknown gaggle data type: \"" + gaggleDataType.type + "\"");
 					// don't return data of unknown type
-					continue;
+					//continue;
 				}
 
 				results.push(gaggleData);

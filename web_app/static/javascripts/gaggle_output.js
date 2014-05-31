@@ -63,8 +63,15 @@ function gaggleDataAddHandler(e) {
     });
     console.log("Output enrichments: " + output.enrichments);
 
+    $("#divNewGaggledData").find(".gaggle-plotexpression").each(function() {
+        var inputurl = $(this).children()[0];
+        var ploturl = $(inputurl).val();
+        console.log("Gaggle plot url: " + ploturl);
+        output.ploturl = ploturl;
+    });
+
     // Parse gaggled data
-    output.gaggledData = gaggleMicroformat.scan(document);
+    output.gaggledData = gaggleMicroformat.scan("#divNewGaggledData");
     if (output.gaggledData != null) {
         for (var i = 0; i < output.gaggledData.length; i++) {
             var data = (output.gaggledData)[i];
