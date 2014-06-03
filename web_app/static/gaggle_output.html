@@ -83,7 +83,24 @@
                     </tbody>
                 </table>
                 <br />
-                <h2>Overlapped Genes</h2>
+                <div ng-if="output.pvalues.length > 0">
+                    <h3>P-Values</h3>
+                    <table>
+                        <th ng-repeat="pvalueprop in output.pvalueProperties">
+                            {{ pvalueprop }}
+                        </th>
+                        <tbody>
+                            <tr ng-repeat="pvalue in output.pvalues">
+                                <td ng-repeat="proppair in pvalue track by $index">
+                                    {{proppair.propvalue}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br />
+                <div ng-if="output.gaggledData.length > 0">
+                <h3>Overlapped Genes</h3>
                 <table>
                     <tbody>
                         <tr ng-repeat="gaggleddata in output.gaggledData">
@@ -92,6 +109,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>

@@ -63,6 +63,31 @@ function gaggleDataAddHandler(e) {
     });
     console.log("Output enrichments: " + output.enrichments);
 
+    // Parse p value results
+    output.pvalues = [];
+    output.pvalueProperties = [];
+    index = 0;
+    $("#divNewGaggledData").find(".gaggle-pvalue").each(function() {
+        (output.pvalues).push([]);
+        $(this).find("label").each(function () {
+            var input1 = $(this).children()[0];
+            var input2 = $(this).children()[1];
+            var propname = $(input1).val();
+            var propvalue = $(input2).val();
+            console.log("P-value prop name: " + propname + " prop value: " + propvalue);
+
+            var proppair = {};
+            proppair.propname = propname;
+            proppair.propvalue = propvalue;
+            (output.pvalues)[index].push(proppair);
+
+            if (index == 0)
+                output.pvalueProperties.push(propname);
+        });
+        index++;
+    });
+    console.log("Output pvalues: " + output.pvalues);
+
     $("#divNewGaggledData").find(".gaggle-plotexpression").each(function() {
         var inputurl = $(this).children()[0];
         var ploturl = $(inputurl).val();
