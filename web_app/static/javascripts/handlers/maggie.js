@@ -11,15 +11,18 @@ MaggieHandler.prototype.handleNameList = function(namelist) {
     var species = namelist.getSpecies();
     var names = namelist.getData();
 
+    var iframeid = cg_util.generateUUID();
+
     // Send custom event to Chrome goose, which will store the data on the background page
     var event = new CustomEvent('GaggleOutputPageEvent', {detail: {
-                                handler: "Maggie Data Viewer", data: namelist},
+                                handler: "Maggie Data Viewer", data: namelist, iframeId: iframeid},
                                 bubbles: true, cancelable: false});
     document.dispatchEvent(event);
 
     var url = "http://maggie.systemsbiology.net/main/start";
     console.log("Maggie injecting " + this._extensionUrl);
-    cg_util.createIFrame(url, ".divResultIFrames", "iframediv", "gaggleiframe");
+
+    cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 };
 
 // create and register website handler

@@ -37,7 +37,8 @@ KEGG.prototype.handleNameList = function(namelist) {
 
 	// open the kegg URL in a new tab
 	console.log("KEGG open url: " + keggurl);
-    cg_util.createIFrame(keggurl, ".divResultIFrames", "iframediv", "gaggleiframe");
+	var iframeid = cg_util.generateUUID();
+    cg_util.createIFrame(keggurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 }
 
 /**

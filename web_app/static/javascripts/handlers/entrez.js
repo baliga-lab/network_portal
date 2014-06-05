@@ -67,7 +67,8 @@ Entrez.prototype.handleNameList = function(namelist) {
 
 	// open the URL in a new tab
 	console.log("Entrez open url: " + url);
-    cg_util.createIFrame(url, ".divResultIFrames", "iframediv", "gaggleiframe");
+	var iframeid = cg_util.generateUUID();
+    cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 }
 
 var entrezGene = new Entrez("gene");

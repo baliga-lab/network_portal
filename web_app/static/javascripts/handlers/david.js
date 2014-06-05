@@ -59,13 +59,14 @@ David.prototype.handleNameList = function(namelist) {
 	var element = null;
 
     // Send custom event to Chrome goose, which will store the data on the background page
+    var iframeid = cg_util.generateUUID();
     var event = new CustomEvent('GaggleOutputPageEvent', {detail: {
-                                handler: "DAVID", data: namelist},
+                                handler: "DAVID", data: namelist, iframeId: iframeid},
                                 bubbles: true, cancelable: false});
     document.dispatchEvent(event);
 
     // create a new iframe
-    cg_util.createIFrame(davidurl, ".divResultIFrames", "iframediv", "gaggleiframe");
+    cg_util.createIFrame(davidurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 };
 
 var david = new David();

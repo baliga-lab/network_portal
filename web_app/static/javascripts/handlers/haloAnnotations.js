@@ -55,7 +55,8 @@ HaloAnnotations.prototype.handleNameList = function(namelist) {
 
 	// open the URL in a new tab
 	console.log("HaloAnnotations open tab " + url);
-    cg_util.createIFrame(url, ".divResultIFrames", "iframediv", "gaggleiframe");
+	var iframeid = cg_util.generateUUID();
+    cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 }
 
 // register website handler

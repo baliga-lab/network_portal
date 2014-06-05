@@ -68,14 +68,16 @@ EMBLString.prototype.handleNameList = function(namelist) {
     var url = "http://string.embl.de/newstring_cgi/show_input_page.pl?input_page_type=multiple_identifiers"
         + "&" + this.callerIdentity();
 
+    var iframeid = cg_util.generateUUID();
+
     // Send custom event to Chrome goose, which will store the data on the background page
     var event = new CustomEvent('GaggleOutputPageEvent', {detail: {
-                                handler: "EMBL String", data: namelist},
+                                handler: "EMBL String", data: namelist, iframeId: iframeid},
                                 bubbles: true, cancelable: false});
     document.dispatchEvent(event);
 
     console.log("EMBL String open url: " + url);
-    cg_util.createIFrame(url, ".divResultIFrames", "iframediv", "gaggleiframe");
+    cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 };
 
 /**

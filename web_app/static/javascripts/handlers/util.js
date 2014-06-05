@@ -77,11 +77,13 @@ retrieveFrom: function(key, url, callback) {
     }
 },
 
-createIFrame: function(url, containerId, divClass, iframeClass) {
+createIFrame: function(url, iframeid, containerId, divClass, iframeClass) {
     if (containerId != null && url != null) {
         var div = document.createElement("div");
         div.className = divClass;
         var iframe = document.createElement("iframe");
+        console.log("New Iframe Id: " + iframeid);
+        iframe.setAttribute("id", iframeid);
         iframe.src = url;
         iframe.className = iframeClass;
         div.appendChild(iframe);
