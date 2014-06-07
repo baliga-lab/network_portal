@@ -890,4 +890,5 @@ KEGG.prototype.speciesCodes = {
 
 
 var kegg = new KEGG();
+
 //kegg.scanPage();

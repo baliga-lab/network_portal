@@ -57,6 +57,33 @@
 
     <div ng-app>
     <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
+        <div id="divGeneInfo">
+           <div ng-repeat="geneInfo in geneInfoList">
+               {{geneInfo.geneName}}: <br />
+               <table>
+                   <tbody>
+                      <tr ng-repeat="sourceObj in geneInfo.sourceList">
+                          <td>{{sourceObj.key}}</td>
+                          <td>
+                              <div ng-repeat="geneDataObj in sourceObj.dataList track by $index">
+                                  <div class="divDetail" ng-if="geneDataObj.type == 'detail'">
+                                      <a ng-href="{{geneDataObj.url}}" target="_blank">{{geneDataObj.desc}}</a>
+                                  </div>
+                                  <div class="divImage" ng-if="geneDataObj.type == 'image'">
+                                      <img style="height: 400px; width: 450px" src="{{geneDataObj.url}}" />
+                                  </div>
+                                  <div class="divIFrame" ng-if="geneDataObj.type == 'iframe'">
+                                      <iframe style="height: 400px; width: 450px" ng-src="{{geneDataObj.url}}" />
+                                  </div>
+
+                              </div>
+                          </td>
+                      </tr>
+                   </tbody>
+               </table>
+           </div>
+        </div>
+        <br>
         <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
             <div class='panel-heading'>
                 <h4 class='panel-title'>

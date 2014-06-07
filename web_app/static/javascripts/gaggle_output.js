@@ -10,11 +10,71 @@ var dictGeese = {
                  "Maggie": maggie
                 };
 
-function GaggleOutputCtrl($scope) {
+
+function findObjectByKey(key, list) {
+    if (key != null && list != null) {
+        for (var i = 0; i < list.length; i++) {
+            var item = list[i];
+            if (item.key == key) {
+                return item;
+            }
+        }
+    }
+    return null;
+}
+
+function GaggleOutputCtrl($scope, $sce) {
   $scope.outputs = {};
+  $scope.geneInfoList = new Array();
+
+  $scope.initGeneParse = function() {
+    $scope.geneInfoList = new Array();
+  };
 
   $scope.addOutput = function(output) {
     ($scope.outputs)[output.id] = output;
+  };
+
+  $scope.addGeneData = function(geneId, geneName, source, type, url, desc, iframeid) {
+     console.log(geneId + " " + geneName + " " + source + " " + type + " " + url);
+     var geneInfo = findObjectByKey(geneId, $scope.geneInfoList);
+
+     var newentry = false;
+     if (geneInfo == null) {
+        geneInfo = {};
+        geneInfo.key = geneId;
+        geneInfo.geneName = geneName;
+        geneInfo.sourceList = new Array();
+        newentry = true;
+     }
+     if (geneInfo != null) {
+        console.log("Searching source handler " + source + " for Gene: " + geneInfo.geneName);
+        var sourceObj = findObjectByKey(source, geneInfo.sourceList);
+        if (sourceObj == null) {
+            sourceObj = {};
+            sourceObj.key = source;
+            sourceObj.dataList = new Array();
+            geneInfo.sourceList.push(sourceObj);
+        }
+
+        // Verify dataobj is not duplicated
+        var dataobj = findObjectByKey(iframeid, sourceObj.dataList);
+        if (dataobj == null) {
+            dataobj = {};
+            dataobj.key = iframeid;
+            dataobj.type = type;
+            dataobj.url = $sce.trustAsResourceUrl(url); // Need to do this to ensure successful binding to iframe src attribute
+            dataobj.desc = desc;
+            dataobj.iframeId = iframeid;
+            console.log("Data obj " + sourceObj.dataList.length + ": " + dataobj.url + " " + dataobj.type);
+            sourceObj.dataList.push(dataobj);
+        }
+     }
+     if (newentry)
+        $scope.geneInfoList.push(geneInfo);
+     // Hide the iframe
+     if (iframeid != null && iframeid.length > 0)
+        $("#" + iframeid).parent().hide();
   };
 }
 
@@ -28,6 +88,7 @@ function generateUUID() {
     return uuid;
 }
 
+// Handles data added from OpenCPU results
 function gaggleDataAddHandler(e) {
     console.log("GaggleDataAddEvent captured...");
     var funcname = e.detail.funcname;
@@ -108,13 +169,32 @@ function gaggleDataAddHandler(e) {
     console.log("Output gaggled data: " + output.gaggledData);
 
     var scope = angular.element($("#divGaggleOutput")).scope();
-        scope.$apply(function(){
-            scope.addOutput(output);
-        })
+    scope.$apply(function(){
+        scope.addOutput(output);
+    });
 
     $("#divNewGaggledData").prop("id", "");
     $(".divGaggleOutputUnit").draggable();
     $(".divGaggleOutputUnit").resizable();
+}
+
+// Handles data received from multiple iframes opened to analyze genes
+function gaggleParseHandler(e)
+{
+    console.log("GaggleParseEvent captured " + e.detail);
+    var geneId = e.detail.GeneId;
+    var geneName = e.detail.GeneName;
+    var url = e.detail.Url;
+    var type = e.detail.Type;
+    var source = e.detail.Source;
+    var iframeid = e.detail.IFrameId;
+    var desc = e.detail.Description;
+    console.log("Gene: " + geneId + " Url: " + url + " IFrame Id: " + iframeid);
+
+    var scope = angular.element($("#divGaggleOutput")).scope();
+    scope.$apply(function(){
+        scope.addGeneData(geneId, geneName, source, type, url, desc, iframeid);
+    });
 }
 
 function getOrganisms() {
@@ -200,9 +280,20 @@ function processNamelist()
             return;
 
         //alert("Namelist species " + namelist.getSpecies());
+        var firstone = true;
         $("input:checkbox.chkboxGeese").each(function () {
             if (this.checked) {
                 //alert("checkbox value: " + $(this).val() + " dictionary " + dictGeese);
+                if (firstone) {
+                    // clean up UI related to gene parsing
+                    firstone = false;
+                    removeAllResults();
+                    var scope = angular.element($("#divGaggleOutput")).scope();
+                    scope.$apply(function(){
+                        scope.initGeneParse();
+                    });
+                }
+
                 var goose = dictGeese[$(this).val()];
                 if (goose != null && goose.handleNameList != null) {
                     console.log("Passing namelist to " + $(this).val());
@@ -220,6 +311,7 @@ function removeAllResults()
 
 // Other data source can pass data to this page by firing the GaggleDataAddEvent
 document.addEventListener("GaggleDataAddEvent", gaggleDataAddHandler, false);
+document.addEventListener("GaggleParseEvent", gaggleParseHandler, false);
 
 $(document).ready(function () {
     console.log("Get organisms...");
