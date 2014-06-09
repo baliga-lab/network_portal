@@ -75,7 +75,7 @@
                                       <img style="height: 400px; width: 450px" src="{{geneDataObj.url}}" />
                                   </div>
                                   <div class="divIFrame" ng-if="geneDataObj.type == 'iframe'">
-                                      <iframe style="height: 400px; width: 450px" ng-src="{{geneDataObj.url}}" />
+                                      <iframe id="{{geneDataObj.iframeId}}" style="height: 400px; width: 450px" ng-src="{{geneDataObj.url}}" />
                                   </div>
 
                               </div>

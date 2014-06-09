@@ -9,8 +9,8 @@
 
 
 var WEBHANDLERS_UPDATE_INTERVAL = 24 * 60 * 60 * 1000; // Update after 24 hour
-//var GAGGLE_SERVER = "http://localhost:8000";
-var GAGGLE_SERVER = "http://networks.systemsbiology.net";
+var GAGGLE_SERVER = "http://localhost:8000";
+//var GAGGLE_SERVER = "http://networks.systemsbiology.net";
 var GAGGLE_HOME = "http://gaggle.systemsbiology.net";
 var BOSS_JNLP = GAGGLE_SERVER + "/static/jnlp/boss.jnlp";
 var HTTPBOSS_ADDRESS = "http://localhost:8082/";
@@ -135,6 +135,15 @@ openNewTab: function(url, callback) {
         if (callback != null)
             callback(tab);
     });
+},
+
+addIframeToAngularJS: function(geneId, geneName, source, url, desc, iframeid) {
+     var scope = angular.element($("#divGaggleOutput")).scope();
+     if (scope != null) {
+         scope.$apply(function(){
+            scope.addGeneData(geneId, geneName, source, "iframe", url, desc, iframeid);
+         });
+     }
 },
 
 injectJavascriptToTab: function(tabid, scripturl, callback) {
