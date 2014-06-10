@@ -81,6 +81,15 @@ EMBLString.prototype.handleNameList = function(namelist) {
     console.log("EMBL String open url: " + url);
     //cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
     cg_util.addIframeToAngularJS("STRING", "STRING", this._name, url, "EMBL String", iframeid);
+
+    //  Send event to ChromeGoose to store the iframeId
+    var event = new CustomEvent('IFrameOpenEvent',
+                                {detail:
+                                    {handler: this._name,
+                                    iframeId: iframeid},
+                                    bubbles: true,
+                                    cancelable: false});
+    document.dispatchEvent(event);
 };
 
 /**

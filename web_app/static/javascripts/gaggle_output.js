@@ -292,6 +292,13 @@ function processNamelist()
                     scope.$apply(function(){
                         scope.initGeneParse();
                     });
+
+                    var event = new CustomEvent('GaggleOutputInitEvent',
+                                                {detail:
+                                                    {},
+                                                    bubbles: true,
+                                                    cancelable: false});
+                    document.dispatchEvent(event);
                 }
 
                 var goose = dictGeese[$(this).val()];
