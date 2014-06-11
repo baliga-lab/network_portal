@@ -38,7 +38,17 @@ KEGG.prototype.handleNameList = function(namelist) {
 	// open the kegg URL in a new tab
 	console.log("KEGG open url: " + keggurl);
 	var iframeid = cg_util.generateUUID();
-    cg_util.createIFrame(keggurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+    //cg_util.createIFrame(keggurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+    cg_util.addIframeToAngularJS(this._name, this._name, this._name, keggurl, this._name, iframeid);
+
+    //  Send event to ChromeGoose to store the iframeId
+    var event = new CustomEvent('IFrameOpenEvent',
+                                {detail:
+                                    {handler: this._name,
+                                    iframeId: iframeid},
+                                    bubbles: true,
+                                    cancelable: false});
+    document.dispatchEvent(event);
 }
 
 /**
