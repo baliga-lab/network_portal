@@ -39,7 +39,9 @@ KEGG.prototype.handleNameList = function(namelist) {
 	console.log("KEGG open url: " + keggurl);
 	var iframeid = cg_util.generateUUID();
     //cg_util.createIFrame(keggurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
-    cg_util.addIframeToAngularJS(this._name, this._name, this._name, keggurl, this._name, iframeid);
+
+    var scope = angular.element($("#divGeneInfo")).scope();
+    cg_util.addIframeToAngularJS(scope, this._name, this._name, this._name, keggurl, this._name, iframeid);
 
     //  Send event to ChromeGoose to store the iframeId
     var event = new CustomEvent('IFrameOpenEvent',

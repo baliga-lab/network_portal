@@ -10,7 +10,6 @@ var dictGeese = {
                  "Maggie": maggie
                 };
 
-
 function findObjectByKey(key, list) {
     if (key != null && list != null) {
         for (var i = 0; i < list.length; i++) {
@@ -23,60 +22,70 @@ function findObjectByKey(key, list) {
     return null;
 }
 
-function GaggleOutputCtrl($scope, $sce) {
-  $scope.outputs = {};
-  $scope.geneInfoList = new Array();
+var app = angular.module('gaggleOutputApp', ['ngSanitize']);
 
-  $scope.initGeneParse = function() {
+app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
     $scope.geneInfoList = new Array();
-  };
+
+    $scope.trustSrc = function(src) {
+       return $sce.trustAsResourceUrl(src);
+    };
+
+    $scope.initGeneParse = function() {
+        $scope.geneInfoList = new Array();
+    };
+
+    $scope.addGeneData = function(geneId, geneName, source, type, url, desc, iframeid) {
+         console.log(geneId + " " + geneName + " " + source + " " + type + " " + url);
+         var geneInfo = findObjectByKey(geneId, $scope.geneInfoList);
+
+         var newentry = false;
+         if (geneInfo == null) {
+            geneInfo = {};
+            geneInfo.key = geneId;
+            geneInfo.geneName = geneName;
+            geneInfo.sourceList = new Array();
+            newentry = true;
+         }
+         if (geneInfo != null) {
+            console.log("Searching source handler " + source + " for Gene: " + geneInfo.geneName);
+            var sourceObj = findObjectByKey(source, geneInfo.sourceList);
+            if (sourceObj == null) {
+                sourceObj = {};
+                sourceObj.key = source;
+                sourceObj.dataList = new Array();
+                geneInfo.sourceList.push(sourceObj);
+            }
+
+            // Verify dataobj is not duplicated
+            var dataobj = findObjectByKey(iframeid, sourceObj.dataList);
+            if (dataobj == null) {
+                dataobj = {};
+                dataobj.key = iframeid;
+                dataobj.type = type;
+                dataobj.url = url; //$sce.trustAsResourceUrl(url); // Need to do this to ensure successful binding to iframe src attribute
+                dataobj.desc = desc;
+                dataobj.iframeId = iframeid;
+                console.log("Data obj " + sourceObj.dataList.length + ": " + dataobj.url + " " + dataobj.type);
+                sourceObj.dataList.push(dataobj);
+            }
+         }
+         if (newentry)
+            $scope.geneInfoList.push(geneInfo);
+
+         // Hide the iframe
+         //if (iframeid != null && iframeid.length > 0)
+         //   $("#" + iframeid).parent().hide();
+    };
+});
+
+app.controller("GaggleOutputCtrl", function($scope, $sce) {
+  $scope.outputs = {};
 
   $scope.addOutput = function(output) {
     ($scope.outputs)[output.id] = output;
   };
-
-  $scope.addGeneData = function(geneId, geneName, source, type, url, desc, iframeid) {
-     console.log(geneId + " " + geneName + " " + source + " " + type + " " + url);
-     var geneInfo = findObjectByKey(geneId, $scope.geneInfoList);
-
-     var newentry = false;
-     if (geneInfo == null) {
-        geneInfo = {};
-        geneInfo.key = geneId;
-        geneInfo.geneName = geneName;
-        geneInfo.sourceList = new Array();
-        newentry = true;
-     }
-     if (geneInfo != null) {
-        console.log("Searching source handler " + source + " for Gene: " + geneInfo.geneName);
-        var sourceObj = findObjectByKey(source, geneInfo.sourceList);
-        if (sourceObj == null) {
-            sourceObj = {};
-            sourceObj.key = source;
-            sourceObj.dataList = new Array();
-            geneInfo.sourceList.push(sourceObj);
-        }
-
-        // Verify dataobj is not duplicated
-        var dataobj = findObjectByKey(iframeid, sourceObj.dataList);
-        if (dataobj == null) {
-            dataobj = {};
-            dataobj.key = iframeid;
-            dataobj.type = type;
-            dataobj.url = $sce.trustAsResourceUrl(url); // Need to do this to ensure successful binding to iframe src attribute
-            dataobj.desc = desc;
-            dataobj.iframeId = iframeid;
-            console.log("Data obj " + sourceObj.dataList.length + ": " + dataobj.url + " " + dataobj.type);
-            sourceObj.dataList.push(dataobj);
-        }
-     }
-     if (newentry)
-        $scope.geneInfoList.push(geneInfo);
-     // Hide the iframe
-     if (iframeid != null && iframeid.length > 0)
-        $("#" + iframeid).parent().hide();
-  };
-}
+});
 
 function generateUUID() {
     var d = new Date().getTime();
@@ -191,7 +200,7 @@ function gaggleParseHandler(e)
     var desc = e.detail.Description;
     console.log("Gene: " + geneId + " Url: " + url + " IFrame Id: " + iframeid);
 
-    var scope = angular.element($("#divGaggleOutput")).scope();
+    var scope = angular.element($("#divGeneInfo")).scope();
     scope.$apply(function(){
         scope.addGeneData(geneId, geneName, source, type, url, desc, iframeid);
     });
@@ -288,7 +297,7 @@ function processNamelist()
                     // clean up UI related to gene parsing
                     firstone = false;
                     removeAllResults();
-                    var scope = angular.element($("#divGaggleOutput")).scope();
+                    var scope = angular.element($("#divGeneInfo")).scope();
                     scope.$apply(function(){
                         scope.initGeneParse();
                     });

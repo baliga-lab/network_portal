@@ -66,7 +66,19 @@ David.prototype.handleNameList = function(namelist) {
     document.dispatchEvent(event);
 
     // create a new iframe
-    cg_util.createIFrame(davidurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+    //cg_util.createIFrame(davidurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+
+    var scope = angular.element($("#divGeneInfo")).scope();
+    cg_util.addIframeToAngularJS(scope, this._name, this._name, this._name, davidurl, this._name, iframeid);
+
+    //  Send event to ChromeGoose to store the iframeId
+    var event = new CustomEvent('IFrameOpenEvent',
+                                {detail:
+                                    {handler: this._name,
+                                    iframeId: iframeid},
+                                    bubbles: true,
+                                    cancelable: false});
+    document.dispatchEvent(event);
 };
 
 var david = new David();

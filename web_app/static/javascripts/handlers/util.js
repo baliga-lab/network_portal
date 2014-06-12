@@ -137,8 +137,7 @@ openNewTab: function(url, callback) {
     });
 },
 
-addIframeToAngularJS: function(geneId, geneName, source, url, desc, iframeid) {
-     var scope = angular.element($("#divGaggleOutput")).scope();
+addIframeToAngularJS: function(scope, geneId, geneName, source, url, desc, iframeid) {
      if (scope != null) {
          scope.$apply(function(){
             scope.addGeneData(geneId, geneName, source, "iframe", url, desc, iframeid);
