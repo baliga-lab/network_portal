@@ -54,12 +54,17 @@
         <input type="button" id="btnRemoveAllResults" onclick="javascript:removeAllResults();" value="Remove All" />
     </div>
     <br/>
-    <br/>
 
     <div class="divResultIFrames">
         <!--<iframe id="testframe" src="http://localhost:8000/static/test.html" /> -->
     </div>
     <br/>
+    <div id="divGaggledData">
+
+    </div>
+
+    <input type="hidden" id="inputDataParsingFinishSignal" value="False" />
+    
     <div >
     <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
         <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
@@ -148,10 +153,6 @@
     </div>
     </div>
 
-    <div id="divGaggledData">
 
-    </div>
-
-    <input type="hidden" id="inputDataParsingFinishSignal" value="False" />
 </body>
 </html>
