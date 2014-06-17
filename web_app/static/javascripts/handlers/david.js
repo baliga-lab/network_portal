@@ -69,7 +69,7 @@ David.prototype.handleNameList = function(namelist) {
     //cg_util.createIFrame(davidurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 
     var scope = angular.element($("#divGeneInfo")).scope();
-    cg_util.addIframeToAngularJS(scope, this._name, this._name, this._name, davidurl, this._name, iframeid);
+    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, davidurl, this._name, iframeid);
 
     //  Send event to ChromeGoose to store the iframeId
     var event = new CustomEvent('IFrameOpenEvent',

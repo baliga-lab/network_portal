@@ -1,5 +1,6 @@
 function KEGG()
 {
+    console.log("KEGG server url: " + WEBHANDLER_BASEURL);
     handler_base.call(this, "KEGG Pathway", true, "handlers/kegg.js", "http://www.genome.jp/kegg-bin/", (WEBHANDLER_BASEURL + "kegg-server.js"));
 }
 
@@ -41,7 +42,7 @@ KEGG.prototype.handleNameList = function(namelist) {
     //cg_util.createIFrame(keggurl, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
 
     var scope = angular.element($("#divGeneInfo")).scope();
-    cg_util.addIframeToAngularJS(scope, this._name, this._name, this._name, keggurl, this._name, iframeid);
+    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, keggurl, this._name, iframeid);
 
     //  Send event to ChromeGoose to store the iframeId
     var event = new CustomEvent('IFrameOpenEvent',

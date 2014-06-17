@@ -15,3 +15,8 @@
     width: 0px;
     height: 0px;
 }
+
+.parseIFrame {
+    height: 800px;
+    width: 1000px;
+}

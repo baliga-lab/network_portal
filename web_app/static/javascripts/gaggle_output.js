@@ -22,7 +22,7 @@ function findObjectByKey(key, list) {
     return null;
 }
 
-var app = angular.module('gaggleOutputApp', ['ngSanitize']);
+var app = angular.module('gaggleOutputApp', ['ngSanitize', 'ui.bootstrap']);
 
 app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
     $scope.geneInfoList = new Array();
@@ -36,7 +36,7 @@ app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
     };
 
     $scope.addGeneData = function(geneId, geneName, source, type, url, desc, iframeid) {
-         console.log(geneId + " " + geneName + " " + source + " " + type + " " + url);
+         console.log(geneId + ", " + geneName + ", " + source + ", " + type + ", " + url + ", " + iframeid);
          var geneInfo = findObjectByKey(geneId, $scope.geneInfoList);
 
          var newentry = false;
@@ -44,7 +44,7 @@ app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
             geneInfo = {};
             geneInfo.key = geneId;
             geneInfo.geneName = geneName;
-            geneInfo.sourceList = new Array();
+            geneInfo.sourceList = new Array();  // all the handlers
             newentry = true;
          }
          if (geneInfo != null) {
@@ -53,7 +53,7 @@ app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
             if (sourceObj == null) {
                 sourceObj = {};
                 sourceObj.key = source;
-                sourceObj.dataList = new Array();
+                sourceObj.dataList = new Array();    // results for each handler
                 geneInfo.sourceList.push(sourceObj);
             }
 
@@ -323,6 +323,8 @@ function processNamelist()
 function removeAllResults()
 {
     $(".divResultIFrames").empty();
+    //$("#divGaggleOutput").empty();
+    //$("#divGeneInfo").empty();
 }
 
 // Other data source can pass data to this page by firing the GaggleDataAddEvent

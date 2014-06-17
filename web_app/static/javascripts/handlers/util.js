@@ -16,6 +16,7 @@ var BOSS_JNLP = GAGGLE_SERVER + "/static/jnlp/boss.jnlp";
 var HTTPBOSS_ADDRESS = "http://localhost:8082/";
 var WEBHANDLER_BASEURL = GAGGLE_SERVER + "/static/javascripts/handlers/";
 var OPENCPU_SERVER = "http://10.10.3.175/ocpu";
+var HANDLER_SEARCH_RESULT_TITLE = "Search Results";
 
 var cg_util = {
 

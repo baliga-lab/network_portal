@@ -81,7 +81,7 @@ EMBLString.prototype.handleNameList = function(namelist) {
     console.log("EMBL String open url: " + url);
     //cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
     var scope = angular.element($("#divGeneInfo")).scope();
-    cg_util.addIframeToAngularJS(scope, this._name, this._name, this._name, url, "EMBL String", iframeid);
+    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, url, "EMBL String", iframeid);
 
     //  Send event to ChromeGoose to store the iframeId
     var event = new CustomEvent('IFrameOpenEvent',
