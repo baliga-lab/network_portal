@@ -996,6 +996,5 @@ var EmblString_Parser = {
 };
 
 
-//FG_addWebsiteHandler("EMBL String", FG_emblString);
 if (EmblString_Parser.recognize(document))
     EmblString_Parser.getPageData(document);
