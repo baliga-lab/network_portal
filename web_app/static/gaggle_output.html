@@ -109,82 +109,51 @@
 
             <input type="hidden" id="inputDataParsingFinishSignal" value="False" />
             <div>
-                <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl" class="panel-group">
-                    <!--<div class="panel-group" id="accordion1">-->
+                <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
+                    <accordion>
+                        <accordion-group heading="Output - {{ output.funcname  }} - {{ output.species }}" ng-repeat="output in outputs">
+                            <accordion>
+                                <accordion-group heading="Enrichments">
+                                    <table>
+                                        <tbody>
+                                        <th ng-repeat="property in output.properties">
+                                            {{ property }}
+                                        </th>
+                                        <tr ng-repeat="enrichment in output.enrichments">
+                                            <td ng-repeat="proppair in enrichment track by $index">
+                                                <div ng-if="proppair.type == 'value'">
+                                                    {{proppair.value}}
+                                                </div>
+                                                <div ng-if="proppair.type=='url'">
+                                                    <a target='_blank' href="{{proppair.value}}">module</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="{{output.ploturl}}" /></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <br />
+                                </accordion-group>
 
-                    <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#divGaggleOutput" href="#collapseOne" >
-                                    Output - {{ output.funcname  }} - {{ output.species }}
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseOne" class="panel-collapse collapse in">
-                            <div class="panel-body">
-                                <table class="table table-hover">
-                                    <tbody>
-                                    <th ng-repeat="property in output.properties">
-                                        {{ property }}
-                                    </th>
-                                    <tr ng-repeat="enrichment in output.enrichments">
-                                        <td ng-repeat="proppair in enrichment track by $index">
-                                            <div ng-if="proppair.type == 'value'">
-                                                {{proppair.value}}
-                                            </div>
-                                            <div ng-if="proppair.type=='url'">
-                                                <a target='_blank' href="{{proppair.value}}">module</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><img src="{{output.ploturl}}" /></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div ng-if="output.pvalues.length > 0">
-                        <div class="panel panel-warning">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#divGaggleOutput" href="#collapseTwo">
-                                        P-Values
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="collapseTwo" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <table class="table table-hover">
+                                <accordion-group heading="P-Values">
+                                    <table>
                                         <th ng-repeat="pvalueprop in output.pvalueProperties">
                                             {{ pvalueprop }}
                                         </th>
                                         <tbody>
                                         <tr ng-repeat="pvalue in output.pvalues">
                                             <td ng-repeat="proppair in pvalue track by $index">
+                                                {{proppair.propvalue}}
                                             </td>
                                         </tr>
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div ng-if="output.gaggledData.length > 0">
-                        <div class="panel panel-warning">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapseThree">
-                                        Overlapped Genes
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="collapseThree" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <table class="table table-hover">
+                                </accordion-group>
+                                
+                                <accordion-group heading="Overlapped Genes" >
+                                    <table>
                                         <tbody>
                                         <tr ng-repeat="gaggleddata in output.gaggledData">
                                             <td>{{gaggleddata._name}}</td>
@@ -192,10 +161,10 @@
                                         </tr>
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </accordion-group>
+                            </accordion>
+                        </accordion-group>
+                    </accordion>
                 </div>
             </div>
         </div>

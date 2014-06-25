@@ -80,10 +80,10 @@ app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
 });
 
 app.controller("GaggleOutputCtrl", function($scope, $sce) {
-  $scope.outputs = {};
+  $scope.outputs = new Array();
 
   $scope.addOutput = function(output) {
-    ($scope.outputs)[output.id] = output;
+    ($scope.outputs).push(output); //  [output.id] = output;
   };
 });
 
@@ -156,6 +156,7 @@ function gaggleDataAddHandler(e) {
         });
         index++;
     });
+    console.log("Output pvalue properties: " + output.pvalueProperties);
     console.log("Output pvalues: " + output.pvalues);
 
     $("#divNewGaggledData").find(".gaggle-plotexpression").each(function() {
@@ -183,8 +184,8 @@ function gaggleDataAddHandler(e) {
     });
 
     $("#divNewGaggledData").prop("id", "");
-    $(".divGaggleOutputUnit").draggable();
-    $(".divGaggleOutputUnit").resizable();
+    //$(".divGaggleOutputUnit").draggable();
+    //$(".divGaggleOutputUnit").resizable();
 }
 
 // Handles data received from multiple iframes opened to analyze genes
