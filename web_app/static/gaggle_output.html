@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html ng-app="gaggleOutputApp">
 <head>
@@ -8,11 +9,11 @@
     <script type="text/javascript" src="/static/javascripts/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="/static/javascripts/jquery-ui-1.10.4.js"></script>
     <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script> -->
-
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-sanitize.min.js"></script>
     <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 
     <script type="text/javascript" src="/static/javascripts/handlers/util.js"></script>
     <script type="text/javascript" src="/static/javascripts/handlers/gaggle_data.js"></script>
@@ -27,135 +28,211 @@
     <script type="text/javascript" src="/static/javascripts/handlers/haloAnnotations.js"></script>
     <script type="text/javascript" src="/static/javascripts/handlers/entrez.js"></script>
     <script type="text/javascript" src="/static/javascripts/handlers/maggie.js"></script>
-
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/javascripts/gaggle_output.js"></script>
 </head>
 <body>
-    <div>
-        Species:
-        <select id="selSpecies">
-            <option value = "" selected>Select an organism</option>
-        </select>
-        <br />
-        Genes: <input type="text" id="inputNamelistText" /><br />
-        <input type="file" id="inputNamelistFile" /><br />
-
-
-        <div id="divGeese">
-            <input class="chkboxGeese" type="checkbox" name="goose" value="DAVID">DAVID<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="KEGG">KEGG Pathway<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="EMBLString">EMBL String<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="EGRIN2">EGRIN2<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="HaloAnnotation">Halo Annotations<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="EntrezGene">Entrez Gene<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="EntrezProtein">Entrez Protein<br/>
-            <input class="chkboxGeese" type="checkbox" name="goose" value="Maggie">Maggie<br/>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1">
         </div>
-        <br />
-        <input type="button" id="btnProcessNamelist" onclick="javascript:processNamelist();" value="Search" />
-        <input type="button" id="btnRemoveAllResults" onclick="javascript:removeAllResults();" value="Remove All" />
-    </div>
-    <br/>
-
-    <div class="divResultIFrames">
-        <!--<iframe id="testframe" src="http://localhost:8000/static/test.html" /> -->
-    </div>
-    <br/>
-    <div id="divGaggledData">
-
-    </div>
-
-    <input type="hidden" id="inputDataParsingFinishSignal" value="False" />
-    
-    <div >
-    <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
-        <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
-            <div class='panel-heading'>
-                <h4 class='panel-title'>
-                    Output - {{ output.funcname  }} - {{ output.species }}
-                </h4>
-                <table>
-                    <tbody>
-                        <th ng-repeat="property in output.properties">
-                            {{ property }}
-                        </th>
-                        <tr ng-repeat="enrichment in output.enrichments">
-                            <td ng-repeat="proppair in enrichment track by $index">
-                                <div ng-if="proppair.type == 'value'">
-                                    {{proppair.value}}
-                                </div>
-                                <div ng-if="proppair.type=='url'">
-                                    <a target='_blank' href="{{proppair.value}}">module</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><img src="{{output.ploturl}}" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br />
-                <div ng-if="output.pvalues.length > 0">
-                    <h3>P-Values</h3>
-                    <table>
-                        <th ng-repeat="pvalueprop in output.pvalueProperties">
-                            {{ pvalueprop }}
-                        </th>
-                        <tbody>
-                            <tr ng-repeat="pvalue in output.pvalues">
-                                <td ng-repeat="proppair in pvalue track by $index">
-                                    {{proppair.propvalue}}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title"> Gaggle Tools </h4>
                 </div>
-                <br />
-                <div ng-if="output.gaggledData.length > 0">
-                <h3>Overlapped Genes</h3>
-                <table>
-                    <tbody>
-                        <tr ng-repeat="gaggleddata in output.gaggledData">
-                            <td>{{gaggleddata._name}}</td>
-                            <td ng-repeat="data in gaggleddata._data">{{data}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="panel-body">
+
+                    <div class="input-group">
+                        <span class="input-group-addon">Species:</span>
+                        <select id="selSpecies" class="form-control">
+                            <option value = "" selected>Select an organism</option>
+                        </select>
+                    </div>
+                    <br />
+
+                    <div class="input-group">
+                        <span class="input-group-addon">Genes:</span>
+                        <input type="text" id="inputNamelistText" class="form-control" placeholder="Paste NameList"/><br />
+                    </div>
+                    <br />
+
+                    <div class="form-group">
+                        <input type="file" id="inputNamelistFile" />
+                    </div>
+
+                    <label> Select Webservice(s)</label>
+                    <div id="divGeese">
+                        <label class="checkbox-inline">
+                            <input class="chkboxGeese" type="checkbox" name="goose" value="DAVID"> DAVID<br/>
+                        </label>
+                        <label class="checkbox-inline">
+                            <input class="chkboxGeese" type="checkbox" name="goose" value="KEGG"> KEGG Pathway<br/>
+                        </label>
+                        <label class="checkbox-inline">
+                            <input class="chkboxGeese" type="checkbox" name="goose" value="EMBLString"> EMBL String<br/>
+                        </label>
+                        <input class="chkboxGeese" type="checkbox" name="goose" value="EGRIN2"> EGRIN2<br/>
+                        <label class="checkbox-inline">
+                            <input class="chkboxGeese" type="checkbox" name="goose" value="HaloAnnotation"> Halo Annotations<br/>
+                        </label>
+                        <label class="checkbox-inline">
+                            <input class="chkboxGeese" type="checkbox" name="goose" value="EntrezGene"> Entrez Gene<br/>
+                        </label>
+                        <label class="checkbox-inline">
+                            <input class="chkboxGeese" type="checkbox" name="goose" value="EntrezProtein"> Entrez Protein<br/>
+                        </label>
+                        <input class="chkboxGeese" type="checkbox" name="goose" value="Maggie"> Maggie<br/>
+                    </div>
+                    <br />
+
+                    <input type="button" id="btnProcessNamelist" onclick="javascript:processNamelist();" value="Search" />
+                    <input type="button" id="btnRemoveAllResults" onclick="javascript:removeAllResults();" value="Remove All" />
                 </div>
+
             </div>
         </div>
     </div>
-    <br />
-    <div id="divGeneInfo"  ng-controller="GaggleGeneInfoCtrl">
-        <accordion>
-            <accordion-group heading="{{geneInfo.geneName}}" ng-repeat="geneInfo in geneInfoList">
-                <carousel interval="-1">
-                    <slide ng-repeat="sourceObj in geneInfo.sourceList">
-                        <h3>{{sourceObj.key}}</h3>
-                        <div>
-                            <carousel interval="-1">
-                                <slide ng-repeat="geneDataObj in sourceObj.dataList track by $index">
-                                    <div ng-switch on="geneDataObj.type">
-                                        <div class="divDetail" ng-switch-when="detail">
-                                            <a ng-href="{{geneDataObj.url}}" target="_blank">{{geneDataObj.desc}}</a>
-                                        </div>
-                                        <div class="divImage" ng-switch-when="image">
-                                            <img style="height: 400px; width: 450px" ng-src="{{geneDataObj.url}}" />
-                                        </div>
-                                        <div class="divIFrame" ng-switch-when="iframe">
-                                            <iframe id="{{geneDataObj.iframeId}}" class="parseIFrame" ng-src="{{trustSrc(geneDataObj.url)}}" />
-                                        </div>
-                                    </div>
-                                </slide>
-                            </carousel>
+
+    <div class="row">
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-10">
+
+            <div class="divResultIFrames">
+                <!--<iframe id="testframe" src="http://localhost:8000/static/test.html" /> -->
+            </div>
+            <br/>
+            <div id="divGaggledData">
+
+            </div>
+
+            <input type="hidden" id="inputDataParsingFinishSignal" value="False" />
+            <div>
+                <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl" class="panel-group">
+                    <!--<div class="panel-group" id="accordion1">-->
+
+                    <div class='panel panel-primary divGaggleOutputUnit' ng-repeat="output in outputs">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#divGaggleOutput" href="#collapseOne" >
+                                    Output - {{ output.funcname  }} - {{ output.species }}
+                                </a>
+                            </h4>
                         </div>
-                    </slide>
-                </carousel>
-            </accordion-group>
-        </accordion>
-    </div>
-    </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <table class="table table-hover">
+                                    <tbody>
+                                    <th ng-repeat="property in output.properties">
+                                        {{ property }}
+                                    </th>
+                                    <tr ng-repeat="enrichment in output.enrichments">
+                                        <td ng-repeat="proppair in enrichment track by $index">
+                                            <div ng-if="proppair.type == 'value'">
+                                                {{proppair.value}}
+                                            </div>
+                                            <div ng-if="proppair.type=='url'">
+                                                <a target='_blank' href="{{proppair.value}}">module</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="{{output.ploturl}}" /></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div ng-if="output.pvalues.length > 0">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#divGaggleOutput" href="#collapseTwo">
+                                        P-Values
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <table class="table table-hover">
+                                        <th ng-repeat="pvalueprop in output.pvalueProperties">
+                                            {{ pvalueprop }}
+                                        </th>
+                                        <tbody>
+                                        <tr ng-repeat="pvalue in output.pvalues">
+                                            <td ng-repeat="proppair in pvalue track by $index">
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div ng-if="output.gaggledData.length > 0">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapseThree">
+                                        Overlapped Genes
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                        <tr ng-repeat="gaggleddata in output.gaggledData">
+                                            <td>{{gaggleddata._name}}</td>
+                                            <td ng-repeat="data in gaggleddata._data">{{data}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+
+        <div id="divGeneInfo"  ng-controller="GaggleGeneInfoCtrl">
+            <accordion>
+                <accordion-group heading="{{geneInfo.geneName}}" ng-repeat="geneInfo in geneInfoList">
+                    <carousel interval="-1">
+                        <slide ng-repeat="sourceObj in geneInfo.sourceList">
+                            <h3>{{sourceObj.key}}</h3>
+                            <div>
+                                <carousel interval="-1">
+                                    <slide ng-repeat="geneDataObj in sourceObj.dataList track by $index">
+                                        <div ng-switch on="geneDataObj.type">
+                                            <div class="divDetail" ng-switch-when="detail">
+                                                <a ng-href="{{geneDataObj.url}}" target="_blank">{{geneDataObj.desc}}</a>
+                                            </div>
+                                            <div class="divImage" ng-switch-when="image">
+                                                <img style="height: 400px; width: 450px" ng-src="{{geneDataObj.url}}" />
+                                            </div>
+                                            <div class="divIFrame" ng-switch-when="iframe">
+                                                <iframe id="{{geneDataObj.iframeId}}" class="parseIFrame" ng-src="{{trustSrc(geneDataObj.url)}}" />
+                                            </div>
+                                        </div>
+                                    </slide>
+                                </carousel>
+                            </div>
+                        </slide>
+                    </carousel>
+                </accordion-group>
+            </accordion>
+        </div>
+    </div>
+</div>
+
+</div>
 </body>
 </html>
