@@ -113,7 +113,7 @@
                     <accordion>
                         <accordion-group heading="Output - {{ output.funcname  }} - {{ output.species }}" is-open="output.open" ng-repeat="output in outputs">
                             <accordion>
-                                <accordion-group heading="{{category.name}}" is-open="category.type == 'geneplot'" ng-repeat="category in output.categories">
+                                <accordion-group heading="{{category.name}}" is-open="category.type == 'geneplot' || category.type == 'enrichments'" ng-repeat="category in output.categories">
                                     <div ng-switch on="category.type">
                                         <div ng-switch-when="enrichments">
                                             <table>
