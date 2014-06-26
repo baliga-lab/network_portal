@@ -97,6 +97,105 @@ function generateUUID() {
     return uuid;
 }
 
+function parseFunctionalEnrichment()
+{
+    var categories = new Array();
+    var enrichment = {name: "Enrichments", type: "enrichments"};
+    categories.push(enrichment);
+    enrichment.properties = new Array();
+    enrichment.values = new Array();
+    var index = 0;
+    var hasData = false;
+    $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
+        enrichment.values.push([]);
+        $(this).find("label").each(function () {
+            hasData = true;
+            var input1 = $(this).children()[0];
+            var input2 = $(this).children()[1];
+            var input3 = $(this).children()[2]; // type
+            console.log("Property " + $(input1).val() + " Value " + $(input2).val() + " Type: " + $(input3).val());
+            if (index == 0) {
+                enrichment.properties.push($(input1).val());
+            }
+            console.log("Enrichments index: " + index);
+            var proppair = {};
+            proppair.value = $(input2).val();
+            proppair.type = $(input3).val();
+            enrichment.values[index].push(proppair);
+        });
+        index++;
+    });
+    console.log("Output enrichments: " + enrichment.values);
+
+    // Parse p value results
+    var pvalues = {name: "P-Values", type: "p-values"};
+    pvalues.properties = new Array();
+    pvalues.values = new Array();
+    categories.push(pvalues);
+    index = 0;
+    $("#divNewGaggledData").find(".gaggle-pvalue").each(function() {
+        pvalues.values.push([]);
+        $(this).find("label").each(function () {
+            hasData = true;
+            var input1 = $(this).children()[0];
+            var input2 = $(this).children()[1];
+            var propname = $(input1).val();
+            var propvalue = $(input2).val();
+            console.log("P-value prop name: " + propname + " prop value: " + propvalue);
+
+            var proppair = {};
+            proppair.propname = propname;
+            proppair.propvalue = propvalue;
+            pvalues.values[index].push(proppair);
+
+            if (index == 0)
+                pvalues.properties.push(propname);
+        });
+        index++;
+    });
+    console.log("Output pvalue properties: " + pvalues.properties);
+    console.log("Output pvalues: " + pvalues.values);
+
+    // Parse gaggled data
+    var overlappedgenes = {name: "Overlapped Genes", type: "overlapped genes"};
+    overlappedgenes.properties = new Array();
+    overlappedgenes.values = new Array();
+    categories.push(overlappedgenes);
+    var gaggledData = gaggleMicroformat.scan("#divNewGaggledData");
+    if (gaggledData != null) {
+        for (var i = 0; i < gaggledData.length; i++) {
+            hasData = true;
+            var data = (gaggledData)[i];
+            // Call the lazy parser
+            var fetcheddata = data.getData();
+            console.log(data.getData());
+            overlappedgenes.values.push(data);
+        }
+    }
+    console.log("Output gaggled data: " + gaggledData);
+    if (hasData)
+        return categories;
+    return null;
+}
+
+function parseGenePlot()
+{
+    var categories = new Array();
+    var plots = {name: "Plot", type: "geneplot"};
+    categories.push(plots);
+    plots.properties = new Array();
+    plots.values = new Array();
+    $("#divNewGaggledData").find(".gaggle-plotexpression").each(function() {
+        var inputurl = $(this).children()[0];
+        var ploturl = $(inputurl).val();
+        console.log("Gaggle plot url: " + ploturl);
+        plots.values.push(ploturl);
+    });
+    if (plots.values.length > 0)
+        return categories;
+    return null;
+}
+
 // Handles data added from OpenCPU results
 function gaggleDataAddHandler(e) {
     console.log("GaggleDataAddEvent captured...");
@@ -107,76 +206,17 @@ function gaggleDataAddHandler(e) {
     output.id = generateUUID();
     output.funcname = funcname;
     output.species = species;
-    output.enrichments = [];
-    output.properties = [];
-    var index = 0;
-    // Parse enrichment results
-    $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
-        (output.enrichments).push([]);
-        $(this).find("label").each(function () {
-            var input1 = $(this).children()[0];
-            var input2 = $(this).children()[1];
-            var input3 = $(this).children()[2]; // type
-            console.log("Property " + $(input1).val() + " Value " + $(input2).val() + " Type: " + $(input3).val());
-            if (index == 0) {
-                output.properties.push($(input1).val());
-            }
-            console.log("Enrichments index: " + index);
-            var proppair = {};
-            proppair.value = $(input2).val();
-            proppair.type = $(input3).val();
-            (output.enrichments)[index].push(proppair);
-        });
-        //console.log("One enrichment: " + enrichment);
-        //(output.enrichments)[index] = enrichment;
-        index++;
-    });
-    console.log("Output enrichments: " + output.enrichments);
+    output.categories = new Array();
 
-    // Parse p value results
-    output.pvalues = [];
-    output.pvalueProperties = [];
-    index = 0;
-    $("#divNewGaggledData").find(".gaggle-pvalue").each(function() {
-        (output.pvalues).push([]);
-        $(this).find("label").each(function () {
-            var input1 = $(this).children()[0];
-            var input2 = $(this).children()[1];
-            var propname = $(input1).val();
-            var propvalue = $(input2).val();
-            console.log("P-value prop name: " + propname + " prop value: " + propvalue);
+    var functionalenrichments = parseFunctionalEnrichment();
+    if (functionalenrichments != null)
+        output.categories = output.categories.concat(functionalenrichments);
 
-            var proppair = {};
-            proppair.propname = propname;
-            proppair.propvalue = propvalue;
-            (output.pvalues)[index].push(proppair);
+    var plots = parseGenePlot();
+    if (plots != null)
+        output.categories = output.categories.concat(plots);
 
-            if (index == 0)
-                output.pvalueProperties.push(propname);
-        });
-        index++;
-    });
-    console.log("Output pvalue properties: " + output.pvalueProperties);
-    console.log("Output pvalues: " + output.pvalues);
-
-    $("#divNewGaggledData").find(".gaggle-plotexpression").each(function() {
-        var inputurl = $(this).children()[0];
-        var ploturl = $(inputurl).val();
-        console.log("Gaggle plot url: " + ploturl);
-        output.ploturl = ploturl;
-    });
-
-    // Parse gaggled data
-    output.gaggledData = gaggleMicroformat.scan("#divNewGaggledData");
-    if (output.gaggledData != null) {
-        for (var i = 0; i < output.gaggledData.length; i++) {
-            var data = (output.gaggledData)[i];
-            // Call the lazy parser
-            var fetcheddata = data.getData();
-            console.log(data.getData());
-        }
-    }
-    console.log("Output gaggled data: " + output.gaggledData);
+    console.log("Adding output to AngularJS " + output.categories.length);
 
     var scope = angular.element($("#divGaggleOutput")).scope();
     scope.$apply(function(){
@@ -184,8 +224,6 @@ function gaggleDataAddHandler(e) {
     });
 
     $("#divNewGaggledData").prop("id", "");
-    //$(".divGaggleOutputUnit").draggable();
-    //$(".divGaggleOutputUnit").resizable();
 }
 
 // Handles data received from multiple iframes opened to analyze genes

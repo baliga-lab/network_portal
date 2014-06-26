@@ -113,54 +113,57 @@
                     <accordion>
                         <accordion-group heading="Output - {{ output.funcname  }} - {{ output.species }}" ng-repeat="output in outputs">
                             <accordion>
-                                <accordion-group heading="Enrichments">
-                                    <table>
-                                        <tbody>
-                                        <th ng-repeat="property in output.properties">
-                                            {{ property }}
-                                        </th>
-                                        <tr ng-repeat="enrichment in output.enrichments">
-                                            <td ng-repeat="proppair in enrichment track by $index">
-                                                <div ng-if="proppair.type == 'value'">
-                                                    {{proppair.value}}
-                                                </div>
-                                                <div ng-if="proppair.type=='url'">
-                                                    <a target='_blank' href="{{proppair.value}}">module</a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><img src="{{output.ploturl}}" /></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <br />
-                                </accordion-group>
-
-                                <accordion-group heading="P-Values">
-                                    <table>
-                                        <th ng-repeat="pvalueprop in output.pvalueProperties">
-                                            {{ pvalueprop }}
-                                        </th>
-                                        <tbody>
-                                        <tr ng-repeat="pvalue in output.pvalues">
-                                            <td ng-repeat="proppair in pvalue track by $index">
-                                                {{proppair.propvalue}}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </accordion-group>
-                                
-                                <accordion-group heading="Overlapped Genes" >
-                                    <table>
-                                        <tbody>
-                                        <tr ng-repeat="gaggleddata in output.gaggledData">
-                                            <td>{{gaggleddata._name}}</td>
-                                            <td ng-repeat="data in gaggleddata._data">{{data}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                <accordion-group heading="{{category.name}}" ng-repeat="category in output.categories">
+                                    <div ng-switch on="category.type">
+                                        <div ng-switch-when="enrichments">
+                                            <table>
+                                                <tbody>
+                                                <th ng-repeat="property in category.properties">
+                                                    {{ property }}
+                                                </th>
+                                                <tr ng-repeat="enrichment in category.values">
+                                                    <td ng-repeat="proppair in enrichment track by $index">
+                                                        <div ng-if="proppair.type == 'value'">
+                                                            {{proppair.value}}
+                                                        </div>
+                                                        <div ng-if="proppair.type=='url'">
+                                                            <a target='_blank' href="{{proppair.value}}">module</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div ng-switch-when="p-values">
+                                            <table>
+                                                <th ng-repeat="pvalueprop in category.properties">
+                                                    {{ pvalueprop }}
+                                                </th>
+                                                <tbody>
+                                                <tr ng-repeat="pvalue in category.values">
+                                                    <td ng-repeat="proppair in pvalue track by $index">
+                                                        {{proppair.propvalue}}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div ng-switch-when="overlapped genes">
+                                            <table>
+                                                <tbody>
+                                                <tr ng-repeat="gaggleddata in category.values">
+                                                    <td>{{gaggleddata._name}}</td>
+                                                    <td ng-repeat="data in gaggleddata._data">{{data}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div ng-switch-when="geneplot">
+                                            <div ng-repeat="ploturl in category.values">
+                                                <img src="{{ploturl}}" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </accordion-group>
                             </accordion>
                         </accordion-group>
