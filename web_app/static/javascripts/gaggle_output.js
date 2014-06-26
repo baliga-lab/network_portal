@@ -83,6 +83,12 @@ app.controller("GaggleOutputCtrl", function($scope, $sce) {
   $scope.outputs = new Array();
 
   $scope.addOutput = function(output) {
+    for (var i = 0; i < ($scope.outputs).length; i++)
+    {
+        var item = ($scope.outputs)[i];
+        item.open = false;
+    }
+    output.open = true;
     ($scope.outputs).push(output); //  [output.id] = output;
   };
 });
