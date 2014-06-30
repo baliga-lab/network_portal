@@ -163,6 +163,11 @@
                                                 <img src="{{ploturl}}" />
                                             </div>
                                         </div>
+                                        <div ng-switch-when="output">
+                                            <div ng-repeat="output in category.values">
+                                                {{output}}
+                                            </div>
+                                        </div>
                                     </div>
                                 </accordion-group>
                             </accordion>

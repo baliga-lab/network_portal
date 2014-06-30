@@ -202,6 +202,34 @@ function parseGenePlot()
     return null;
 }
 
+function parseTFOEFilter(output)
+{
+    console.log("Parsing TFOE filter results..." + output);
+    var categories = new Array();
+    var plots = {name: "Plot", type: "geneplot"};
+    categories.push(plots);
+    plots.properties = new Array();
+    plots.values = new Array();
+    var hasData = (output != null);
+    $("#divNewGaggledData").find(".gaggle-plottfoe").each(function() {
+        hasData = true;
+        var inputurl = $(this).children()[0];
+        var ploturl = $(inputurl).val();
+        console.log("Gaggle plot url: " + ploturl);
+        plots.values.push(ploturl);
+    });
+
+    var outputs = {name: "Output", type: "output"};
+    outputs.properties = new Array();
+    outputs.values = new Array();
+    outputs.values.push(output);
+    categories.push(outputs);
+
+    if (hasData)
+        return categories;
+    return null;
+}
+
 // Handles data added from OpenCPU results
 function gaggleDataAddHandler(e) {
     console.log("GaggleDataAddEvent captured...");
@@ -222,7 +250,11 @@ function gaggleDataAddHandler(e) {
     if (plots != null)
         output.categories = output.categories.concat(plots);
 
+    var tfoeresults = parseTFOEFilter(e.detail.output);
+    if (tfoeresults != null)
+        output.categories = output.categories.concat(tfoeresults);
     console.log("Adding output to AngularJS " + output.categories.length);
+
 
     var scope = angular.element($("#divGaggleOutput")).scope();
     scope.$apply(function(){
