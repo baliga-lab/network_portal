@@ -103,6 +103,31 @@ function generateUUID() {
     return uuid;
 }
 
+function parseGaggleData(categoryName, categoryType) {
+    console.log("Parsing gaggle data...");
+
+    var category = {name: categoryName, type: categoryType};
+    category.properties = new Array();
+    category.values = new Array();
+    var hasData = false;
+    var gaggledData = gaggleMicroformat.scan("#divNewGaggledData");
+    if (gaggledData != null) {
+        for (var i = 0; i < gaggledData.length; i++) {
+            hasData = true;
+            var data = (gaggledData)[i];
+            // Call the lazy parser
+            var fetcheddata = data.getData();
+            console.log(data.getData());
+            category.values.push(data);
+        }
+        console.log("Output gaggled data: " + gaggledData);
+    }
+
+    if (hasData)
+        return category;
+    return null;
+}
+
 function parseFunctionalEnrichment()
 {
     var categories = new Array();
@@ -163,22 +188,14 @@ function parseFunctionalEnrichment()
     console.log("Output pvalues: " + pvalues.values);
 
     // Parse gaggled data
-    var overlappedgenes = {name: "Overlapped Genes", type: "overlapped genes"};
-    overlappedgenes.properties = new Array();
-    overlappedgenes.values = new Array();
-    categories.push(overlappedgenes);
-    var gaggledData = gaggleMicroformat.scan("#divNewGaggledData");
-    if (gaggledData != null) {
-        for (var i = 0; i < gaggledData.length; i++) {
+    if (hasData) {
+        var category = parseGaggleData("Overlapped Genes", "output");
+        if (category != null) {
+            categories.push(category);
             hasData = true;
-            var data = (gaggledData)[i];
-            // Call the lazy parser
-            var fetcheddata = data.getData();
-            console.log(data.getData());
-            overlappedgenes.values.push(data);
         }
     }
-    console.log("Output gaggled data: " + gaggledData);
+
     if (hasData)
         return categories;
     return null;
@@ -219,11 +236,16 @@ function parseTFOEFilter(output)
         plots.values.push(ploturl);
     });
 
-    var outputs = {name: "Output", type: "output"};
+    var category = parseGaggleData("Expression Genes", "output");
+    if (category != null) {
+        hasData = true;
+        categories.push(category);
+    }
+    /*var outputs = {name: "Output", type: "output"};
     outputs.properties = new Array();
     outputs.values = new Array();
     outputs.values.push(output);
-    categories.push(outputs);
+    categories.push(outputs);*/
 
     if (hasData)
         return categories;
@@ -262,6 +284,8 @@ function gaggleDataAddHandler(e) {
     });
 
     $("#divNewGaggledData").prop("id", "");
+    // Set the hidden input to inform chrome goose to scan page for gaggled data
+    $("#inputDataParsingFinishSignal").val("True");
 }
 
 // Handles data received from multiple iframes opened to analyze genes

@@ -148,7 +148,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div ng-switch-when="overlapped genes">
+                                        <div ng-switch-when="output">
                                             <table>
                                                 <tbody>
                                                 <tr ng-repeat="gaggleddata in category.values">
@@ -161,11 +161,6 @@
                                         <div ng-switch-when="geneplot">
                                             <div ng-repeat="ploturl in category.values">
                                                 <img src="{{ploturl}}" />
-                                            </div>
-                                        </div>
-                                        <div ng-switch-when="output">
-                                            <div ng-repeat="output in category.values">
-                                                {{output}}
                                             </div>
                                         </div>
                                     </div>
