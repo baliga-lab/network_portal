@@ -236,16 +236,13 @@ function parseTFOEFilter(output)
         plots.values.push(ploturl);
     });
 
-    var category = parseGaggleData("Expression Genes", "output");
-    if (category != null) {
-        hasData = true;
-        categories.push(category);
+    if (hasData) {
+        var category = parseGaggleData("Expression Genes", "output");
+        if (category != null) {
+            hasData = true;
+            categories.push(category);
+        }
     }
-    /*var outputs = {name: "Output", type: "output"};
-    outputs.properties = new Array();
-    outputs.values = new Array();
-    outputs.values.push(output);
-    categories.push(outputs);*/
 
     if (hasData)
         return categories;
