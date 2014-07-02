@@ -37,6 +37,8 @@ GaggleMicroformatParser.prototype.recognize = function (doc) {
  * retrieve the data from the page.
  */
 GaggleMicroformatParser.prototype.getPageData = function(doc) {
+    if (window.self != top)
+        console.log("GaggleMicroformatParser parsing data in IFrame " + window.location);
 	var gaggleDataElements = gaggleMicroformat.scan(doc);
 	console.log("GaggleMicroformatParser got " + gaggleDataElements.length + " items");
 	var results = [];
@@ -54,6 +56,15 @@ GaggleMicroformatParser.prototype.getPageData = function(doc) {
         pagedata.source = "Page";
         //alert(pagedata.source);
 		pageGaggleData.push(pagedata); //.setConvertToJavaOnGetData());
+	}
+
+	// If we are in an iframe, we need to pass the pageGaggleData to gaggle.js
+	if (window.self != top) {
+	    console.log("In an IFrame, pass the data to the Chrome Goose");
+        var event = new CustomEvent('IFrameGaggleDataEvent', {detail: {
+                                        data: pageGaggleData},
+                                        bubbles: true, cancelable: false});
+        document.dispatchEvent(event);
 	}
 	//return results;
 }
