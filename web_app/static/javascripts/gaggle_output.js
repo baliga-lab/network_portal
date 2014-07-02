@@ -242,6 +242,12 @@ function parseTFOEFilter(output)
             hasData = true;
             categories.push(category);
         }
+
+        var category1 = {name: "Output", type: "html"};
+        category1.properties = new Array();
+        category1.values = new Array();
+        category1.values.push(output);
+        categories.push(category1);
     }
 
     if (hasData)
