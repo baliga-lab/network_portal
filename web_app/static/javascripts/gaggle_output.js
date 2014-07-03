@@ -260,11 +260,13 @@ function gaggleDataAddHandler(e) {
     console.log("GaggleDataAddEvent captured...");
     var funcname = e.detail.funcname;
     var species = e.detail.species;
-    console.log("Function name: " + funcname + " Species: " + species);
+    var desc = e.detail.description;
+    console.log("Function name: " + funcname + " Species: " + species + " Desc: " + desc);
     var output = {};
     output.id = generateUUID();
     output.funcname = funcname;
     output.species = species;
+    output.description = desc;
     output.categories = new Array();
 
     var functionalenrichments = parseFunctionalEnrichment();

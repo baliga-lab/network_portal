@@ -111,7 +111,7 @@
             <div>
                 <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
                     <accordion>
-                        <accordion-group heading="Output - {{ output.funcname  }} - {{ output.species }}" is-open="output.open" ng-repeat="output in outputs">
+                        <accordion-group heading="Output - {{ output.funcname  }} - {{ output.species }} - {{output.description}}" is-open="output.open" ng-repeat="output in outputs">
                             <accordion>
                                 <accordion-group heading="{{category.name}}" is-open="category.type == 'geneplot' || category.type == 'enrichments'" ng-repeat="category in output.categories">
                                     <div ng-switch on="category.type">
