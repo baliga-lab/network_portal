@@ -62,6 +62,7 @@ GaggleMicroformatParser.prototype.getPageData = function(doc) {
 	if (window.self != top && pageGaggleData.length > 0) {
 	    console.log("In an IFrame, pass the data to the Chrome Goose");
         var event = new CustomEvent('IFrameGaggleDataEvent', {detail: {
+                                        type: "gaggle",
                                         data: pageGaggleData},
                                         bubbles: true, cancelable: false});
         document.dispatchEvent(event);
