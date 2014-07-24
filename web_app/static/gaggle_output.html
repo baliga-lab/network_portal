@@ -176,12 +176,12 @@
                 </div>
             </div>
         </div>
-
-        <br />
-
+    </div>
+    <br />
+    <div class="row">
         <div id="divGeneInfo"  ng-controller="GaggleGeneInfoCtrl">
             <accordion>
-                <accordion-group heading="{{geneInfo.geneName}}" ng-repeat="geneInfo in geneInfoList">
+                <accordion-group heading="{{geneInfo.geneName}}" ng-repeat="geneInfo in geneInfoList" is-open="geneInfo.geneName == 'Search Results'">
                     <carousel interval="-1">
                         <slide ng-repeat="sourceObj in geneInfo.sourceList">
                             <h3>{{sourceObj.key}}</h3>
@@ -210,6 +210,5 @@
     </div>
 </div>
 
-</div>
 </body>
 </html>
