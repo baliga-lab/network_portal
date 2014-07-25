@@ -82,6 +82,10 @@ app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
 app.controller("GaggleOutputCtrl", function($scope, $sce) {
   $scope.outputs = new Array();
 
+  $scope.init = function() {
+    $scope.outputs = new Array();
+  };
+
   $scope.addOutput = function(output) {
     for (var i = 0; i < ($scope.outputs).length; i++)
     {
@@ -402,7 +406,9 @@ function processNamelist()
                 if (firstone) {
                     // clean up UI related to gene parsing
                     firstone = false;
-                    removeAllResults();
+                    $(".divResultIFrames").empty();
+
+                    //removeAllResults();
                     var scope = angular.element($("#divGeneInfo")).scope();
                     scope.$apply(function(){
                         scope.initGeneParse();
@@ -429,6 +435,24 @@ function processNamelist()
 function removeAllResults()
 {
     $(".divResultIFrames").empty();
+
+    var scope = angular.element($("#divGeneInfo")).scope();
+    scope.$apply(function(){
+        scope.initGeneParse();
+    });
+
+    var event = new CustomEvent('GaggleOutputInitEvent',
+                                {detail:
+                                    {},
+                                    bubbles: true,
+                                    cancelable: false});
+    document.dispatchEvent(event);
+
+    var scope1 = angular.element($("#divGaggleOutput")).scope();
+    scope1.$apply(function(){
+        scope1.init();
+    });
+
     //$("#divGaggleOutput").empty();
     //$("#divGeneInfo").empty();
 }
