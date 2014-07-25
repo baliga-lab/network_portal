@@ -179,6 +179,9 @@
     </div>
     <br />
     <div class="row">
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-10">
         <div id="divGeneInfo"  ng-controller="GaggleGeneInfoCtrl">
             <accordion>
                 <accordion-group heading="{{geneInfo.geneName}}" ng-repeat="geneInfo in geneInfoList" is-open="geneInfo.geneName == 'Search Results'">
@@ -206,6 +209,7 @@
                     </carousel>
                 </accordion-group>
             </accordion>
+        </div>
         </div>
     </div>
 </div>
