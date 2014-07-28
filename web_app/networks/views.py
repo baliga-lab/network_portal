@@ -313,8 +313,8 @@ def bicluster(request, species=None, network_num=None, bicluster_num=None):
     expmap = {}
     genes = bicluster.genes.all()
     gene_map = { gene.id: gene.name for gene in genes }
-    conds = Condition.objects.filter(pk__in=[cond_id
-                                             for gene_id, cond_id, value in expressions])
+    #conds = Condition.objects.filter(pk__in=[cond_id
+    #                                         for gene_id, cond_id, value in expressions])
     for gene_id, cond_id, value in expressions:
         if gene_id not in expmap:
             expmap[gene_id] = []
