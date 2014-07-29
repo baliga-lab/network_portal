@@ -68,7 +68,10 @@ Entrez.prototype.handleNameList = function(namelist) {
 	// open the URL in a new tab
 	console.log("Entrez open url: " + url);
 	var iframeid = cg_util.generateUUID();
-    cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+    //cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+
+    var scope = angular.element($("#divGeneInfo")).scope();
+    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, url, this._name, iframeid);
 }
 
 var entrezGene = new Entrez("gene");

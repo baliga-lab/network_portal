@@ -22,7 +22,9 @@ MaggieHandler.prototype.handleNameList = function(namelist) {
     var url = "http://maggie.systemsbiology.net/main/start";
     console.log("Maggie injecting " + this._extensionUrl);
 
-    cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+    //cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
+    var scope = angular.element($("#divGeneInfo")).scope();
+    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, url, this._name, iframeid);
 };
 
 // create and register website handler

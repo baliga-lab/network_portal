@@ -21,8 +21,12 @@ Egrin2Handler.prototype.handleNameList = function(namelist) {
         + "search_biclusters?search_text=" + cg_util.join(names, "+");
 
         // open the URL in a new tab
-        console.log("Open tab " + url);
-        cg_util.createIFrame(url, ".divResultIFrames", "iframediv", "gaggleiframe");
+        console.log("Egrin2 open tab " + url);
+        //cg_util.createIFrame(url, ".divResultIFrames", "iframediv", "gaggleiframe");
+
+        var iframeid = cg_util.generateUUID();
+        var scope = angular.element($("#divGeneInfo")).scope();
+        cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, url, this._name, iframeid);
     }
 }
 
