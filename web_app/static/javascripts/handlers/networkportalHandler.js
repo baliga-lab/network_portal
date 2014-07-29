@@ -80,17 +80,23 @@ NetworkPortal.prototype.handleNameList = function(namelist) {
     // open url in a new tab
     // And then scanPage will be called, which retrieves data from the background page, and calls processData
     // Send custom event to Chrome goose, which will store the data on the background page
-    var event = new CustomEvent('GaggleOutputPageEvent', {detail: {
-                                handler: "Network Portal", data: namelist, iframeId: iframeid},
-                                bubbles: true, cancelable: false});
-    document.dispatchEvent(event);
+    //var event = new CustomEvent('GaggleOutputPageEvent', {detail: {
+    //                            handler: "Network Portal", data: namelist, iframeId: iframeid},
+    //                            bubbles: true, cancelable: false});
+    //document.dispatchEvent(event);
 
-    // We call angularJS to create a new entry for EMBL String iframe
+    var names = namelist.getData();
+    var url = this._pageUrl + "/search?q=";
+    for (var i=0; i<names.length; i++) {
+        url += names[i];
+        if (i < names.length - 1)
+            url += "+";
+    }
 
-    console.log("Network Portal open url: " + this._pageUrl);
+    console.log("Network Portal open url: " + url);
     //cg_util.createIFrame(url, iframeid, ".divResultIFrames", "iframediv", "gaggleiframe");
     var scope = angular.element($("#divGeneInfo")).scope();
-    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, this._pageUrl, "Network Portal", iframeid);
+    cg_util.addIframeToAngularJS(scope, HANDLER_SEARCH_RESULT_TITLE, HANDLER_SEARCH_RESULT_TITLE, this._name, url, "Network Portal", iframeid);
 
 };
 
