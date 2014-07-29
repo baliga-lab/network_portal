@@ -7,7 +7,8 @@ var dictGeese = {
                  "HaloAnnotation": haloAnnotation,
                  "EntrezGene": entrezGene,
                  "EntrezProtein": entrezProtein,
-                 "Maggie": maggie
+                 "Maggie": maggie,
+                 "NetworkPortal": networkPortal
                 };
 
 function findObjectByKey(key, list) {
@@ -423,6 +424,7 @@ function processNamelist()
                 }
 
                 var goose = dictGeese[$(this).val()];
+                //alert(goose);
                 if (goose != null && goose.handleNameList != null) {
                     console.log("Passing namelist to " + $(this).val());
                     goose.handleNameList(namelist);
