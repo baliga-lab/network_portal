@@ -133,6 +133,26 @@ function parseGaggleData(categoryName, categoryType) {
     return null;
 }
 
+function insertPValueToEnrichment(moduleid, pvalueProperties, enrichmentObj)
+{
+    if (moduleid != null && pvalueProperties != null && enrichmentObj != null) {
+        //alert("Inserting pvalue of module " + moduleid);
+        for (var i = 0; i < enrichmentObj.values.length; i++) {
+            // We assume the first item of enrichmentObj.values is the module property
+            var enrichmentProp = (enrichmentObj.values[i])[0];
+            if (moduleid == enrichmentProp.value)  {
+                //alert("Enrichment " + moduleid + " properties " + enrichmentObj.values[i].length + " " + pvalueProperties.length);
+                for (var j = 0; j < pvalueProperties.length; j++) {
+                    //alert("Inserting " + pvalueProperties[j].value);
+                    enrichmentObj.values[i].push(pvalueProperties[j]);
+                }
+                //alert("Enrichment properties " + enrichmentObj.values[i].length + " for module " + moduleid);
+                break;
+            }
+        }
+    }
+}
+
 function parseFunctionalEnrichment()
 {
     var categories = new Array();
@@ -144,6 +164,7 @@ function parseFunctionalEnrichment()
     var hasData = false;
     $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
         enrichment.values.push([]);
+
         $(this).find("label").each(function () {
             hasData = true;
             var input1 = $(this).children()[0];
@@ -151,6 +172,7 @@ function parseFunctionalEnrichment()
             var input3 = $(this).children()[2]; // type
             console.log("Property " + $(input1).val() + " Value " + $(input2).val() + " Type: " + $(input3).val());
             if (index == 0) {
+                // Add all the column names (e.gl, Input.Name, Enriched.Module, etc)
                 enrichment.properties.push($(input1).val());
             }
             console.log("Enrichments index: " + index);
@@ -167,10 +189,11 @@ function parseFunctionalEnrichment()
     var pvalues = {name: "P-Values", type: "p-values"};
     pvalues.properties = new Array();
     pvalues.values = new Array();
-    categories.push(pvalues);
+    //categories.push(pvalues);
     index = 0;
     $("#divNewGaggledData").find(".gaggle-pvalue").each(function() {
         pvalues.values.push([]);
+        var module = "";
         $(this).find("label").each(function () {
             hasData = true;
             var input1 = $(this).children()[0];
@@ -178,28 +201,32 @@ function parseFunctionalEnrichment()
             var propname = $(input1).val();
             var propvalue = $(input2).val();
             console.log("P-value prop name: " + propname + " prop value: " + propvalue);
+            if (propname == "Module")
+                module = propvalue;
+            else {
+                var proppair = {};
+                proppair.value = propvalue;
+                proppair.type = "value";
+                pvalues.values[index].push(proppair);
 
-            var proppair = {};
-            proppair.propname = propname;
-            proppair.propvalue = propvalue;
-            pvalues.values[index].push(proppair);
-
-            if (index == 0)
-                pvalues.properties.push(propname);
+                if (index == 0)
+                    enrichment.properties.push(propname);
+            }
         });
+        insertPValueToEnrichment(module, pvalues.values[index], enrichment);
         index++;
     });
     console.log("Output pvalue properties: " + pvalues.properties);
     console.log("Output pvalues: " + pvalues.values);
 
     // Parse gaggled data
-    if (hasData) {
+    /*if (hasData) {
         var category = parseGaggleData("Overlapped Genes", "output");
         if (category != null) {
             categories.push(category);
             hasData = true;
         }
-    }
+    }*/
 
     if (hasData)
         return categories;
