@@ -18,7 +18,7 @@ Egrin2Handler.prototype.handleNameList = function(namelist) {
     if (namelist != null) {
         var names = namelist.getData();
         var url = this._pageUrl
-        + "search_biclusters?search_text=" + cg_util.join(names, "+");
+                + "search/?search_query=" + cg_util.join(names, "+") + "&search=Search";
 
         // open the URL in a new tab
         console.log("Egrin2 open tab " + url);
