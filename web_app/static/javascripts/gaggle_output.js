@@ -322,7 +322,7 @@ function gaggleDataAddHandler(e) {
 
     $("#divNewGaggledData").prop("id", "");
     // Set the hidden input to inform chrome goose to scan page for gaggled data
-    $("#inputDataParsingFinishSignal").val("True");
+    $("#inputDataParsingFinishSignal").val("Page");
 }
 
 // Handles data received from multiple iframes opened to analyze genes
@@ -342,6 +342,37 @@ function gaggleParseHandler(e)
     scope.$apply(function(){
         scope.addGeneData(geneId, geneName, source, type, url, desc, iframeid);
     });
+}
+
+function gaggleDataItemSelected(event)
+{
+    console.log("Gaggle data item selected "); // + $("#selGaggleMenu").val());
+
+    var source = event.target;
+    console.log("gaggleDataItemSelected: event source: " + source);
+    var selected = $(source).val();
+    console.log("Selected data value: " + selected);
+    if (selected == "text") {
+        $(".divTextInput").show();
+        $(".divFileInput").hide();
+    }
+    else if (selected == "file") {
+        $(".divFileInput").show();
+        $(".divTextInput").hide();
+    }
+}
+
+function cancelTextInput(event) {
+    console.log("Cancel data text input"); // + $("#selGaggleMenu").val());
+    $(".divTextInput").hide();
+    $("#selGaggleData").val("-1");
+}
+
+function cancelFileInput(event) {
+    console.log("Cancel data text input"); // + $("#selGaggleMenu").val());
+
+    $(".divFileInput").hide();
+    $("#selGaggleData").val("-1");
 }
 
 function getOrganisms() {
@@ -372,7 +403,9 @@ function generateNamelist(species, nameliststring)
         {
             var line = splitted[i];
             console.log("Line: " + line);
-            var delimitted = line.split(";");
+            var delimited = line.split(" ");
+            if (delimited.length == 1)
+                delimitted = line.split(";");
             if (delimitted.length == 1)
                 delimitted = line.split("\t");
             if (delimitted.length == 1)
@@ -392,30 +425,46 @@ function getNamelist(callback)
 {
     var species = $("#selSpecies").val();
     //alert("Species: " + species);
-    var line = $("#inputNamelistText").val();
-    if (line != null && line.trim().length > 0) {
-        var names = line.split(";");
-        var namelist = new GaggleData("", "NameList", names.length, species, names);
-        if (callback != null)
-            callback(namelist);
-    }
-    else {
-        var file = $("#inputNamelistFile")[0].files[0];
-        if (file != null) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var contents = e.target.result;
-                console.log( "Got the file.\n"
-                  +"name: " + file.name + "\n"
-                  +"type: " + file.type + "\n"
-                  +"size: " + file.size + " bytes\n"
-                  + "Content: " + contents
-                );
-                var namelist = generateNamelist(species, contents);
+    var selected = $("#selGaggleData").val();
+    //alert("Selected " + selected);
+    if (selected == "text" || selected == "file") {
+        if (selected == "text") {
+            var line = $("#inputTextData").val();
+            if (line != null && line.trim().length > 0) {
+                var names = line.split(";");
+                var namelist = new GaggleData("", "NameList", names.length, species, names);
                 if (callback != null)
                     callback(namelist);
             }
-            reader.readAsText(file);
+        }
+        else {
+            var fileinput = document.getElementById("inputFileData");
+            var file = fileinput.files[0];
+            if (file != null) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var contents = e.target.result;
+                    console.log( "Got the file.\n"
+                      +"name: " + file.name + "\n"
+                      +"type: " + file.type + "\n"
+                      +"size: " + file.size + " bytes\n"
+                      + "Content: " + contents
+                    );
+                    var namelist = generateNamelist(species, contents);
+                    if (callback != null)
+                        callback(namelist);
+                }
+                reader.readAsText(file);
+            }
+        }
+    }
+    else {
+        var intsel = parseInt(selected);
+        if (intsel >= 0) {
+            var namelist = generateNamelist(pageGaggleData[intsel].getSpecies(), pageGaggleData[intsel].getData().join(";"));
+            //alert(namelist);
+            if (callback != null)
+                callback(namelist);
         }
     }
 }
@@ -482,8 +531,8 @@ function removeAllResults()
         scope1.init();
     });
 
-    //$("#divGaggleOutput").empty();
-    //$("#divGeneInfo").empty();
+    $("#divGaggledData").empty();
+    $("#inputDataParsingFinishSignal").val("Page");
 }
 
 // Other data source can pass data to this page by firing the GaggleDataAddEvent
@@ -493,4 +542,47 @@ document.addEventListener("GaggleParseEvent", gaggleParseHandler, false);
 $(document).ready(function () {
     console.log("Get organisms...");
     getOrganisms();
+    $("#selGaggleData").on('change', gaggleDataItemSelected);
+
+    // Periodically check gaggle data on the page
+    setInterval(function() {
+         var control = $("#inputDataParsingFinishSignal");
+         if (control != null && ($("#inputDataParsingFinishSignal").val() == "Page"))
+         {
+
+            $("#selGaggleData").children().each(function() {
+                 var val = $(this).val();
+                 if (val != "-1" && val != "-2" && val != "text" && val != "file")
+                 {
+                     $(this).remove();
+                 }
+            });
+            pageGaggleData = [];
+
+            //$("#selGaggleData").change(gaggleDataItemSelected);
+            if (gaggleMicroformat.hasGaggleData(document)) {
+                //alert("Scanning data...")
+                pageGaggleData = gaggleMicroformat.scan(document);
+                //alert(gaggleddata);
+                if (pageGaggleData != null && pageGaggleData.length > 0) {
+                    for (var i = 0; i < pageGaggleData.length; i++) {
+                        var pagedata = pageGaggleData[i];
+                        var text = pagedata.getName();
+                        console.log("Data name: " + text);
+                        if (text == null)
+                            text = pagedata.getType();
+                        console.log("Final name: " + text);
+                        if (text != null) {
+                            //var data = pagedata.getData();
+                            //if (data != null && data.length > 0)
+                            //    text += " (" + data.length + ")";
+                            $("#selGaggleData").append($("<option></option>").attr("value", i).text(text));
+                        }
+                    }
+                }
+            }
+            $("#inputDataParsingFinishSignal").val("Goose");
+         }
+    },
+    4000);
 });
