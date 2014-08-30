@@ -1,4 +1,12 @@
 var pageGaggleData = [];
+var tunableVariables = {};
+var genePlotTunableControls = [];
+var progressId = null;
+var divProgressBar = null;
+var progress = 0;
+var step = 10;
+var previousDataDiv = null;
+
 var dictGeese = {
                  "DAVID": david,
                  "KEGG": kegg,
@@ -21,6 +29,18 @@ function findObjectByKey(key, list) {
         }
     }
     return null;
+}
+
+function findObjectByKey1(key, list) {
+    if (key != null && list != null) {
+        for (var i = 0; i < list.length; i++) {
+            var item = list[i];
+            if (item.key == key) {
+                return i;
+            }
+        }
+    }
+    return -1;
 }
 
 var app = angular.module('gaggleOutputApp', ['ngSanitize', 'ui.bootstrap']);
@@ -82,6 +102,7 @@ app.controller("GaggleGeneInfoCtrl", function($scope, $sce) {
 
 app.controller("GaggleOutputCtrl", function($scope, $sce) {
   $scope.outputs = new Array();
+  $scope.updatedOutputId = "";
 
   $scope.init = function() {
     $scope.outputs = new Array();
@@ -93,8 +114,96 @@ app.controller("GaggleOutputCtrl", function($scope, $sce) {
         var item = ($scope.outputs)[i];
         item.open = false;
     }
-    output.open = true;
-    ($scope.outputs).push(output); //  [output.id] = output;
+
+    console.log("Searching for output with guid " + output.key);
+    var index = findObjectByKey1(output.key, $scope.outputs);
+    if (index < 0) {
+        console.log("New output structure...");
+        output.open = true;
+        ($scope.outputs).push(output); //  [output.id] = output;
+    }
+    else {
+        console.log("Found existing output structure " + index);
+        var oldoutput = $scope.outputs[index];
+        // We need to set the tunableVariables to the previous one to keep the selected values
+        output.tunableVariables = oldoutput.tunableVariables;
+        output.open = true;
+        var clone = $.extend(true, [], $scope.outputs);
+        clone.splice(index, 1, output);
+        $scope.outputs.length = 0;
+        $.extend($scope.outputs, clone);
+    }
+  };
+
+  $scope.updateClicked = function(clickEvent) {
+    var src = clickEvent.target;
+    var parentdiv = $(src).parent();
+    var grandparentdiv = $(parentdiv).parent();
+    var inputkey = $(grandparentdiv).children()[0];
+    var key = $(inputkey).val();
+
+    console.log("Output key " + key);
+    previousDataDiv = document.getElementById(key);
+    var output = findObjectByKey(key, $scope.outputs);
+    if (output != null) {
+        console.log("Found output obj: " + JSON.stringify(output));
+        var runscriptguid = output.key;
+        var tabid = output.tabid;
+        var params = {};
+        var count = 0;
+        for (var i = 0; i < output.tunableVariables.rows.length; i++)
+        {
+            for (var j = 0; j < output.tunableVariables.rows[i].length; j++) {
+                var tunable = output.tunableVariables.rows[i][j];
+                if (tunable.paramName != null && tunable.paramName.length > 0) {
+                    console.log("tunable " + tunable + " selected item: " + tunable.selecteditem);
+                    var paramvalue = (tunable.selecteditem.value.value != null) ? tunable.selecteditem.value.value : tunable.selecteditem.value;
+                    var paramname = tunable["paramName"];
+                    var paramvaluetype = tunable["paramValueType"];
+                    console.log("Param name: " + paramname + " param value type: " + paramvaluetype + " param value: " + paramvalue);
+                    params[count.toString()] = {paramName: paramname,
+                                                    paramValueType: paramvaluetype,
+                                                    paramValue: paramvalue};
+                    count++;
+                }
+
+            }
+        }
+
+        console.log("Runscript guid: " + runscriptguid + " source data tab id: " + tabid + " params: " + params);
+
+        divProgressBar = $(parentdiv).find(".divProgressBar")[0];
+        console.log("progress bar div: " + divProgressBar);
+        $(divProgressBar).show();
+        $(divProgressBar).progressbar({value: 0});
+        var progressbarValue = $(divProgressBar).find( ".ui-progressbar-value" );
+        progressbarValue.css({
+            "background": '#' + Math.floor( Math.random() * 16777215 ).toString( 16 )
+        });
+
+        progress = 0;
+        step = 10;
+        progessId = setInterval(function() {
+            progress += step;
+            if (progress == 60)
+                step = 2;
+            else if (progress == 86)
+                step = 1;
+            else if (progress == 95)
+                step = 0;
+            $(divProgressBar).progressbar( "option", {
+                      value: progress
+                    });
+        }, 500);
+
+
+
+        // Now we inform gaggle.js of chrome goose to rerun the rscript
+        var event = new CustomEvent('RScriptRerunFromOutputPageEvent', {detail: { rscriptGuid : runscriptguid,
+                                        sourceTabId: tabid, parameters: params, initialRun: "false"},
+                                        bubbles: true, cancelable: false});
+        document.dispatchEvent(event);
+    }
   };
 });
 
@@ -153,15 +262,49 @@ function insertPValueToEnrichment(moduleid, pvalueProperties, enrichmentObj)
     }
 }
 
+// Generate the tunable variable object for a opencpu execution result.
+// We add the necessary information (guid, tabid, param name, type, etc)
+// to value the values object to be used in the reexecution
+function generateTunableVariableObj(packagekey, runscriptguid, tabid)
+{
+    console.log("clone tunarable variable obj: " + packagekey + " " + runscriptguid + " " + tabid);
+    if (tunableVariables[packagekey] != null) {
+        console.log("Original object: " + JSON.stringify(tunableVariables[packagekey]));
+
+        var clonedcontrols = {};
+        var clonedrows= $.extend(true, [], tunableVariables[packagekey].rows);
+        clonedcontrols.rows = clonedrows;
+        console.log("Cloned controls: " + JSON.stringify(clonedcontrols));
+        return clonedcontrols;
+    }
+    return {rows: []};
+}
+
 function parseFunctionalEnrichment()
 {
+    var returnobj = {};
     var categories = new Array();
+    returnobj.categories = categories;
     var enrichment = {name: "Enrichments", type: "enrichments"};
     categories.push(enrichment);
     enrichment.properties = new Array();
     enrichment.values = new Array();
     var index = 0;
     var hasData = false;
+
+    $("#divNewGaggledData").find(".gaggle-genesetenrichment-info").each(function() {
+       var inputtabid = $(this).children()[0];
+       var tabid = $(inputtabid).val();
+       var inputrunscriptguid = $(this).children()[1];
+       var runscriptguid = $(inputrunscriptguid).val();
+       returnobj.guid = runscriptguid;
+       returnobj.tabid = tabid;
+       console.log("genesetenrichment guid " + runscriptguid + " tabid " + tabid);
+
+       var clonedcontrols = generateTunableVariableObj("gagglefunctionalenrichment-geneSetEnrichment", runscriptguid, tabid);
+       returnobj.tunableVariables = clonedcontrols;
+    });
+
     $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
         enrichment.values.push([]);
 
@@ -229,13 +372,15 @@ function parseFunctionalEnrichment()
     }*/
 
     if (hasData)
-        return categories;
+        return returnobj;
     return null;
 }
 
 function parseGenePlot()
 {
+    var returnobj = {};
     var categories = new Array();
+    returnobj.categories = categories;
     var plots = {name: "Plot", type: "geneplot"};
     categories.push(plots);
     plots.properties = new Array();
@@ -243,18 +388,28 @@ function parseGenePlot()
     $("#divNewGaggledData").find(".gaggle-plotexpression").each(function() {
         var inputurl = $(this).children()[0];
         var ploturl = $(inputurl).val();
-        console.log("Gaggle plot url: " + ploturl);
+        var inputtabid = $(this).children()[1];
+        var tabid = $(inputtabid).val();
+        var inputrunscriptguid = $(this).children()[2];
+        var runscriptguid = $(inputrunscriptguid).val();
+        returnobj.guid = runscriptguid;
+        returnobj.tabid = tabid;
+        var clonedcontrols = generateTunableVariableObj("gaggleplotexpression-plotExpression", runscriptguid, tabid);
+        returnobj.tunableVariables = clonedcontrols;
+        console.log("Gaggle plot url: " + ploturl + " tabid: " + tabid + " runscript guid: " + runscriptguid);
         plots.values.push(ploturl);
     });
     if (plots.values.length > 0)
-        return categories;
+        return returnobj;
     return null;
 }
 
 function parseTFOEFilter(output)
 {
     console.log("Parsing TFOE filter results..." + output);
+    var returnobj = {};
     var categories = new Array();
+    returnobj.categories = categories;
     var plots = {name: "Plot", type: "geneplot"};
     categories.push(plots);
     plots.properties = new Array();
@@ -264,8 +419,17 @@ function parseTFOEFilter(output)
         hasData = true;
         var inputurl = $(this).children()[0];
         var ploturl = $(inputurl).val();
-        console.log("Gaggle plot url: " + ploturl);
+        var inputtabid = $(this).children()[1];
+        var tabid = $(inputtabid).val();
+        var inputrunscriptguid = $(this).children()[2];
+        var runscriptguid = $(inputrunscriptguid).val();
+        returnobj.guid = runscriptguid;
+        returnobj.tabid = tabid;
+        console.log("Gaggle plot url: " + ploturl + " tabid: " + tabid + " runscript guid: " + runscriptguid);
         plots.values.push(ploturl);
+        var clonedcontrols = generateTunableVariableObj("gaggletfoefilter-tfoefilter", runscriptguid, tabid);
+        returnobj.tunableVariables = clonedcontrols;
+        console.log("Gaggle tfoe url: " + ploturl + " tabid: " + tabid + " runscript guid: " + runscriptguid);
     });
 
     if (hasData) {
@@ -283,7 +447,7 @@ function parseTFOEFilter(output)
     }
 
     if (hasData)
-        return categories;
+        return returnobj;
     return null;
 }
 
@@ -302,18 +466,38 @@ function gaggleDataAddHandler(e) {
     output.categories = new Array();
 
     var functionalenrichments = parseFunctionalEnrichment();
-    if (functionalenrichments != null)
-        output.categories = output.categories.concat(functionalenrichments);
+    if (functionalenrichments != null) {
+        output.categories = output.categories.concat(functionalenrichments.categories);
+        output.key = functionalenrichments.guid;
+        output.tabid = functionalenrichments.tabid;
+        output.tunableVariables = functionalenrichments.tunableVariables;
+    }
 
     var plots = parseGenePlot();
-    if (plots != null)
-        output.categories = output.categories.concat(plots);
+    if (plots != null) {
+        output.categories = output.categories.concat(plots.categories);
+        output.key = plots.guid;
+        output.tabid = plots.tabid;
+        output.tunableVariables = plots.tunableVariables;
+    }
 
     var tfoeresults = parseTFOEFilter(e.detail.output);
-    if (tfoeresults != null)
-        output.categories = output.categories.concat(tfoeresults);
+    if (tfoeresults != null) {
+        output.categories = output.categories.concat(tfoeresults.categories);
+        output.key = tfoeresults.guid;
+        output.tabid = tfoeresults.tabid;
+        output.tunableVariables = tfoeresults.tunableVariables;
+    }
     console.log("Adding output to AngularJS " + output.categories.length);
 
+    if (output.categories.length > 0) {
+        if (previousDataDiv != null) {
+            // If we get updated data, we remove the previous gaggled data
+            $(previousDataDiv).empty();
+            $(previousDataDiv).prop("id", "");
+        }
+    }
+    previousDataDiv = null;
 
     var scope = angular.element($("#divGaggleOutput")).scope();
     scope.$apply(function(){
@@ -329,6 +513,17 @@ function gaggleDataAddHandler(e) {
 function gaggleParseHandler(e)
 {
     console.log("GaggleParseEvent captured " + e.detail);
+    if (progessId != null) {
+       if (divProgressBar != null) {
+           $(divProgressBar).progressbar( "option", {
+             value: 100
+           });
+           divProgressBar = null;
+       }
+       clearInterval(progessId);
+       progressId = null;
+    }
+
     var geneId = e.detail.GeneId;
     var geneName = e.detail.GeneName;
     var url = e.detail.Url;
@@ -543,6 +738,74 @@ $(document).ready(function () {
     console.log("Get organisms...");
     getOrganisms();
     $("#selGaggleData").on('change', gaggleDataItemSelected);
+
+    // Initialize tunable variables for opencpu packages
+    var genePlotTunableControls = {};
+    genePlotTunableControls.rows = [];
+    var row0 = [];
+    genePlotTunableControls.rows.push(row0);
+    var plottunable = {type: "select", description: "Select Plot Type ",
+                       paramName: "plottype", paramValueType:"string"}; // uiCol indicates which column of the table to display
+    plottunable.values = [];
+    //var default = {"value": "", "text": "---- Select a Plot Type ----"};
+    var value0 = {"value": "lineplot", "text": "Line Plot"};
+    var value1 = {"value": "heatmap", "text": "Heat Map"};
+    var value2 = {"value": "smooth", "text": "Smooth"};
+    //plottunable.values.push(default);
+    plottunable.values.push(value0);
+    plottunable.values.push(value1);
+    plottunable.values.push(value2);
+    row0.push(plottunable);
+    var dummycontrol1 = {paramName: ""};
+    var dummycontrol2 = {paramName: ""};
+    var dummycontrol3 = {paramName: ""};
+    row0.push(dummycontrol1);
+    row0.push(dummycontrol2);
+    row0.push(dummycontrol3);
+    plottunable.selecteditem = value0;
+    tunableVariables["gaggleplotexpression-plotExpression"] = genePlotTunableControls;
+
+    var tfoefilterTunableControls = {};
+    tfoefilterTunableControls.rows = [];
+    var row0 = [];
+    tfoefilterTunableControls.rows.push(row0);
+
+    var control0 = {type: "input", description: "fold change",
+                    paramName: "fold.change", paramValueType:"string"};
+    var value0 = {"value": "1"}
+    control0.values = [];
+    control0.values.push(value0);
+    control0.selecteditem = value0;
+    row0.push(control0);
+
+    var control1 = {type: "input", description: "P-Value",
+                    paramName: "p.value", paramValueType:"double"};
+    control1.values = [];
+    var value0 = {"value": "0.05"};
+    control1.values.push(value0);
+    control1.selecteditem = value0;
+    row0.push(control1);
+
+    var control2 = {type: "select", description: "Show only up-regulated",
+                    paramName: "only.up", paramValueType:"string"};
+    control2.values = [];
+    var value0 = {"value": "True", "text": "True"};
+    var value1 = {"value": "False", "text": "False"};
+    control2.values.push(value0);
+    control2.values.push(value1);
+    row0.push(control2);
+    control2.selecteditem = value1;
+
+    var control3 = {type: "select", description: "Show only down-regulated",
+                        paramName: "only.down", paramValueType:"string"};
+    control3.values = [];
+    var value0 = {"value": "True", "text": "True"};
+    var value1 = {"value": "False", "text": "False"};
+    control3.values.push(value0);
+    control3.values.push(value1);
+    row0.push(control3);
+    control3.selecteditem = value1;
+    tunableVariables["gaggletfoefilter-tfoefilter"] = tfoefilterTunableControls;
 
     // Periodically check gaggle data on the page
     setInterval(function() {
