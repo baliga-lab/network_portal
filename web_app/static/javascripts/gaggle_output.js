@@ -194,7 +194,7 @@ app.controller("GaggleOutputCtrl", function($scope, $sce) {
             $(divProgressBar).progressbar( "option", {
                       value: progress
                     });
-        }, 500);
+        }, 1000);
 
 
 
