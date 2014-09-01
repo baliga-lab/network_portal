@@ -123,8 +123,15 @@
             <input type="hidden" id="inputDataParsingFinishSignal" value="False" />
             <div>
                 <div id="divGaggleOutput" ng-controller="GaggleOutputCtrl">
-                    <accordion>
-                        <accordion-group heading="Output - {{ output.funcname  }} - {{ output.species }} - {{output.description}}" is-open="output.open" ng-repeat="output in outputs">
+                    <accordion close-others="false">
+                        <accordion-group is-open="output.open" ng-repeat="output in outputs">
+                            <accordion-heading>
+                                <span style="font-family: courier; font-size: large;">
+                                <b>
+                                    Output - {{ output.funcname  }} - {{ output.species }} - {{output.description}}
+                                </b>
+                                </span>
+                            </accordion-heading>
                             <div>
                                 <input type="hidden" value="{{output.key}}" />
                                 <table>
@@ -134,10 +141,10 @@
                                             <div ng-switch on="variable.type">
                                                 <div ng-switch-when="select">
                                                     {{variable.description}} <select ng-model="variable.selecteditem.value" ng-options="v.text for v in variable.values track by v.value">
-                                                </select>
+                                                </select>&nbsp;&nbsp;
                                                 </div>
                                                 <div ng-switch-when="input">
-                                                    {{variable.description}} <input ng-model="variable.selecteditem.value" />
+                                                    {{variable.description}} <input ng-model="variable.selecteditem.value" /> &nbsp;&nbsp;
                                                 </div>
                                             </div>
                                         </td>
