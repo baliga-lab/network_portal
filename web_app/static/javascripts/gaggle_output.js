@@ -207,6 +207,49 @@ app.controller("GaggleOutputCtrl", function($scope, $sce) {
   };
 });
 
+app.directive('gaggleTable', function() {
+    return function(scope, element, attrs) {
+
+        options = {
+            "bStateSave": true,
+            "iCookieDuration": 2419200, /* 1 month */
+            "bJQueryUI": true,
+            "bPaginate": true,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bInfo": true,
+            "bDestroy": true
+        };
+
+        var explicitColumns = [];
+        element.find('th').each(function(index, elem) {
+            explicitColumns.push($(elem).text());
+        });
+        if (explicitColumns.length > 0) {
+            options["aoColumns"] = explicitColumns;
+        } else if (attrs.aoColumns) {
+            options["aoColumns"] = scope.$eval(attrs.aoColumns);
+        }
+
+        //alert(attrs.aoColumnDefs);
+        if (attrs.aoColumnDefs) {
+            options["aoColumnDefs"] = scope.$eval(attrs.aoColumnDefs);
+        }
+
+        //alert(explicitColumns);
+        var dataTable = element.dataTable(options);
+
+        scope.$watch(attrs.aaData, function(value) {
+            var val = value || null;
+            if (val) {
+                dataTable.fnClearTable();
+                dataTable.fnAddData(scope.$eval(attrs.aaData));
+            }
+        });
+    }
+});
+
+
 function generateUUID() {
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -249,11 +292,11 @@ function insertPValueToEnrichment(moduleid, pvalueProperties, enrichmentObj)
         for (var i = 0; i < enrichmentObj.values.length; i++) {
             // We assume the first item of enrichmentObj.values is the module property
             var enrichmentProp = (enrichmentObj.values[i])[0];
-            if (moduleid == enrichmentProp.value)  {
+            if (moduleid == enrichmentProp)  {
                 //alert("Enrichment " + moduleid + " properties " + enrichmentObj.values[i].length + " " + pvalueProperties.length);
                 for (var j = 0; j < pvalueProperties.length; j++) {
                     //alert("Inserting " + pvalueProperties[j].value);
-                    enrichmentObj.values[i].push(pvalueProperties[j]);
+                    enrichmentObj.values[i].push(pvalueProperties[j].value);
                 }
                 //alert("Enrichment properties " + enrichmentObj.values[i].length + " for module " + moduleid);
                 break;
@@ -288,6 +331,7 @@ function parseFunctionalEnrichment()
     var enrichment = {name: "Enrichments", type: "enrichments"};
     categories.push(enrichment);
     enrichment.properties = new Array();
+    enrichment.columnDefs = new Array();
     enrichment.values = new Array();
     var index = 0;
     var hasData = false;
@@ -305,9 +349,9 @@ function parseFunctionalEnrichment()
        returnobj.tunableVariables = clonedcontrols;
     });
 
+    var colindex = 0;
     $("#divNewGaggledData").find(".gaggle-enrichment").each(function() {
         enrichment.values.push([]);
-
         $(this).find("label").each(function () {
             hasData = true;
             var input1 = $(this).children()[0];
@@ -317,12 +361,20 @@ function parseFunctionalEnrichment()
             if (index == 0) {
                 // Add all the column names (e.gl, Input.Name, Enriched.Module, etc)
                 enrichment.properties.push($(input1).val());
+                var columndef = {"sTitle": $(input1).val()};
+                var targets = [];
+                targets.push(colindex++);
+                columndef["aTargets"] = targets;
+                enrichment.columnDefs.push(columndef);
             }
             console.log("Enrichments index: " + index);
             var proppair = {};
             proppair.value = $(input2).val();
             proppair.type = $(input3).val();
-            enrichment.values[index].push(proppair);
+            var value = proppair.value;
+            if (proppair.type == "url")
+                value = "<a target='_blank' href='" + proppair.value + "'>module</a>";
+            enrichment.values[index].push(value);
         });
         index++;
     });
@@ -352,8 +404,14 @@ function parseFunctionalEnrichment()
                 proppair.type = "value";
                 pvalues.values[index].push(proppair);
 
-                if (index == 0)
+                if (index == 0) {
                     enrichment.properties.push(propname);
+                    var columndef = {"sTitle": propname};
+                    var targets = [];
+                    targets.push(colindex++);
+                    columndef["aTargets"] = targets;
+                    enrichment.columnDefs.push(columndef);
+                }
             }
         });
         insertPValueToEnrichment(module, pvalues.values[index], enrichment);
