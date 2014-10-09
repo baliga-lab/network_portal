@@ -46,8 +46,6 @@
     <argument>-p</argument>
     <argument>org.cytoscape.scripting.ScriptEngineManagerPlugin</argument>
     <argument>-p</argument>
-    <argument>tudelft.CytoscapeRPC.CytoscapeRPCPlugin</argument>
-    <argument>-p</argument>
     <argument>csplugins.network.merge.NetworkMergePlugin</argument>
     <argument>-p</argument>
     <argument>browser.AttributeBrowserPlugin</argument>
