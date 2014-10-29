@@ -84,6 +84,9 @@
           <!--<li class="{% active request "^/networks" %}"><a href="/networks/">Networks</a></li>-->
 
           <li class="{% active request "^/workspace" %}"><a href="/workspace">Workspace</a></li>
+	        {% if request.user.is_authenticated %}
+          <li class="{% active request "^/userdata" %}"><a href="/userdata">My Networks</a></li>
+          {% endif %}
           <li class="{% active request "^/help" %}"><a href="/help/" title="help">Help</a></li>
 
         <!-- <li class="{% active request "^/analysis/gene" %}"><a href="/analysis/gene">Example</a></li>-->

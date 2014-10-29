@@ -56,7 +56,8 @@ urlpatterns = patterns('',
 
     # network inference app
     url(r'^configjob$', 'inference.views.configjob', name='configjob'),
-    
+    url(r'^kbasejob$', 'inference.views.kbasejob', name='kbasejob'),
+    url(r'^userdata$', 'inference.views.userdata', name='userdata'),
 
     # Proxy URLs
     url(r'^sviewer/ncfetch.cgi', 'views.sviewer_cgi', name='ncfetch'),

@@ -1,0 +1,41 @@
+{% extends "base2.html" %}
+{% load filters %}
+{% load staticfiles %}
+{% block title %}Network Portal - List of inference jobs{% endblock %}
+{% block content %}
+<script>
+$(document).ready(function() { 
+    $("#jobs-table") 
+    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
+    {#.tablesorterPager({container: $("#tablepager")})#}; 
+});
+</script>
+
+<div class="main">
+  <h3>Your Inference Jobs</h3>
+
+  <div style="margin-left: 5pt; margin-top: 5pt">
+    <a href="/kbasejob"> + Create new KBase inference job</a>
+  </div>
+  <table id="jobs-table" class="tablesorter">
+    <thead>
+      <tr>
+        <th>Organism code</th>
+        <th>Created at</th>
+        <th>Status</th>
+        <th>Compute On</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td>{{job.orgcode}}</td>
+        <td>{{job.created_at}}</td>
+        <td>{{job.status}}</td>
+        <td>{{job.compute_on}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+{% endblock %}
