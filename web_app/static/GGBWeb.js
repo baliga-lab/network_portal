@@ -1,25 +1,81 @@
 var app = angular.module('GGBWebApp', ['ngSanitize', 'ui.bootstrap']);
 
 app.controller("GGBWebLeftPaneCtrl", function($scope, $sce) {
-    $scope.geneInfoList = new Array();
+    $scope.columnDefs = [];
+    var columndef = {"sTitle": "Gene"};
+    var targets = [];
+    targets.push(0);
+    columndef["aTargets"] = targets;
+    $scope.columnDefs.push(columndef);
 
-    $scope.trustSrc = function(src) {
-       return $sce.trustAsResourceUrl(src);
-    };
+    columndef = {"sTitle": "Position"};
+    targets = [];
+    targets.push(1);
+    columndef["aTargets"] = targets;
+    $scope.columnDefs.push(columndef);
 
-    $scope.loadGeneOfSpecies = function(geneinfotsv) {
+    columndef = {"sTitle": "Info"};
+    targets = [];
+    targets.push(2);
+    columndef["aTargets"] = targets;
+    $scope.columnDefs.push(columndef);
 
+    $scope.values = [];
+    $scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
+});
+
+app.directive('gaggleTable', function() {
+    return function(scope, element, attrs) {
+        options = {
+            "bStateSave": true,
+            "iCookieDuration": 2419200, /* 1 month */
+            "bJQueryUI": true,
+            "bPaginate": true,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bInfo": true,
+            "bDestroy": true
+        };
+
+        var explicitColumns = [];
+        element.find('th').each(function(index, elem) {
+            explicitColumns.push($(elem).text());
+        });
+        if (explicitColumns.length > 0) {
+            options["aoColumns"] = explicitColumns;
+        } else if (attrs.aoColumns) {
+            options["aoColumns"] = scope.$eval(attrs.aoColumns);
+        }
+
+        if (attrs.aoColumnDefs) {
+            options["aoColumnDefs"] = scope.$eval(attrs.aoColumnDefs);
+        }
+
+
+        var dataTable = element.dataTable(options);
+
+        scope.$watch(attrs.aaData, function(value) {
+            var val = value || null;
+            if (val) {
+                dataTable.fnClearTable();
+                dataTable.fnAddData(scope.$eval(attrs.aaData));
+            }
+             $('body').layout({ applyDefaultStyles: true });
+             $( "#tabs" ).tabs();
+        });
     }
 });
 
-
-
 $(document).ready(function () {
+    $('body').layout({ applyDefaultStyles: true });
+    $( "#tabs" ).tabs();
+
+
     // Load ecoli info from network portal
-    $.ajax({
-      url: "http://networks.systemsbiology.net/eco/genes/?format=tsv",
+    /*$.ajax({
+      url: "http://localhost:8000/dvu/genes/?format=tsv",
     }).done(function(data) {
-      alert(data);
+      console.log(data);
       if (data != null) {
           var lines = data.split("\n");
           console.log("Gene info " + lines.length + " lines");
@@ -41,10 +97,10 @@ $(document).ready(function () {
                 }
           });
 
-         /*var scope = angular.element($("#divLeftPane")).scope();
-         scope.$apply(function(){
-             scope.loadGeneOfSpecies(data);
-         }); */
+         //var scope = angular.element($("#divLeftPane")).scope();
+         //scope.$apply(function(){
+         //    scope.loadGeneOfSpecies(data);
+         //});
       }
-    });
+    }); */
 });
