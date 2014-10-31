@@ -336,7 +336,8 @@ $(document).ready(function () {
     load it as a track (trackCircle - to map regions of interest agains the whole genome vis).
 
     */
-    d3.csv("data/PurRRegulates.csv", function(d) {
+    d3.csv("http://igbweb.systemsbiology.net/data/PurRRegulates.csv", function(d) {
+        console.log(d);
         window["regulates"] = d;
         init();
     });
