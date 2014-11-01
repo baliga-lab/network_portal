@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html>
+<html ng-app="GGBWebApp">
 <head>
     <title>Gaggle Genome Browser Web Portal</title>
     <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.9.4/css/jquery.dataTables.css" />
@@ -51,23 +51,25 @@
 <div class="ui-layout-east">
     East
 </div>
-<div class="ui-layout-west" ng-controller="GGBWebLeftPaneCtrl">
-    <div id="tabs">
-        <ul>
-            <li><a href="#tabs-1">TFs</a></li>
-            <li><a href="#tabs-2">GREs</a></li>
-            <li><a href="#tabs-3">Modules</a></li>
-        </ul>
-        <div id="tabs-1">
-            <p>TFs</p>
-        </div>
-        <div id="tabs-2">
-            <p>GREs</p>
-        </div>
-        <div id="tabs-3">
-            <table gaggle-Table="overrideOptions" ao-column-defs="{{columnDefs}}" aa-data="{{values}}">
+<div class="ui-layout-west">
+    <div ng-controller="GGBWebLeftPaneCtrl">
+        <div id="tabs">
+            <ul>
+                <li><a href="#tabs-1">TFs</a></li>
+                <li><a href="#tabs-2">GREs</a></li>
+                <li><a href="#tabs-3">Modules</a></li>
+            </ul>
+            <div id="tabs-1">
+                <p>TFs</p>
+            </div>
+            <div id="tabs-2">
+                <p>GREs</p>
+            </div>
+            <div id="tabs-3">
+                <table gaggle-Table="overrideOptions" ao-column-defs="columnDefs" aa-data="values">
 
-            </table>
+                </table>
+            </div>
         </div>
     </div>
 </div>
