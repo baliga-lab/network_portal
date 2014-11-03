@@ -351,7 +351,16 @@ function contentLoaded() {
 
     */
     console.log("Loading igbweb data...");
-    $('body').layout({ applyDefaultStyles: true });
+    $('body').layout({
+        applyDefaultStyles: true,
+
+        west: {
+            minSize: "500"
+        },
+        east: {
+            minSize: "400"
+        }
+    }); //   ({ applyDefaultStyles: true });
     $( "#tabs" ).tabs();
 
     d3.csv("data/PurRRegulates.csv", function(d) {
