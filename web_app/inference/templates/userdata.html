@@ -12,6 +12,14 @@ $(document).ready(function() {
 </script>
 
 <div class="main">
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{message.tags}}"{% endif %}>{{message}}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
   <h3>Your Inference Jobs</h3>
 
   <div style="margin-left: 5pt; margin-top: 5pt">
@@ -20,7 +28,7 @@ $(document).ready(function() {
   <table id="jobs-table" class="tablesorter">
     <thead>
       <tr>
-        <th>Organism code</th>
+        <th>Organism</th>
         <th>Created at</th>
         <th>Status</th>
         <th>Compute On</th>
@@ -29,7 +37,7 @@ $(document).ready(function() {
     <tbody>
       {% for job in jobs %}
       <tr>
-        <td>{{job.orgcode}}</td>
+        <td>{{job.species.name}}</td>
         <td>{{job.created_at}}</td>
         <td>{{job.status}}</td>
         <td>{{job.compute_on}}</td>

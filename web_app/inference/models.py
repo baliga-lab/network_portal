@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from networks.models import Species, Network
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -7,8 +8,10 @@ class InferenceJob(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(AUTH_USER_MODEL)
+    species = models.ForeignKey(Species)
+    network = models.ForeignKey(Network, null=True)
 
-    orgcode = models.CharField(max_length=10)
+    #orgcode = models.CharField(max_length=10)
     tmpfile = models.CharField(max_length=200)
 
     # 1 = ready

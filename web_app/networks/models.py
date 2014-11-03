@@ -5,8 +5,12 @@ import StringIO
 from django.db import models
 from django.db import connection
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from .helpers import synonym
+
+
+AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
 class Species(models.Model):
@@ -49,6 +53,7 @@ class Network(models.Model):
     description = models.TextField(blank=True, null=True)
     version_id = models.CharField(max_length=255)
     created_at = models.DateTimeField()
+    user = models.ForeignKey(AUTH_USER_MODEL, null=True)
     
     def get_biclusters_regulated_by(regulator):
         biclusters = Bicluster.objects.filter(influences__name__contains=regulator)
