@@ -16,6 +16,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-sanitize.min.js"></script>
     <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src = "https://plus.google.com/js/client:plusone.js"></script>
 
     <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/protovis.min.js"></script>
     <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/visquick-min/vq.min.js"></script>
@@ -44,6 +45,22 @@
     <div id="igbweb-usecase2"></div>
     <div id="div_button"></div>
 </div>
+
+<div class="ui-layout-north">
+    <div id="gConnect">
+    <button id="signinButton" class="g-signin"
+            data-scope="https://www.googleapis.com/auth/plus.login"
+            data-requestvisibleactions="http://schemas.google.com/AddActivity"
+            data-clientId="525630266935-el4o74js95gpvumka2n0esqotd94tv5n.apps.googleusercontent.com"
+            data-callback="onSignInCallback"
+            data-theme="dark"
+            data-cookiepolicy="single_host_origin">
+    </button>
+    </div>
+   <div id="responseContainer"></div>
+</div>
+
+<div class="ui-layout-south">South</div>
 
 
 <div class="ui-layout-east">
