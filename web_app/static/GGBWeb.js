@@ -469,7 +469,9 @@ function contentLoaded() {
     console.log("Loading igbweb data...");
     $('body').layout({
         applyDefaultStyles: true,
-
+        north: {
+            minSize: "65"
+        },
         west: {
             minSize: "500"
         },
@@ -488,8 +490,9 @@ function contentLoaded() {
 
 
     // Load ecoli info from network portal
-    /*$.ajax({
-      url: "http://localhost:8000/dvu/genes/?format=tsv",
+    console.log("Loading species data...");
+    $.ajax({
+      url: "http://networks.systemsbiology.net/dvu/genes/?format=tsv",
     }).done(function(data) {
       console.log(data);
       if (data != null) {
@@ -504,7 +507,7 @@ function contentLoaded() {
               url: '/json/circvis/?species=1&gene=NP_415256.1',
                 success: function(json) {
                     var circle_vis = new vq.CircVis();
-                    var cvdata = vqhelpers.makeCircVisData('circvis', json.chromosomes,
+                    var cvdata = vqhelpers.makeCircVisData($('#CircVis_div'), json.chromosomes,
                         json.genes, json.network);
                     circle_vis.draw(cvdata);
                 },
@@ -518,6 +521,6 @@ function contentLoaded() {
          //    scope.loadGeneOfSpecies(data);
          //});
       }
-    }); */
+    });
 }
 //);
