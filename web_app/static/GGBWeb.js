@@ -507,7 +507,7 @@ function contentLoaded() {
               url: '/json/circvis/?species=1&gene=NP_415256.1',
                 success: function(json) {
                     var circle_vis = new vq.CircVis();
-                    var cvdata = vqhelpers.makeCircVisData($('#CircVis_div'), json.chromosomes,
+                    var cvdata = vqhelpers.makeCircVisData($('#CircVis_div')[0], json.chromosomes,
                         json.genes, json.network);
                     circle_vis.draw(cvdata);
                 },
