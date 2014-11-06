@@ -36,7 +36,10 @@
     <script type='text/javascript' src='feature.js'></script>
     <script type='text/javascript' src='heatmap.js'></script>
 
+    <script type="text/javascript" src="GGBWebLogin.js"></script>
     <script type="text/javascript" src="GGBWeb.js"></script>
+    <script type="text/javascript" src="GGBWebLeftController.js"></script>
+    <script type="text/javascript" src="GGBWebRightController.js"></script>
 </head>
 <body>
 
@@ -64,7 +67,27 @@
 
 
 <div class="ui-layout-east">
-    East
+    <div ng-controller="GGBWebRightPaneCtrl">
+        <div id="divUserTabs">
+            <ul>
+                <li><a href="#usertabs-1">TFs</a></li>
+                <li><a href="#usertabs-2">GREs</a></li>
+                <li><a href="#usertabs-3">Modules</a></li>
+            </ul>
+            <div id="usertabs-1">
+                <p>TFs</p>
+                <button onclick="javascript:sendDataToChromeGoose()">Send</button>
+            </div>
+            <div id="usertabs-2">
+                <p>GREs</p>
+            </div>
+            <div id="usertabs-3">
+                <table gaggle-Table="overrideOptions" ao-column-defs="columnDefs" aa-data="values">
+
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="ui-layout-west">
     <div ng-controller="GGBWebLeftPaneCtrl">
