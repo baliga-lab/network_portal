@@ -1,4 +1,4 @@
-app.controller("GGBWebLeftPaneCtrl", function($scope, $sce) {
+app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
     $scope.columnDefs = [];
     var columndef = {"sTitle": "Gene"};
     var targets = [];
@@ -20,6 +20,14 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce) {
 
     $scope.values = [];
     $scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
+
+    // Listen to state changes
+    $scope.$on('state.update', function(newState) {
+        console.log("State update received");
+        $scope.values = [];
+        $scope.values.push(["NP_415256.5", "chromosome+:762237-763403", "NP_415256.5"]);
+    });
+
 
     angular.element(document).ready(function () {
        console.log('left document loaded...');
