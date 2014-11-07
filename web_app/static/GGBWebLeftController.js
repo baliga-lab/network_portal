@@ -153,6 +153,8 @@ function leftcontentLoaded() {
                   var moduleId = parseInt(splitted[0]);
                   console.log("Module Id: " + moduleId);
                   var genes = splitted[1];
+                  if (genes == null)
+                     continue;
                   var module = {};
                   module.moduleId = moduleId;
                   module.geneinfolist = [];
