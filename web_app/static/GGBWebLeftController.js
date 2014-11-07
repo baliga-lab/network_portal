@@ -110,14 +110,14 @@ function leftcontentLoaded() {
     // Load ecoli info from network portal
     console.log("Loading species data...");
     $.ajax({
-      url: "http://networks.systemsbiology.net/eco/genes/?format=tsv",
+      url: "http://networks.systemsbiology.net/eco/genes/?format=tsv"
     }).done(function(genedata) {
-      console.log("Received gene data");
+      alert("Received gene data");
       if (genedata != null) {
           $.ajax({
-                url: "http://networks.systemsbiology.net/eco/modgenes/export",
+                url: "http://networks.systemsbiology.net/eco/modgenes/export"
           }).done(function(modulegenes) {
-              console.log("Got module gene info ");
+              alert("Got module gene info ");
               var genelines = genedata.split("\n");
               var geneinfolist = {};
               for (var i = 0; i < genelines.length; i++) {
