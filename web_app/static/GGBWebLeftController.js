@@ -101,7 +101,7 @@ function leftcontentLoaded() {
     }); //   ({ applyDefaultStyles: true });
     $( "#tabs" ).tabs();
 
-    d3.csv("data/PurRRegulates.csv", function(d) {
+    d3.csv("PurRRegulates.csv", function(d) {
         console.log(d);
         window["regulates"] = d;
         init();
