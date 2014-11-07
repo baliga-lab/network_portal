@@ -22,7 +22,7 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
     //$scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
 
     $scope.addModules = function(modules) {
-        console.log("Left pane controller adding modules info");
+        alert("Left pane controller adding modules info");
         $scope.modules = modules;
     }
 
@@ -64,6 +64,7 @@ function binaryIndexOf(searchElement, source) {
     return -1;
 }
 
+var genedata = null;
 //$(document).ready(function () {
 function leftcontentLoaded() {
     document.addEventListener("GoosePageDataEvent", function(e) {
@@ -111,24 +112,29 @@ function leftcontentLoaded() {
     console.log("Loading species data...");
     $.ajax({
       url: "http://networks.systemsbiology.net/eco/genes/?format=tsv"
-    }).done(function(genedata) {
-      alert("Received gene data");
+    }).done(function(data) {
+      alert("Received gene data " + data);
+      genedata = data;
       if (genedata != null) {
           $.ajax({
                 url: "http://networks.systemsbiology.net/eco/modgenes/export"
           }).done(function(modulegenes) {
-              alert("Got module gene info ");
+              alert("Got module gene info " + modulegenes);
+              try {
               var genelines = genedata.split("\n");
               var geneinfolist = {};
               for (var i = 0; i < genelines.length; i++) {
                    var geneline = genelines[i];
-                   console.log("Gene info line: " + geneline)
+                   if (i == 0)
+                      alert("Gene info line: " + geneline)
                    var genelinesplitted = geneline.split("\t");
                    var genename = genelinesplitted[0];
-                   console.log("Gene name: " + genename);
+                   if (i == 0)
+                      alert("Gene name: " + genename);
                    geneinfolist[genename] = [];
                    for (var j = 1; j < genelinesplitted.length; j++) {
-                       console.log("Gene line field " + j + ": " + genelinesplitted[j]);
+                       if (j == 1)
+                          alert("Gene line field " + j + ": " + genelinesplitted[j]);
                    }
                    geneinfolist[genename].push(genelinesplitted[0]);
                    geneinfolist[genename].push(genelinesplitted[genelinesplitted.length - 1]);
@@ -136,12 +142,13 @@ function leftcontentLoaded() {
               }
 
               var lines = modulegenes.split("\n");
-              console.log("Module Gene info " + lines.length + " lines");
+              alert("Module Gene info " + lines.length + " lines");
               var modules = [];
               for (var i = 1; i < lines.length; i++) {
                   var line = lines[i];
                   var splitted = line.split('\t');
-                  console.log("Fields " + splitted);
+                  if (i == 1)
+                     console.log("Fields " + splitted);
                   var moduleId = parseInt(splitted[0]);
                   console.log("Module Id: " + moduleId);
                   var genes = splitted[1];
@@ -153,12 +160,12 @@ function leftcontentLoaded() {
                   for (var j = 0; j < genesplitted.length; j++) {
                       var gene = genesplitted[j];
                       // Now we try to find the gene info from the gene data
-                      console.log("Searching info for gene " + gene);
+                      alert("Searching info for gene " + gene);
                       //var index = binaryIndexOf(gene, geneindex);
                       //if (index >= 0) {
                       var geneinfo = geneinfolist[gene];
                       if (geneinfo != null) {
-                          console.log("Found info " + geneinfo);
+                          alert("Found info " + geneinfo);
                           module.geneinfolist.push(geneinfo);
                       }
                       //}
