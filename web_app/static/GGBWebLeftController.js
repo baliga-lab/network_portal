@@ -143,6 +143,8 @@ function leftcontentLoaded() {
                   var modules = [];
                   for (var i = 1; i < lines.length; i++) {
                       var line = lines[i];
+                      if (line == null)
+                         continue;
                       var splitted = line.split('\t');
                       if (splitted == null)
                          continue;
