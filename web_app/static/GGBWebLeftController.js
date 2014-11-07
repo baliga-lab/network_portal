@@ -133,12 +133,12 @@ function leftcontentLoaded() {
                           alert("Gene name: " + genename);
                        geneinfolist[genename] = [];
                        for (var j = 1; j < genelinesplitted.length; j++) {
-                           if (j == 1)
+                           if (i == 0)
                               alert("Gene line field " + j + ": " + genelinesplitted[j]);
                        }
                        geneinfolist[genename].push(genelinesplitted[0]);
                        geneinfolist[genename].push(genelinesplitted[genelinesplitted.length - 1]);
-                       geneinfolist[genename].push(genelinesplitted[1]);
+                       geneinfolist[genename].push(genelinesplitted[1] + " " + genelinesplitted[2]);
                   }
 
                   var lines = modulegenes.split("\n");
