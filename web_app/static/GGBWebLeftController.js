@@ -18,8 +18,13 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
     columndef["aTargets"] = targets;
     $scope.columnDefs.push(columndef);
 
-    $scope.values = [];
-    $scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
+    //$scope.values = [];
+    //$scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
+
+    $scope.addModules = function(modules) {
+        console.log("Left pane controller adding modules info");
+        $scope.modules = modules;
+    }
 
     // Listen to state changes
     $scope.$on('state.update', function(newState) {
@@ -34,6 +39,30 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
        leftcontentLoaded();
     });
 });
+
+function binaryIndexOf(searchElement, source) {
+    var minIndex = 0;
+    var maxIndex = source.length - 1;
+    var currentIndex;
+    var currentElement;
+
+    while (minIndex <= maxIndex) {
+        currentIndex = (minIndex + maxIndex) / 2 | 0;
+        currentElement = source[currentIndex];
+
+        if (currentElement < searchElement) {
+            minIndex = currentIndex + 1;
+        }
+        else if (currentElement > searchElement) {
+            maxIndex = currentIndex - 1;
+        }
+        else {
+            return currentIndex;
+        }
+    }
+
+    return -1;
+}
 
 //$(document).ready(function () {
 function leftcontentLoaded() {
@@ -78,39 +107,88 @@ function leftcontentLoaded() {
         init();
     });
 
-
-
     // Load ecoli info from network portal
     console.log("Loading species data...");
     $.ajax({
-      url: "http://networks.systemsbiology.net/dvu/genes/?format=tsv",
-    }).done(function(data) {
-      console.log(data);
-      if (data != null) {
-          var lines = data.split("\n");
-          console.log("Gene info " + lines.length + " lines");
-          var line = lines[0];
-          var splitted = line.split('\t');
-          console.log("Fields " + splitted);
-
-          var circle_vis = new vq.CircVis();
+      url: "http://networks.systemsbiology.net/eco/genes/?format=tsv",
+    }).done(function(genedata) {
+      console.log("Received gene data");
+      if (genedata != null) {
           $.ajax({
-              url: '/json/circvis/?species=1&gene=NP_415256.1',
-                success: function(json) {
-                    var circle_vis = new vq.CircVis();
-                    var cvdata = vqhelpers.makeCircVisData($('#CircVis_div')[0], json.chromosomes,
-                        json.genes, json.network);
-                    circle_vis.draw(cvdata);
-                },
-                error: function() {
-                    console.debug('could not read data');
-                }
-          });
+                url: "http://networks.systemsbiology.net/eco/modgenes/export",
+          }).done(function(modulegenes) {
+              console.log("Got module gene info ");
+              var genelines = genedata.split("\n");
+              var geneinfolist = {};
+              for (var i = 0; i < genelines.length; i++) {
+                   var geneline = genelines[i];
+                   console.log("Gene info line: " + geneline)
+                   var genelinesplitted = geneline.split("\t");
+                   var genename = genelinesplitted[0];
+                   console.log("Gene name: " + genename);
+                   geneinfolist[genename] = [];
+                   for (var j = 1; j < genelinesplitted.length; j++) {
+                       console.log("Gene line field " + j + ": " + genelinesplitted[j]);
+                   }
+                   geneinfolist[genename].push(genelinesplitted[0]);
+                   geneinfolist[genename].push(genelinesplitted[genelinesplitted.length - 1]);
+                   geneinfolist[genename].push(genelinesplitted[1]);
+              }
 
-         //var scope = angular.element($("#divLeftPane")).scope();
-         //scope.$apply(function(){
-         //    scope.loadGeneOfSpecies(data);
-         //});
+              var lines = modulegenes.split("\n");
+              console.log("Module Gene info " + lines.length + " lines");
+              var modules = [];
+              for (var i = 1; i < lines.length; i++) {
+                  var line = lines[i];
+                  var splitted = line.split('\t');
+                  console.log("Fields " + splitted);
+                  var moduleId = parseInt(splitted[0]);
+                  console.log("Module Id: " + moduleId);
+                  var genes = splitted[1];
+                  var module = {};
+                  module.moduleId = moduleId;
+                  module.geneinfolist = [];
+                  modules.push(module);
+                  var genesplitted = genes.split(":");
+                  for (var j = 0; j < genesplitted.length; j++) {
+                      var gene = genesplitted[j];
+                      // Now we try to find the gene info from the gene data
+                      console.log("Searching info for gene " + gene);
+                      //var index = binaryIndexOf(gene, geneindex);
+                      //if (index >= 0) {
+                      var geneinfo = geneinfolist[gene];
+                      if (geneinfo != null) {
+                          console.log("Found info " + geneinfo);
+                          module.geneinfolist.push(geneinfo);
+                      }
+                      //}
+                  }
+              }
+
+              var scope = angular.element($("#divLeftPane")).scope();
+              scope.$apply(function(){
+                  scope.addModules(modules);
+              });
+
+              var circle_vis = new vq.CircVis();
+              $.ajax({
+                  url: '/json/circvis/?species=1&gene=NP_415256.1',
+                    success: function(json) {
+                        var circle_vis = new vq.CircVis();
+                        var cvdata = vqhelpers.makeCircVisData($('#CircVis_div')[0], json.chromosomes,
+                            json.genes, json.network);
+                        circle_vis.draw(cvdata);
+                    },
+                    error: function() {
+                        console.debug('could not read data');
+                    }
+              });
+
+             //var scope = angular.element($("#divLeftPane")).scope();
+             //scope.$apply(function(){
+             //    scope.loadGeneOfSpecies(data);
+             //});
+          });
       }
     });
 }
