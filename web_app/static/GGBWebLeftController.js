@@ -22,7 +22,7 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
     //$scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
 
     $scope.addModules = function(modules) {
-        alert("Left pane controller adding modules info");
+        console.log("Left pane controller adding modules info");
         $scope.modules = modules;
     }
 
@@ -113,24 +113,22 @@ function leftcontentLoaded() {
     $.ajax({
       url: "http://networks.systemsbiology.net/eco/genes/?format=tsv"
     }).done(function(data) {
-      alert("Received gene data " + data);
+      console.log("Received gene data " + data);
       genedata = data;
       if (genedata != null) {
           $.ajax({
                 url: "http://networks.systemsbiology.net/eco/modgenes/export"
           }).done(function(modulegenes) {
-              alert("Got module gene info " + modulegenes);
+              console.log("Got module gene info " + modulegenes);
               try {
                   var genelines = genedata.split("\n");
                   var geneinfolist = {};
                   for (var i = 0; i < genelines.length; i++) {
                        var geneline = genelines[i];
-                       if (i == 0)
-                          alert("Gene info line: " + geneline)
+                       console.log("Gene info line: " + geneline)
                        var genelinesplitted = geneline.split("\t");
                        var genename = genelinesplitted[0];
-                       if (i == 0)
-                          alert("Gene name: " + genename);
+                       console.log("Gene name: " + genename);
                        geneinfolist[genename] = [];
                        for (var j = 1; j < genelinesplitted.length; j++) {
                            if (i == 0)
@@ -142,13 +140,14 @@ function leftcontentLoaded() {
                   }
 
                   var lines = modulegenes.split("\n");
-                  alert("Module Gene info " + lines.length + " lines");
+                  console.log("Module Gene info " + lines.length + " lines");
                   var modules = [];
                   for (var i = 1; i < lines.length; i++) {
                       var line = lines[i];
                       var splitted = line.split('\t');
-                      if (i == 1)
-                         console.log("Fields " + splitted);
+                      console.log("Fields " + splitted);
+                      if (splitted.length < 1)
+                         continue;
                       var moduleId = parseInt(splitted[0]);
                       console.log("Module Id: " + moduleId);
                       var genes = splitted[1];
@@ -160,9 +159,6 @@ function leftcontentLoaded() {
                       for (var j = 0; j < genesplitted.length; j++) {
                           var gene = genesplitted[j];
                           // Now we try to find the gene info from the gene data
-                          //alert("Searching info for gene " + gene);
-                          //var index = binaryIndexOf(gene, geneindex);
-                          //if (index >= 0) {
                           var geneinfo = geneinfolist[gene];
                           if (geneinfo != null) {
                               //alert("Found info " + geneinfo);
@@ -173,7 +169,7 @@ function leftcontentLoaded() {
                   }
               }
               catch (e) {
-                alert(e);
+                alert("Failed to load data: " + e);
               }
               var scope = angular.element($("#divLeftPane")).scope();
               scope.$apply(function(){
