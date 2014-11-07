@@ -160,12 +160,12 @@ function leftcontentLoaded() {
                       for (var j = 0; j < genesplitted.length; j++) {
                           var gene = genesplitted[j];
                           // Now we try to find the gene info from the gene data
-                          alert("Searching info for gene " + gene);
+                          //alert("Searching info for gene " + gene);
                           //var index = binaryIndexOf(gene, geneindex);
                           //if (index >= 0) {
                           var geneinfo = geneinfolist[gene];
                           if (geneinfo != null) {
-                              alert("Found info " + geneinfo);
+                              //alert("Found info " + geneinfo);
                               module.geneinfolist.push(geneinfo);
                           }
                           //}
