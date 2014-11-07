@@ -131,8 +131,7 @@ function leftcontentLoaded() {
                        console.log("Gene name: " + genename);
                        geneinfolist[genename] = [];
                        for (var j = 1; j < genelinesplitted.length; j++) {
-                           if (i == 0)
-                              alert("Gene line field " + j + ": " + genelinesplitted[j]);
+                           console.log("Gene line field " + j + ": " + genelinesplitted[j]);
                        }
                        geneinfolist[genename].push(genelinesplitted[0]);
                        geneinfolist[genename].push(genelinesplitted[genelinesplitted.length - 1]);
@@ -145,6 +144,8 @@ function leftcontentLoaded() {
                   for (var i = 1; i < lines.length; i++) {
                       var line = lines[i];
                       var splitted = line.split('\t');
+                      if (splitted == null)
+                         continue;
                       console.log("Fields " + splitted);
                       if (splitted.length < 1)
                          continue;
