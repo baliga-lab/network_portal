@@ -18,15 +18,48 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
     columndef["aTargets"] = targets;
     $scope.columnDefs.push(columndef);
 
-    //$scope.values = [];
-    //$scope.values.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1"]);
+    columndef = {"sTitle": ""};
+    targets = [];
+    targets.push(3);
+    columndef["aTargets"] = targets;
+    $scope.columnDefs.push(columndef);
+
+    // Test
+    /*var module = {};
+    module["moduleId"] = 1;
+    module.geneinfolist = [];
+    module.geneinfolist.push(["NP_415256.1", "chromosome+:762237-763403", "NP_415256.1",
+                              "<button onclick=\"angular.element(this).scope().selectRow(event)\">Show</button>"]);
+    $scope.modules = [];
+    $scope.modules.push(module); */
 
     $scope.addModules = function(modules) {
         console.log("Left pane controller adding modules info");
         $scope.modules = modules;
     }
 
-    // Listen to state changes
+    $scope.selectRow = function(event) {
+        var target = event.target;
+        if (target != null) {
+            var gene = $(target).closest('tr').find('td:first').text();
+            var circle_vis = new vq.CircVis();
+            var geneurl = '/json/circvis/?species=1&gene=' + gene;
+            $.ajax({
+                  url: geneurl,
+                    success: function(json) {
+                        var circle_vis = new vq.CircVis();
+                        var cvdata = vqhelpers.makeCircVisData($('#CircVis_div')[0], json.chromosomes,
+                            json.genes, json.network);
+                        circle_vis.draw(cvdata);
+                    },
+                    error: function() {
+                        console.debug('could not read data');
+                    }
+            });
+        }
+    }
+
+    // Listen to state changes from other controllers
     $scope.$on('state.update', function(newState) {
         console.log("State update received");
         $scope.values = [];
@@ -164,11 +197,10 @@ function leftcontentLoaded() {
                       var gene = genesplitted[j];
                       // Now we try to find the gene info from the gene data
                       var geneinfo = geneinfolist[gene];
+                      geneinfo.push("<button onclick=\"angular.element(this).scope().selectRow(event)\">Show</button>");
                       if (geneinfo != null) {
-                          //alert("Found info " + geneinfo);
                           module.geneinfolist.push(geneinfo);
                       }
-                      //}
                   }
               }
 
@@ -177,26 +209,13 @@ function leftcontentLoaded() {
                   scope.addModules(modules);
               });
 
-              var circle_vis = new vq.CircVis();
-              $.ajax({
-                  url: '/json/circvis/?species=1&gene=NP_415256.1',
-                    success: function(json) {
-                        var circle_vis = new vq.CircVis();
-                        var cvdata = vqhelpers.makeCircVisData($('#CircVis_div')[0], json.chromosomes,
-                            json.genes, json.network);
-                        circle_vis.draw(cvdata);
-                    },
-                    error: function() {
-                        console.debug('could not read data');
-                    }
-              });
 
-             //var scope = angular.element($("#divLeftPane")).scope();
-             //scope.$apply(function(){
-             //    scope.loadGeneOfSpecies(data);
-             //});
+
+             var scope = angular.element($("#divLeftPane")).scope();
+             scope.$apply(function(){
+                 scope.loadGeneOfSpecies(data);
+             });
           });
       }
     });
 }
-//);

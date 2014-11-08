@@ -10,7 +10,12 @@ app.directive('gaggleTable', function() {
             "bLengthChange": false,
             "bFilter": true,
             "bInfo": true,
-            "bDestroy": true
+            "bDestroy": true,
+            "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+                                        // In the row created callback, we add the ondblclick event handler from the controller
+                                        //$(nRow).attr('ondblclick', 'angular.element(this).scope().selectRow(event)');
+
+                                    }
         };
 
         var explicitColumns = [];
