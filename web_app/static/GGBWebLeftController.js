@@ -197,8 +197,8 @@ function leftcontentLoaded() {
                       var gene = genesplitted[j];
                       // Now we try to find the gene info from the gene data
                       var geneinfo = geneinfolist[gene];
-                      geneinfo.push("<button onclick=\"angular.element(this).scope().selectRow(event)\">Show</button>");
                       if (geneinfo != null) {
+                          geneinfo.push("<button onclick=\"angular.element(this).scope().selectRow(event)\">Show</button>");
                           module.geneinfolist.push(geneinfo);
                       }
                   }
