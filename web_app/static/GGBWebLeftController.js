@@ -24,6 +24,8 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
     columndef["aTargets"] = targets;
     $scope.columnDefs.push(columndef);
 
+    $scope.modules = null;
+
     // Test
     /*var module = {};
     module["moduleId"] = 1;

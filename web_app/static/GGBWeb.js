@@ -1,5 +1,35 @@
 var app = angular.module('GGBWebApp', ['ngSanitize', 'ui.bootstrap']);
 
+app.directive('ggbloading', function ()
+{
+    return {
+        restrict: 'AE',
+        template: "<div><img src='/static/images/loading.gif' /></div>",
+        link: function (scope, elm, attrs)
+        {
+            scope.isLoading = function () {
+                if (attrs.targetdata != null)
+                {
+                   return false;
+                }
+                return true;
+            };
+
+            scope.$watch(scope.modules, function (v)
+            {
+                console.log(v);
+                if(v == null){
+                    elm.show();
+                }else{
+                    elm.hide();
+                }
+            });
+        }
+    };
+
+});
+
+
 app.directive('gaggleTable', function() {
     return function(scope, element, attrs) {
         options = {

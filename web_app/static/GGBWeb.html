@@ -93,6 +93,7 @@
 </div>
 <div class="ui-layout-west">
     <div id="divLeftPane" ng-controller="GGBWebLeftPaneCtrl">
+        <ggbLoading targetdata="modules"></ggbLoading>
         <div id="CircVis_div">
 
         </div>
@@ -110,12 +111,14 @@
                 <p>GREs</p>
             </div>
             <div id="tabs-3">
-                <div style="maxheight: 1000px; overflow: scroll">
+                <div id="divModules" style="maxheight: 1000px; overflow: scroll">
                     <div ng-repeat="module in modules">
-                        <p>Module {{module.moduleId}}</p>
-                        <table gaggle-Table="overrideOptions" ao-column-defs="columnDefs" aa-data="module.geneinfolist">
+                        <div style="overflow: scroll">
+                            <p>Module {{module.moduleId}}</p>
+                            <table gaggle-Table="overrideOptions" ao-column-defs="columnDefs" aa-data="module.geneinfolist">
 
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
