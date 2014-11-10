@@ -208,13 +208,6 @@ function leftcontentLoaded() {
               scope.$apply(function(){
                   scope.addModules(modules);
               });
-
-
-
-             var scope = angular.element($("#divLeftPane")).scope();
-             scope.$apply(function(){
-                 scope.loadGeneOfSpecies(data);
-             });
           });
       }
     });
