@@ -15,7 +15,7 @@ app.directive('ggbloading', function ()
                 return true;
             };
 
-            scope.$watch(scope.modules, function (v)
+            scope.$watch('modules', function (v)
             {
                 console.log(v);
                 if(v == null){
