@@ -54,9 +54,6 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
                             json.genes, json.network);
                         circle_vis.draw(cvdata);
 
-                        //var container = $("#divWest");
-                        //var target = $('#');
-                        //alert(target.offset().top + " " + container.offset().top);
                         $('#divWest').animate({
                           scrollTop: $("#divLeftPane").position().top
                         }, "fast");
