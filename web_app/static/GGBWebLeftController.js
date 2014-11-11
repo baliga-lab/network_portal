@@ -54,7 +54,7 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
                             json.genes, json.network);
                         circle_vis.draw(cvdata);
                         $('html, body').animate({
-                            scrollTop: $("#devWest").offset().top
+                            scrollTop: $("#divWest").offset().top
                         }, 2000);
                     },
                     error: function() {
