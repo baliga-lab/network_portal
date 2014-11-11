@@ -53,7 +53,12 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
                         var cvdata = vqhelpers.makeCircVisData($('#CircVis_div')[0], json.chromosomes,
                             json.genes, json.network);
                         circle_vis.draw(cvdata);
-                        window.scrollTo(0);
+
+                        var container = $("#divLeftPane");
+                        var target = $('#CircVis_div');
+                        container.animate({
+                            scrollTop: target.offset().top - container.offset().top + container.scrollTop()
+                        });​
                     },
                     error: function() {
                         console.debug('could not read data');
