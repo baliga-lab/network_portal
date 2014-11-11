@@ -57,7 +57,7 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
                         var container = $("#divLeftPane");
                         var target = $('#CircVis_div');
                         container.animate({
-                            scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()
+                            scrollTop: target.offset().top - container.offset().top + container.scrollTop()
                         });
                     },
                     error: function() {
