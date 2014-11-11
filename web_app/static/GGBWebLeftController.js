@@ -54,12 +54,12 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
                             json.genes, json.network);
                         circle_vis.draw(cvdata);
 
-                        var container = $("#divWest");
-                        var target = $('#divLeftPane');
+                        //var container = $("#divWest");
+                        //var target = $('#');
                         //alert(target.offset().top + " " + container.offset().top);
-                        container.animate({
-                            scrollTop: target.offset().top - container.offset().top + container.scrollTop()
-                        });
+                        $('#divWest').animate({
+                          scrollTop: $("#divLeftPane").position().top
+                        }, "fast");
                     },
                     error: function() {
                         console.debug('could not read data');
