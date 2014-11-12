@@ -67,7 +67,6 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
 
     $scope.showWindow = function() {
         GGBWebDataService.newWindowEvent("NewGGBWindow");
-        //$scope.jqxWindowSettings.apply('open');
     };
 
     // Listen to state changes from other controllers
@@ -150,11 +149,11 @@ function leftcontentLoaded() {
     //var parentPosition = $("#divCenter").offset();
     //alert(parentPosition.left + " " + parentPosition.top);
 
-    d3.csv("PurRRegulates.csv", function(d) {
+    /*d3.csv("PurRRegulates.csv", function(d) {
         console.log(d);
         window["regulates"] = d;
         init();
-    });
+    }); */
 
     // Load ecoli info from network portal
     console.log("Loading species data...");
