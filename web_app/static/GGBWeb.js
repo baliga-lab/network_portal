@@ -49,9 +49,9 @@ app.directive('gaggleTable', function() {
         };
 
         var explicitColumns = [];
-        element.find('th').each(function(index, elem) {
+        /*element.find('th').each(function(index, elem) {
             explicitColumns.push($(elem).text());
-        });
+        }); */
         if (explicitColumns.length > 0) {
             options["aoColumns"] = explicitColumns;
         } else if (attrs.aoColumns) {
