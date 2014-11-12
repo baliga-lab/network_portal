@@ -5,6 +5,12 @@ app.service('GGBWebDataService', function($rootScope) {
       $rootScope.$broadcast('state.update', state);
   }
 
+  var newWindowEvent = function(newWindowEvent) {
+      var arg = {};
+      arg.name = newWindowEvent;
+      broadcast(arg);
+  }
+
   var addProduct = function(newObj) {
       productList.push(newObj);
       broadcast("new state");
@@ -20,7 +26,8 @@ app.service('GGBWebDataService', function($rootScope) {
 
   return {
     addProduct: addProduct,
-    getProducts: getProducts
+    getProducts: getProducts,
+    newWindowEvent: newWindowEvent
   };
 
 });

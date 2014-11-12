@@ -65,11 +65,17 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
         }
     }
 
+    $scope.showWindow = function() {
+        GGBWebDataService.newWindowEvent("NewGGBWindow");
+        //$scope.jqxWindowSettings.apply('open');
+    };
+
     // Listen to state changes from other controllers
     $scope.$on('state.update', function(newState) {
         console.log("State update received");
-        $scope.values = [];
-        $scope.values.push(["NP_415256.5", "chromosome+:762237-763403", "NP_415256.5"]);
+
+        //$scope.values = [];
+        //$scope.values.push(["NP_415256.5", "chromosome+:762237-763403", "NP_415256.5"]);
     });
 
 
@@ -140,6 +146,9 @@ function leftcontentLoaded() {
         }
     }); //   ({ applyDefaultStyles: true });
     $( "#tabs" ).tabs();
+
+    //var parentPosition = $("#divCenter").offset();
+    //alert(parentPosition.left + " " + parentPosition.top);
 
     d3.csv("PurRRegulates.csv", function(d) {
         console.log(d);
