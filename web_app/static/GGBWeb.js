@@ -17,7 +17,7 @@ app.directive('ggbloading', function ()
 
             scope.$watch(attrs.targetdata, function (v)
             {
-                console.log(v);
+                //alert(v);
                 if(v == null){
                     elm.show();
                 }else{

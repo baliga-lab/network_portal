@@ -67,7 +67,7 @@ app.controller("GGBWebLeftPaneCtrl", function($scope, $sce, GGBWebDataService) {
 
     $scope.showWindow = function() {
         GGBWebDataService.newWindowEvent("NewGGBWindow");
-    };
+    }
 
     // Listen to state changes from other controllers
     $scope.$on('state.update', function(newState) {

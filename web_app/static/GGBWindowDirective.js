@@ -224,7 +224,7 @@ function getDataFromTrackManager(registerTracks, id_sequenceElement, start, stop
 
                            }
                      //} // end of experiment components
-                   } //end of root object
+                   }; //end of root object
                //},
                //error: function(e, xhr){
                //    console.log("error: " + e); debugger
@@ -233,7 +233,7 @@ function getDataFromTrackManager(registerTracks, id_sequenceElement, start, stop
                //      dataType:"text",
                //});
          return transition_set_obj;
- };
+ }
 
 function init(elem){
    var ids = [];
