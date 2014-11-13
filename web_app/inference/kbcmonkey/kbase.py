@@ -1,5 +1,6 @@
 import os
 import pandas
+import urllib2
 
 import WorkspaceClient as wsc
 import CmonkeyClient as cmc
@@ -127,15 +128,31 @@ def save_expression_series(ws, name, source_file,
     return ws.save_object('KBaseExpression.ExpressionSeries-1.0', name, data)
 
 
+
+def synonyms(ws, genome_name):
+    """using a KBase genome object, create a synonyms object"""
+    result = {}
+    features = ws.get_object(genome_name)['data']['features']
+    for feature in features:
+        if 'aliases' in feature:
+            for alias in feature['aliases']:
+                result[alias] = feature['id']
+        else:
+            result[feature['id']] = feature['id']
+    return result
+
+
 def import_ratios_matrix(ws, name, genome_id, filepath, sep='\t'):
     """Reads a gene expression matrix and stores it in the specified
     workspace"""
+    # note: genome needs to be in ws !!!!
+    thesaurus = synonyms(ws, genome_id)
     filename = os.path.basename(filepath)
     matrix = pandas.io.parsers.read_table(filepath, index_col=0)
     samples = []
     for i, colname in enumerate(matrix.columns):
         colvals = matrix.values[:, i]
-        pvals = {rowname: colvals[j] for j, rowname in enumerate(matrix.index)}
+        pvals = {thesaurus[rowname]: colvals[j] for j, rowname in enumerate(matrix.index)}
         samples.append(save_expression_sample(ws, '%s-%d' % (name, i), colname,
                                               pvals, genome_id))
     return save_expression_series(ws, name, filename, genome_id, samples)
@@ -144,7 +161,7 @@ def import_ratios_matrix(ws, name, genome_id, filepath, sep='\t'):
 """
 Interaction Sets
 """
-def save_interaction_set(ws, name, nwtype, edges, score_name):
+def save_interaction_set(ws, name, nwtype, interactions, score_name):
     """Save an interaction set, this is for things like STRING networks and operons
     Edges are a list of triples (node1, node2, weight)
     """
@@ -154,19 +171,13 @@ def save_interaction_set(ws, name, nwtype, edges, score_name):
                 'description': desc,
                 'resource_url': url}
 
-    def interaction(id, node1, node2, nwtype, weight):
-        return {'id': id, 'type': nwtype,
-                'entity1_id': node1, 'entity2_id': node2,
-                'scores': {score_name: weight} }
-
-    interactions = []
-    for i, edge in enumerate(edges):
-        n1, n2, weight = edge
-        interactions.append(interaction('edge-%d' % i, n1, n2, nwtype, weight))
+    # add an id for every interaction
+    for i, interaction in enumerate(interactions):
+        interaction['id'] = 'edge-%d' % i
 
     data = {'id': name, 'name': name,
             'description': 'my network',
-            'type': 'somenetwork',
+            'type': nwtype,
             'source': dataset_source('%s-source' % name, 'some description', ''),
             'interactions': interactions}
 
@@ -174,6 +185,13 @@ def save_interaction_set(ws, name, nwtype, edges, score_name):
 
 
 def import_network(ws, name, nwtype, filepath, sep='\t'):
+
+    def interaction(node1, node2, weight):
+        """creates a generic interaction, without id"""
+        return {'type': nwtype,
+                'entity1_id': node1, 'entity2_id': node2,
+                'scores': {score_name: weight} }
+
     filename = os.path.basename(filepath)
     if nwtype == 'STRING':
         score_name = 'STRING_SCORE'
@@ -181,17 +199,62 @@ def import_network(ws, name, nwtype, filepath, sep='\t'):
         score_name = 'pval'
 
     with open(filename) as infile:
-        edges = []
+        interactions = []    
         for line in infile:
             n1, n2, w = line.strip().split(sep)
-            edges.append((n1, n2, float(w)))
-        return save_interaction_set(ws, name, nwtype, edges, score_name)
+            interactions.append(interaction(n1, n2, float(w)))
+        return save_interaction_set(ws, name, nwtype, interactions, score_name)
 
 
 def import_string_network(ws, name, filepath, sep='\t'):
     """Import a STRING network from a tab separated file"""
     return import_network(ws, name, 'STRING', filepath, sep)
 
+
+def to_operome_entry(line):
+    def tryfloat(s):
+        try:
+            return float(s)
+        except:
+            return 0.0
+
+    comps = line.strip().split('\t')
+    sysname1 = comps[2]
+    sysname2 = comps[3]
+    b_op = comps[6]
+    if b_op == 'TRUE':
+        b_op = 1
+    else:
+        b_op = 0
+
+    p_op = tryfloat(comps[7])
+    sep = tryfloat(comps[8])
+    mog_score = tryfloat(comps[9])
+    go_score = tryfloat(comps[10])
+    cog_sim = tryfloat(comps[11])
+    expr_sim = tryfloat(comps[12])
+
+    return {'entity1_id': sysname1, 'entity2_id': sysname2, 'type': 'operon',
+            'scores': {'CONSERVATION_SCORE': mog_score, 'EXPR_SIM': expr_sim,
+                       'GENE_DISTANCE': sep, 'COG_SIM': cog_sim,
+                       'SAME_OPERON': b_op, 'SAME_OPERON_SCORE': p_op}}
+
+def import_mo_operome(ws, name, ncbi_id):
+    """Download operome from Microbes Online and imports it to the specified
+    workspace"""
+    url = "http://www.microbesonline.org/operons/gnc%d.named" % ncbi_id
+    line_num = 0
+    operome = []
+    for line in urllib2.urlopen(url):
+        if line_num > 0:
+            # skip the header
+            # gene1, gene2, sysname1, sysname2, name1, name2, bOp, pOp, Sep, MOGScore,
+            # GOScore, COGSim, ExprSim
+            # we only need the sysnames and the scores
+            operome.append(to_operome_entry(line))
+        line_num += 1
+    return save_interaction_set(ws, name, 'operon', operome, 'SAME_OPERON_SCORE')
+    
 
 """
 Gene Lists
@@ -278,3 +341,10 @@ def run_inferelator(service_url, user, password, target_workspace,
                                        {'tf_list_ws_ref': tf_ref,
                                         'cmonkey_run_result_ws_ref': result_ref,
                                         'expression_series_ws_ref': expression_ref})
+
+
+
+
+"""
+546296e8e4b0d82af0eafdb9
+"""
