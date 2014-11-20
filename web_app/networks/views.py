@@ -202,7 +202,7 @@ def genes(request, species=None):
             for gene in genes:
                 response.write("\t".join([nice_string(field) for field in (gene.name, gene.common_name, gene.geneid, gene.type, gene.description, gene.location(),)]) + "\n")
                 #allow cross domain access
-                response["Access-Control-Allow-Origin"] = "*"
+                response["Access-Control-Allow-Origin"] = "http://ggbweb.systemsbiology.net"
                 response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
                 response["Access-Control-Max-Age"] = "1000"
                 response["Access-Control-Allow-Headers"] = "*"
