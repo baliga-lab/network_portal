@@ -106,6 +106,9 @@ def species_modgenes_export(request, species=None):
         gnames = [g.best_name() for g in b.genes.all()]
         response.write('%d\t"%s"\n' % (b.k, ':'.join(gnames)))
     response['Content-Disposition'] = 'attachment; filename=%s-module-genes.tsv' % species
+    response["Access-Control-Allow-Origin"] = "http://ggbweb.systemsbiology.net"
+    response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
     return response
 
 def species_modfuncs_export(request, species=None):
