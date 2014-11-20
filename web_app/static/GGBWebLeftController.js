@@ -108,6 +108,96 @@ function binaryIndexOf(searchElement, source) {
     return -1;
 }
 
+function makeCorsRequest(url, onloadCallback) {
+  // All HTML5 Rocks properties support CORS.
+  var url = "http://networks.systemsbiology.net/eco/genes/?format=tsv";
+
+  var xhr = createCORSRequest('GET', url);
+  if (!xhr) {
+    alert('CORS not supported');
+    return;
+  }
+
+  // Response handlers.
+  xhr.onload = onloadCallback;
+
+  xhr.onerror = function() {
+    alert('Woops, there was an error making the request.');
+  };
+
+  xhr.send();
+}
+
+function geneTSVLoaded(data)
+{
+  console.log("Received gene data " + data);
+  genedata = data;
+  if (genedata != null) {
+
+      $.ajax({
+            url: "http://networks.systemsbiology.net/eco/modgenes/export"
+      }).done(function(modulegenes) {
+          console.log("Got module gene info " + modulegenes);
+          makeCorsRequest()
+          var genelines = genedata.split("\n");
+          var geneinfolist = {};
+          for (var i = 0; i < genelines.length; i++) {
+               var geneline = genelines[i];
+               console.log("Gene info line: " + geneline)
+               var genelinesplitted = geneline.split("\t");
+               var genename = genelinesplitted[0];
+               console.log("Gene name: " + genename);
+               geneinfolist[genename] = [];
+               for (var j = 1; j < genelinesplitted.length; j++) {
+                   console.log("Gene line field " + j + ": " + genelinesplitted[j]);
+               }
+               geneinfolist[genename].push(genelinesplitted[0]);
+               geneinfolist[genename].push(genelinesplitted[genelinesplitted.length - 1]);
+               geneinfolist[genename].push(genelinesplitted[1] + " " + genelinesplitted[2]);
+          }
+
+          var lines = modulegenes.split("\n");
+          console.log("Module Gene info " + lines.length + " lines");
+          var modules = [];
+          for (var i = 1; i < lines.length; i++) {
+              var line = lines[i];
+              if (line == null)
+                 continue;
+              var splitted = line.split('\t');
+              if (splitted == null)
+                 continue;
+              console.log("Fields " + splitted);
+              if (splitted.length < 1)
+                 continue;
+              var moduleId = parseInt(splitted[0]);
+              console.log("Module Id: " + moduleId);
+              var genes = splitted[1];
+              if (genes == null)
+                 continue;
+              var module = {};
+              module.moduleId = moduleId;
+              module.geneinfolist = [];
+              modules.push(module);
+              var genesplitted = genes.split(":");
+              for (var j = 0; j < genesplitted.length; j++) {
+                  var gene = genesplitted[j];
+                  // Now we try to find the gene info from the gene data
+                  var geneinfo = geneinfolist[gene];
+                  if (geneinfo != null) {
+                      geneinfo.push("<button onclick=\"angular.element(this).scope().selectRow(event)\">Show</button>");
+                      module.geneinfolist.push(geneinfo);
+                  }
+              }
+          }
+
+          var scope = angular.element($("#divLeftPane")).scope();
+          scope.$apply(function(){
+              scope.addModules(modules);
+          });
+      });
+  }
+}
+
 var genedata = null;
 //$(document).ready(function () {
 function leftcontentLoaded() {
@@ -157,7 +247,85 @@ function leftcontentLoaded() {
 
     // Load ecoli info from network portal
     console.log("Loading species data...");
-    $.ajax({
+    //makeCorsRequest("http://networks.systemsbiology.net/eco/genes/?format=tsv", geneTSVLoaded);
+    var xhr1 = createCORSRequest('GET', "http://networks.systemsbiology.net/eco/genes/?format=tsv");
+    if (!xhr1) {
+        alert('CORS not supported');
+        return;
+    }
+
+    xhr1.onload = function(data) {
+        console.log("Received gene data " + data);
+        genedata = data;
+        if (genedata != null) {
+            var xhr2 = createCORSRequest('GET', "http://networks.systemsbiology.net/eco/modgenes/export");
+            if (xhr2 != null) {
+                xhr2.onload = function(modulegenes) {
+
+                    console.log("Got module gene info " + modulegenes);
+                    var genelines = genedata.split("\n");
+                    var geneinfolist = {};
+                    for (var i = 0; i < genelines.length; i++) {
+                         var geneline = genelines[i];
+                         console.log("Gene info line: " + geneline)
+                         var genelinesplitted = geneline.split("\t");
+                         var genename = genelinesplitted[0];
+                         console.log("Gene name: " + genename);
+                         geneinfolist[genename] = [];
+                         for (var j = 1; j < genelinesplitted.length; j++) {
+                             console.log("Gene line field " + j + ": " + genelinesplitted[j]);
+                         }
+                         geneinfolist[genename].push(genelinesplitted[0]);
+                         geneinfolist[genename].push(genelinesplitted[genelinesplitted.length - 1]);
+                         geneinfolist[genename].push(genelinesplitted[1] + " " + genelinesplitted[2]);
+                    }
+
+                    var lines = modulegenes.split("\n");
+                    console.log("Module Gene info " + lines.length + " lines");
+                    var modules = [];
+                    for (var i = 1; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line == null)
+                           continue;
+                        var splitted = line.split('\t');
+                        if (splitted == null)
+                           continue;
+                        console.log("Fields " + splitted);
+                        if (splitted.length < 1)
+                           continue;
+                        var moduleId = parseInt(splitted[0]);
+                        console.log("Module Id: " + moduleId);
+                        var genes = splitted[1];
+                        if (genes == null)
+                           continue;
+                        var module = {};
+                        module.moduleId = moduleId;
+                        module.geneinfolist = [];
+                        modules.push(module);
+                        var genesplitted = genes.split(":");
+                        for (var j = 0; j < genesplitted.length; j++) {
+                            var gene = genesplitted[j];
+                            // Now we try to find the gene info from the gene data
+                            var geneinfo = geneinfolist[gene];
+                            if (geneinfo != null) {
+                                geneinfo.push("<button onclick=\"angular.element(this).scope().selectRow(event)\">Show</button>");
+                                module.geneinfolist.push(geneinfo);
+                            }
+                        }
+                    }
+
+                    var scope = angular.element($("#divLeftPane")).scope();
+                    scope.$apply(function(){
+                        scope.addModules(modules);
+                    });
+                };
+                xhr2.send();
+            }
+        }
+    };
+    xhr1.send();
+
+    /*$.ajax({
       url: "http://networks.systemsbiology.net/eco/genes/?format=tsv"
     }).done(function(data) {
       console.log("Received gene data " + data);
@@ -224,5 +392,5 @@ function leftcontentLoaded() {
               });
           });
       }
-    });
+    }); */
 }
