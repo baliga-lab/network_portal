@@ -88,8 +88,8 @@ function createCORSRequest(method, url) {
     // CORS not supported.
     xhr = null;
   }
-  if (xhr != null)
-    xhr.withCredentials = true;
+  //if (xhr != null)
+  //  xhr.withCredentials = true;
   return xhr;
 }
 
