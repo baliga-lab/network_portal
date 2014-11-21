@@ -490,7 +490,12 @@ def pssm(request):
 def circvis(request):
     gene = request.GET['gene']
     data = make_circvis_data(gene)
-    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    response = HttpResponse(content_type='application/json')
+    response.write(simplejson.dumps(data))
+    response["Access-Control-Allow-Origin"] = "http://ggbweb.systemsbiology.net"
+    response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
+    return response
 
 def make_circvis_data(gene):
     """helper function to build a CircVis object"""
