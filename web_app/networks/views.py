@@ -489,15 +489,12 @@ def pssm(request):
 
 def circvis(request):
     gene = request.GET['gene']
-    origin = request.META['HTTP_HOST']
-    print 'request host: ' + origin
     data = make_circvis_data(gene)
     response = HttpResponse(content_type='application/json')
     response.write(simplejson.dumps(data))
-    if (origin == 'localhost:8000' or origin == 'ggbweb.systemsbiology.net'):
-        response["Access-Control-Allow-Origin"] = 'http://' + origin
-        response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
-        response["Access-Control-Max-Age"] = "1000"
+    response["Access-Control-Allow-Origin"] = '*' #'http://ggbweb.systemsbiology.net'
+    response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
     return response
 
 def make_circvis_data(gene):
