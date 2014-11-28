@@ -489,7 +489,7 @@ def pssm(request):
 
 def circvis(request):
     gene = request.GET['gene']
-    origin = request.META[HTTP_HOST]
+    origin = request.META['HTTP_HOST']
     print 'request host: ' + origin
     data = make_circvis_data(gene)
     response = HttpResponse(content_type='application/json')
