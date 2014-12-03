@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html ng-app="GGBWebApp">
+<head>
+    <title>Gaggle Genome Browser Web Portal</title>
+    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.9.4/css/jquery.dataTables.css" />
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css" />
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="/static/GGBWeb/jqx.base.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/GGBWeb/jqx.energyblue.css"/>
+    <link rel="stylesheet" type="text/css" href="iGBweb.css"/>
+
+    <script type="text/javascript" src = "https://plus.google.com/js/client:plusone.js"></script>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-sanitize.min.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
+
+
+
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script> -->
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
+
+    <script type="text/javascript" src="/static/GGBWeb/jqxcore.js"></script>
+    <script type="text/javascript" src="/static/GGBWeb/jqxbuttons.js"></script>
+    <script type="text/javascript" src="/static/GGBWeb/jqxwindow.js"></script>
+    <script type="text/javascript" src="/static/GGBWeb/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="/static/GGBWeb/jqxangular.js"></script>
+
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+
+
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/protovis.min.js"></script>
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/visquick-min/vq.min.js"></script>
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/visquick-min/vq.circvis.min.js"></script>
+    <script type="text/javascript" src="http://networks.systemsbiology.net/static/javascripts/visquick_helpers.js"></script>
+
+    <script type="text/javascript" src="/static/javascripts/jquery.layout-latest.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+    <!-- Loading External Javascript Libraries/Plug-ins -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+
+    <script src="/static/javascripts/iGBweb_v1.0.js" type='text/javascript' ></script>
+    <script src="/static/javascripts/iGBweb_v1.0-genomeController.js" type='text/javascript' ></script>
+    <script src="/static/javascripts/mask.js" type='text/javascript'></script>
+
+    <script type='text/javascript' src='dotbracketdata.js'></script>
+    <script type='text/javascript' src='feature.js'></script>
+    <script type='text/javascript' src='heatmap.js'></script>
+
+
+    <script type="text/javascript" src="GGBWeb.js"></script>
+    <script type="text/javascript" src="GGBWebDataService.js"></script>
+    <script type="text/javascript" src="GGBWebLogin.js"></script>
+    <script type="text/javascript" src="GGBWindowDirective.js"></script>
+    <script type="text/javascript" src="GGBWebCenterController.js"></script>
+    <script type="text/javascript" src="GGBWebLeftController.js"></script>
+    <script type="text/javascript" src="GGBWebRightController.js"></script>
+</head>
+<body>
+
+<div id="divCenter" class="ui-layout-center">
+    <div ng-controller="GGBWebCenterPaneCtrl">
+        <div ng-repeat="window in ggbWindows">
+        <jqx-window jqx-settings="window.settings">
+            <div>
+
+            </div>
+            <div>
+                <ggb-Window></ggb-Window>
+            </div>
+        </jqx-window>
+        </div>
+    </div>
+</div>
+
+<div class="ui-layout-north">
+    <div id="gConnect">
+    <button id="signinButton" class="g-signin"
+            data-scope="https://www.googleapis.com/auth/plus.login"
+            data-requestvisibleactions="http://schemas.google.com/AddActivity"
+            data-clientId="525630266935-el4o74js95gpvumka2n0esqotd94tv5n.apps.googleusercontent.com"
+            data-callback="onSignInCallback"
+            data-theme="dark"
+            data-cookiepolicy="single_host_origin">
+    </button>
+    </div>
+   <div id="responseContainer"></div>
+</div>
+
+<div class="ui-layout-south">South</div>
+
+
+<div class="ui-layout-east">
+    <div ng-controller="GGBWebRightPaneCtrl">
+        <div id="divUserTabs">
+            <ul>
+                <li><a href="#usertabs-1">TFs</a></li>
+                <li><a href="#usertabs-2">GREs</a></li>
+                <li><a href="#usertabs-3">Modules</a></li>
+            </ul>
+            <div id="usertabs-1">
+                <button ng-click="sendData()">Send</button>
+            </div>
+            <div id="usertabs-2">
+                <p>GREs</p>
+            </div>
+            <div id="usertabs-3">
+                <table gaggle-Table="overrideOptions" ao-column-defs="columnDefs" aa-data="values">
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="divWest" class="ui-layout-west">
+    <div id="divLeftPane" ng-controller="GGBWebLeftPaneCtrl">
+        <ggbLoading targetdata="modules"></ggbLoading>
+        <div id="CircVis_div">
+
+        </div>
+        <br />
+        <div id="tabs">
+            <ul>
+                <li><a href="#tabs-1">TFs</a></li>
+                <li><a href="#tabs-2">GREs</a></li>
+                <li><a href="#tabs-3">Modules</a></li>
+            </ul>
+            <div id="tabs-1">
+                <jqx-button jqx-on-click="showWindow()">Add Window</jqx-button>
+            </div>
+            <div id="tabs-2">
+                <p>GREs</p>
+            </div>
+            <div id="tabs-3">
+                <div id="divModules" style="maxheight: 1000px; overflow: scroll">
+                    <div ng-repeat="module in modules">
+                        <div style="overflow-x: scroll">
+                            <p>Module {{module.moduleId}}</p>
+                            <table gaggle-Table="overrideOptions" ao-column-defs="columnDefs" aa-data="module.geneinfolist">
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
