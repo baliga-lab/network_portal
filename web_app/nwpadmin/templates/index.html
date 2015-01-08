@@ -1,0 +1,67 @@
+{% extends "base2.html" %}
+{% load filters %}
+{% load staticfiles %}
+{% block title %}Network Portal - Administration{% endblock %}
+{% block content %}
+<script>
+$(document).ready(function() { 
+    $("#species-table") 
+    .tablesorter({widthFixed: true, widgets: ['zebra']}) 
+    {#.tablesorterPager({container: $("#tablepager")})#};
+
+    $("#addspecies").click(function() {
+       $('#keggcode').attr('disabled', 'disabled');
+       var kegg = $('#keggcode').val();
+       if (kegg.length == 0) {
+         alert('Please enter a KEGG code');
+       } else {
+         // submit by Ajax
+         console.debug($('#keggcode').val());
+         $.ajax('/import_species/' + kegg).done(function() {
+           console.debug('done');
+           $('#keggcode').removeAttr('disabled');
+         });
+       }
+       return false;
+    });
+});
+</script>
+
+<div class="main">
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{message.tags}}"{% endif %}>{{message}}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <h3>Administration</h3>
+  <div>
+  <div><p><b>Species In The System</b></p></div>
+  <form>
+    <div><b>Add new Species</b></div>
+    KEGG Code
+    <input type="text" id="keggcode"></input>
+    <input type="submit" id="addspecies" value="Submit"></input>
+  </form>
+
+  <table id="species-table" class="tablesorter">
+    <thead>
+      <th>Name</th>
+      <th>Short Name</th>
+      <th>NCBI ID</th>
+    </thead>
+    <tbody>
+      {% for s in species %}
+      <tr>
+        <td>{{s.name}}</td>
+        <td>{{s.short_name}}</td>
+        <td>{{s.ncbi_taxonomy_id}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  </div>
+</div>
+{% endblock %}
