@@ -223,6 +223,11 @@ input, select, textarea {
     border-style: solid;
     border-color: #d4d4d4 #ebebeb #ebebeb #d4d4d4;
 }
+
+input[type=submit][disabled=disabled],button[disabled=disabled] {
+    color: #aaaaaa;
+}
+
 option { padding-right: 0.5em; } 
 
 input.button {
