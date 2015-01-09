@@ -59,6 +59,13 @@ urlpatterns = patterns('',
     url(r'^kbasejob$', 'inference.views.kbasejob', name='kbasejob'),
     url(r'^userdata$', 'inference.views.userdata', name='userdata'),
 
+    # portal administration app
+    url(r'^nwpadmin$', 'nwpadmin.views.index', name='nwpadmin'),
+    url(r'^check_import_species/(?P<keggcode>.*)$', 'nwpadmin.views.check_import_species',
+        name='check_import_species'),
+    url(r'^import_species/(?P<keggcode>.*)$', 'nwpadmin.views.import_species',
+        name='import_species'),
+
     # Proxy URLs
     url(r'^sviewer/ncfetch.cgi', 'views.sviewer_cgi', name='ncfetch'),
     url(r'^sviewer/objinfo.cgi', 'views.sviewer_cgi', name='objinfo'),

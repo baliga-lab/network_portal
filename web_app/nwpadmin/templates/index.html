@@ -9,6 +9,26 @@ $(document).ready(function() {
     .tablesorter({widthFixed: true, widgets: ['zebra']}) 
     {#.tablesorterPager({container: $("#tablepager")})#};
 
+    $('#addspecies').attr('disabled', 'disabled');
+
+    $("#checkspecies").click(function() {
+       $('#keggcode').attr('disabled', 'disabled');
+       var kegg = $('#keggcode').val();
+       if (kegg.length == 0) {
+         alert('Please enter a KEGG code');
+         $('#keggcode').removeAttr('disabled');
+       } else {
+         $('<div id="import-message">Checking organism...</div>').replaceAll("#import-message");
+         $.ajax('/check_import_species/' + kegg).done(function(data) {
+           if (data.status == 'ok') {
+             $('<div id="import-message">Ok</div>').replaceAll("#import-message");
+             $('#addspecies').removeAttr('disabled');
+           }
+         });         
+       }
+       return false;
+    });
+
     $("#addspecies").click(function() {
        $('#keggcode').attr('disabled', 'disabled');
        var kegg = $('#keggcode').val();
@@ -37,14 +57,16 @@ $(document).ready(function() {
   {% endif %}
   <h3>Administration</h3>
   <div>
-  <div><p><b>Species In The System</b></p></div>
   <form>
-    <div><b>Add new Species</b></div>
+    <h4>Add new Species</h4>
     KEGG Code
-    <input type="text" id="keggcode"></input>
-    <input type="submit" id="addspecies" value="Submit"></input>
+    <input type="text" style="width: 80px" id="keggcode"></input>
+    <input type="submit" id="checkspecies" value="Check..."></input>
+    <input type="submit" id="addspecies" value="Add..."></input>
+    <div id="import-message"></div>
   </form>
 
+  <h4 style="margin-left: 10px;">Species Currently In The System</h4>
   <table id="species-table" class="tablesorter">
     <thead>
       <th>Name</th>

@@ -60,6 +60,8 @@ def get_kegg2ncbi():
 
 
 def get_mo_genome(ncbi_code):
+    """Note that MicrobesOnline will give you an empty list of genes instead of
+    an error !"""
     print MO_GENOME_URL % ncbi_code
     content = read_url(MO_GENOME_URL % ncbi_code).split('\n')[1:]
     print "# genes read: %d" % (len(content) - 1)
@@ -106,6 +108,37 @@ def get_chrom_map(scaffold_ids):
     return chrom_map
 
 
+def check_import_species(request, keggcode=None):
+    """This action does a pre-check which allows the user to check and then
+    confirm the import"""
+    kegg2ncbi = get_kegg2ncbi()
+    if keggcode not in kegg2ncbi:
+        result = {'status': 'error', 'message': 'invalid kegg code: %s' % keggcode}
+        return HttpResponse(json.dumps(result), mimetype='application/json')
+
+    ncbi_code, species_name = kegg2ncbi[keggcode]
+    mo_genome_lines = get_mo_genome(ncbi_code)
+    if  len(mo_genome_lines) == 0:
+        result = {'status': 'error', 'message': 'no genome found for: %s' % keggcode}
+        return HttpResponse(json.dumps(result), mimetype='application/json')
+    
+    try:
+        synonyms = get_synonyms(keggcode)
+        print "synonyms retrieved"
+    except URLError:
+        result = {'status': 'error', 'message': 'no synonyms found for: %s' % keggcode}
+        return HttpResponse(json.dumps(result), mimetype='application/json')
+
+    try:
+        canon_tfs = get_tfs(keggcode, synonyms)
+    except URLError:
+        result = {'status': 'error', 'message': 'no TFS found for: %s' % keggcode}
+        return HttpResponse(json.dumps(result), mimetype='application/json')
+        
+    result = {'status': 'ok'}
+    return HttpResponse(json.dumps(result), mimetype='application/json')
+
+
 def import_species(request, keggcode=None):
     """This action is to be called through Ajax.
     Import from RSAT if possible, and return with status data
@@ -130,11 +163,12 @@ def import_species(request, keggcode=None):
                 chrom_map = get_chrom_map(scaffold_ids)
 
                 num_tfs = 0
+                genes = []
                 for line in mo_genome_lines:
                     accession = line[1]
-                    scaffold = line[3]
-                    start = line[4]
-                    stop = line[5]
+                    scaffold = int(line[3])
+                    start = int(line[4])
+                    stop = int(line[5])
                     strand = line[6]
                     sys_name = line[7]
                     name = line[8]
@@ -149,9 +183,10 @@ def import_species(request, keggcode=None):
 
                     if is_tf:
                         num_tfs += 1
+                    genes.append((accession, scaffold, start, stop, strand, sys_name, name, description, is_tf))
                 print "# TFs found: %d" % num_tfs
                 result = {'message': "let's go !"}
-
+                print genes
         return HttpResponse(json.dumps(result), mimetype='application/json')
     else:
         raise Exception('not authenticated')

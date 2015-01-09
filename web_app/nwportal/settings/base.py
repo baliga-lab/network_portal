@@ -133,7 +133,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.core.context_processors.debug',
-    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
 )
 
 INSTALLED_APPS = (
@@ -152,6 +152,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'networks',
     'inference',
+    'nwpadmin',
     'search'
 )
 
@@ -188,3 +189,18 @@ OPENID_CREATE_USERS = True
 LOGIN_URL = '/openid/login/'
 LOGIN_REDIRECT_URL = '/'
 OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
+
+# KBase settings
+KBASE_USER = 'nwportal'
+KBASE_PASSWD = '<3P[[Dg)KR5GhL<'
+KBASE_DATA_WORKSPACE = 'nwportal:nwportal_data'
+KBASE_CMRESULTS_WORKSPACE = 'nwportal:cmtestresults'
+
+# KBase Service URLs
+KBASE_WS_SERVICE_URL = 'https://kbase.us/services/ws'
+KBASE_CM_SERVICE_URL = 'http://140.221.67.196:7112'
+KBASE_INF_SERVICE_URL = 'http://140.221.67.196:7113'
+KBASE_UJS_SERVICE_URL = 'https://kbase.us/services/userandjobstate'
+
+# Synonym service
+ORGANISM_SERVICE_HOST = 'http://condor:5000'
