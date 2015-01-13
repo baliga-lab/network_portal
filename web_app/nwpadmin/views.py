@@ -111,6 +111,12 @@ def get_chrom_map(scaffold_ids):
 def check_import_species(request, keggcode=None):
     """This action does a pre-check which allows the user to check and then
     confirm the import"""
+    """
+    species_exists = Species.objects.filter(short_name=keggcode).count() > 0
+    if species_exists:
+        result = {'status': 'error', 'message': 'Species exists already'}
+        return HttpResponse(json.dumps(result), mimetype='application/json')"""
+
     kegg2ncbi = get_kegg2ncbi()
     if keggcode not in kegg2ncbi:
         result = {'status': 'error', 'message': 'invalid kegg code: %s' % keggcode}
@@ -146,12 +152,13 @@ def import_species(request, keggcode=None):
     """
     if request.user.is_staff:
         species_exists = Species.objects.filter(short_name=keggcode).count() > 0
-        if False: # species_exists:
-            result = {'message': 'species already exists: %s' % keggcode}
+        #if species_exists:
+        if False:
+            result = {'status': 'error', 'message': 'species already exists: %s' % keggcode}
         else:
             kegg2ncbi = get_kegg2ncbi()
             if keggcode not in kegg2ncbi:
-                result = {'message': 'invalid kegg code: %s' % keggcode}
+                result = {'status': 'error', 'message': 'invalid kegg code: %s' % keggcode}
             else:
                 ncbi_code, species_name = kegg2ncbi[keggcode]
                 mo_genome_lines = get_mo_genome(ncbi_code)
@@ -185,7 +192,7 @@ def import_species(request, keggcode=None):
                         num_tfs += 1
                     genes.append((accession, scaffold, start, stop, strand, sys_name, name, description, is_tf))
                 print "# TFs found: %d" % num_tfs
-                result = {'message': "let's go !"}
+                result = {'status': "ok"}
                 print genes
         return HttpResponse(json.dumps(result), mimetype='application/json')
     else:

@@ -10,19 +10,32 @@ $(document).ready(function() {
     {#.tablesorterPager({container: $("#tablepager")})#};
 
     $('#addspecies').attr('disabled', 'disabled');
+    $("#keggcode").on("input", function() {
+       $('#checkspecies').removeAttr('disabled');
+       $('#addspecies').attr('disabled', 'disabled');
+    });
 
     $("#checkspecies").click(function() {
-       $('#keggcode').attr('disabled', 'disabled');
        var kegg = $('#keggcode').val();
        if (kegg.length == 0) {
          alert('Please enter a KEGG code');
-         $('#keggcode').removeAttr('disabled');
        } else {
+         $("#keggcode").attr('disabled', 'disabled');
+         $("#checkspecies").attr('disabled', 'disabled');
          $('<div id="import-message">Checking organism...</div>').replaceAll("#import-message");
-         $.ajax('/check_import_species/' + kegg).done(function(data) {
+         $.ajax('/check_import_species/' + kegg,
+                {error: function(jqXHR, status, error) {
+                  alert('status: ' + status + ' error: ' + error);
+                }}).done(function(data) {
            if (data.status == 'ok') {
-             $('<div id="import-message">Ok</div>').replaceAll("#import-message");
+             $('<div id="import-message" style="color: green">Data available, adding possible</div>').replaceAll("#import-message");
              $('#addspecies').removeAttr('disabled');
+             $('#keggcode').removeAttr('disabled');
+             $('#checkspecies').attr('disabled', 'disabled');
+           } else {
+             $('<div id="import-message" style="color: red">' + data.message + '</div>').replaceAll("#import-message");
+             $("#checkspecies").removeAttr('disabled');
+             $("#keggcode").removeAttr('disabled');
            }
          });         
        }
@@ -30,15 +43,20 @@ $(document).ready(function() {
     });
 
     $("#addspecies").click(function() {
-       $('#keggcode').attr('disabled', 'disabled');
        var kegg = $('#keggcode').val();
        if (kegg.length == 0) {
          alert('Please enter a KEGG code');
        } else {
-         // submit by Ajax
-         console.debug($('#keggcode').val());
-         $.ajax('/import_species/' + kegg).done(function() {
-           console.debug('done');
+         $('#keggcode').attr('disabled', 'disabled');
+         $('<div id="import-message">Importing species data...</div>').replaceAll("#import-message");
+         $.ajax('/import_species/' + kegg).done(function(data) {
+           if (data.status == 'ok') {
+             $('<div id="import-message" style="color: green">Species data imported</div>').replaceAll("#import-message");
+           } else {
+             $('<div id="import-message" style="color: red">' + data.message + '</div>').replaceAll("#import-message");
+             $("#addspecies").attr('disabled', 'disabled');
+             $("#checkspecies").removeAttr('disabled');
+           }
            $('#keggcode').removeAttr('disabled');
          });
        }
