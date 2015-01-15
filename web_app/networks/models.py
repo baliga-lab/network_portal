@@ -18,7 +18,7 @@ class Species(models.Model):
     short_name = models.CharField(max_length=64)
     ncbi_taxonomy_id = models.IntegerField(blank=True, null=True)
     ucsc_id = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now=True)
     
     def transcription_factors(self):
         return self.gene_set.filter(transcription_factor=True)

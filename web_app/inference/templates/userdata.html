@@ -19,6 +19,8 @@ $(document).ready(function() {
     {% endfor %}
   </ul>
   {% endif %}
+  <h3>Your Networks</h3>
+
 
   <h3>Your Inference Jobs</h3>
 
@@ -45,5 +47,14 @@ $(document).ready(function() {
       {% endfor %}
     </tbody>
   </table>
+
+  <h3>Upload your cmonkey run</h3>
+  <p>
+    <form>
+      Gene expression file <input type="text"></input><br>
+      cmonkey run result file <input type="text"></input><br>
+      <input type="submit"></input>
+    </form>
+  </p>
   </div>
 {% endblock %}

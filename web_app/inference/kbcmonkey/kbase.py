@@ -1,5 +1,6 @@
 import os
 import pandas
+import numpy as np
 import urllib2
 
 import WorkspaceClient as wsc
@@ -59,6 +60,7 @@ class WorkspaceInstance(object):
 
     def get_object(self, object_name):
         """returns the object data for the specified object"""
+        #print "get_object('%s')" % object_name
         return self.ws_service.get_object({'workspace': self.name(), 'id': object_name})
 
 
@@ -92,7 +94,7 @@ def __workspaces(ws_service, exclude_global=True):
 Gene Expressions
 """
 
-def save_expression_sample(ws, id, condition, gene_pvals, genome_id):
+def save_expression_sample(ws, id, condition, gene_pvals, genome_ref):
   """
   Saves the pvalue for each gene in an expression sample.
   gene_pvals is a dictionary that maps from gene name to pvalue
@@ -104,8 +106,8 @@ def save_expression_sample(ws, id, condition, gene_pvals, genome_id):
           'numerical_interpretation': 'undefined',
           'external_source_date': 'unknown',
           'expression_levels': gene_pvals,
-          'genome_id': genome_id}
-
+          'genome_id': genome_ref}
+  #print "saving sample under name: '%s'" % id
   return ws.save_object('KBaseExpression.ExpressionSample-1.2', id, data)
 
 
@@ -125,6 +127,7 @@ def save_expression_series(ws, name, source_file,
     data = {'id': name, 'source_id': source_file,
             'external_source_date': 'unknown',
             'genome_expression_sample_ids_map': {genome_id: sample_ids}}
+    #print "Saving as name '%s'"
     return ws.save_object('KBaseExpression.ExpressionSeries-1.0', name, data)
 
 
@@ -142,20 +145,29 @@ def synonyms(ws, genome_name):
     return result
 
 
-def import_ratios_matrix(ws, name, genome_id, filepath, sep='\t'):
+def import_ratios_matrix(ratios_ws, genome_ws, ratios_name, genome_name, filepath, sep='\t'):
     """Reads a gene expression matrix and stores it in the specified
     workspace"""
-    # note: genome needs to be in ws !!!!
-    thesaurus = synonyms(ws, genome_id)
+    genome_ref = '/'.join([genome_ws.name(), genome_name])
+    thesaurus = synonyms(genome_ws, genome_name)
     filename = os.path.basename(filepath)
-    matrix = pandas.io.parsers.read_table(filepath, index_col=0)
+    # make sure, all NaNs are replaced by 0, KBase can't handle it
+    matrix = pandas.io.parsers.read_table(filepath, index_col=0).fillna(0)
+
+    # note that KBase genome annotations can be incomplete, so we remove
+    # the rows from the 
+    missing_genes = [rowname for rowname in matrix.index if rowname not in thesaurus]
+    if len(missing_genes) > 0:
+        print "some (%d) genes were not found, please add the missing genes to the base genome !!!" % len(missing_genes)
+
     samples = []
     for i, colname in enumerate(matrix.columns):
         colvals = matrix.values[:, i]
-        pvals = {thesaurus[rowname]: colvals[j] for j, rowname in enumerate(matrix.index)}
-        samples.append(save_expression_sample(ws, '%s-%d' % (name, i), colname,
-                                              pvals, genome_id))
-    return save_expression_series(ws, name, filename, genome_id, samples)
+        pvals = {thesaurus[rowname]: colvals[j] for j, rowname in enumerate(matrix.index)
+                 if rowname in thesaurus}
+        samples.append(save_expression_sample(ratios_ws, '%s-%d' % (ratios_name, i), colname,
+                                              pvals, genome_ref))
+    return save_expression_series(ratios_ws, ratios_name, filename, genome_ref, samples)
 
 
 """
@@ -260,10 +272,10 @@ def import_mo_operome(ws, name, ncbi_id):
 Gene Lists
 """
 
-def save_gene_list(ws, id, genes):
+def save_gene_list(ws, id, source_id, genes):
   """Saves a gene list"""
   data = {'id': id,
-          'source_id': 'Microbes Online',
+          'source_id': source_id,
           'description': 'Transcription factors',
           'genes': genes}
   return ws.save_object('Inferelator.GeneList-1.0', id, data)

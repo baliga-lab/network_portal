@@ -6,6 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
 
+import json
+
 from .forms import UploadConfigForm
 from .models import InferenceJob
 from networks.models import Species
@@ -79,10 +81,10 @@ def kbasejob(request):
                 jobid = kbase.run_cmonkey(settings.KBASE_USER, settings.KBASE_PASSWD,
                                           settings.KBASE_CM_SERVICE_URL,
                                           settings.KBASE_CMRESULTS_WORKSPACE,
-                                          'nwportal:nwportal_data/hal5-example.ratios',
-                                          'nwportal:nwportal_data/hal.genome',
-                                          'nwportal:nwportal_data/hal.string',
-                                          'nwportal:nwportal_data/hal.operome')
+                                          'nwportal:input1/%s.ratios' % orgcode,  # TODO
+                                          'nwportal:nwportal_data/%s.genome' % orgcode,
+                                          'nwportal:nwportal_data/%s.string' % orgcode,
+                                          'nwportal:nwportal_data/%s.operome' % orgcode)
 
                 # only if we have started the cmonkey job
                 job = InferenceJob()
@@ -127,7 +129,19 @@ def job_repr(ujs_client, job):
         if status_obj[1] == 'started':
             status = "%s (%s)" % (status_obj[1], status_obj[2])
         elif status_obj[1] == 'complete':
-            status = 'completed'
+            results = ujs_client.get_results(job.kbase_cm_job_id)['workspaceids']
+            if len(results) > 0:
+                result_id = results[0]
+                path = result_id.split('/')
+                workspace_name, result_name = path
+            status = "completed, result at: workspace '%s' object '%s'" % (workspace_name,
+                                                                           result_name)
+            ws = kbase.workspace(settings.KBASE_USER,
+                                 settings.KBASE_PASSWD,
+                                 settings.KBASE_WS_SERVICE_URL, workspace_name)
+            obj = ws.get_object(result_name)['data']
+            with open('cmresult.json', 'w') as outfile:
+                outfile.write(json.dumps(obj))
         else:
             status = status_obj[1]
     else:

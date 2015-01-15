@@ -111,11 +111,10 @@ def get_chrom_map(scaffold_ids):
 def check_import_species(request, keggcode=None):
     """This action does a pre-check which allows the user to check and then
     confirm the import"""
-    """
     species_exists = Species.objects.filter(short_name=keggcode).count() > 0
     if species_exists:
         result = {'status': 'error', 'message': 'Species exists already'}
-        return HttpResponse(json.dumps(result), mimetype='application/json')"""
+        return HttpResponse(json.dumps(result), mimetype='application/json')
 
     kegg2ncbi = get_kegg2ncbi()
     if keggcode not in kegg2ncbi:
@@ -129,14 +128,14 @@ def check_import_species(request, keggcode=None):
         return HttpResponse(json.dumps(result), mimetype='application/json')
     
     try:
-        synonyms = get_synonyms(keggcode)
+        synonyms = get_synonyms(ncbi_code)
         print "synonyms retrieved"
     except URLError:
         result = {'status': 'error', 'message': 'no synonyms found for: %s' % keggcode}
         return HttpResponse(json.dumps(result), mimetype='application/json')
 
     try:
-        canon_tfs = get_tfs(keggcode, synonyms)
+        canon_tfs = get_tfs(ncbi_code, synonyms)
     except URLError:
         result = {'status': 'error', 'message': 'no TFS found for: %s' % keggcode}
         return HttpResponse(json.dumps(result), mimetype='application/json')
@@ -152,8 +151,7 @@ def import_species(request, keggcode=None):
     """
     if request.user.is_staff:
         species_exists = Species.objects.filter(short_name=keggcode).count() > 0
-        #if species_exists:
-        if False:
+        if species_exists:
             result = {'status': 'error', 'message': 'species already exists: %s' % keggcode}
         else:
             kegg2ncbi = get_kegg2ncbi()
@@ -165,8 +163,8 @@ def import_species(request, keggcode=None):
                 scaffold_ids = {int(line[3]) for line in mo_genome_lines if len(line) > 4}
                 print "# scaffolds: %d -> %s" % (len(scaffold_ids), repr(scaffold_ids))
 
-                synonyms = get_synonyms(keggcode)
-                canon_tfs = get_tfs(keggcode, synonyms)
+                synonyms = get_synonyms(ncbi_code)
+                canon_tfs = get_tfs(ncbi_code, synonyms)
                 chrom_map = get_chrom_map(scaffold_ids)
 
                 num_tfs = 0
@@ -192,8 +190,29 @@ def import_species(request, keggcode=None):
                         num_tfs += 1
                     genes.append((accession, scaffold, start, stop, strand, sys_name, name, description, is_tf))
                 print "# TFs found: %d" % num_tfs
+                try:
+                    ## NOTE: We need to update to at least Django 1.6.x to
+                    ## support meaningful transactions !!!
+                    species = Species(short_name=keggcode, name=species_name,
+                                      ncbi_taxonomy_id = ncbi_code)
+                    species.save()
+                    # TODO: chromosomes
+                    for scaffoldId, chrnum, is_circ, length, filename in chrom_map.values():
+                        if is_circ:
+                            topology = 'circular'
+                        else:
+                            topology = 'linear'
+                        chrom = Chromosome(species=species,
+                                           name="Chromosome %d" % chrnum,
+                                           length=length,
+                                           topology=topology,
+                                           refseq=filename)
+                        chrom.save()
+                except:
+                    traceback.print_exc()
                 result = {'status': "ok"}
-                print genes
+                
+
         return HttpResponse(json.dumps(result), mimetype='application/json')
     else:
         raise Exception('not authenticated')

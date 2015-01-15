@@ -49,9 +49,14 @@ $(document).ready(function() {
        } else {
          $('#keggcode').attr('disabled', 'disabled');
          $('<div id="import-message">Importing species data...</div>').replaceAll("#import-message");
-         $.ajax('/import_species/' + kegg).done(function(data) {
+         $.ajax('/import_species/' + kegg,
+           {error: function(jqXHR, status, error) {
+                     alert('status: ' + status + ' error: ' + error);
+                     $("#addspecies").removeAttr('disabled');
+           }}).done(function(data) {
            if (data.status == 'ok') {
              $('<div id="import-message" style="color: green">Species data imported</div>').replaceAll("#import-message");
+             $("#addspecies").attr('disabled', 'disabled');
            } else {
              $('<div id="import-message" style="color: red">' + data.message + '</div>').replaceAll("#import-message");
              $("#addspecies").attr('disabled', 'disabled');
