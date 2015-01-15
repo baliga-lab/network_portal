@@ -1,6 +1,6 @@
 import urllib2
 import urllib
-from django.utils import simplejson
+import json
 
 
 def make_query_string(q):
@@ -12,7 +12,7 @@ def solr_search(baseurl, q, max_results=10000):
     """
     query_string = make_query_string(q)
     response = urllib2.urlopen(baseurl, 'wt=json&rows=%d&q=%s' % (max_results, query_string))
-    resp = simplejson.loads(response.read())['response']
+    resp = json.loads(response.read())['response']
     start = resp['start']
     num_found = resp['numFound']
     docs = resp['docs']

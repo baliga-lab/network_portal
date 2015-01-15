@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.utils import simplejson as json
 from django.utils import formats
 from django.utils.formats import get_format
 from django.db import transaction
@@ -18,6 +17,8 @@ from django.conf import settings
 from datetime import datetime
 from datetime import timedelta
 from django.utils.timezone import utc
+
+import json
 
 # apparently, the location of this changed between Django versions?
 # from django.contrib.csrf.middleware import csrf_exempt
@@ -242,22 +243,16 @@ def workflow(request):
 
 @csrf_exempt
 def getdataspace(request):
-    print request.raw_post_data
-
     try:
         if request.user.is_authenticated():
             print 'user ' + request.user.username + ' ' + request.user.email + ' is authenticated'
         else:
             print 'user not authenticated'
-
-
-        query = json.loads(request.raw_post_data)
+        query = json.loads(request.body)
         print 'Organism: ' + query['organism']
         print 'user id: ' + query['userid']
-
         returndata = {}
         index = 0
-
         organismobj = Species.objects.filter(short_name = query['organism'])[0]
 
         print 'Get predefined data for ' + str(organismobj.id)
@@ -293,9 +288,7 @@ def getdataspace(request):
 
     except Exception as e:
         print str(e)
-
-    print json.dumps(returndata)
-    return HttpResponse(json.dumps(returndata), mimetype='application/json')
+    return HttpResponse(json.dumps(returndata), content_type='application/json')
 
 class WorkflowEdge:
     def __init__(self):
@@ -380,14 +373,14 @@ def makedir(path):
 @csrf_exempt
 def saveworkflow(request):
     print "Save workflow"
-    print request.raw_post_data
+    print request.body
 
     try:
-        workflow = json.loads(request.raw_post_data)
+        workflow = json.loads(request.body)
     except Exception as e:
         print str(e)
         error = {'status':500, 'desc':wfdesc }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     try:
         # put the whole thing in a transaction
@@ -499,7 +492,7 @@ def saveworkflow(request):
         return HttpResponse(json.dumps(e))
 
     data = {'id':str(wfid), 'name':wfname, 'desc':wfdesc }
-    return HttpResponse(json.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 def deleteworkflow(request, workflowid):
     print "Delete workflow " + str(workflowid)
@@ -514,7 +507,7 @@ def deleteworkflow(request, workflowid):
     except Exception as e:
             print str(e)
             error = {'status':500, 'message': 'Failed to retreive workflow info' }
-            return HttpResponse(json.dumps(error), mimetype='application/json')
+            return HttpResponse(json.dumps(error), content_type='application/json')
     return HttpResponse("1")
 
 def generateworkflowobj(workflow_id):
@@ -562,13 +555,13 @@ def generateworkflowobj(workflow_id):
 
 def getworkflow(request, workflow_id):
     print "Get workflow for " + workflow_id
-    #print request.raw_post_data
+    #print request.body
 
     workflowobj = generateworkflowobj(workflow_id)
     if workflowobj is None:
-       return HttpResponse(json.dumps("Error"),  mimetype='application/json')
+       return HttpResponse(json.dumps("Error"),  content_type='application/json')
 
-    return HttpResponse(json.dumps(workflowobj), mimetype='application/json')
+    return HttpResponse(json.dumps(workflowobj), content_type='application/json')
 
 @csrf_exempt
 def getorganisms(request):
@@ -579,7 +572,7 @@ def getorganisms(request):
         for organism in organisms:
             orgobj = {'shortname': organism.short_name, 'name': organism.name};
             result.append(orgobj)
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
     except Exception as e:
         print str(e)
 
@@ -589,7 +582,7 @@ def getsessions(request):
     #print "Get sessions for workflow " + workflowid
 
     try:
-       jsonobj = json.loads(request.raw_post_data)
+       jsonobj = json.loads(request.body)
        workflowid = jsonobj['workflowid']
        userid = jsonobj['userid']
 
@@ -615,10 +608,10 @@ def getsessions(request):
            sessions_obj.append(session_dict)
 
        print json.dumps(sessions_obj)
-       return HttpResponse(json.dumps(sessions_obj), mimetype='application/json')
+       return HttpResponse(json.dumps(sessions_obj), content_type='application/json')
     except Exception as e:
             print str(e)
-            return HttpResponse(json.dumps(e), mimetype='application/json')
+            return HttpResponse(json.dumps(e), content_type='application/json')
 
 def sessionreport(request, sessionId):
     print 'Get session report page for ' + sessionId
@@ -651,10 +644,10 @@ def getsessiondata(request, sessionId):
         sessiondata_dict['sessiondata'] = data_obj
 
         print json.dumps(sessiondata_dict)
-        return HttpResponse(json.dumps(sessiondata_dict), mimetype='application/json')
+        return HttpResponse(json.dumps(sessiondata_dict), content_type='application/json')
     except Exception as e:
         print str(e)
-        return HttpResponse(json.dumps(e), mimetype='application/json')
+        return HttpResponse(json.dumps(e), content_type='application/json')
 
 def deletesession(sessionId):
     sessiondata = WorkflowReportData.objects.filter(sessionid = sessionId)
@@ -681,15 +674,15 @@ def deletesessiondata(request, sessionId):
         return HttpResponse("1")
     except Exception as e:
         print str(e)
-        return HttpResponse(json.dumps(e), mimetype='application/json')
+        return HttpResponse(json.dumps(e), content_type='application/json')
 
 @csrf_exempt
 def deletesessionreports(request):
     print "delete session reports"
-    print request.raw_post_data
+    print request.body
 
     try:
-        sessions = json.loads(request.raw_post_data)
+        sessions = json.loads(request.body)
         with transaction.commit_on_success():
              for key in sessions.keys():
                 sessionId = sessions[key]
@@ -699,7 +692,7 @@ def deletesessionreports(request):
     except Exception as e:
         print str(e)
         error = {'status':500, 'status': str(e) }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
 @csrf_exempt
 def savereportdata(request):
@@ -821,7 +814,7 @@ def savereportdata(request):
         return HttpResponse(wfid, content_type="text/plain")
     except Exception as e:
         print 'Failed to save session ' + str(e)
-        return HttpResponse(json.dumps(e), mimetype='application/json')
+        return HttpResponse(json.dumps(e), content_type='application/json')
 
 def getedgedatatypes(request):
    print "get edge data types"
@@ -830,7 +823,7 @@ def getedgedatatypes(request):
        #print edatatype.name
        edgedatatype_dict[edatatype.id] = edatatype.name
    print json.dumps(edgedatatype_dict);
-   return HttpResponse(json.dumps(edgedatatype_dict), mimetype='application/json')
+   return HttpResponse(json.dumps(edgedatatype_dict), content_type='application/json')
 
 @csrf_exempt
 def saveedge(request):
@@ -845,12 +838,12 @@ def saveedge(request):
 @csrf_exempt
 def saveworkflowdatagroup(request):
     try:
-        print 'save workflow group ' + request.raw_post_data
-        datagroup = json.loads(request.raw_post_data)
+        print 'save workflow group ' + request.body
+        datagroup = json.loads(request.body)
     except Exception as e:
         print str(e)
         error = {'status':500, 'desc': 'Failed to load json' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     try:
         name = datagroup['name']
@@ -877,7 +870,7 @@ def saveworkflowdatagroup(request):
         print str(e1)
 
     data = {'id': str(groupid), 'contents': nodeobjs }
-    return HttpResponse(json.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 @csrf_exempt
 def deleteworkflowdatagroup(request, datagroupid):
@@ -888,15 +881,15 @@ def deleteworkflowdatagroup(request, datagroupid):
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': 'Failed to delete workflow data group' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     return HttpResponse("1")
 
 @csrf_exempt
 def deleteworkflowgroupitem(request):
     try:
-        itemstodelete = json.loads(request.raw_post_data)
-        print 'delete data group items ' + request.raw_post_data
+        itemstodelete = json.loads(request.body)
+        print 'delete data group items ' + request.body
 
         data = itemstodelete['data']
         for key in data.keys():
@@ -910,7 +903,7 @@ def deleteworkflowgroupitem(request):
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': 'Failed to delete workflow data group' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     data = {'id': itemstodelete['id'] }
     return HttpResponse(json.dumps(data))
@@ -918,12 +911,12 @@ def deleteworkflowgroupitem(request):
 @csrf_exempt
 def savecaptureddata(request):
     try:
-        captureddata = json.loads(request.raw_post_data)
+        captureddata = json.loads(request.body)
         print captureddata
     except Exception as e:
         print str(e)
         error = {'status':500, 'desc': 'Failed to load json' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     try:
         #print captureddata['userid']
@@ -970,17 +963,17 @@ def savecaptureddata(request):
         print str(e1)
 
     print json.dumps(responsedata)
-    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+    return HttpResponse(json.dumps(responsedata), content_type='application/json')
 
 @csrf_exempt
 def deletecaptureddata(request):
     try:
         print 'deletecaptureddata'
-        datatodelete = json.loads(request.raw_post_data)
+        datatodelete = json.loads(request.body)
     except Exception as e:
         print str(e)
         error = {'status':500, 'desc': 'Failed to load json' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     try:
         nodelist = datatodelete['data']
@@ -997,10 +990,10 @@ def deletecaptureddata(request):
 
     except Exception as e1:
         print str(e1)
-        return HttpResponse(json.dumps(e1), mimetype='application/json')
+        return HttpResponse(json.dumps(e1), content_type='application/json')
 
     response = {'id': '1' }
-    return HttpResponse(json.dumps(response), mimetype='application/json')
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 @csrf_exempt
 def uploaddata(request):
@@ -1091,10 +1084,10 @@ def uploaddata(request):
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': 'Failed to save data file' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     print 'Upload files response: ' + json.dumps(responsedata)
-    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+    return HttpResponse(json.dumps(responsedata), content_type='application/json')
 
 @csrf_exempt
 def getstateinfo(request, stateid):
@@ -1144,8 +1137,8 @@ def getstateinfo(request, stateid):
     except Exception as e:
         print 'Failed to get saved state info ' + str(e)
         error = {'status':500, 'message': 'Failed to get saved state info' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
-    return HttpResponse(json.dumps(gooseobjs), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
+    return HttpResponse(json.dumps(gooseobjs), content_type='application/json')
 
 @csrf_exempt
 def deletesavedstate(request, stateid):
@@ -1174,7 +1167,7 @@ def deletesavedstate(request, stateid):
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': 'Failed to delete workflow data group' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
     return HttpResponse("1")
 
 
@@ -1267,20 +1260,20 @@ def savestate(request):
     except Exception as e:
         print str(e)
         error = {'status':500, 'message': str(e) }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     print json.dumps(responsedata)
-    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+    return HttpResponse(json.dumps(responsedata), content_type='application/json')
 
 @csrf_exempt
 def updatestate(request):
     try:
-        statedata = json.loads(request.raw_post_data)
+        statedata = json.loads(request.body)
         print statedata
     except Exception as e:
         print str(e)
         error = {'status':500, 'desc': 'Failed to load json' }
-        return HttpResponse(json.dumps(error), mimetype='application/json')
+        return HttpResponse(json.dumps(error), content_type='application/json')
 
     try:
 
@@ -1306,7 +1299,7 @@ def updatestate(request):
         print str(e1)
 
     print json.dumps(responsedata)
-    return HttpResponse(json.dumps(responsedata), mimetype='application/json')
+    return HttpResponse(json.dumps(responsedata), content_type='application/json')
 
 
 @csrf_exempt
@@ -1330,7 +1323,7 @@ def getuserdata(request, organismtype, datatype, userid, filename):
         print "file size is: " + str(file_size)
         mime_type_guess = mimetypes.guess_type(file_name)
         if mime_type_guess is not None:
-            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+            response = HttpResponse(fsock, content_type=mime_type_guess[0])
         response['Content-Disposition'] = 'attachment; filename=' + filename
     except Exception as e:
         print 'Failed to get user file ' + str(e)
@@ -1359,7 +1352,7 @@ def getreportdata(request, workflowid, sessionid, workflownodeid, filename):
         print "file size is: " + str(file_size)
         mime_type_guess = mimetypes.guess_type(file_name)
         if mime_type_guess is not None:
-            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+            response = HttpResponse(fsock, content_type=mime_type_guess[0])
         response['Content-Disposition'] = 'attachment; filename=' + filename
     except Exception as e:
         print str(e)
@@ -1422,6 +1415,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(max_length=100)
 
 def login_page(request):
+    print "LOGIN PAGE !!"
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():

@@ -114,34 +114,34 @@ def check_import_species(request, keggcode=None):
     species_exists = Species.objects.filter(short_name=keggcode).count() > 0
     if species_exists:
         result = {'status': 'error', 'message': 'Species exists already'}
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
 
     kegg2ncbi = get_kegg2ncbi()
     if keggcode not in kegg2ncbi:
         result = {'status': 'error', 'message': 'invalid kegg code: %s' % keggcode}
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
 
     ncbi_code, species_name = kegg2ncbi[keggcode]
     mo_genome_lines = get_mo_genome(ncbi_code)
     if  len(mo_genome_lines) == 0:
         result = {'status': 'error', 'message': 'no genome found for: %s' % keggcode}
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
     
     try:
         synonyms = get_synonyms(ncbi_code)
         print "synonyms retrieved"
     except URLError:
         result = {'status': 'error', 'message': 'no synonyms found for: %s' % keggcode}
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
 
     try:
         canon_tfs = get_tfs(ncbi_code, synonyms)
     except URLError:
         result = {'status': 'error', 'message': 'no TFS found for: %s' % keggcode}
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
         
     result = {'status': 'ok'}
-    return HttpResponse(json.dumps(result), mimetype='application/json')
+    return HttpResponse(json.dumps(result), content_type='application/json')
 
 
 def import_species(request, keggcode=None):
@@ -213,6 +213,6 @@ def import_species(request, keggcode=None):
                 result = {'status': "ok"}
                 
 
-        return HttpResponse(json.dumps(result), mimetype='application/json')
+        return HttpResponse(json.dumps(result), content_type='application/json')
     else:
         raise Exception('not authenticated')

@@ -12,6 +12,8 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 MANAGERS = ADMINS
 SOLR_SELECT_GENES = 'http://localhost:8983/solr/nwportal/select/'
 SOLR_SELECT_MODULES = 'http://localhost:8983/solr/nwportal_adv/select/'

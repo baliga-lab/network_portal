@@ -12,7 +12,6 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.db.models import Q
-from django.utils import simplejson
 
 import networkx as nx
 from .models import *
@@ -60,7 +59,7 @@ def bicluster_hcseries(request, bicluster_id=None):
                           'data': map(lambda v: 0 if math.isnan(v) else v,
                                       [exps[gene][cond] for cond in conds
                                        if gene in exps and cond in exps[gene]])})
-    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), mimetype='application/json')
 
 def networks(request):
     networks = Network.objects.all()
@@ -485,13 +484,13 @@ def pssm(request):
         pssm_list.append(position_list)
 
     data = {'alphabet':alphabet, 'values':pssm_list }
-    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), mimetype='application/json')
 
 def circvis(request):
     gene = request.GET['gene']
     data = make_circvis_data(gene)
     response = HttpResponse(content_type='application/json')
-    response.write(simplejson.dumps(data))
+    response.write(json.dumps(data))
     response["Access-Control-Allow-Origin"] = '*' #'http://ggbweb.systemsbiology.net'
     response["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
     response["Access-Control-Max-Age"] = "1000"
