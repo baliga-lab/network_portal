@@ -1,6 +1,7 @@
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "nwportal.settings.production")
+os.environ['MPLCONFIGDIR'] = '/tmp'
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
