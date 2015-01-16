@@ -11,7 +11,7 @@ from django.db import transaction
 import json
 import MySQLdb
 
-from networks.models import Species
+from networks.models import Species, Chromosome, Gene
 
 
 MO_GENOME_URL = 'http://microbesonline.org/cgi-bin/genomeInfo.cgi?tId=%s;export=tab'
@@ -190,27 +190,36 @@ def import_species(request, keggcode=None):
                         num_tfs += 1
                     genes.append((accession, scaffold, start, stop, strand, sys_name, name, description, is_tf))
                 print "# TFs found: %d" % num_tfs
+                chrom_db = {}
                 try:
-                    ## NOTE: We need to update to at least Django 1.6.x to
-                    ## support meaningful transactions !!!
-                    species = Species(short_name=keggcode, name=species_name,
-                                      ncbi_taxonomy_id = ncbi_code)
-                    species.save()
-                    # TODO: chromosomes
-                    for scaffoldId, chrnum, is_circ, length, filename in chrom_map.values():
-                        if is_circ:
-                            topology = 'circular'
-                        else:
-                            topology = 'linear'
-                        chrom = Chromosome(species=species,
-                                           name="Chromosome %d" % chrnum,
-                                           length=length,
-                                           topology=topology,
-                                           refseq=filename)
-                        chrom.save()
+                    with transaction.atomic():
+                        species = Species(short_name=keggcode, name=species_name,
+                                          ncbi_taxonomy_id = ncbi_code)
+                        species.save()
+
+                        for scaffoldId, value in chrom_map.items():
+                            chrnum, is_circ, length, filename = value
+                            if is_circ:
+                                topology = 'circular'
+                            else:
+                                topology = 'linear'
+                            chrom = Chromosome(species=species,
+                                               name="Chromosome %d" % chrnum,
+                                               length=length,
+                                               topology=topology,
+                                               refseq=filename)
+                            chrom.save()
+                            chrom_db[scaffoldId] = chrom
+                        for accession, scaffold, start, stop, strand, sysname, name, desc, istf in genes:
+                            gene = Gene(species=species, chromosome=chrom_db[scaffold],
+                                        name=sysname, common_name=name,
+                                        start=start, end=stop, strand=strand,
+                                        description=desc[0:255], transcription_factor=istf)
+                            gene.save()
+                    result = {'status': "ok"}
                 except:
                     traceback.print_exc()
-                result = {'status': "ok"}
+                    result = {'status': 'error', 'message': 'problem while importing'}
                 
 
         return HttpResponse(json.dumps(result), content_type='application/json')

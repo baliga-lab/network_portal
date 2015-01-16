@@ -458,7 +458,7 @@ class MotifAnnotation(models.Model):
     motif = models.ForeignKey(Motif)
     gene = models.ForeignKey(Gene)
     position = models.IntegerField()
-    reverse = models.BooleanField()
+    reverse = models.BooleanField(default=None)
     pvalue = models.DecimalField(max_digits=9, decimal_places=6)
 
 
