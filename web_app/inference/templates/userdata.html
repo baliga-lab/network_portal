@@ -9,6 +9,23 @@ $(document).ready(function() {
     $("#jobs-table") 
     .tablesorter({widthFixed: true, widgets: ['zebra']}) 
     {#.tablesorterPager({container: $("#tablepager")})#}; 
+
+    $('#upload_cm_form').click(function() {
+      var postData = $(this).serializeArray();
+      var formURL = $(this).attr("action");
+      $.ajax({
+        url: formURL,
+        type: "POST",
+        data: postData,
+        success: function(data, textStatus, jqXHR) {
+          alert("Submit successfull");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert('SUBMIT ERROR: ' + errorThrown);
+        }
+      });
+      return false;
+    });
 });
 </script>
 
@@ -27,14 +44,11 @@ $(document).ready(function() {
       <li><a href="#kbasejob-tab">Your Inference Jobs</a></li>
     </ul>
     <div id="networks-tab">
-      <div>
-        <form>
-          <b>Upload your cmonkey run</b><br>
-          Gene expression file <input type="text"></input><br>
-          cmonkey run result file <input type="text"></input><br>
-          <input type="submit"></input>
-        </form>
-      </div>
+        <form id="upload_cm_form" action="upload_cmrun" method="post" style="margin-top: 5px; margin-bottom: 0px;">
+          {% csrf_token %}
+          <b>Upload your cmonkey run</b> <input type="submit" value="Upload..." style="margin-left: 8px"></input><br>
+          Gene expression file {{cmform.ratios}}<br>
+          cmonkey run result file {{cmform.result}}</form>
       <table id="jobs-table" class="tablesorter">
         <caption>Networks</caption>
         <thead></thead>

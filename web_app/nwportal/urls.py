@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     url(r'^configjob$', 'inference.views.configjob', name='configjob'),
     url(r'^kbasejob$', 'inference.views.kbasejob', name='kbasejob'),
     url(r'^userdata$', 'inference.views.userdata', name='userdata'),
+    url(r'^upload_cmrun', 'inference.views.upload_cmrun', name='upload_cmrun'),
 
     # portal administration app
     url(r'^nwpadmin$', 'nwpadmin.views.index', name='nwpadmin'),

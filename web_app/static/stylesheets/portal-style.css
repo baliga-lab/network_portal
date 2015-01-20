@@ -224,6 +224,9 @@ input, select, textarea {
     border-color: #d4d4d4 #ebebeb #ebebeb #d4d4d4;
 }
 
+input[type=submit] {
+    color: #444;
+}
 input[type=submit][disabled=disabled],button[disabled=disabled] {
     color: #aaaaaa;
 }

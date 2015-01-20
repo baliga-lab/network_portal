@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
+from django import forms
 
 import json
 
@@ -17,6 +18,11 @@ import kbcmonkey.UserAndJobStateClient as ujs
 
 import uuid
 import startboto
+
+
+class UploadRunResultForm(forms.Form):
+    ratios = forms.FileField()
+    result = forms.FileField()
 
 
 def write_upload_file(filename, f):
@@ -152,9 +158,19 @@ def userdata(request):
     ujs_client = ujs.UserAndJobState(url=settings.KBASE_UJS_SERVICE_URL,
                                      user_id=settings.KBASE_USER,
                                      password=settings.KBASE_PASSWD)
-    jobs = InferenceJob.objects.filter(user=request.user)
-    jobs = [job_repr(ujs_client, job) for job in jobs]
+    #jobs = InferenceJob.objects.filter(user=request.user)
+    #jobs = [job_repr(ujs_client, job) for job in jobs]
+    jobs = []  # TODO: above is very slow
 
+    cmform = UploadRunResultForm()
     return render_to_response('userdata.html', locals(),
                               context_instance=RequestContext(request))
-    
+
+
+def upload_cmrun(request):
+    if request.method == 'POST':
+        print "POST !!!"
+        result = {"message": "YIPPIEH !"}
+        return HttpResponse(json.dumps(result), content_type='application/json')
+    else:
+        raise Exception('BOOOOO')
