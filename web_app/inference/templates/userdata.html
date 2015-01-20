@@ -12,7 +12,7 @@ $(document).ready(function() {
 });
 </script>
 
-<div class="main">
+<div class="main" style="width: 100%">
   {% if messages %}
   <ul class="messages">
     {% for message in messages %}
@@ -21,32 +21,32 @@ $(document).ready(function() {
   </ul>
   {% endif %}
 
-  <div style="margin-left: 5pt; margin-top: 5pt">
-    <a href="/kbasejob"> + Create new KBase inference job</a>
-  </div>
-  <h3>Upload your cmonkey run</h3>
-  <p>
-    <form>
-      Gene expression file <input type="text"></input><br>
-      cmonkey run result file <input type="text"></input><br>
-      <input type="submit"></input>
-    </form>
-  </p>
-
-
   <div id="user-tabs">
     <ul>
       <li><a href="#networks-tab">Your Networks</a></li>
       <li><a href="#kbasejob-tab">Your Inference Jobs</a></li>
     </ul>
     <div id="networks-tab">
-      <h3>Your Networks</h3>
       <div>
+        <form>
+          <b>Upload your cmonkey run</b><br>
+          Gene expression file <input type="text"></input><br>
+          cmonkey run result file <input type="text"></input><br>
+          <input type="submit"></input>
+        </form>
       </div>
+      <table id="jobs-table" class="tablesorter">
+        <caption>Networks</caption>
+        <thead></thead>
+        <tbody><tbody>
+      </table>
     </div>
     <div id="kbasejob-tab">
-      <h3>Your Inference Jobs</h3>
+      <div style="margin-left: 5pt; margin-top: 5pt">
+        <a href="/kbasejob"> + Create new KBase inference job</a>
+      </div>
       <table id="jobs-table" class="tablesorter">
+        <caption>Jobs</caption>
         <thead>
           <tr>
             <th>Organism</th>
