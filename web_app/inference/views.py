@@ -169,7 +169,11 @@ def userdata(request):
 
 def upload_cmrun(request):
     if request.method == 'POST':
-        print "POST !!!"
+        print "POST !!!: ", request.FILES
+        #form = UploadRunResultForm(request.POST, request.FILES)
+        #if form.is_valid():
+        #print "UPLOADED FILES: ", request.FILES.keys()
+
         result = {"message": "YIPPIEH !"}
         return HttpResponse(json.dumps(result), content_type='application/json')
     else:

@@ -10,13 +10,19 @@ $(document).ready(function() {
     .tablesorter({widthFixed: true, widgets: ['zebra']}) 
     {#.tablesorterPager({container: $("#tablepager")})#}; 
 
-    $('#upload_cm_form').click(function() {
-      var postData = $(this).serializeArray();
-      var formURL = $(this).attr("action");
+    // AJAX file upload of cmonkey results
+    $('#upload_cm_form').submit(function(event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      var data = new FormData($(this)[0]);
       $.ajax({
-        url: formURL,
-        type: "POST",
-        data: postData,
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: data,
+        cache: false,
+        processData: false,
+        contentType: false,
         success: function(data, textStatus, jqXHR) {
           alert("Submit successfull");
         },
