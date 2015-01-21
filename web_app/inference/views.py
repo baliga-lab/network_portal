@@ -1,13 +1,17 @@
 import traceback
 from urllib2 import URLError
+
+import gzip
+import json
+import sqlite3
+import tempfile
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
 from django import forms
-
-import json
 
 from .forms import UploadConfigForm
 from .models import InferenceJob
@@ -167,14 +171,52 @@ def userdata(request):
                               context_instance=RequestContext(request))
 
 
+def write_uploadfile(upload_file):
+    filename = ''
+    with tempfile.NamedTemporaryFile(delete=False) as tmpfile:
+        filename = tmpfile.name
+        for chunk in upload_file.chunks():
+            tmpfile.write(chunk)
+    return filename
+    
+
+
+def process_ratiofile(ratiofile):
+    destfilename = write_uploadfile(ratiofile)
+
+    if ratiofile.name.endswith('gz'):
+        infile = gzip.open(destfilename, 'rb')
+    else:
+        infile = gzip.open(destfilename)
+    line0 = infile.readline()
+    print line0
+
+
+def process_resultfile(resultfile):
+    destfilename = write_uploadfile(resultfile)
+    try:
+        conn = sqlite3.connect(destfilename)
+        cur = conn.cursor()
+        cur.execute('select count(*) from run_infos')
+        num_runinfos = cur.fetchone()[0]
+        print "# RUNINFOS: ", num_runinfos
+        conn.close()
+        return {'status': 'ok'}
+    except:
+        print "not a sqlite file"
+        return {'status': 'error'}
+
 def upload_cmrun(request):
     if request.method == 'POST':
-        print "POST !!!: ", request.FILES
-        #form = UploadRunResultForm(request.POST, request.FILES)
-        #if form.is_valid():
-        #print "UPLOADED FILES: ", request.FILES.keys()
-
-        result = {"message": "YIPPIEH !"}
+        form = UploadRunResultForm(request.POST, request.FILES)
+        if form.is_valid():
+            ratiofile = request.FILES['ratios']
+            resultfile = request.FILES['result']            
+            process_ratiofile(ratiofile)
+            process_resultfile(resultfile)
+            result = {"status": "ok", "message": "YIPPIEH !"}
+        else:
+            result = {"status": "error", "message": "please specify all files"}
         return HttpResponse(json.dumps(result), content_type='application/json')
     else:
         raise Exception('BOOOOO')
