@@ -47,7 +47,7 @@ $(document).ready(function() {
   <div id="user-tabs">
     <ul>
       <li><a href="#networks-tab">Your Networks</a></li>
-      <li><a href="#kbasejob-tab">Your Inference Jobs</a></li>
+      <li><a href="#kbasejob-tab">Inference Jobs</a></li>
     </ul>
     <div id="networks-tab">
         <form id="upload_cm_form" action="upload_cmrun" method="post" style="margin-top: 5px; margin-bottom: 0px;">
@@ -61,10 +61,20 @@ $(document).ready(function() {
         <tbody><tbody>
       </table>
     </div>
-    <div id="kbasejob-tab">
+    <div id="kbasejob-tab" style="width: 100%">
+      <!--
       <div style="margin-left: 5pt; margin-top: 5pt">
         <a href="/kbasejob"> + Create new KBase inference job</a>
-      </div>
+      </div>-->
+      <form id="kbase_cm_form" action="start_kbase_cm" method="post">
+        {% csrf_token %}
+        <b>Start inference job on KBase</b> <input type="submit" value="Start..." style="margin-left: 8px"></input><br>
+        Organism {{kbcmform.organism}}<br>
+        <div style="width: 100%"><span style="width:500px">Gene expression file</span><span>{{kbcmform.ratios}}</span></div>
+        <div style="width: 100%"><span style="width:500px">STRING file (optional)</span><span>{{kbcmform.string_edges}}</span></div>
+        <div style="width: 100%"><span style="width:500px">Operons file (optional)</span><span>{{kbcmform.operons}}</span></div>
+        <div>Run as ensemble {{kbcmform.use_egrin2}}</div></form>
+
       <table id="jobs-table" class="tablesorter">
         <caption>Jobs</caption>
         <thead>
@@ -87,6 +97,7 @@ $(document).ready(function() {
         </tbody>
       </table>
     </div>
+
   </div>
 </div>
 {% endblock %}

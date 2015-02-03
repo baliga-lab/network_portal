@@ -10,19 +10,18 @@ class InferenceJob(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL)
     species = models.ForeignKey(Species)
     network = models.ForeignKey(Network, null=True)
-
-    #orgcode = models.CharField(max_length=10)
     tmpfile = models.CharField(max_length=200)
 
     # 1 = ready
     status = models.IntegerField()
 
-    # ec2, kbase or priv_cluster
+    # ec2, kbase or internal
     compute_on = models.CharField(max_length=30)
 
     # EC2 specific
     ec2ip = models.CharField(max_length=30, null=True)
 
-    # KBase specific
-    kbase_cm_job_id = models.CharField(max_length=100, null=True)
-    kbase_inf_job_id = models.CharField(max_length=100, null=True)
+    # All inference tool types should be able to store
+    # their ids here
+    cm_job_id = models.CharField(max_length=100, null=True)
+    inf_job_id = models.CharField(max_length=100, null=True)

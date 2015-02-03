@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib import messages
 from django import forms
 
-from .forms import UploadConfigForm
+from .forms import UploadConfigForm, UploadRunResultForm, KBaseCmonkeyForm
 from .models import InferenceJob
 from networks.models import Species
 
@@ -21,13 +21,7 @@ from kbcmonkey import kbase
 import kbcmonkey.UserAndJobStateClient as ujs
 
 import uuid
-import startboto
-
-
-class UploadRunResultForm(forms.Form):
-    ratios = forms.FileField()
-    result = forms.FileField()
-
+#import startboto
 
 def write_upload_file(filename, f):
     tmppath = '/tmp/%s' % filename
@@ -35,40 +29,6 @@ def write_upload_file(filename, f):
         for chunk in f.chunks():
             outfile.write(chunk)
     
-def configjob(request):
-    user = request.user  # we retrieve the user here
-    if request.method == 'POST':
-        form = UploadConfigForm(request.POST, request.FILES)
-        if form.is_valid():
-            orgcode = form.cleaned_data['organism']
-            print "organism: ", orgcode
-            print "file: ", form.cleaned_data['file']
-            f = request.FILES['file']
-            filename = str(uuid.uuid1())
-            write_upload_file(filename, f)
-
-            starter = startboto.EC2Starter()
-            job = InferenceJob()
-            job.orgcode = orgcode
-            job.ec2ip = starter.instance().ip_address
-            job.tmpfile = filename
-            job.status = 1
-            job.compute_on = 'ec2'
-
-            ssh = startboto.SSHHelper(starter.instance().ip_address)
-            remote_ratios = ssh.upload_ratios(tmppath)
-            ssh.start_cmonkey(orgcode, remote_ratios)
-
-            job.save()
-            return HttpResponseRedirect('/')
-        else:
-            
-            print "form is not valid"
-    else:
-        form = UploadConfigForm()
-    return render_to_response('configjob.html', locals(),
-                              context_instance=RequestContext(request))
-
 
 def kbasejob(request):
     if request.method == 'POST':
@@ -104,7 +64,7 @@ def kbasejob(request):
                 job.status = 1
                 job.compute_on = 'kbase'
                 job.ec2ip = None
-                job.kbase_cm_job_id = jobid
+                job.cm_job_id = jobid
                 job.save()
                 messages.info(request, "KBase cmonkey job started with id '%s'" % jobid)
 
@@ -134,12 +94,12 @@ class JobRepr:
 
 
 def job_repr(ujs_client, job):
-    if job.kbase_cm_job_id is not None:
-        status_obj = ujs_client.get_job_status(job.kbase_cm_job_id)
+    if job.cm_job_id is not None:
+        status_obj = ujs_client.get_job_status(job.cm_job_id)
         if status_obj[1] == 'started':
             status = "%s (%s)" % (status_obj[1], status_obj[2])
         elif status_obj[1] == 'complete':
-            results = ujs_client.get_results(job.kbase_cm_job_id)['workspaceids']
+            results = ujs_client.get_results(job.cm_job_id)['workspaceids']
             if len(results) > 0:
                 result_id = results[0]
                 path = result_id.split('/')
@@ -162,11 +122,12 @@ def userdata(request):
     ujs_client = ujs.UserAndJobState(url=settings.KBASE_UJS_SERVICE_URL,
                                      user_id=settings.KBASE_USER,
                                      password=settings.KBASE_PASSWD)
-    #jobs = InferenceJob.objects.filter(user=request.user)
-    #jobs = [job_repr(ujs_client, job) for job in jobs]
-    jobs = []  # TODO: above is very slow
+    jobs = InferenceJob.objects.filter(user=request.user)
+    jobs = [job_repr(ujs_client, job) for job in jobs]
 
     cmform = UploadRunResultForm()
+    kbcmform = KBaseCmonkeyForm()
+
     return render_to_response('userdata.html', locals(),
                               context_instance=RequestContext(request))
 
@@ -179,7 +140,6 @@ def write_uploadfile(upload_file):
             tmpfile.write(chunk)
     return filename
     
-
 
 def process_ratiofile(ratiofile):
     destfilename = write_uploadfile(ratiofile)
@@ -207,6 +167,8 @@ def process_resultfile(resultfile):
         return {'status': 'error'}
 
 def upload_cmrun(request):
+    """This is the form action for uploading and importing a user cmonkey run into the system
+    """
     if request.method == 'POST':
         form = UploadRunResultForm(request.POST, request.FILES)
         if form.is_valid():
@@ -220,3 +182,42 @@ def upload_cmrun(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
     else:
         raise Exception('BOOOOO')
+
+"""This is the EC2 view. For cost reasons, currently not exposed"""
+"""
+
+def configjob(request):
+    user = request.user  # we retrieve the user here
+    if request.method == 'POST':
+        form = UploadConfigForm(request.POST, request.FILES)
+        if form.is_valid():
+            orgcode = form.cleaned_data['organism']
+            print "organism: ", orgcode
+            print "file: ", form.cleaned_data['file']
+            f = request.FILES['file']
+            filename = str(uuid.uuid1())
+            write_upload_file(filename, f)
+
+            starter = startboto.EC2Starter()
+            job = InferenceJob()
+            job.orgcode = orgcode
+            job.ec2ip = starter.instance().ip_address
+            job.tmpfile = filename
+            job.status = 1
+            job.compute_on = 'ec2'
+
+            ssh = startboto.SSHHelper(starter.instance().ip_address)
+            remote_ratios = ssh.upload_ratios(tmppath)
+            ssh.start_cmonkey(orgcode, remote_ratios)
+
+            job.save()
+            return HttpResponseRedirect('/')
+        else:
+            
+            print "form is not valid"
+    else:
+        form = UploadConfigForm()
+    return render_to_response('configjob.html', locals(),
+                              context_instance=RequestContext(request))
+"""
+
