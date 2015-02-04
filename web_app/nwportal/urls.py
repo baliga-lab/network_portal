@@ -56,10 +56,11 @@ urlpatterns = patterns('',
 
     # network inference app
     # url(r'^configjob$', 'inference.views.configjob', name='configjob'),
-    #url(r'^upload_cmrun', 'inference.views.upload_cmrun', name='upload_cmrun'),
+    #url(r'^kbasejob$', 'inference.views.kbasejob', name='kbasejob'),
 
-    url(r'^kbasejob$', 'inference.views.kbasejob', name='kbasejob'),
     url(r'^userdata$', 'inference.views.userdata', name='userdata'),
+    url(r'^upload_cmrun', 'inference.views.upload_cmrun', name='upload_cmrun'),
+    url(r'^start_kbase_cm', 'inference.views.start_kbase_cm', name='start_kbase_cm'),
 
     # portal administration app
     url(r'^nwpadmin$', 'nwpadmin.views.index', name='nwpadmin'),

@@ -169,6 +169,7 @@ def process_resultfile(resultfile):
 def upload_cmrun(request):
     """This is the form action for uploading and importing a user cmonkey run into the system
     """
+    print "upload_cmrun()"
     if request.method == 'POST':
         form = UploadRunResultForm(request.POST, request.FILES)
         if form.is_valid():
@@ -178,7 +179,43 @@ def upload_cmrun(request):
             process_resultfile(resultfile)
             result = {"status": "ok", "message": "YIPPIEH !"}
         else:
-            result = {"status": "error", "message": "please specify all files"}
+            print "ERROR: ", form.errors
+            result = {"status": "error", "message": form.errors}
+        return HttpResponse(json.dumps(result), content_type='application/json')
+    else:
+        raise Exception('BOOOOO')
+
+def start_kbase_cm(request):
+    """This is the form action for uploading and importing a user cmonkey run into the system
+    """
+    print "start_kbase_cm()"
+    if request.method == 'POST':
+        form = KBaseCmonkeyForm(request.POST, request.FILES)
+        if form.is_valid():
+            ratiofile = request.FILES['ratios']
+            if 'operons' in request.FILES:
+                operonfile = request.FILES['operons']
+            else:
+                operonfile = None
+            if 'string_edges' in request.FILES:
+                stringfile = request.FILES['string_edges']
+            else:
+                stringfile = None
+            use_ensemble = form.cleaned_data['use_ensemble']
+            organism = form.cleaned_data['organism']
+            #process_ratiofile(ratiofile)
+            #process_resultfile(resultfile)
+            print "organism: ", organism
+            print "use_ensemble: ", use_ensemble
+            print "ratios: ", ratiofile
+            print "string: ", stringfile
+            print "operons: ", operonfile
+            result = {"status": "ok", "message": "YIPPIEH !"}
+        else:
+            print "not valid !!", form.errors.keys()
+            for key, message in form.errors.items():
+                print "%s: [%s]" % (key, message)
+            result = {"status": "error", "message": form.errors}
         return HttpResponse(json.dumps(result), content_type='application/json')
     else:
         raise Exception('BOOOOO')

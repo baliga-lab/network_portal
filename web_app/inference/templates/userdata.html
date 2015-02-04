@@ -4,6 +4,41 @@
 {% block title %}Network Portal - List of inference jobs{% endblock %}
 {% block content %}
 <script>
+
+function submitAjax(event, jqForm, messageSelector) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    var data = new FormData(jqForm[0]);
+    $.ajax({
+        url: jqForm.attr('action'),
+        type: jqForm.attr('method'),
+        data: data,
+        cache: false,
+        processData: false,
+        contentType: false,
+        success: function(data, textStatus, jqXHR) {
+          if (data.status == 'error') {
+             //alert('SUBMIT ERROR: ' + data.message);
+             var msg = '<div id="' + messageSelector + '" style="color: red">';
+             for (var key in data.message) {
+               msg += key;
+               msg += ": " + data.message[key];
+               msg += "<br>"
+             }
+             msg += '</div>';
+             $(msg).replaceAll(messageSelector);
+          } else {
+          alert("Submit successfull");
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert('SUBMIT ERROR: ' + errorThrown);
+        }
+    });
+    return false;
+}
+
 $(document).ready(function() { 
     $("#user-tabs").tabs();
     $("#jobs-table") 
@@ -12,25 +47,10 @@ $(document).ready(function() {
 
     // AJAX file upload of cmonkey results
     $('#upload_cm_form').submit(function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-
-      var data = new FormData($(this)[0]);
-      $.ajax({
-        url: $(this).attr('action'),
-        type: $(this).attr('method'),
-        data: data,
-        cache: false,
-        processData: false,
-        contentType: false,
-        success: function(data, textStatus, jqXHR) {
-          alert("Submit successfull");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-          alert('SUBMIT ERROR: ' + errorThrown);
-        }
-      });
-      return false;
+      return submitAjax(event, $(this), '#upload-cmjob-messages');
+    });
+    $('#kbase_cm_form').submit(function(event) {
+      return submitAjax(event, $(this), '#kbasejob-messages');
     });
 });
 </script>
@@ -52,6 +72,7 @@ $(document).ready(function() {
     <div id="networks-tab">
         <form id="upload_cm_form" action="upload_cmrun" method="post" style="margin-top: 5px; margin-bottom: 0px;">
           {% csrf_token %}
+          <div id="upload-cmjob-messages"></div>
           <b>Upload your cmonkey run</b> <input type="submit" value="Upload..." style="margin-left: 8px"></input><br>
           Gene expression file {{cmform.ratios}}<br>
           cmonkey run result file {{cmform.result}}</form>
@@ -62,18 +83,15 @@ $(document).ready(function() {
       </table>
     </div>
     <div id="kbasejob-tab" style="width: 100%">
-      <!--
-      <div style="margin-left: 5pt; margin-top: 5pt">
-        <a href="/kbasejob"> + Create new KBase inference job</a>
-      </div>-->
       <form id="kbase_cm_form" action="start_kbase_cm" method="post">
         {% csrf_token %}
+        <div id="kbasejob-messages"></div>
         <b>Start inference job on KBase</b> <input type="submit" value="Start..." style="margin-left: 8px"></input><br>
         Organism {{kbcmform.organism}}<br>
         <div style="width: 100%"><span style="width:500px">Gene expression file</span><span>{{kbcmform.ratios}}</span></div>
         <div style="width: 100%"><span style="width:500px">STRING file (optional)</span><span>{{kbcmform.string_edges}}</span></div>
         <div style="width: 100%"><span style="width:500px">Operons file (optional)</span><span>{{kbcmform.operons}}</span></div>
-        <div>Run as ensemble {{kbcmform.use_egrin2}}</div></form>
+        <div>Run as ensemble {{kbcmform.use_ensemble}}</div></form>
 
       <table id="jobs-table" class="tablesorter">
         <caption>Jobs</caption>

@@ -11,9 +11,9 @@ class UploadRunResultForm(forms.Form):
 
 class KBaseCmonkeyForm(forms.Form):
     ratios = forms.FileField()
-    string_edges= forms.FileField()
-    operons = forms.FileField()
-    use_egrin2 = forms.BooleanField()
+    string_edges= forms.FileField(required=False)
+    operons = forms.FileField(required=False)
+    use_ensemble = forms.BooleanField(required=False)
     organism = forms.ChoiceField(choices=[("hal", "Halobacterium sp"),
                                           ("mtu", "Mycobacterium tuberculosis H37v"),
                                           ("psa", "Pseudomonas stutzeri"),
