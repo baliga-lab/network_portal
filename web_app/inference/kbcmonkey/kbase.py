@@ -290,13 +290,25 @@ def workspaces_for(user, password, service_url):
     return [ws for ws in __workspaces(ws_service)]
 
 
-def workspace(user, password, service_url, ws_name, search_global=False):
-    ws_service = wsc.Workspace(service_url, user_id=user, password=password)
+def workspace(service_url, ws_name, ws_service_obj=None,
+              user=None, password=None, search_global=False):
+    if ws_service_obj is None:
+        ws_service = wsc.Workspace(service_url, user_id=user, password=password)
+    else:
+        ws_service = ws_service_obj
+
     for ws in __workspaces(ws_service, not search_global):
         if ws.name() == ws_name:
             return ws
     raise Exception("no workspace named '%s' found !" % ws_name)
 
+
+def create_workspace(ws_service_obj, ws_name):
+    info = ws_service_obj.create_workspace({'workspace': ws_name,
+                                            'globalread': 'r',
+                                            'description': '',
+                                            'meta': {}})
+    return info
 
 def user_job_state(user, password, service_url, jobid):
     ujs_service = ujs.UserAndJobState(service_url, user_id=user, password=password)
@@ -353,10 +365,3 @@ def run_inferelator(service_url, user, password, target_workspace,
                                        {'tf_list_ws_ref': tf_ref,
                                         'cmonkey_run_result_ws_ref': result_ref,
                                         'expression_series_ws_ref': expression_ref})
-
-
-
-
-"""
-546296e8e4b0d82af0eafdb9
-"""

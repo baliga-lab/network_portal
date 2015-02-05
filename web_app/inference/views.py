@@ -5,6 +5,8 @@ import gzip
 import json
 import sqlite3
 import tempfile
+import time
+import datetime
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -19,16 +21,11 @@ from networks.models import Species
 
 from kbcmonkey import kbase
 import kbcmonkey.UserAndJobStateClient as ujs
+import kbcmonkey.WorkspaceClient as wsc
 
 import uuid
 #import startboto
 
-def write_upload_file(filename, f):
-    tmppath = '/tmp/%s' % filename
-    with open(tmppath, 'wb+') as outfile:
-        for chunk in f.chunks():
-            outfile.write(chunk)
-    
 
 def kbasejob(request):
     if request.method == 'POST':
@@ -38,8 +35,7 @@ def kbasejob(request):
             species = Species.objects.filter(short_name=orgcode)
 
             f = request.FILES['file']
-            filename = str(uuid.uuid1())
-            write_upload_file(filename, f)
+            path = write_uploadfile(f)
 
             """
             ws = kbase.workspace(settings.KBASE_USER,
@@ -119,6 +115,7 @@ def job_repr(ujs_client, job):
     return JobRepr(job.species.name, job.created_at, status, job.compute_on)
     
 def userdata(request):
+    print request.user.username
     ujs_client = ujs.UserAndJobState(url=settings.KBASE_UJS_SERVICE_URL,
                                      user_id=settings.KBASE_USER,
                                      password=settings.KBASE_PASSWD)
@@ -210,6 +207,47 @@ def start_kbase_cm(request):
             print "ratios: ", ratiofile
             print "string: ", stringfile
             print "operons: ", operonfile
+
+
+            ws_service = wsc.Workspace(settings.KBASE_WS_SERVICE_URL,
+                                       user_id=settings.KBASE_USER,
+                                       password=settings.KBASE_PASSWD)
+
+            data_ws = kbase.workspace(settings.KBASE_WS_SERVICE_URL,
+                                      settings.KBASE_DATA_WORKSPACE,
+                                      ws_service_obj=ws_service)
+
+            print "logged in to KBASE data workspace"
+
+            # KBase is picky with identifier names, no colons, e.g.
+            username = request.user.username
+            timestamp = str(time.time())
+            if use_ensemble:
+                input_ws_name = 'cm_ensemble-%s-%s' % (username, timestamp)
+            else:
+                input_ws_name = 'cm_single-%s-%s' % (username, timestamp)
+
+            input_ws_info = kbase.create_workspace(ws_service, input_ws_name)
+            print "created input workspace under: ", input_ws_info
+            input_ws = kbase.workspace(settings.KBASE_WS_SERVICE_URL,
+                                       input_ws_name,
+                                       ws_service_obj=ws_service)
+            print "logged in to KBASE input workspace"
+
+            genome_name = '%s.genome' % organism
+            ratios_name = 'ratios-%s-%s' % (organism, timestamp)
+
+            ratio_file_path = write_uploadfile(ratiofile)
+            expression_ref = kbase.import_ratios_matrix(input_ws, data_ws,
+                                                        ratios_name,
+                                                        genome_name,
+                                                        ratio_file_path, sep='\t')
+            if stringfile is not None:
+                pass
+            if operonfile is not None:
+                pass
+
+            print "saved expression"
             result = {"status": "ok", "message": "YIPPIEH !"}
         else:
             print "not valid !!", form.errors.keys()
@@ -232,8 +270,7 @@ def configjob(request):
             print "organism: ", orgcode
             print "file: ", form.cleaned_data['file']
             f = request.FILES['file']
-            filename = str(uuid.uuid1())
-            write_upload_file(filename, f)
+            write_uploadfile(f)
 
             starter = startboto.EC2Starter()
             job = InferenceJob()

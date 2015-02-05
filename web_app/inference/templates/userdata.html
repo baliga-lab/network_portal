@@ -5,7 +5,7 @@
 {% block content %}
 <script>
 
-function submitAjax(event, jqForm, messageSelector) {
+function submitAjax(event, jqForm, messageId) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -19,17 +19,17 @@ function submitAjax(event, jqForm, messageSelector) {
         contentType: false,
         success: function(data, textStatus, jqXHR) {
           if (data.status == 'error') {
-             //alert('SUBMIT ERROR: ' + data.message);
-             var msg = '<div id="' + messageSelector + '" style="color: red">';
+             var msg = '<div id="#' + messageId + '" style="color: red">';
              for (var key in data.message) {
                msg += key;
                msg += ": " + data.message[key];
                msg += "<br>"
              }
              msg += '</div>';
-             $(msg).replaceAll(messageSelector);
+             $(msg).replaceAll('#' + messageId);
           } else {
-          alert("Submit successfull");
+             var msg = '<div id="' + messageId + '" style="color: green">Job submitted</div>';
+             $(msg).replaceAll('#' + messageId);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -47,10 +47,10 @@ $(document).ready(function() {
 
     // AJAX file upload of cmonkey results
     $('#upload_cm_form').submit(function(event) {
-      return submitAjax(event, $(this), '#upload-cmjob-messages');
+      return submitAjax(event, $(this), 'upload-cmjob-messages');
     });
     $('#kbase_cm_form').submit(function(event) {
-      return submitAjax(event, $(this), '#kbasejob-messages');
+      return submitAjax(event, $(this), 'kbasejob-messages');
     });
 });
 </script>
