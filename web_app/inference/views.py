@@ -228,9 +228,6 @@ def start_kbase_cm(request):
                                        ws_service_obj=ws_service)
             print "logged in to KBASE input workspace"
 
-            genome_name = '%s.genome' % organism
-            ratios_name = 'ratios-%s-%s' % (organism, timestamp)
-
             if stringfile is not None:
                 print "uploading STRING network..."
                 string_file_path = write_uploadfile(stringfile)
@@ -246,15 +243,13 @@ def start_kbase_cm(request):
                 kbase.import_mo_operome_file(input_ws, operon_obj_name,
                                              operon_file_path)
                 print "uploaded operome"
-
-            print "uploading ratios..."
-            ratio_file_path = write_uploadfile(ratiofile)
-            expression_ref = kbase.import_ratios_matrix(input_ws, data_ws,
-                                                        ratios_name,
-                                                        genome_name,
-                                                        ratio_file_path, sep='\t')
-            print "saved expression"
-            result = {"status": "ok", "message": "YIPPIEH !"}
+            try:
+                start_cm_single(data_ws, input_ws, organism, timestamp,
+                                ratiofile, string_obj_name, operon_obj_name)
+                result = {"status": "ok", "message": "YIPPIEH !"}
+            except:
+                traceback.print_exc()
+                result = {"status": "error", "message": {'connect': 'service not available'}}
         else:
             print "not valid !!", form.errors.keys()
             for key, message in form.errors.items():
@@ -263,6 +258,39 @@ def start_kbase_cm(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
     else:
         raise Exception('BOOOOO')
+
+
+def start_cm_single(data_ws, input_ws, organism, timestamp,
+                    ratiofile, string_obj_name, operon_obj_name):
+    print "uploading ratios..."
+    data_ws_name = data_ws.name()
+    input_ws_name = input_ws.name()
+
+    genome_name = '%s.genome' % organism
+    ratios_name = 'ratios-%s-%s' % (organism, timestamp)
+    ratio_file_path = write_uploadfile(ratiofile)
+    kbase.import_ratios_matrix(input_ws, data_ws, ratios_name, genome_name,
+                               ratio_file_path, sep='\t')
+
+    jobid = kbase.run_cmonkey(settings.KBASE_USER, settings.KBASE_PASSWD,
+                              settings.KBASE_CM_SERVICE_URL,
+                              settings.KBASE_CMRESULTS_WORKSPACE,
+                              '%s/%s' % (input_ws_name, ratios_name),                              
+                              '%s/%s.genome' % (data_ws, organism),
+                              '%s/%s' % (input_ws_name, string_obj_name),
+                              '%s/%s' % (input_ws_name, operon_obj_name))
+    print "started job with id: ", jobid
+    job = InferenceJob()
+    job.user = request.user
+    job.species = species[0]
+    job.tmpfile = ratios_file_path
+    job.status = 1
+    job.compute_on = 'kbase'
+    job.ec2ip = None
+    job.cm_job_id = jobid
+    job.save()
+
+    print "saved expression"
 
 """This is the EC2 view. For cost reasons, currently not exposed"""
 """
