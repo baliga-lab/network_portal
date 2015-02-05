@@ -135,6 +135,7 @@ def write_uploadfile(upload_file):
         filename = tmpfile.name
         for chunk in upload_file.chunks():
             tmpfile.write(chunk)
+    print "written as: ", filename
     return filename
     
 
@@ -182,6 +183,7 @@ def upload_cmrun(request):
     else:
         raise Exception('BOOOOO')
 
+
 def start_kbase_cm(request):
     """This is the form action for uploading and importing a user cmonkey run into the system
     """
@@ -200,14 +202,6 @@ def start_kbase_cm(request):
                 stringfile = None
             use_ensemble = form.cleaned_data['use_ensemble']
             organism = form.cleaned_data['organism']
-            #process_ratiofile(ratiofile)
-            #process_resultfile(resultfile)
-            print "organism: ", organism
-            print "use_ensemble: ", use_ensemble
-            print "ratios: ", ratiofile
-            print "string: ", stringfile
-            print "operons: ", operonfile
-
 
             ws_service = wsc.Workspace(settings.KBASE_WS_SERVICE_URL,
                                        user_id=settings.KBASE_USER,
@@ -237,16 +231,28 @@ def start_kbase_cm(request):
             genome_name = '%s.genome' % organism
             ratios_name = 'ratios-%s-%s' % (organism, timestamp)
 
+            if stringfile is not None:
+                print "uploading STRING network..."
+                string_file_path = write_uploadfile(stringfile)
+                string_obj_name = 'string-%s-%s' % (organism, timestamp)
+                kbase.import_string_network(input_ws, string_obj_name,
+                                            string_file_path)
+                print "uploaded STRING network"
+
+            if operonfile is not None:
+                print "uploading operome..."
+                operon_file_path = write_uploadfile(operonfile)
+                operon_obj_name = 'operon-%s-%s' % (organism, timestamp)
+                kbase.import_mo_operome_file(input_ws, operon_obj_name,
+                                             operon_file_path)
+                print "uploaded operome"
+
+            print "uploading ratios..."
             ratio_file_path = write_uploadfile(ratiofile)
             expression_ref = kbase.import_ratios_matrix(input_ws, data_ws,
                                                         ratios_name,
                                                         genome_name,
                                                         ratio_file_path, sep='\t')
-            if stringfile is not None:
-                pass
-            if operonfile is not None:
-                pass
-
             print "saved expression"
             result = {"status": "ok", "message": "YIPPIEH !"}
         else:

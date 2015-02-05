@@ -204,13 +204,12 @@ def import_network(ws, name, nwtype, filepath, sep='\t'):
                 'entity1_id': node1, 'entity2_id': node2,
                 'scores': {score_name: weight} }
 
-    filename = os.path.basename(filepath)
     if nwtype == 'STRING':
         score_name = 'STRING_SCORE'
     else:
         score_name = 'pval'
 
-    with open(filename) as infile:
+    with open(filepath) as infile:
         interactions = []    
         for line in infile:
             n1, n2, w = line.strip().split(sep)
@@ -266,7 +265,15 @@ def import_mo_operome(ws, name, ncbi_id):
             operome.append(to_operome_entry(line))
         line_num += 1
     return save_interaction_set(ws, name, 'operon', operome, 'SAME_OPERON_SCORE')
-    
+
+
+def import_mo_operome_file(ws, name, filepath):
+    """Import Microbes Online operome from a file"""
+    with open(filepath) as infile:
+        infile.readline()
+        operome = [to_operome_entry(line) for line in infile]
+        return save_interaction_set(ws, name, 'operon', operome, 'SAME_OPERON_SCORE')
+
 
 """
 Gene Lists
