@@ -14,6 +14,7 @@ class InferenceJob(models.Model):
 
     # 1 = ready
     status = models.IntegerField()
+    use_ensemble = models.BooleanField(default=False)
 
     # ec2, kbase or internal
     compute_on = models.CharField(max_length=30)

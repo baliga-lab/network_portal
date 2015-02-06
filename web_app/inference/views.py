@@ -23,6 +23,9 @@ from kbcmonkey import kbase
 import kbcmonkey.UserAndJobStateClient as ujs
 import kbcmonkey.WorkspaceClient as wsc
 
+import cmonkey.datamatrix as dm
+import cmonkey.util as util
+
 import uuid
 #import startboto
 
@@ -82,11 +85,12 @@ def kbasejob(request):
 
 
 class JobRepr:
-    def __init__(self, species, created_at, status, compute_on):
+    def __init__(self, species, created_at, status, compute_on, use_ensemble):
         self.species = species
         self.created_at = created_at
         self.status = status
         self.compute_on = compute_on
+        self.use_ensemble = 'yes' if use_ensemble else 'no'
 
 
 def job_repr(ujs_client, job):
@@ -109,10 +113,11 @@ def job_repr(ujs_client, job):
             with open('cmresult.json', 'w') as outfile:
                 outfile.write(json.dumps(obj))
         else:
-            status = status_obj[1]
+            print status_obj
+            status = '%s - %s' % (status_obj[1], status_obj[2])
     else:
         status = "N/A"
-    return JobRepr(job.species.name, job.created_at, status, job.compute_on)
+    return JobRepr(job.species.name, job.created_at, status, job.compute_on, job.use_ensemble)
     
 def userdata(request):
     print request.user.username
@@ -244,8 +249,12 @@ def start_kbase_cm(request):
                                              operon_file_path)
                 print "uploaded operome"
             try:
-                start_cm_single(data_ws, input_ws, organism, timestamp,
-                                ratiofile, string_obj_name, operon_obj_name)
+                if use_ensemble:
+                    start_cm_ensemble(request, data_ws, input_ws, organism, timestamp,
+                                      ratiofile, string_obj_name, operon_obj_name)
+                else:
+                    start_cm_single(request, data_ws, input_ws, organism, timestamp,
+                                    ratiofile, string_obj_name, operon_obj_name)
                 result = {"status": "ok", "message": "YIPPIEH !"}
             except:
                 traceback.print_exc()
@@ -260,7 +269,17 @@ def start_kbase_cm(request):
         raise Exception('BOOOOO')
 
 
-def start_cm_single(data_ws, input_ws, organism, timestamp,
+def start_cm_ensemble(request, data_ws, input_ws, organism, timestamp,
+                      ratiofile, string_obj_name, operon_obj_name):
+    print "splitting ratios"
+    ratio_file_path = write_uploadfile(ratiofile)
+    matrix_factory = dm.DataMatrixFactory([dm.nochange_filter,
+                                           dm.center_scale_filter])
+    infile = util.read_dfile(ratio_file_path, has_header=True, quote='\"')
+    matrix = matrix_factory.create_from(infile)
+    #split_matrix(matrix, outdir, n, kmin, matrix.num_columns)
+
+def start_cm_single(request, data_ws, input_ws, organism, timestamp,
                     ratiofile, string_obj_name, operon_obj_name):
     print "uploading ratios..."
     data_ws_name = data_ws.name()
@@ -280,13 +299,15 @@ def start_cm_single(data_ws, input_ws, organism, timestamp,
                               '%s/%s' % (input_ws_name, string_obj_name),
                               '%s/%s' % (input_ws_name, operon_obj_name))
     print "started job with id: ", jobid
+    species = Species.objects.filter(short_name=organism)
     job = InferenceJob()
     job.user = request.user
     job.species = species[0]
-    job.tmpfile = ratios_file_path
+    job.tmpfile = ratio_file_path
     job.status = 1
     job.compute_on = 'kbase'
     job.ec2ip = None
+    job.use_ensemble = False
     job.cm_job_id = jobid
     job.save()
 
@@ -328,4 +349,3 @@ def configjob(request):
     return render_to_response('configjob.html', locals(),
                               context_instance=RequestContext(request))
 """
-

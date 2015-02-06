@@ -101,6 +101,7 @@ $(document).ready(function() {
             <th>Created at</th>
             <th>Status</th>
             <th>Compute On</th>
+            <th>Ensemble ?</th>
           </tr>
         </thead>
         <tbody>
@@ -110,6 +111,7 @@ $(document).ready(function() {
             <td>{{job.created_at}}</td>
             <td>{{job.status}}</td>
             <td>{{job.compute_on}}</td>
+            <td>{{job.use_ensemble}}</td>
           </tr>
           {% endfor %}
         </tbody>
