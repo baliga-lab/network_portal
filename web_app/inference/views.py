@@ -8,6 +8,8 @@ import tempfile
 import time
 import datetime
 
+import pika
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
@@ -28,6 +30,20 @@ import cmonkey.util as util
 
 import uuid
 #import startboto
+
+def setup_channel(exchange, user, password, vhost, host='localhost'):
+    credentials = pika.PlainCredentials(user, password)
+    conn_params = pika.ConnectionParameters(host=host,
+                                            credentials=credentials,
+                                            virtual_host=vhost)
+    conn_broker = pika.BlockingConnection(conn_params)
+    channel = conn_broker.channel()
+    channel.exchange_declare(exchange=exchange,
+                             type='direct',
+                             passive=False,
+                             durable=False,
+                             auto_delete=True)
+    return channel
 
 
 def kbasejob(request):
@@ -209,6 +225,7 @@ def start_kbase_cm(request):
             use_ensemble = form.cleaned_data['use_ensemble']
             organism = form.cleaned_data['organism']
 
+            """
             ws_service = wsc.Workspace(settings.KBASE_WS_SERVICE_URL,
                                        user_id=settings.KBASE_USER,
                                        password=settings.KBASE_PASSWD)
@@ -260,6 +277,24 @@ def start_kbase_cm(request):
             except:
                 traceback.print_exc()
                 result = {"status": "error", "message": {'connect': 'service not available'}}
+            """
+            # Delegate inference jobs to messaging
+            rabbit_config = settings.CMONKEY_RABBITMQ
+            channel = setup_channel(rabbit_config['exchange'],
+                                    rabbit_config['user'], rabbit_config['password'],
+                                    rabbit_config['vhost'])
+            channel.confirm_delivery()
+            msg_props = pika.BasicProperties(content_type="application/json", delivery_mode=1)
+            msg = json.dumps({
+                'use_ensemble': use_ensemble,
+                'organism': organism
+            })
+            if channel.basic_publish(body=msg, exchange=rabbit_config['exchange'],
+                                     properties=msg_props,
+                                     routing_key=rabbit_config['routing_key']):
+                print "message confirmed"
+            channel.close()
+            result = {"status": "ok", "message": "YIPPIEH !"}
         else:
             print "not valid !!", form.errors.keys()
             for key, message in form.errors.items():

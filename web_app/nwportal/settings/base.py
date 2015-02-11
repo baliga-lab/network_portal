@@ -206,3 +206,15 @@ KBASE_UJS_SERVICE_URL = 'https://kbase.us/services/userandjobstate'
 
 # Synonym service
 ORGANISM_SERVICE_HOST = 'http://condor:5000'
+
+# RabbitMQ
+CMONKEY_RABBITMQ = {
+    'host': 'localhost',
+    'queue': 'cmonkey-queue',
+    'exchange': 'cmonkey-exchange',
+    'user': 'cmonkey',
+    'password': 'cmonkey',
+    'vhost': 'cmonkey',
+    'routing_key': 'cmonkey',
+    'consumer_tag': 'cmonkey-consumer'
+}
