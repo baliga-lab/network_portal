@@ -292,7 +292,7 @@ def save_gene_list(ws, id, source_id, genes):
 High-level Service Access
 """
 
-def workspaces_for(user, password, service_url):
+def workspaces_for(service_url, user, password):
     ws_service = wsc.Workspace(service_url, user_id=user, password=password)
     return [ws for ws in __workspaces(ws_service)]
 
@@ -317,14 +317,20 @@ def create_workspace(ws_service_obj, ws_name):
                                             'meta': {}})
     return info
 
-def user_job_state(user, password, service_url, jobid):
+def user_job_state(service_url, user, password, jobid):
     ujs_service = ujs.UserAndJobState(service_url, user_id=user, password=password)
     return UserAndJobState(ujs_service, jobid)
 
 
-def run_cmonkey(user, password, service_url, target_workspace,
+def run_cmonkey(service_url, user, password, target_workspace,
                 series_ref, genome_ref, network_ref, operome_ref):
   cm_service = cmc.Cmonkey(service_url, user_id=user, password=password)
+  print "running cmonkey on kbase"
+  print "series_ref: '%s'" % series_ref
+  print "genome_ref: '%s'" % genome_ref
+  print "operome_ref: '%s'" % operome_ref
+  print "network_ref: '%s'" % network_ref
+
   return cm_service.run_cmonkey(target_workspace,
                                 {'series_ref': series_ref,
                                  'genome_ref': genome_ref,

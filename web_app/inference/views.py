@@ -47,8 +47,8 @@ def kbasejob(request):
                                  settings.KBASE_WS_SERVICE_URL)
             """
             try:
-                jobid = kbase.run_cmonkey(settings.KBASE_USER, settings.KBASE_PASSWD,
-                                          settings.KBASE_CM_SERVICE_URL,
+                jobid = kbase.run_cmonkey(settings.KBASE_CM_SERVICE_URL,
+                                          settings.KBASE_USER, settings.KBASE_PASSWD,
                                           settings.KBASE_CMRESULTS_WORKSPACE,
                                           'nwportal:input1/%s.ratios' % orgcode,  # TODO
                                           'nwportal:nwportal_data/%s.genome' % orgcode,
@@ -106,9 +106,10 @@ def job_repr(ujs_client, job):
                 workspace_name, result_name = path
             status = "completed, result at: workspace '%s' object '%s'" % (workspace_name,
                                                                            result_name)
-            ws = kbase.workspace(settings.KBASE_USER,
-                                 settings.KBASE_PASSWD,
-                                 settings.KBASE_WS_SERVICE_URL, workspace_name)
+            ws = kbase.workspace(settings.KBASE_WS_SERVICE_URL, workspace_name,
+                                 ws_service_obj=None,
+                                 user=settings.KBASE_USER,
+                                 password=settings.KBASE_PASSWD)
             obj = ws.get_object(result_name)['data']
             with open('cmresult.json', 'w') as outfile:
                 outfile.write(json.dumps(obj))
@@ -291,11 +292,11 @@ def start_cm_single(request, data_ws, input_ws, organism, timestamp,
     kbase.import_ratios_matrix(input_ws, data_ws, ratios_name, genome_name,
                                ratio_file_path, sep='\t')
 
-    jobid = kbase.run_cmonkey(settings.KBASE_USER, settings.KBASE_PASSWD,
-                              settings.KBASE_CM_SERVICE_URL,
+    jobid = kbase.run_cmonkey(settings.KBASE_CM_SERVICE_URL,
+                              settings.KBASE_USER, settings.KBASE_PASSWD,
                               settings.KBASE_CMRESULTS_WORKSPACE,
                               '%s/%s' % (input_ws_name, ratios_name),                              
-                              '%s/%s.genome' % (data_ws, organism),
+                              '%s/%s.genome' % (data_ws_name, organism),
                               '%s/%s' % (input_ws_name, string_obj_name),
                               '%s/%s' % (input_ws_name, operon_obj_name))
     print "started job with id: ", jobid
