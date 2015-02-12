@@ -23,7 +23,6 @@ from networks.models import Species
 
 from kbcmonkey import kbase
 import kbcmonkey.UserAndJobStateClient as ujs
-import kbcmonkey.WorkspaceClient as wsc
 
 import cmonkey.datamatrix as dm
 import cmonkey.util as util
@@ -44,60 +43,6 @@ def setup_channel(exchange, user, password, vhost, host='localhost'):
                              durable=False,
                              auto_delete=True)
     return channel
-
-
-def kbasejob(request):
-    if request.method == 'POST':
-        form = UploadConfigForm(request.POST, request.FILES)
-        if form.is_valid():
-            orgcode = form.cleaned_data['organism']
-            species = Species.objects.filter(short_name=orgcode)
-
-            f = request.FILES['file']
-            path = write_uploadfile(f)
-
-            """
-            ws = kbase.workspace(settings.KBASE_USER,
-                                 settings.KBASE_PASSWD,
-                                 settings.KBASE_DATA_WORKSPACE,
-                                 settings.KBASE_WS_SERVICE_URL)
-            """
-            try:
-                jobid = kbase.run_cmonkey(settings.KBASE_CM_SERVICE_URL,
-                                          settings.KBASE_USER, settings.KBASE_PASSWD,
-                                          settings.KBASE_CMRESULTS_WORKSPACE,
-                                          'nwportal:input1/%s.ratios' % orgcode,  # TODO
-                                          'nwportal:nwportal_data/%s.genome' % orgcode,
-                                          'nwportal:nwportal_data/%s.string' % orgcode,
-                                          'nwportal:nwportal_data/%s.operome' % orgcode)
-
-                # only if we have started the cmonkey job
-                job = InferenceJob()
-                job.user = request.user
-                job.species = species[0]
-                job.tmpfile = filename
-                job.status = 1
-                job.compute_on = 'kbase'
-                job.ec2ip = None
-                job.cm_job_id = jobid
-                job.save()
-                messages.info(request, "KBase cmonkey job started with id '%s'" % jobid)
-
-            except URLError:
-                messages.error(request, "Can not connect to KBase cmonkey service")
-            except:
-                traceback.print_exc()
-                messages.error(request, "Unknown error")
-
-            return HttpResponseRedirect('/userdata')
-
-        else:
-            messages.error(request, "form is not valid")
-    else:
-        form = UploadConfigForm()
-
-    return render_to_response('kbasejob.html', locals(),
-                              context_instance=RequestContext(request))
 
 
 class JobRepr:
@@ -206,6 +151,39 @@ def upload_cmrun(request):
         raise Exception('BOOOOO')
 
 
+def prepare_kbase_cm_runs(nwp_jobid, organism, username, use_ensemble, files):
+    """using the parameters to send to the background processing system"""
+    msg = { 'nwp_jobid': nwp_jobid, 'use_ensemble': use_ensemble,
+            'organism': organism, 'username': username }
+
+    ratiofile = files['ratios']
+    operonfile = None
+    stringfile = None
+
+    msg['ratio_file_path'] = write_uploadfile(ratiofile)
+    if 'operons' in files:
+        operonfile = files['operons']
+        msg['operon_file_path'] = write_uploadfile(operonfile)
+
+    if 'string_edges' in files:
+        stringfile = files['string_edges']
+        msg['string_file_path'] = write_uploadfile(stringfile)
+
+    # Delegate inference jobs to messaging
+    rabbit_config = settings.CMONKEY_RABBITMQ
+    channel = setup_channel(rabbit_config['exchange'],
+                            rabbit_config['user'], rabbit_config['password'],
+                            rabbit_config['vhost'])
+    channel.confirm_delivery()
+    msg_props = pika.BasicProperties(content_type="application/json", delivery_mode=1)
+
+    json_msg = json.dumps(msg)
+    if channel.basic_publish(body=json_msg, exchange=rabbit_config['exchange'],
+                             properties=msg_props,
+                             routing_key=rabbit_config['routing_key']):
+        print "message confirmed"
+    channel.close()
+
 def start_kbase_cm(request):
     """This is the form action for uploading and importing a user cmonkey run into the system
     """
@@ -213,87 +191,22 @@ def start_kbase_cm(request):
     if request.method == 'POST':
         form = KBaseCmonkeyForm(request.POST, request.FILES)
         if form.is_valid():
-            ratiofile = request.FILES['ratios']
-            if 'operons' in request.FILES:
-                operonfile = request.FILES['operons']
-            else:
-                operonfile = None
-            if 'string_edges' in request.FILES:
-                stringfile = request.FILES['string_edges']
-            else:
-                stringfile = None
             use_ensemble = form.cleaned_data['use_ensemble']
             organism = form.cleaned_data['organism']
-
-            """
-            ws_service = wsc.Workspace(settings.KBASE_WS_SERVICE_URL,
-                                       user_id=settings.KBASE_USER,
-                                       password=settings.KBASE_PASSWD)
-
-            data_ws = kbase.workspace(settings.KBASE_WS_SERVICE_URL,
-                                      settings.KBASE_DATA_WORKSPACE,
-                                      ws_service_obj=ws_service)
-
-            print "logged in to KBASE data workspace"
-
-            # KBase is picky with identifier names, no colons, e.g.
             username = request.user.username
-            timestamp = str(time.time())
-            if use_ensemble:
-                input_ws_name = 'cm_ensemble-%s-%s' % (username, timestamp)
-            else:
-                input_ws_name = 'cm_single-%s-%s' % (username, timestamp)
+            species = Species.objects.filter(short_name=organism)
 
-            input_ws_info = kbase.create_workspace(ws_service, input_ws_name)
-            print "created input workspace under: ", input_ws_info
-            input_ws = kbase.workspace(settings.KBASE_WS_SERVICE_URL,
-                                       input_ws_name,
-                                       ws_service_obj=ws_service)
-            print "logged in to KBASE input workspace"
+            job = InferenceJob()
+            job.user = request.user
+            job.species = species[0]
+            job.status = 1
+            job.compute_on = 'kbase'
+            job.ec2ip = None
+            job.use_ensemble = use_ensemble
+            job.cm_job_id = None
+            job.save()
 
-            if stringfile is not None:
-                print "uploading STRING network..."
-                string_file_path = write_uploadfile(stringfile)
-                string_obj_name = 'string-%s-%s' % (organism, timestamp)
-                kbase.import_string_network(input_ws, string_obj_name,
-                                            string_file_path)
-                print "uploaded STRING network"
-
-            if operonfile is not None:
-                print "uploading operome..."
-                operon_file_path = write_uploadfile(operonfile)
-                operon_obj_name = 'operon-%s-%s' % (organism, timestamp)
-                kbase.import_mo_operome_file(input_ws, operon_obj_name,
-                                             operon_file_path)
-                print "uploaded operome"
-            try:
-                if use_ensemble:
-                    start_cm_ensemble(request, data_ws, input_ws, organism, timestamp,
-                                      ratiofile, string_obj_name, operon_obj_name)
-                else:
-                    start_cm_single(request, data_ws, input_ws, organism, timestamp,
-                                    ratiofile, string_obj_name, operon_obj_name)
-                result = {"status": "ok", "message": "YIPPIEH !"}
-            except:
-                traceback.print_exc()
-                result = {"status": "error", "message": {'connect': 'service not available'}}
-            """
-            # Delegate inference jobs to messaging
-            rabbit_config = settings.CMONKEY_RABBITMQ
-            channel = setup_channel(rabbit_config['exchange'],
-                                    rabbit_config['user'], rabbit_config['password'],
-                                    rabbit_config['vhost'])
-            channel.confirm_delivery()
-            msg_props = pika.BasicProperties(content_type="application/json", delivery_mode=1)
-            msg = json.dumps({
-                'use_ensemble': use_ensemble,
-                'organism': organism
-            })
-            if channel.basic_publish(body=msg, exchange=rabbit_config['exchange'],
-                                     properties=msg_props,
-                                     routing_key=rabbit_config['routing_key']):
-                print "message confirmed"
-            channel.close()
+            prepare_kbase_cm_runs(job.id, organism, username, use_ensemble, request.FILES)
             result = {"status": "ok", "message": "YIPPIEH !"}
         else:
             print "not valid !!", form.errors.keys()
@@ -304,50 +217,6 @@ def start_kbase_cm(request):
     else:
         raise Exception('BOOOOO')
 
-
-def start_cm_ensemble(request, data_ws, input_ws, organism, timestamp,
-                      ratiofile, string_obj_name, operon_obj_name):
-    print "splitting ratios"
-    ratio_file_path = write_uploadfile(ratiofile)
-    matrix_factory = dm.DataMatrixFactory([dm.nochange_filter,
-                                           dm.center_scale_filter])
-    infile = util.read_dfile(ratio_file_path, has_header=True, quote='\"')
-    matrix = matrix_factory.create_from(infile)
-    #split_matrix(matrix, outdir, n, kmin, matrix.num_columns)
-
-def start_cm_single(request, data_ws, input_ws, organism, timestamp,
-                    ratiofile, string_obj_name, operon_obj_name):
-    print "uploading ratios..."
-    data_ws_name = data_ws.name()
-    input_ws_name = input_ws.name()
-
-    genome_name = '%s.genome' % organism
-    ratios_name = 'ratios-%s-%s' % (organism, timestamp)
-    ratio_file_path = write_uploadfile(ratiofile)
-    kbase.import_ratios_matrix(input_ws, data_ws, ratios_name, genome_name,
-                               ratio_file_path, sep='\t')
-
-    jobid = kbase.run_cmonkey(settings.KBASE_CM_SERVICE_URL,
-                              settings.KBASE_USER, settings.KBASE_PASSWD,
-                              settings.KBASE_CMRESULTS_WORKSPACE,
-                              '%s/%s' % (input_ws_name, ratios_name),                              
-                              '%s/%s.genome' % (data_ws_name, organism),
-                              '%s/%s' % (input_ws_name, string_obj_name),
-                              '%s/%s' % (input_ws_name, operon_obj_name))
-    print "started job with id: ", jobid
-    species = Species.objects.filter(short_name=organism)
-    job = InferenceJob()
-    job.user = request.user
-    job.species = species[0]
-    job.tmpfile = ratio_file_path
-    job.status = 1
-    job.compute_on = 'kbase'
-    job.ec2ip = None
-    job.use_ensemble = False
-    job.cm_job_id = jobid
-    job.save()
-
-    print "saved expression"
 
 """This is the EC2 view. For cost reasons, currently not exposed"""
 """
