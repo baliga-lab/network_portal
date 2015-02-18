@@ -53,30 +53,44 @@ class JobRepr:
         self.compute_on = compute_on
         self.use_ensemble = 'yes' if use_ensemble else 'no'
 
+def handle_inf_job(ujs_client, job):
+    status_obj = ujs_client.get_job_status(job.inf_job_id)
+    print "Inferelator status", status_obj
+    if status_obj[1] == 'complete':
+        results = ujs_client.get_results(job.inf_job_id)['workspaceids']
+        if len(results) > 0:
+            result_id = results[0]
+            path = result_id.split('/')
+            workspace_name, result_name = path
+        status = "completed, result at: workspace '%s' object '%s'" % (workspace_name,
+                                                                       result_name)
+    else:
+        print status_obj
+        status = '%s - %s' % (status_obj[1], status_obj[2])
+    return status
+
+def handle_cm_job(ujs_client, job):
+    status_obj = ujs_client.get_job_status(job.cm_job_id)
+    if status_obj[1] == 'started':
+        status = "%s (%s)" % (status_obj[1], status_obj[2])
+    elif status_obj[1] == 'complete':
+        results = ujs_client.get_results(job.cm_job_id)['workspaceids']
+        if len(results) > 0:
+            result_id = results[0]
+            path = result_id.split('/')
+            workspace_name, result_name = path
+        status = "completed, result at: workspace '%s' object '%s'" % (workspace_name,
+                                                                       result_name)
+    else:
+        print status_obj
+        status = '%s - %s' % (status_obj[1], status_obj[2])
+    return status
 
 def job_repr(ujs_client, job):
-    if job.cm_job_id is not None:
-        status_obj = ujs_client.get_job_status(job.cm_job_id)
-        if status_obj[1] == 'started':
-            status = "%s (%s)" % (status_obj[1], status_obj[2])
-        elif status_obj[1] == 'complete':
-            results = ujs_client.get_results(job.cm_job_id)['workspaceids']
-            if len(results) > 0:
-                result_id = results[0]
-                path = result_id.split('/')
-                workspace_name, result_name = path
-            status = "completed, result at: workspace '%s' object '%s'" % (workspace_name,
-                                                                           result_name)
-            ws = kbase.workspace(settings.KBASE_WS_SERVICE_URL, workspace_name,
-                                 ws_service_obj=None,
-                                 user=settings.KBASE_USER,
-                                 password=settings.KBASE_PASSWD)
-            obj = ws.get_object(result_name)['data']
-            with open('cmresult.json', 'w') as outfile:
-                outfile.write(json.dumps(obj))
-        else:
-            print status_obj
-            status = '%s - %s' % (status_obj[1], status_obj[2])
+    if job.inf_job_id is not None:
+        status = handle_inf_job(ujs_client, job)
+    elif job.cm_job_id is not None:
+        status = handle_cm_job(ujs_client, job)
     else:
         status = "N/A"
     return JobRepr(job.species.name, job.created_at, status, job.compute_on, job.use_ensemble)

@@ -29,11 +29,13 @@ def start_cm_single(nwp_jobid, data_ws, input_ws, organism, timestamp,
     if operon_obj_name is not None:
         operon_obj_ref = '%s/%s' % (input_ws_name, operon_obj_name)
 
+    # note that the results workspace is also the input workspace
+    ratios_ref = '%s/%s' % (input_ws_name, ratios_obj_name)
     jobid = kbase.run_cmonkey(config.get('KBase', 'cm_service_url'),
                               config.get('KBase', 'user'),
                               config.get('KBase', 'password'),
-                              config.get('KBase', 'cmresults_workspace'),
-                              '%s/%s' % (input_ws_name, ratios_obj_name),
+                              input_ws_name,
+                              ratios_ref,
                               '%s/%s.genome' % (data_ws_name, organism),
                               string_obj_ref, operon_obj_ref)
     print "started job with id: ", jobid
@@ -41,8 +43,8 @@ def start_cm_single(nwp_jobid, data_ws, input_ws, organism, timestamp,
                                                               config.get('Database', 'user'),
                                                               config.get('Database', 'password')))
     cursor = con.cursor()
-    cursor.execute('update inference_inferencejob set cm_job_id=%s where id=%s',
-                   (jobid, nwp_jobid))
+    cursor.execute('update inference_inferencejob set cm_job_id=%s, ratios_file=%s where id=%s',
+                   (jobid, ratios_ref, nwp_jobid))
     con.commit()
     cursor.close()
     con.close()

@@ -29,8 +29,14 @@ class UserAndJobState(object):
     def get_job_status(self):
         return self.ujs_service.get_job_status(self.job_id)
 
+    def get_job_info(self):
+        return self.ujs_service.get_job_info(self.job_id)
+
     def get_detailed_error(self):
         return self.ujs_service.get_detailed_error(self.job_id)
+
+    def get_results(self):
+        return self.ujs_service.get_results(self.job_id)
 
 
 class WorkspaceInstance(object):
@@ -324,20 +330,24 @@ def user_job_state(service_url, user, password, jobid):
 
 def run_cmonkey(service_url, user, password, target_workspace,
                 series_ref, genome_ref, network_ref, operome_ref):
-  cm_service = cmc.Cmonkey(service_url, user_id=user, password=password)
-  print "running cmonkey on kbase"
-  print "series_ref: '%s'" % series_ref
-  print "genome_ref: '%s'" % genome_ref
-  print "operome_ref: '%s'" % operome_ref
-  print "network_ref: '%s'" % network_ref
-
-  return cm_service.run_cmonkey(target_workspace,
-                                {'series_ref': series_ref,
-                                 'genome_ref': genome_ref,
-                                 'operome_ref': operome_ref,
-                                 'network_ref': network_ref,
-                                 'networks_scoring': 1,
-                                 'motifs_scoring': 1})
+    cm_service = cmc.Cmonkey(service_url, user_id=user, password=password)
+    print "running cmonkey on kbase"
+    print "series_ref: '%s'" % series_ref
+    print "genome_ref: '%s'" % genome_ref
+    print "operome_ref: '%s'" % operome_ref
+    print "network_ref: '%s'" % network_ref
+    if network_ref is None:
+        network_ref = ''
+        networks_scoring = 0
+    else:
+        networks_scoring = 1
+    return cm_service.run_cmonkey(target_workspace,
+                                  {'series_ref': series_ref,
+                                   'genome_ref': genome_ref,
+                                   'operome_ref': operome_ref,
+                                   'network_ref': network_ref,
+                                   'networks_scoring': networks_scoring,
+                                   'motifs_scoring': 1})
 
 
 class CmonkeyResult(object):

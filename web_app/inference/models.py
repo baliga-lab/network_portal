@@ -10,7 +10,7 @@ class InferenceJob(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL)
     species = models.ForeignKey(Species)
     network = models.ForeignKey(Network, null=True)
-    tmpfile = models.CharField(max_length=200)
+    ratios_file = models.CharField(max_length=200)
 
     # 1 = ready
     status = models.IntegerField()
