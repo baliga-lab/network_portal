@@ -80,30 +80,50 @@ def extract_job_info(con, nwp_jobid, cm_result):
     conditions = sample_ids_map.values()[0]
     num_conditions = len(conditions)
     print "# conditions: ", num_conditions
-    ratios_sample1 = get_object(ratios_file + '-1')
-    exp_levels = ratios_sample1['data']['expression_levels']
-    num_genes = len(exp_levels)
-    print "# genes: ", num_genes
 
+    # Extract the used conditions and genes here
+    features = None
+    used_features = {}
+    conditions = []
+
+    for samplenum in range(num_conditions):
+        ratios_sample = get_object('%s-%d' % (ratios_file, samplenum))
+        cond_name = ratios_sample['data']['source_id']
+        conditions.append(cond_name)
+
+        if features is None:
+            exp_levels = ratios_sample['data']['expression_levels']
+            num_genes = len(exp_levels)
+            used_genes =  exp_levels.keys()
+            genome_id = ratios_sample['data']['genome_id']
+            genome = get_object(genome_id)
+            features = genome['data']['features']
+
+            for feature in features:
+                if feature['id'] in used_genes:
+                    for alias in feature['aliases']:
+                        cursor.execute('select id,name from networks_gene where species_id=%s and (name=%s or common_name=%s)', (species_id, alias, alias))
+                        matches = [(row[0], row[1]) for row in cursor.fetchall()]
+                        if len(matches) > 0:
+                            used_features[feature['id']] = matches[0]
+                            break
+    print "conditions: ", conditions
+    print "# used features: ", len(used_features)
+            
     """
-    genome_id = ratios_sample1['data']['genome_id']
-    genome = get_object(genome_id)
-    features = genome['data']['features']
-    for feature in features:
-        if 'aliases' in feature:
-            print feature['id'] + str(feature['aliases'])
-        else:
-            print feature['id'] + ' (no aliases)'
     #with open('hal_genome.json', 'w') as outfile:
     #    outfile.write(json.dumps(genome))
     """
-    """
+    # Creates the network
     nw_id = impcm.insert_network(cursor, orgcode, finish_time, (num_genes, num_conditions),
                                  user_id)
-    con.commit()
     print "Created network with id: ", nw_id
-    """
-    pass
+    # 1. insert conditions
+    condition_map = impcm.insert_conditions(cursor, nw_id, conditions)
+    print condition_map
+    
+    # 2. create biclusters
+    #con.commit()
 
 
 def check_inf_jobs():
