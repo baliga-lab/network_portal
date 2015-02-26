@@ -19,7 +19,7 @@ from django import forms
 
 from .forms import UploadConfigForm, UploadRunResultForm, KBaseCmonkeyForm
 from .models import InferenceJob
-from networks.models import Species
+from networks.models import Species, Network
 
 from kbcmonkey import kbase
 import kbcmonkey.UserAndJobStateClient as ujs
@@ -102,6 +102,8 @@ def userdata(request):
                                      password=settings.KBASE_PASSWD)
     jobs = InferenceJob.objects.filter(user=request.user)
     jobs = [job_repr(ujs_client, job) for job in jobs]
+
+    networks = Network.objects.filter(user=request.user)
 
     cmform = UploadRunResultForm()
     kbcmform = KBaseCmonkeyForm()

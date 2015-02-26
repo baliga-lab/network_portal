@@ -62,7 +62,7 @@ def bicluster_hcseries(request, bicluster_id=None):
     return HttpResponse(json.dumps(data), mimetype='application/json')
 
 def networks(request):
-    networks = Network.objects.all()
+    networks = Network.objects.filter(user=None)
     return render_to_response('networks.html', locals())
 
 def network(request, species=None, network_num=None):

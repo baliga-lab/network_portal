@@ -62,14 +62,15 @@ def dbconn():
 
 def extract_job_info(con, nwp_jobid, cm_result):
     cursor = con.cursor()
-    cursor.execute('select species_id,ratios_file from inference_inferencejob where id=%s',
+    cursor.execute('select species_id,ratios_file,user_id from inference_inferencejob where id=%s',
                    [nwp_jobid])
-    species_id, ratios_file = cursor.fetchone()
+    species_id, ratios_file, user_id = cursor.fetchone()
     cursor.execute('select short_name from networks_species where id=%s', [species_id])
     orgcode = cursor.fetchone()[0]
     print "organism: ", orgcode
     print "start time: ", cm_result['data']['start_time']
-    print "finish time: ", cm_result['data']['finish_time']
+    finish_time = cm_result['data']['finish_time']
+    print "finish time: ", finish_time
     print "ratios: ", ratios_file
     ratios_skel = get_object(ratios_file)
     
@@ -96,7 +97,13 @@ def extract_job_info(con, nwp_jobid, cm_result):
     #with open('hal_genome.json', 'w') as outfile:
     #    outfile.write(json.dumps(genome))
     """
-    nw_id = impcm.insert_network(cursor, orgcode, finish_time, (num_genes, num_conditions))
+    """
+    nw_id = impcm.insert_network(cursor, orgcode, finish_time, (num_genes, num_conditions),
+                                 user_id)
+    con.commit()
+    print "Created network with id: ", nw_id
+    """
+    pass
 
 
 def check_inf_jobs():

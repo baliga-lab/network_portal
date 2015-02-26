@@ -76,10 +76,27 @@ $(document).ready(function() {
           <b>Upload your cmonkey run</b> <input type="submit" value="Upload..." style="margin-left: 8px"></input><br>
           Gene expression file {{cmform.ratios}}<br>
           cmonkey run result file {{cmform.result}}</form>
-      <table id="jobs-table" class="tablesorter">
+
+      <table id="user-networks-table" class="tablesorter">
         <caption>Networks</caption>
-        <thead></thead>
-        <tbody><tbody>
+        <thead>
+          <tr>
+            <th>Organism</th>
+            <th>Name</th>
+            <th>Data Source</th>
+            <th>version_id</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for network in networks %}
+          <tr>
+            <td>{{network.species}}</td>
+            <td>{{network.name}}</td>
+            <td>{{network.data_source}}</td>
+            <td>{{network.version_id}}</td>
+          </tr>
+          {% endfor %}
+        <tbody>
       </table>
     </div>
     <div id="kbasejob-tab" style="width: 100%">
