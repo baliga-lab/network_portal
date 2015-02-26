@@ -303,6 +303,16 @@ def workspaces_for(service_url, user, password):
     return [ws for ws in __workspaces(ws_service)]
 
 
+def get_object_by_ref(service_url, user, password, objref):
+    ws_service = wsc.Workspace(service_url, user_id=user, password=password)
+    return ws_service.get_object({'id': objref})
+
+
+def workspace_objects(ws_service, ws_name):
+    """as a reminder because of currently missing KBase API documentation"""
+    return ws_service.list_workspace_objects({'workspace': ws_name})
+
+
 def workspace(service_url, ws_name, ws_service_obj=None,
               user=None, password=None, search_global=False):
     if ws_service_obj is None:
