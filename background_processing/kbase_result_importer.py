@@ -84,10 +84,12 @@ def insert_biclusters(dstcur, nw_id, cluster_data, used_features, kb_cond_map, c
 
        cluster_data: a list of tuples, (cluster, residual, row_members, col_members, motifs)
     """
+    cluster_ids = []
     for cluster, residual, row_members, col_members, motifs in cluster_data:
         #print "processing bicluster %d" % cluster
         dstcur.execute("insert into networks_bicluster (network_id,k,residual) values (%s,%s,%s) returning id", [nw_id, cluster, residual])
         cluster_id = dstcur.fetchone()[0]
+        cluster_ids.append(cluster_id)
 
         for row_member in row_members:
             gene_id = used_features[row_member][0]
@@ -96,7 +98,22 @@ def insert_biclusters(dstcur, nw_id, cluster_data, used_features, kb_cond_map, c
         for col_member in col_members:
             cond_id = condition_map[kb_cond_map[col_member]]
             dstcur.execute("insert into networks_bicluster_conditions (bicluster_id,condition_id) values (%s,%s)", [cluster_id,cond_id])
-            
+
+        for i, motif in enumerate(motifs):
+            pssm_id, evalue, pssm_rows, num_sites, hits = motif
+            dstcur.execute("insert into networks_motif (bicluster_id,position,sites,e_value) values (%s,%s,%s,%s) returning id", [cluster_id,i+1,num_sites,evalue])
+            motif_id = dstcur.fetchone()[0]
+
+            # annotations
+            for pval, pos, strand, gene_id in hits:
+                dstcur.execute('insert into networks_motifannotation (motif_id,gene_id,position,reverse,pvalue) values (%s,%s,%s,%s,%s)', [motif_id,gene_id,pos, strand == '-',pval])
+
+            # pssms
+            for row, pssm_row in enumerate(pssm_rows):
+                a, c, g, t = pssm_row
+                dstcur.execute('insert into pssms (motif_id,position,a,c,g,t) values (%s,%s,%s,%s,%s,%s)', [motif_id, row, a, c, g, t])
+
+    return cluster_ids
 
 def process_clusters(cursor, nw_id, cm_result, used_features, kb_cond_map, condition_map):
     """
@@ -110,7 +127,6 @@ def process_clusters(cursor, nw_id, cm_result, used_features, kb_cond_map, condi
                     for cluster_num, cluster in enumerate(cm_result['data']['network']['clusters'])]
     cluster_ids = insert_biclusters(cursor, nw_id, cluster_data, used_features,
                                     kb_cond_map, condition_map)
-    print cluster_ids
     return cluster_ids
 
 
@@ -143,7 +159,6 @@ def extract_job_info(con, nwp_jobid, cm_result):
     num_conditions = len(conditions)
     print "# conditions: ", num_conditions
     sample_refs = sample_ids_map.values()[0]
-    print sample_refs
 
     # Extract the used conditions and genes here
     features = None
@@ -177,7 +192,6 @@ def extract_job_info(con, nwp_jobid, cm_result):
                         if len(matches) > 0:
                             used_features[feature['id']] = matches[0]
                             break
-    print "KB cond map: ", kb_cond_map
     print "# used features: ", len(used_features)
 
     # Creates the network
@@ -189,9 +203,10 @@ def extract_job_info(con, nwp_jobid, cm_result):
     print condition_map
 
     # 2. create biclusters
-    process_clusters(cursor, nw_id, cm_result, used_features, kb_cond_map, condition_map)
+    cluster_ids = process_clusters(cursor, nw_id, cm_result, used_features, kb_cond_map, condition_map)
+    print "%d clusters created" % len(cluster_ids)
 
-    #con.commit()
+    con.commit()
 
 
 def check_inf_jobs():
