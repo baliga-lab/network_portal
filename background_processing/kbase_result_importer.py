@@ -33,7 +33,6 @@ def get_result_object(jobid):
                                     ws_name=ws_name,
                                     user=config.get('KBase', 'user'),
                                     password=config.get('KBase', 'password'))
-
         return result_ws.get_object(inst_name)
 
 
@@ -50,8 +49,69 @@ def get_object(objref):
     #for obj in objs:
     #    print obj
     # DEBUG END
-
     return result
+
+
+def get_objects_by_ref(objrefs):
+    return kbase.get_objects_by_ref(config.get('KBase', 'ws_service_url'),
+                                    user=config.get('KBase', 'user'),
+                                    password=config.get('KBase', 'password'),
+                                    objrefs=objrefs)
+
+
+def extract_motif(cmr_cluster, used_features):
+    result = []
+    for motif in cmr_cluster['motifs']:
+        cmr_sites = motif['sites']
+        cmr_hits = motif['hits']
+        hits = []
+        for cmr_hit in cmr_hits:
+            nwp_gene_id = used_features[cmr_hit['seq_id']][0]
+            hits.append((cmr_hit['hit_pvalue'],
+                         cmr_hit['hit_start'],
+                         cmr_hit['strand'],  # - or +
+                         nwp_gene_id))
+
+        result.append((motif['pssm_id'], motif['evalue'], motif['pssm_rows'], len(cmr_sites),
+                       hits))
+    return result
+
+
+def insert_biclusters(dstcur, nw_id, cluster_data, used_features, kb_cond_map, condition_map):
+    """Create biclusters in the database and returns a mapping
+    cluster numbers -> database id
+    Input:
+
+       cluster_data: a list of tuples, (cluster, residual, row_members, col_members, motifs)
+    """
+    for cluster, residual, row_members, col_members, motifs in cluster_data:
+        #print "processing bicluster %d" % cluster
+        dstcur.execute("insert into networks_bicluster (network_id,k,residual) values (%s,%s,%s) returning id", [nw_id, cluster, residual])
+        cluster_id = dstcur.fetchone()[0]
+
+        for row_member in row_members:
+            gene_id = used_features[row_member][0]
+            dstcur.execute("insert into networks_bicluster_genes (bicluster_id,gene_id) values (%s,%s)", [cluster_id,gene_id])
+
+        for col_member in col_members:
+            cond_id = condition_map[kb_cond_map[col_member]]
+            dstcur.execute("insert into networks_bicluster_conditions (bicluster_id,condition_id) values (%s,%s)", [cluster_id,cond_id])
+            
+
+def process_clusters(cursor, nw_id, cm_result, used_features, kb_cond_map, condition_map):
+    """
+    a. bicluster + residual
+    b. row members
+    c. column members
+    """
+    cluster_data = [(cluster_num + 1, cluster['residual'], cluster['gene_ids'],
+                     cluster['sample_ws_ids'],
+                     extract_motif(cluster, used_features))
+                    for cluster_num, cluster in enumerate(cm_result['data']['network']['clusters'])]
+    cluster_ids = insert_biclusters(cursor, nw_id, cluster_data, used_features,
+                                    kb_cond_map, condition_map)
+    print cluster_ids
+    return cluster_ids
 
 
 def dbconn():
@@ -71,25 +131,35 @@ def extract_job_info(con, nwp_jobid, cm_result):
     print "start time: ", cm_result['data']['start_time']
     finish_time = cm_result['data']['finish_time']
     print "finish time: ", finish_time
-    print "ratios: ", ratios_file
-    ratios_skel = get_object(ratios_file)
+    series_ref = cm_result['data']['parameters']['series_ref']
+    print "ratios file: ", ratios_file
+    print "series_ref: ", series_ref
+    # for consistency, take the expression from the result object
+    ratios_skel = get_objects_by_ref([series_ref])[0]
     
-    # TODO
     # We need to map KBase genome ids to Network portal gene ids
     sample_ids_map = ratios_skel['data']['genome_expression_sample_ids_map']
     conditions = sample_ids_map.values()[0]
     num_conditions = len(conditions)
     print "# conditions: ", num_conditions
+    sample_refs = sample_ids_map.values()[0]
+    print sample_refs
 
     # Extract the used conditions and genes here
     features = None
     used_features = {}
-    conditions = []
+    kb_cond_map = {}
 
-    for samplenum in range(num_conditions):
-        ratios_sample = get_object('%s-%d' % (ratios_file, samplenum))
+    #for samplenum in range(num_conditions):
+    for ratios_sample in get_objects_by_ref(sample_refs):
+        # the cond_id is used in the KBase result object, store it for later when
+        # extracting the biclusters
         cond_name = ratios_sample['data']['source_id']
-        conditions.append(cond_name)
+        kb_sample_id = ratios_sample['data']['id']
+
+        # we need this to map column members in KBase's result format to
+        # the original condition name
+        kb_cond_map[kb_sample_id] = cond_name
 
         if features is None:
             exp_levels = ratios_sample['data']['expression_levels']
@@ -107,22 +177,20 @@ def extract_job_info(con, nwp_jobid, cm_result):
                         if len(matches) > 0:
                             used_features[feature['id']] = matches[0]
                             break
-    print "conditions: ", conditions
+    print "KB cond map: ", kb_cond_map
     print "# used features: ", len(used_features)
-            
-    """
-    #with open('hal_genome.json', 'w') as outfile:
-    #    outfile.write(json.dumps(genome))
-    """
+
     # Creates the network
     nw_id = impcm.insert_network(cursor, orgcode, finish_time, (num_genes, num_conditions),
                                  user_id)
     print "Created network with id: ", nw_id
     # 1. insert conditions
-    condition_map = impcm.insert_conditions(cursor, nw_id, conditions)
+    condition_map = impcm.insert_conditions(cursor, nw_id, kb_cond_map.values())
     print condition_map
-    
+
     # 2. create biclusters
+    process_clusters(cursor, nw_id, cm_result, used_features, kb_cond_map, condition_map)
+
     #con.commit()
 
 

@@ -303,9 +303,9 @@ def workspaces_for(service_url, user, password):
     return [ws for ws in __workspaces(ws_service)]
 
 
-def get_object_by_ref(service_url, user, password, objref):
+def get_objects_by_ref(service_url, user, password, objrefs):
     ws_service = wsc.Workspace(service_url, user_id=user, password=password)
-    return ws_service.get_object({'id': objref})
+    return ws_service.get_objects([{'ref': objref} for objref in objrefs])
 
 
 def workspace_objects(ws_service, ws_name):

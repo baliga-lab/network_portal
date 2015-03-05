@@ -149,6 +149,7 @@ def copy_motif_data(dstcur, srccur2, srccur3, maxiter, cluster, bc_id, gene_map,
             dstcur.execute('insert into pssms (motif_id,position,a,c,g,t) values (%s,%s,%s,%s,%s,%s)', [m_id,row,a,c,g,t])
 
 
+
 def copy_biclusters(dstcur, srcconn, nw_id, syns):
     """copy biclusters and related data (motifs)"""
     srccur = srcconn.cursor()
