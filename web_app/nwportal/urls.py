@@ -8,7 +8,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'views.home', name='home'),
-    #url(r'^openid/complete/\w*$', 'views.logincomplete', name='about'),
 
     # django_openid_auth
     url(r'^openid/', include('django_openid_auth.urls')),
@@ -55,8 +54,6 @@ urlpatterns = patterns('',
     url(r'^seqviewer', 'views.seqviewer', name='seqviewer'),
 
     # network inference app
-    # url(r'^configjob$', 'inference.views.configjob', name='configjob'),
-
     url(r'^userdata$', 'inference.views.userdata', name='userdata'),
     url(r'^upload_cmrun', 'inference.views.upload_cmrun', name='upload_cmrun'),
     url(r'^start_kbase_cm', 'inference.views.start_kbase_cm', name='start_kbase_cm'),
@@ -99,10 +96,7 @@ urlpatterns = patterns('',
     # Login / Logout
     #url(r'^login/$', 'django.contrib.auth.views.login'),
     url(r'^logout$', 'views.logout_page'),
-    url(r'^login/$', 'views.login_page'),
 
-    #(r'^analysis/$', 'networks.views.analysis', name='analysis'),
-    #(r'^analysis/$', include('analysis.urls')),
     (r'^analysis/gene/$', 'networks.views.analysis_gene'),
     (r'^analysis/network/$', 'networks.views.network'),
     (r'^analysis/function/$', 'networks.views.function'),

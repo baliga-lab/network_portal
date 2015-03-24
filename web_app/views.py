@@ -1,47 +1,36 @@
 from django import forms
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
-from django.http import Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.template import Context
+from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth import logout
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import formats
 from django.utils.formats import get_format
 from django.db import transaction
 from django.conf import settings
-from datetime import datetime
-from datetime import timedelta
 from django.utils.timezone import utc
 
-import json
-
-# apparently, the location of this changed between Django versions?
-# from django.contrib.csrf.middleware import csrf_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
-from django.views.decorators.csrf import csrf_exempt
+
+from django.core.files import File
+
+import itertools
+import urllib2
+import json
+
+import os
+import mimetypes
+import shutil
+from collections import namedtuple
+from datetime import datetime, timedelta
 
 from networks.models import *
 from networks.functions import functional_systems
 from networks.helpers import get_influence_biclusters
 
-import openid
-
-import itertools
-import urllib2
-
-from django.core.files import File
-import os
-import mimetypes
-import shutil
-from collections import namedtuple
-
-from django.contrib.auth.decorators import login_required
 
 Dialog = namedtuple('Dialog', ['name', 'short_name', 'network_url', 'ngenes', 'ntfs', 'coords'])
 
@@ -1361,48 +1350,6 @@ def getreportdata(request, workflowid, sessionid, workflownodeid, filename):
     return response
 
 
-
-
-# This function is not used now.
-# It extracts the authentication info from response of the openid server
-def logincomplete(request):
-    print "login redirect"
-    print request.REQUEST
-    mode = request.REQUEST['openid.mode']
-    if mode == 'id_res':
-        firstname = request.REQUEST['openid.ext1.value.firstname']
-        lastname = request.REQUEST['openid.ext1.value.lastname']
-        email = request.REQUEST['openid.ext1.value.email']
-        identity = request.REQUEST['openid.identity']
-        print firstname + ' ' + lastname + ' ' + email + ' ' + identity
-        if request.user.is_authenticated():
-            print 'User ' + request.user.username + ' ' + request.user.password + ' authenticated'
-            #request.user.username = email
-            #request.user.first_name = firstname
-            #request.user.last_name = lastname
-            #request.user.email = email
-
-        userresult = Users.objects.filter(password = identity)
-        if (len(userresult) == 0):
-            #Create a user
-            #UserManager manager
-            record = Users(firstname = firstname,
-                           lastname = lastname,
-                           email = email,
-                           password = identity)
-            record.save()
-        else:
-            user = userresult[0]
-            user.firstname = firstname
-            user.lastname = lastname
-            user.email = email
-            user.save()
-        return HttpResponseRedirect('/')
-    else:
-        error_message = "Invalid login."
-
-
-
 def logout_page(request):
     """
     Log users out and re-direct them to the main page.
@@ -1410,27 +1357,6 @@ def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
 
-class LoginForm(forms.Form):
-    username = forms.CharField(max_length=100)
-    password = forms.CharField(max_length=100)
-
-def login_page(request):
-    print "LOGIN PAGE !!"
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(username=request.POST['username'], password=request.POST['password'])
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponseRedirect('/')
-                else:
-                    error_message = "The account for user %s (%s) is disabled." % (user.get_full_name(), user.username)
-            else:
-                error_message = "Invalid login."
-    else:
-        form = LoginForm()
-    return render_to_response('login.html', locals(), context_instance=RequestContext(request))
 
 def help(request):
     return render_to_response('help.html', locals())
