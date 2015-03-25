@@ -6,11 +6,11 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^$', 'views.home', name='home'),
+    url('', include('social.apps.django_app.urls', namespace='social')),
 
-    # django_openid_auth
-    url(r'^openid/', include('django_openid_auth.urls')),
     url(r'^about$', 'views.about', name='about'),
     url(r'^contact$', 'views.contact', name='contact'),
     url(r'^inference$', 'views.inference', name='inference'),

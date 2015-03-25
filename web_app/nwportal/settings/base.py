@@ -143,8 +143,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django_openid_auth',
-    #'social_auth',
+    'social.apps.django_app.default',
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -183,19 +182,18 @@ LOGGING = {
 }
 
 AUTHENTICATION_BACKENDS = (
-            'django_openid_auth.auth.OpenIDBackend',
-            #'social_auth.backends.contrib.github.GithubBackend',
-            'django.contrib.auth.backends.ModelBackend',
-        )
+    'social.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
-OPENID_CREATE_USERS = True
-LOGIN_URL = '/openid/login/'
-LOGIN_REDIRECT_URL = '/'
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
+# Social Auth Settings
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
+
 
 # KBase settings
-KBASE_USER = 'nwportal'
-KBASE_PASSWD = '<3P[[Dg)KR5GhL<'
+KBASE_USER = ''
+KBASE_PASSWD = ''
 KBASE_DATA_WORKSPACE = 'nwportal:nwportal_data'
 KBASE_CMRESULTS_WORKSPACE = 'nwportal:cmtestresults'
 
