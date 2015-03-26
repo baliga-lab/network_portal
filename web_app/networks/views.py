@@ -59,7 +59,7 @@ def bicluster_hcseries(request, bicluster_id=None):
                           'data': map(lambda v: 0 if math.isnan(v) else v,
                                       [exps[gene][cond] for cond in conds
                                        if gene in exps and cond in exps[gene]])})
-    return HttpResponse(json.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 def networks(request):
     networks = Network.objects.filter(user=None)
@@ -67,6 +67,11 @@ def networks(request):
 
 def network(request, species=None, network_num=None):
     network = Network.objects.filter(species__short_name=species)[0]
+    return render_to_response('network.html', locals())
+
+
+def network_by_id(request, network_id=None):
+    network = Network.objects.get(id=network_id)
     return render_to_response('network.html', locals())
 
 
@@ -484,7 +489,7 @@ def pssm(request):
         pssm_list.append(position_list)
 
     data = {'alphabet':alphabet, 'values':pssm_list }
-    return HttpResponse(json.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 def circvis(request):
     gene = request.GET['gene']
@@ -578,6 +583,6 @@ letter-probability matrix: alength= 4 w= %d nsites= %d E= %.3e
         for row in m.pssm:
             meme_result += """%.3f %.3f %.3f %.3f\n""" % (row['a'], row['c'],
                                                           row['g'], row['t'])
-    resp = HttpResponse(meme_result, mimetype='application/meme')
+    resp = HttpResponse(meme_result, content_type='application/meme')
     resp['Content-Disposition'] = 'attachment; filename="%s_motifs.meme"' % species
     return resp

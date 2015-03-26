@@ -9,6 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^$', 'views.home', name='home'),
+    url(r'^admin/', include(admin.site.urls)),
     url('', include('social.apps.django_app.urls', namespace='social')),
 
     url(r'^about$', 'views.about', name='about'),
@@ -83,19 +84,17 @@ urlpatterns = patterns(
     url(r'^network/graphml', 'networks.views.network_as_graphml', name='network'),
     url(r'^network/(?P<network_id>\d+)/regulated_by/(?P<regulator>.*)$', 'networks.views.regulated_by', name='regulated by'),
     url(r'^network/(?P<network_id>\d+)/gene/(?P<gene>.*)$', 'networks.views.gene', name='network_gene'),
+    url(r'^network_by_id/(?P<network_id>\d+)$', 'networks.views.network_by_id',
+        name='network_by_id'),
     
     url(r'^functions/(?P<type>[^/]*)/?$', 'networks.views.functions', name='functions'),
     url(r'^function/(?P<name>[^/]*)/?$', 'networks.views.function', name='function'),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Login / Logout
     #url(r'^login/$', 'django.contrib.auth.views.login'),
-    url(r'^logout$', 'views.logout_page'),
+    url(r'^logout$', 'views.logout_page', name='logout'),
 
     (r'^analysis/gene/$', 'networks.views.analysis_gene'),
     (r'^analysis/network/$', 'networks.views.network'),

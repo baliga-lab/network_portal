@@ -59,18 +59,18 @@
     {% block basewrap %}<div id="wrap-no-line">{% endblock %}
     <div id="header">
       <h1 id="logo-text"><a href="/"></a>
-     <a href="/"><img alt="Logo" src="{{ STATIC_PREFIX }}images/logo-text.png"></a></h1>
+     <a href="{% url 'home' %}"><img alt="Logo" src="{{ STATIC_PREFIX }}images/logo-text.png"></a></h1>
      <p id="slogan"> <a href="http://www.systemsbiology.org"><img alt="Logo" src="{{ STATIC_PREFIX }}images/isb_logo.png"></a></p>    
      <div id="underlinemenu" class="underlinemenu">
 	<ul>
 	  {% if request.user.is_authenticated %}
-	  <li><a href="/logout" title="Click to logout">{{ request.user.email }}</a></li>
-      <li><a href="/workspace" title="Go to My workspace">My Workspace</a></li>
+	  <li><a href="{% url 'logout' %}" title="Click to logout">{{ request.user.email }}</a></li>
+      <li><a href="{% url 'workspace' %}" title="Go to My workspace">My Workspace</a></li>
 	  {% else %}
 	  <li><a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login</a></li>
 	  {% endif %}
-	  <li><a href="/about">About</a></li>
-	  <li><a href="/contact">Contact</a></li>
+	  <li><a href="{% url 'about' %}">About</a></li>
+	  <li><a href="{% url 'contact' %}">Contact</a></li>
 	  <li><a href="{{ STATIC_PREFIX }}apidocuments">API</a></li>
 	</ul>
       </div>
@@ -80,9 +80,6 @@
           <li class="{% active request "^/$" %}"><a href="/">Home</a></li>
           <li class="{% active request "^/search" %}"><a href="/search">Search</a></li>
           <li class="{% active request "^/species" %}"><a href="/species">Species</a></li>
-          <!--<li class="{% active request "^/function" %}"><a href="/functions/">Function</a></li>-->
-          <!--<li class="{% active request "^/networks" %}"><a href="/networks/">Networks</a></li>-->
-
           <li class="{% active request "^/workspace" %}"><a href="/workspace">Workspace</a></li>
 	        {% if request.user.is_authenticated %}
           <li class="{% active request "^/userdata" %}"><a href="/userdata">My Networks</a></li>
@@ -103,8 +100,8 @@
          <!--<a href="http://genomicscience.energy.gov/index.shtml#page=news"><img height="50px"src="{{ STATIC_PREFIX }}images/kbase-logo.jpg"></a>-->
 	  <p> &copy <a href="http://baliga.systemsbiology.net/" title="Baliga Lab">Baliga Lab</a>
           | <a href="http://systemsbiology.org" title="ISB">Institute for Systems Biology</a>
-        | <a href="/workspace">Development</a>
-        | <a href="/">Home</a></p> 	
+        | <a href="{% url 'workspace' %}">Development</a>
+        | <a href="{% url 'home' %}">Home</a></p>
 	{% endblock %}
       </div>{# end footer #}
       <center>
