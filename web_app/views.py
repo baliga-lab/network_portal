@@ -66,7 +66,7 @@ def about(request):
 def contact(request):
     return render_to_response('contact.html', locals())
 
-@login_required
+#@login_required
 def inference(request):
     return render_to_response('inference.html', locals())
 
