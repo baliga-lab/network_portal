@@ -24,11 +24,7 @@ from networks.models import Species, Network
 from kbcmonkey import kbase
 import kbcmonkey.UserAndJobStateClient as ujs
 
-import cmonkey.datamatrix as dm
-import cmonkey.util as util
-
 import uuid
-#import startboto
 
 """
 def setup_channel(exchange, user, password, vhost, host='localhost'):
