@@ -8,7 +8,7 @@ import tempfile
 import time
 import datetime
 
-import pika
+#import pika
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -30,6 +30,7 @@ import cmonkey.util as util
 import uuid
 #import startboto
 
+"""
 def setup_channel(exchange, user, password, vhost, host='localhost'):
     credentials = pika.PlainCredentials(user, password)
     conn_params = pika.ConnectionParameters(host=host,
@@ -43,7 +44,7 @@ def setup_channel(exchange, user, password, vhost, host='localhost'):
                              durable=False,
                              auto_delete=True)
     return channel
-
+"""
 
 class JobRepr:
     def __init__(self, species, created_at, status, compute_on, use_ensemble):
@@ -120,7 +121,6 @@ def write_uploadfile(upload_file):
             tmpfile.write(chunk)
     print "written as: ", filename
     return filename
-    
 
 def process_ratiofile(ratiofile):
     destfilename = write_uploadfile(ratiofile)
@@ -166,9 +166,9 @@ def upload_cmrun(request):
     else:
         raise Exception('BOOOOO')
 
-
+"""
 def prepare_kbase_cm_runs(nwp_jobid, organism, username, use_ensemble, files):
-    """using the parameters to send to the background processing system"""
+    using the parameters to send to the background processing system
     msg = { 'nwp_jobid': nwp_jobid, 'use_ensemble': use_ensemble,
             'organism': organism, 'username': username }
 
@@ -198,11 +198,11 @@ def prepare_kbase_cm_runs(nwp_jobid, organism, username, use_ensemble, files):
                              properties=msg_props,
                              routing_key=rabbit_config['routing_key']):
         print "message confirmed"
-    channel.close()
+    channel.close()"""
 
+"""
 def start_kbase_cm(request):
-    """This is the form action for uploading and importing a user cmonkey run into the system
-    """
+    # This is the form action for uploading and importing a user cmonkey run into the system
     print "start_kbase_cm()"
     if request.method == 'POST':
         form = KBaseCmonkeyForm(request.POST, request.FILES)
@@ -232,6 +232,7 @@ def start_kbase_cm(request):
         return HttpResponse(json.dumps(result), content_type='application/json')
     else:
         raise Exception('BOOOOO')
+"""
 
 
 """This is the EC2 view. For cost reasons, currently not exposed"""
@@ -263,7 +264,6 @@ def configjob(request):
             job.save()
             return HttpResponseRedirect('/')
         else:
-            
             print "form is not valid"
     else:
         form = UploadConfigForm()
