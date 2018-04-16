@@ -81,9 +81,11 @@
           <li class="{% active request "^/search" %}"><a href="/search">Search</a></li>
           <li class="{% active request "^/species" %}"><a href="/species">Species</a></li>
           <li class="{% active request "^/workspace" %}"><a href="/workspace">Workspace</a></li>
+          {#
 	        {% if request.user.is_authenticated %}
           <li class="{% active request "^/userdata" %}"><a href="/userdata">My Networks</a></li>
           {% endif %}
+          #}
 	        {% if request.user.is_staff %}
           <li class="{% active request "^/nwpadmin" %}"><a href="/nwpadmin">Administration</a></li>
           {% endif %}
