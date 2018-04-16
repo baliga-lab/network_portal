@@ -5,6 +5,7 @@ from itertools import chain
 from pprint import pprint
 import json
 import collections
+import logging
 
 from django.template import RequestContext
 from django.http import HttpResponse
@@ -17,6 +18,8 @@ import networkx as nx
 from .models import *
 from .functions import functional_systems
 from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
+
+logger = logging.getLogger(__name__)
 
 # I renamed this to make a gene page
 def analysis_gene(request):
@@ -232,7 +235,7 @@ def gene_popup(request, gene_id=None):
                                 for function in functions ]
         systems.append(system)
     return render_to_response('gene_snippet.html', locals())
-    
+
 
 def gene(request, species=None, gene=None, network_id=None):
     """TODO: What is this ? This handler does too much !!!
@@ -252,7 +255,7 @@ def gene(request, species=None, gene=None, network_id=None):
         gene_count = Gene.objects.count()
         species_count = Species.objects.count()
         return render_to_response('genes_empty.html', locals())
-    
+
     # TODO: need to figure out how to handle cases where there's
     # more than one network
     if network_id:
@@ -263,6 +266,7 @@ def gene(request, species=None, gene=None, network_id=None):
     else:
         network_id = None
     member_biclusters, influence_biclusters = get_influence_biclusters(gene)
+    logger.info("# influence_biclusters: %d", len(influence_biclusters))
 
     # set species for use in template
     species = gene.species
@@ -299,7 +303,7 @@ def gene(request, species=None, gene=None, network_id=None):
                 preview_added = True
     motifs = all_motifs  # used in template
     preview_motifs = preview_motifs[:2]  # restrict to 2 motifs on the front tab to improve load time
-    
+
     return render_to_response('gene.html', locals())
 
 SVG_MAP = {

@@ -30,7 +30,7 @@ def nice_string(obj):
 def get_influence_biclusters(gene):
     # get all biclusters that the gene is a member of
     member_biclusters = gene.bicluster_set.all()
-    
+
     # get regulatory influences for this gene
     influence_biclusters = []
     for bicluster in member_biclusters:
