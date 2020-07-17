@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/jquery-overlay.css" media="screen" />
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/start/jquery-ui.css" />
 <link rel="stylesheet" href="{{STATIC_PREFIX}}stylesheets/accordion-slider.css" media="screen" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" media="screen" />
 {% endblock %}
 {% block jsspecial %}
 
@@ -34,6 +35,7 @@
   <h5>Welcome to Network Portal  <img src="{{ STATIC_PREFIX }}images/logo_small.png" title="Network Portal Icon" style="background:none;border:0px;position:relative; float:right;"></h5>
   <p> Network Portal provides analysis and visualization tools for selected gene regulatory networks to aid researchers in biological discovery and hypothesis development. [<a href="/about" title="Read more"> ..read more</a>]</p>
 <p><a class="large blue awesome" href="/help#tabs-4"> See it in Action</a><a class="large magenta awesome" href="/help"> Get Help</a><a class="large yellow awesome" href="/help#tabs-5"> Get involved</a>
+<!--
 <div>
 	<ul id="accordion-slider">
 		<li><a href="workspace"><img src="{{ STATIC_PREFIX }}images/slide-1.jpg"/></a><span>Visit <a href="workspace" title="workspace">Workspace</a> page to give it a try.</span></li>
@@ -41,8 +43,37 @@
 		<li><a href="http://gaggle.systemsbiology.net"><img src="{{ STATIC_PREFIX }}images/slide-3.jpg"/></a><span>Make sure to check out <a href="http://gaggle.systemsbiology.net">Gaggle Website</a> for the latest updates.</span></li>
 	</ul>
 </div>
-
+-->
 <h5> Organisms </h5>
+<table id="species" class="display" style="width:100%">
+  <thead>
+    <tr><th>EGRIN Model</th><th>EGRIN2 Model</th><th>Species</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><a href="http://networks.systemsbiology.net/eco/network/1">Explore</a></td><td><a target="_blank" href="http://egrin2.systemsbiology.net/species/511145">Explore</a></td><td>Escherichia coli K12</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/hal/network/1">Explore</a></td><td><a target="_blank" href="http://egrin2.systemsbiology.net/species/64091">Explore</a></td><td>Halobacterium salinarum NRC-1</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/mtb/">Explore</a></td><td><a target="_blank" href="http://mtb.egrin2.systemsbiology.net/">Explore</a></td><td>Mycobacterium tuberculosis H37Rv</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/bce/network/1">Explore</a></td><td>&nbsp;</td><td>Bacillus cereus ATCC14579</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/bsu/network/1">Explore</a></td><td>&nbsp;</td><td>Bacillus subtilis</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/bth/network/1">Explore</a></td><td>&nbsp;</td><td>Bacteroides thetaiotaomicron VPI-5482</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/cac/network/1">Explore</a></td><td>&nbsp;</td><td>Clostridium acetobutylicum</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/cje/network/1">Explore</a></td><td>&nbsp;</td><td>Campylobacter jejuni</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/syntrophy/modules-table?field_organism_tid=20650">Explore</a></td><td>&nbsp;</td><td>Desulfovibrio vulgaris Hildenborough</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/gsu/network/1">Explore</a></td><td>&nbsp;</td><td>Geobacter sulfurreducens</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/syntrophy/modules-table?field_organism_tid=28569">Explore</a></td><td>&nbsp;</td><td>Methanococcus maripaludis S2</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/pae/network/1">Explore</a></td><td>&nbsp;</td><td>Pseudomonas aeruginosa</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/rsp/network/1">Explore</a></td><td>&nbsp;</td><td>Rhodobacter sphaeroides 2.4.1</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/syf/network/1">Explore</a></td><td>&nbsp;</td><td>Synechococcus elongatus PCC 7942</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/cmnr/biclusters?field_organism_tid=56599">Explore</a></td><td>&nbsp;</td><td>Corynebacterium glutamicum ATCC 13032</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/cmnr/biclusters?field_organism_tid=31915">Explore</a></td><td>&nbsp;</td><td>Mycobacterium smegmatis (strain ATCC 700084 / mc(2)155)</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/cdiff-portal">Explore</a></td><td>&nbsp;</td><td>Clostridioides difficile</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/diatom-portal/transcripts">Explore</a></td><td>&nbsp;</td><td>Thalassiosira pseudonana</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/diatom-portal/phatr/genes">Explore</a></td><td>&nbsp;</td><td>Phaeodactylum tricornutum</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/chlamy-portal/">Explore</a></td><td>&nbsp;</td><td>Chlamydomonas reinhardtii</td></tr>
+    <tr><td><a href="http://networks.systemsbiology.net/syntrophy/modules-table?field_organism_tid=11712">Explore</a></td><td>&nbsp;</td><td>Methylobacterium extorquens AM1</td></tr>
+  </tbody>
+</table>
+<!--
 <span class="search_help">(Click on organism name to access related resources)</span>
 <div style="text-align:center; width:412px; margin-left:auto; margin-right:auto;">
 
@@ -54,6 +85,7 @@
 {% endfor %}
 </map>
 </div>
+-->
 
 {% for dialog in dialogs %}
 <div class="simple_overlay" id="overlay{{ forloop.counter }}">
@@ -162,9 +194,11 @@
 
 </div><!-- end #sidebar -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-tools/1.2.7/jquery.tools.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script>
   $(document).ready(function() {
       $("area[rel]").overlay();
+      $('#species').DataTable({"paging": false, "ordering": false, "info": false, "searching": false});
     });
 </script>
 <script type='text/javascript' src='{{STATIC_PREFIX}}javascripts/jquery.kwicks-1.5.1.pack.js'></script>

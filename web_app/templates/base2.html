@@ -63,12 +63,14 @@
      <p id="slogan"> <a href="http://www.systemsbiology.org"><img alt="Logo" src="{{ STATIC_PREFIX }}images/isb_logo.png"></a></p>    
      <div id="underlinemenu" class="underlinemenu">
 	<ul>
+          <!--
 	  {% if request.user.is_authenticated %}
 	  <li><a href="{% url 'logout' %}" title="Click to logout">{{ request.user.email }}</a></li>
       <li><a href="{% url 'workspace' %}" title="Go to My workspace">My Workspace</a></li>
 	  {% else %}
 	  <li><a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login</a></li>
 	  {% endif %}
+          -->
 	  <li><a href="{% url 'about' %}">About</a></li>
 	  <li><a href="{% url 'contact' %}">Contact</a></li>
 	  <li><a href="{{ STATIC_PREFIX }}apidocuments">API</a></li>
@@ -80,7 +82,9 @@
           <li class="{% active request "^/$" %}"><a href="/">Home</a></li>
           <li class="{% active request "^/search" %}"><a href="/search">Search</a></li>
           <li class="{% active request "^/species" %}"><a href="/species">Species</a></li>
+          <!--
           <li class="{% active request "^/workspace" %}"><a href="/workspace">Workspace</a></li>
+          -->
 	        {% if request.user.is_staff %}
           <li class="{% active request "^/nwpadmin" %}"><a href="/nwpadmin">Administration</a></li>
           {% endif %}
