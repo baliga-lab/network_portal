@@ -87,9 +87,8 @@
 		<li><a class="motif" href="#tab-motif">Motifs</a></li>
 		<li><a class="function" href="#tab-function">Functions</a></li>
 		<li><a class="genes" href="#tab-gene">Genes</a></li>
-		{# <li><a class="cart" href="#tab-add-cart">Add to Cart</a></li> #}
 		<li><a class="module-help" href="#tab-help">Help</a></li>
-		<li><a class="social" href="#tab-social">Social</a></li>
+	       
       </ul>
 	  
       <div id="tab-main">
@@ -189,41 +188,6 @@
 	  
       <div id="tab-gene" class="sub-page">
 	{% include 'bicl_gene_snippet.html' %}
-      </div>
-	  
-      <!--
-      <div id="tab-add-cart">
-	add cart tab <br />
-	...TO BE DONE...
-      </div>
-      -->
-      <div id="tab-social" class="sub-page">
-      <a class="help" href="#help-social"><img align="right" src="/static/images/help.png" /></a>
-	  <h5> Comments for Module {{ bicluster.k }}</h5><br>
-	  Please add your comments for this module by using the form below. Your comments will be publicly available.</p>
-		<div id="disqus_thread" class="main"></div> <!-- Commenting from Disqus-->
-			<script type="text/javascript">
-			/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-				var disqus_shortname = 'thenetworkportal'; // required: replace example with your forum shortname
-
-			/* * * DON'T EDIT BELOW THIS LINE * * */
-				(function() {
-				var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-				dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-				(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-			})();
-		</script>
-		<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-		<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-    <!-- Commenting from Disqus-->
-    <div style="display:none">
-		<div id='help-social' class="help" style='padding:10px; background:#fff; text-align:left;'>
-    <h5>Social Help</h5>
-		<p>You can start a conversation about this module or join the existing discussion by adding your comments. In order to be able to add your comments you need to sign in by using any of the following services;Disqus, Google, Facebook or Twitter. For full compatibility with other network portal features, we recommend using your Google ID.</p>   
-    	</div>
- 	</div>
-
-    
       </div>
 	  
       <div id="tab-help" class="sub-page">
