@@ -7,14 +7,46 @@
 // is loaded rather than on tab activation like in the gene view
 var django_pssm = {{ pssm_logo_dict }};
 $(document).ready(function() {
+  nwhelpers.initCanvas(django_pssm);
+/*
 var vis = nwhelpers.initBiclusterNetworkTab({{ bicluster.id }},
   "{{ STATIC_PREFIX }}cytoscapeweb/swf/CytoscapeWeb",
   "{{ STATIC_PREFIX }}cytoscapeweb/swf/playerProductInstall",
-  nwhelpers.load_popup);
-nwhelpers.initCanvas(django_pssm);
+  nwhelpers.load_popup); */
+  // TODO: initialize Cytoscape.js on id "#cytoscapeweb"
+  // on the current bicluster.id
+  console.log('making cytoscape');
+  var cy = cytoscape({
+    container: document.getElementById('cytoscapeweb'),
+    elements: [ { data: { id: 'a' } }, { data: { id: 'b' } }, { data: { id: 'ab', source: 'a', target: 'b' } } ],
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'background-color': '#666',
+          'label': 'data(id)'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'width': 3,
+          'line-color': '#ccc',
+          'target-arrow-color': '#ccc',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'bezier'
+        }
+      }
+    ],
+    layout: {
+      name: 'dagre'
+    }
+  });
+  //cy.center();
+  console.log('making cytoscape - done');
 });
 </script>
-<div id="cytoscapeweb">Cytoscape Web</div>
+<div id="cytoscapeweb"></div>
 <div id="pop_up"></div>
 <div style="display:none">
 	<div id='help-network' class="help" style='padding:10px; background:#fff; text-align:left;'>
