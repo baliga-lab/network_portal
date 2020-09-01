@@ -18,7 +18,8 @@ var vis = nwhelpers.initBiclusterNetworkTab({{ bicluster.id }},
   console.log('making cytoscape');
   var cy = cytoscape({
     container: document.getElementById('cytoscapeweb'),
-    elements: [ { data: { id: 'a' } }, { data: { id: 'b' } }, { data: { id: 'ab', source: 'a', target: 'b' } } ],
+    //elements: [ { data: { id: 'a' } }, { data: { id: 'b' } }, { data: { id: 'ab', source: 'a', target: 'b' } } ],
+    elements: {{cy_elements|safe}},
     style: [
       {
         selector: 'node',
@@ -36,6 +37,18 @@ var vis = nwhelpers.initBiclusterNetworkTab({{ bicluster.id }},
           'target-arrow-shape': 'triangle',
           'curve-style': 'bezier'
         }
+      },
+      {
+        selector: '.bicluster',
+        style: { 'background-color': 'red', 'shape': 'square'}
+      },
+      {
+        selector: '.tf',
+        style: {'background-color': 'pink', 'shape': 'triangle'}
+      },
+      {
+        selector: '.gene',
+        style: {'background-color': 'green', 'shape': 'circle'}
       }
     ],
     layout: {

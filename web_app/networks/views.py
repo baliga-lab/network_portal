@@ -8,7 +8,7 @@ import collections
 import logging
 
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
@@ -17,7 +17,7 @@ from django.db.models import Q
 import networkx as nx
 from .models import *
 from .functions import functional_systems
-from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters
+from .helpers import nice_string, get_influence_biclusters, get_nx_graph_for_biclusters, get_cy_graph_for_biclusters
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +153,18 @@ def network_as_graphml(request):
     writer.add_graph_element(graph)
     response = HttpResponse(content_type='application/xml')
     writer.dump(response)
+    return response
+
+def network_as_cytoscape(request):
+    # use 
+    if request.GET.has_key('biclusters'):
+        bicluster_nums = re.split( r'[\s,;]+', request.GET['biclusters'] )
+        biclusters = Bicluster.objects.filter(id__in=bicluster_nums)
+    elif request.GET.has_key('gene'):
+        biclusters = Bicluster.objects.filter(genes__name=request.GET['gene'])
+    nodes, edges = get_cy_graph_for_biclusters(biclusters)
+    nodes.extend(edges)
+    response = JsonResponse({"elements": nodes})
     return response
 
 
@@ -322,6 +334,13 @@ def bicluster(request, species=None, network_num=None, bicluster_num=None):
 
     bicluster = Bicluster.objects.filter(network__species__short_name=species,
                                          k=bicluster_num)[0]
+
+
+    biclusters = Bicluster.objects.filter(id__in=[bicluster.id])
+    nodes, edges = get_cy_graph_for_biclusters(biclusters)
+    nodes.extend(edges)
+    cy_elements = json.dumps(nodes)
+
     expressions = bicluster.expressions()
     expressionmatrix = expression_matrix(bicluster.conditions.all())
     expressionmatrixstring = expression_matrix_to_tsv(expressionmatrix)

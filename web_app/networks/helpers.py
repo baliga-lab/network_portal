@@ -115,3 +115,38 @@ def get_nx_graph_for_biclusters(biclusters, expand=False):
             graph.add_edge("bicluster:%d" %(bicluster.id,), "motif:%d" % (motif.id,))
     
     return graph
+
+def get_cy_graph_for_biclusters(biclusters):
+  genes = set()
+  influences = set()  # regulators
+  nodes = []
+  edges = []
+  for b in biclusters:
+    genes.update(b.genes.all())
+    influences.update(b.influences.all())
+
+  # add all unique genes as nodes
+  for gene in genes:
+    nodes.append({"classes": "gene", "data": { "id": gene.display_name() }})
+
+  # add all unique influences as nodes
+  for influence in influences:
+    nodes.append({"classes": "tf", "data": { "id": influence.name }})
+
+  edge_num = 0
+  for b in biclusters:
+    bc_id = "bicluster:%d" % b.id
+    nodes.append({"classes": "bicluster", "data": { "id": bc_id }})
+    for gene in b.genes.all():
+      edges.append({ "data": {"id": "e%d" % edge_num, "source": bc_id,
+                              "target": gene.display_name()}})
+      edge_num = edge_num + 1
+
+    for influence in b.influences.all():
+      edges.append({"data": {"id": "e%d" % edge_num, "source": bc_id,
+                             "target": influence.name}})
+      edge_num = edge_num + 1
+
+  return nodes, edges
+
+

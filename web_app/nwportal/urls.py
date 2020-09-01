@@ -82,6 +82,7 @@ urlpatterns = patterns(
 
     url(r'^networks/$', 'networks.views.networks', name='networks'),
     url(r'^network/graphml', 'networks.views.network_as_graphml', name='network'),
+    url(r'^network/cytoscapejs', 'networks.views.network_as_cytoscape', name='network_cytoscape'),
     url(r'^network/(?P<network_id>\d+)/regulated_by/(?P<regulator>.*)$', 'networks.views.regulated_by', name='regulated by'),
     url(r'^network/(?P<network_id>\d+)/gene/(?P<gene>.*)$', 'networks.views.gene', name='network_gene'),
     url(r'^network_by_id/(?P<network_id>\d+)$', 'networks.views.network_by_id',
